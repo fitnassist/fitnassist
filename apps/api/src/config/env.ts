@@ -1,0 +1,45 @@
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  PORT: z.string().default('3001'),
+  DATABASE_URL: z.string(),
+
+  // Auth
+  BETTER_AUTH_SECRET: z.string(),
+  BETTER_AUTH_URL: z.string().default('http://localhost:3001'),
+
+  // Email (Resend)
+  RESEND_API_KEY: z.string().optional(),
+  FROM_EMAIL: z.string().default('onboarding@resend.dev'),
+  SUPPORT_EMAIL: z.string().default('support@fitnassist.com'),
+
+  // Frontend
+  FRONTEND_URL: z.string().default('http://localhost:3000'),
+
+  // Google Maps
+  GOOGLE_MAPS_API_KEY: z.string().optional(),
+
+  // Cloudinary
+  CLOUDINARY_CLOUD_NAME: z.string().optional(),
+  CLOUDINARY_API_KEY: z.string().optional(),
+  CLOUDINARY_API_SECRET: z.string().optional(),
+
+  // USDA FoodData Central (free key from https://api.data.gov/signup/)
+  USDA_API_KEY: z.string().optional(),
+});
+
+export type Env = z.infer<typeof envSchema>;
+
+function loadEnv(): Env {
+  const result = envSchema.safeParse(process.env);
+
+  if (!result.success) {
+    console.error('Invalid environment variables:', result.error.flatten().fieldErrors);
+    throw new Error('Invalid environment variables');
+  }
+
+  return result.data;
+}
+
+export const env = loadEnv();

@@ -1,0 +1,1042 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider                         = "zod-prisma-types"
+  output                           = "../src/generated/zod"
+  createInputTypes                 = false
+  createModelTypes                 = true
+  addInputTypeValidation           = false
+  addIncludeType                   = false
+  addSelectType                    = false
+  validateWhereUniqueInput         = false
+  createOptionalDefaultValuesTypes = true
+  createRelationValuesTypes        = false
+  useMultipleFiles                 = true
+  writeBarrelFiles                 = true
+  prismaClientPath                 = "@prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================================
+// ENUMS
+// =============================================================================
+
+enum UserRole {
+  TRAINEE
+  TRAINER
+  GYM
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  BASIC
+  PRO
+}
+
+enum TravelOption {
+  CLIENT_TRAVELS
+  TRAINER_TRAVELS
+  BOTH
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  NON_BINARY
+  PREFER_NOT_TO_SAY
+}
+
+enum UnitPreference {
+  METRIC
+  IMPERIAL
+}
+
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LIGHTLY_ACTIVE
+  MODERATELY_ACTIVE
+  VERY_ACTIVE
+  EXTREMELY_ACTIVE
+}
+
+enum ContactRequestType {
+  CALLBACK_REQUEST
+  CONNECTION_REQUEST
+}
+
+enum ContactRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  RESPONDED
+  CLOSED
+}
+
+// =============================================================================
+// USER & AUTH
+// =============================================================================
+
+model User {
+  id            String    @id @default(cuid())
+  /// @zod.string.min(2, { message: "Name must be at least 2 characters" })
+  name          String
+  /// @zod.string.email({ message: "Please enter a valid email address" })
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          UserRole  @default(TRAINEE)
+  lastActiveAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Notification Preferences - Email
+  emailNotifyConnectionRequests Boolean @default(true)
+  emailNotifyMessages           Boolean @default(true)
+  emailNotifyMarketing          Boolean @default(false)
+
+  // Notification Preferences - SMS (default OFF - costs money)
+  smsNotifyConnectionRequests   Boolean @default(false)
+  smsNotifyMessages             Boolean @default(false)
+
+  // Notification Preferences - Push (for future mobile app)
+  pushNotifyConnectionRequests  Boolean @default(true)
+  pushNotifyMessages            Boolean @default(true)
+
+  // Relations
+  trainerProfile   TrainerProfile?
+  traineeProfile   TraineeProfile?
+  contactsSent     ContactRequest[] @relation("ContactSender")
+  sessions         Session[]
+  accounts         Account[]
+  sentMessages     Message[]
+  conversationPreferences ConversationPreference[]
+  diaryEntries   DiaryEntry[]
+  diaryComments  DiaryComment[]
+  goals          Goal[]       @relation("goalUser")
+  createdGoals   Goal[]       @relation("goalCreator")
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Better Auth fields
+  ipAddress String?
+  userAgent String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  accountId         String
+  providerId        String
+  accessToken       String?
+  refreshToken      String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  idToken           String?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+// =============================================================================
+// TRAINER
+// =============================================================================
+
+model TrainerProfile {
+  id               String           @id @default(cuid())
+  userId           String           @unique
+  /// @zod.string.min(3, { message: "Handle must be at least 3 characters" }).max(30, { message: "Handle must be at most 30 characters" }).regex(/^[a-z0-9-]+$/, { message: "Handle can only contain lowercase letters, numbers, and hyphens" })
+  handle           String           @unique
+
+  // Profile info
+  /// @zod.string.min(2, { message: "Display name must be at least 2 characters" }).max(100)
+  displayName      String
+  /// @zod.string.max(2000, { message: "Bio must be at most 2000 characters" })
+  bio              String?
+  qualifications   String[]
+  services         String[]
+
+  // Images
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  profileImageUrl  String?
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  coverImageUrl    String?
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  videoIntroUrl    String?
+
+  // Location - structured address fields
+  /// @zod.string.max(100)
+  addressLine1     String?   // e.g., "123 High Street"
+  /// @zod.string.max(100)
+  addressLine2     String?   // e.g., "Flat 4" or "Building Name"
+  /// @zod.string.max(100)
+  city             String?
+  /// @zod.string.max(50)
+  county           String?
+  /// @zod.string.max(20)
+  postcode         String?
+  /// @zod.string.max(2)
+  country          String?   @default("GB")
+  /// Google Place ID for the address (for future reference)
+  placeId          String?
+  /// @zod.number.min(-90).max(90)
+  latitude         Float?
+  /// @zod.number.min(-180).max(180)
+  longitude        Float?
+
+  // Contact
+  /// @zod.string.email({ message: "Please enter a valid email address" })
+  contactEmail     String?
+  /// @zod.string.regex(/^\+?[0-9\s\-\(\)]{10,20}$/, { message: "Please enter a valid phone number" })
+  phoneNumber      String?
+  socialLinks      Json?
+
+  // Pricing
+  /// @zod.number.int().min(0, { message: "Rate must be a positive number" })
+  hourlyRateMin    Int?             // Minimum hourly rate in pence (e.g., 2500 = £25)
+  /// @zod.number.int().min(0, { message: "Rate must be a positive number" })
+  hourlyRateMax    Int?             // Maximum hourly rate in pence (e.g., 5000 = £50)
+
+  // Settings
+  travelOption     TravelOption     @default(CLIENT_TRAVELS)
+  subscriptionTier SubscriptionTier @default(FREE)
+  acceptingClients Boolean          @default(true)
+  isPublished      Boolean          @default(false)
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Relations
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contactRequests  ContactRequest[]
+  profileViews     ProfileView[]
+  galleryImages    GalleryImage[]
+  clientRoster     ClientRoster[]
+  onboardingTemplates OnboardingTemplate[]
+  exercises        Exercise[]
+  recipes          Recipe[]
+  workoutPlans     WorkoutPlan[]
+  mealPlans        MealPlan[]
+
+  @@index([latitude, longitude])
+  @@index([city])
+  @@index([postcode])
+  @@index([acceptingClients])
+  @@index([hourlyRateMin])
+  @@index([hourlyRateMax])
+  @@map("trainer_profiles")
+}
+
+model GalleryImage {
+  id        String         @id @default(cuid())
+  trainerId String
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  url       String
+  sortOrder Int            @default(0)
+  createdAt DateTime       @default(now())
+
+  trainer   TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@index([trainerId])
+  @@map("gallery_images")
+}
+
+// =============================================================================
+// RESOURCES
+// =============================================================================
+
+enum MuscleGroup {
+  CHEST
+  BACK
+  SHOULDERS
+  BICEPS
+  TRICEPS
+  FOREARMS
+  ABS
+  OBLIQUES
+  QUADS
+  HAMSTRINGS
+  GLUTES
+  CALVES
+  FULL_BODY
+  CARDIO
+}
+
+model Exercise {
+  id             String          @id @default(cuid())
+  trainerId      String
+
+  /// @zod.string.min(2, { message: "Name must be at least 2 characters" }).max(100)
+  name           String
+  /// @zod.string.max(2000, { message: "Description must be at most 2000 characters" })
+  description    String?         @db.Text
+  /// @zod.string.max(500, { message: "Instructions must be at most 500 characters" })
+  instructions   String?         @db.Text
+
+  // Media — link OR upload (not mutually exclusive)
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  videoUrl       String?         // External link (YouTube, Vimeo, any URL)
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  videoUploadUrl String?         // Uploaded video via Cloudinary
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  thumbnailUrl   String?         // Uploaded thumbnail or auto-generated
+
+  // Categorisation
+  muscleGroups   MuscleGroup[]
+  equipment      String[]
+  difficulty     ExperienceLevel?
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // Relations
+  trainer        TrainerProfile  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  workoutExercises WorkoutExercise[]
+
+  @@index([trainerId])
+  @@map("exercises")
+}
+
+model Recipe {
+  id             String          @id @default(cuid())
+  trainerId      String
+
+  /// @zod.string.min(2, { message: "Name must be at least 2 characters" }).max(100)
+  name           String
+  /// @zod.string.max(2000, { message: "Description must be at most 2000 characters" })
+  description    String?         @db.Text
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  imageUrl       String?
+
+  // Ingredients stored as JSON array: [{name, quantity, unit}]
+  ingredients    Json            @default("[]")
+  /// @zod.string.min(1, { message: "Instructions are required" }).max(5000, { message: "Instructions must be at most 5000 characters" })
+  instructions   String          @db.Text
+
+  // Nutrition (per serving)
+  /// @zod.number.int().min(0)
+  calories       Int?
+  /// @zod.number.min(0)
+  proteinG       Float?
+  /// @zod.number.min(0)
+  carbsG         Float?
+  /// @zod.number.min(0)
+  fatG           Float?
+
+  // Timing
+  /// @zod.number.int().min(0)
+  prepTimeMin    Int?
+  /// @zod.number.int().min(0)
+  cookTimeMin    Int?
+  /// @zod.number.int().min(1)
+  servings       Int?
+
+  tags           String[]
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // Relations
+  trainer        TrainerProfile  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  mealPlanRecipes MealPlanRecipe[]
+
+  @@index([trainerId])
+  @@map("recipes")
+}
+
+model WorkoutPlan {
+  id             String          @id @default(cuid())
+  trainerId      String
+
+  /// @zod.string.min(2, { message: "Name must be at least 2 characters" }).max(100)
+  name           String
+  /// @zod.string.max(2000, { message: "Description must be at most 2000 characters" })
+  description    String?         @db.Text
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // Relations
+  trainer        TrainerProfile  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  exercises      WorkoutExercise[]
+  clientAssignments ClientWorkoutPlanAssignment[]
+  workoutLogs    WorkoutLogEntry[]
+
+  @@index([trainerId])
+  @@map("workout_plans")
+}
+
+model WorkoutExercise {
+  id             String       @id @default(cuid())
+  workoutPlanId  String
+  exerciseId     String
+
+  /// @zod.number.int().min(1)
+  sets           Int?
+  /// @zod.string.max(50)
+  reps           String?      // "8-12" or "to failure"
+  /// @zod.number.int().min(0)
+  restSeconds    Int?
+  sortOrder      Int          @default(0)
+  /// @zod.string.max(500)
+  notes          String?
+
+  // Relations
+  workoutPlan    WorkoutPlan  @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  exercise       Exercise     @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([workoutPlanId])
+  @@map("workout_exercises")
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+}
+
+model MealPlan {
+  id             String          @id @default(cuid())
+  trainerId      String
+
+  /// @zod.string.min(2, { message: "Name must be at least 2 characters" }).max(100)
+  name           String
+  /// @zod.string.max(2000, { message: "Description must be at most 2000 characters" })
+  description    String?         @db.Text
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  // Relations
+  trainer        TrainerProfile  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  recipes        MealPlanRecipe[]
+  clientAssignments ClientMealPlanAssignment[]
+
+  @@index([trainerId])
+  @@map("meal_plans")
+}
+
+model MealPlanRecipe {
+  id             String     @id @default(cuid())
+  mealPlanId     String
+  recipeId       String
+
+  dayOfWeek      Int?       // 0=Monday, 6=Sunday
+  mealType       MealType?
+  sortOrder      Int        @default(0)
+
+  // Relations
+  mealPlan       MealPlan   @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  recipe         Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([mealPlanId])
+  @@map("meal_plan_recipes")
+}
+
+// =============================================================================
+// CLIENT ROSTER
+// =============================================================================
+
+enum ClientStatus {
+  ONBOARDING
+  ACTIVE
+  INACTIVE
+  ON_HOLD
+  DISCONNECTED
+}
+
+enum OnboardingStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+model ClientRoster {
+  id             String        @id @default(cuid())
+  trainerId      String
+  connectionId   String        @unique
+
+  // Client status
+  status         ClientStatus  @default(ACTIVE)
+
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  trainer        TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  connection     ContactRequest @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  workoutPlanAssignments ClientWorkoutPlanAssignment[]
+  mealPlanAssignments    ClientMealPlanAssignment[]
+  onboardingResponses    OnboardingResponse[]
+  clientNotes    ClientNote[]
+
+  @@unique([trainerId, connectionId])
+  @@index([trainerId])
+  @@index([status])
+  @@map("client_roster")
+}
+
+model ClientNote {
+  id             String       @id @default(cuid())
+  clientRosterId String
+  /// @zod.string.min(1, { message: "Note cannot be empty" }).max(2000, { message: "Note must be at most 2000 characters" })
+  content        String       @db.Text
+  createdAt      DateTime     @default(now())
+
+  clientRoster   ClientRoster @relation(fields: [clientRosterId], references: [id], onDelete: Cascade)
+
+  @@index([clientRosterId])
+  @@map("client_notes")
+}
+
+model ClientWorkoutPlanAssignment {
+  id             String        @id @default(cuid())
+  clientRosterId String
+  workoutPlanId  String
+  assignedAt     DateTime      @default(now())
+
+  clientRoster   ClientRoster  @relation(fields: [clientRosterId], references: [id], onDelete: Cascade)
+  workoutPlan    WorkoutPlan   @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+
+  @@unique([clientRosterId, workoutPlanId])
+  @@index([clientRosterId])
+  @@map("client_workout_plan_assignments")
+}
+
+model ClientMealPlanAssignment {
+  id             String        @id @default(cuid())
+  clientRosterId String
+  mealPlanId     String
+  assignedAt     DateTime      @default(now())
+
+  clientRoster   ClientRoster  @relation(fields: [clientRosterId], references: [id], onDelete: Cascade)
+  mealPlan       MealPlan      @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+
+  @@unique([clientRosterId, mealPlanId])
+  @@index([clientRosterId])
+  @@map("client_meal_plan_assignments")
+}
+
+// =============================================================================
+// TRAINEE
+// =============================================================================
+
+model TraineeProfile {
+  id               String           @id @default(cuid())
+  userId           String           @unique
+
+  // Personal info
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  avatarUrl        String?
+  /// @zod.string.max(2000, { message: "Bio must be at most 2000 characters" })
+  bio              String?
+  dateOfBirth      DateTime?
+  gender           Gender?
+
+  // Body metrics (stored in metric units)
+  /// @zod.number.min(50).max(300)
+  heightCm         Float?
+  /// @zod.number.min(20).max(500)
+  startWeightKg    Float?            @map("currentWeightKg")
+  /// @zod.number.min(20).max(500)
+  goalWeightKg     Float?
+  unitPreference   UnitPreference   @default(METRIC)
+
+  // Fitness info
+  experienceLevel  ExperienceLevel?
+  activityLevel    ActivityLevel?
+  fitnessGoals     String[]
+  /// @zod.string.max(2000, { message: "Fitness goal notes must be at most 2000 characters" })
+  fitnessGoalNotes String?
+  /// @zod.string.max(2000, { message: "Medical notes must be at most 2000 characters" })
+  medicalNotes     String?
+
+  // Weight goal (kg per week: negative = lose, positive = gain, 0 = maintain)
+  /// @zod.number.min(-1).max(0.5)
+  weeklyWeightGoalKg  Float?
+
+  // Daily targets (null = auto-calculated from TDEE + weight goal)
+  /// @zod.number.int().min(0)
+  dailyCalorieTarget  Int?
+  /// @zod.number.min(0)
+  dailyProteinTargetG Float?
+  /// @zod.number.min(0)
+  dailyCarbsTargetG   Float?
+  /// @zod.number.min(0)
+  dailyFatTargetG     Float?
+  /// @zod.number.int().min(0)
+  dailyWaterTargetMl  Int?
+
+  // Other
+  /// @zod.string.max(200)
+  location         String?
+  isPublic         Boolean          @default(false)
+
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Relations
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("trainee_profiles")
+}
+
+// =============================================================================
+// CONTACT REQUESTS
+// =============================================================================
+
+model ContactRequest {
+  id          String               @id @default(cuid())
+  trainerId   String
+  senderId    String?
+  type        ContactRequestType
+
+  // Contact form fields
+  /// @zod.string.min(2, { message: "Name must be at least 2 characters" }).max(100)
+  name        String
+  /// @zod.string.email({ message: "Please enter a valid email address" })
+  email       String
+  /// @zod.string.min(10, { message: "Please enter a valid phone number" }).max(20)
+  phone       String?
+  /// @zod.string.max(2000, { message: "Message must be at most 2000 characters" })
+  message     String?
+
+  status      ContactRequestStatus @default(PENDING)
+  respondedAt DateTime?
+
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  // Relations
+  trainer     TrainerProfile       @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  sender      User?                @relation("ContactSender", fields: [senderId], references: [id], onDelete: SetNull)
+  messages    Message[]
+  clientRoster ClientRoster?
+  conversationPreferences ConversationPreference[]
+
+  @@index([trainerId])
+  @@index([senderId])
+  @@map("contact_requests")
+}
+
+// =============================================================================
+// MESSAGING
+// =============================================================================
+
+model Message {
+  id           String    @id @default(cuid())
+  connectionId String
+  senderId     String
+  /// @zod.string.min(1, { message: "Message cannot be empty" }).max(5000, { message: "Message must be at most 5000 characters" })
+  content      String    @db.Text
+  isRead       Boolean   @default(false)
+  readAt       DateTime?
+  createdAt    DateTime  @default(now())
+
+  // Relations
+  connection   ContactRequest @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  sender       User           @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([connectionId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model ConversationPreference {
+  id           String         @id @default(cuid())
+  connectionId String
+  userId       String
+  isArchived   Boolean        @default(false)
+  deletedAt    DateTime?
+
+  connection   ContactRequest @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([connectionId, userId])
+  @@index([userId])
+  @@map("conversation_preferences")
+}
+
+// =============================================================================
+// ONBOARDING
+// =============================================================================
+
+model OnboardingTemplate {
+  id         String  @id @default(cuid())
+  trainerId  String
+
+  /// @zod.string.min(2, { message: "Name must be at least 2 characters" }).max(100)
+  name       String
+  /// Questions JSON: [{ id, type, label, required, options? }]
+  questions  Json
+  /// @zod.string.max(10000, { message: "Waiver text must be at most 10000 characters" })
+  waiverText String? @db.Text
+  isActive   Boolean @default(false)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  trainer    TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  responses  OnboardingResponse[]
+
+  @@index([trainerId])
+  @@map("onboarding_templates")
+}
+
+model OnboardingResponse {
+  id              String           @id @default(cuid())
+  templateId      String
+  clientRosterId  String
+
+  /// Answers JSON: [{ questionId, answer }]
+  answers         Json?
+  waiverSigned    Boolean          @default(false)
+  waiverSignedAt  DateTime?
+  /// @zod.string.max(200, { message: "Name must be at most 200 characters" })
+  waiverSignedName String?
+  status          OnboardingStatus @default(PENDING)
+  completedAt     DateTime?
+  reviewedAt      DateTime?
+  /// @zod.string.max(2000, { message: "Review notes must be at most 2000 characters" })
+  reviewNotes     String?          @db.Text
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relations
+  template        OnboardingTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  clientRoster    ClientRoster       @relation(fields: [clientRosterId], references: [id], onDelete: Cascade)
+
+  @@unique([clientRosterId, templateId])
+  @@index([clientRosterId])
+  @@index([templateId])
+  @@index([status])
+  @@map("onboarding_responses")
+}
+
+// =============================================================================
+// DIARY & PROGRESS TRACKING
+// =============================================================================
+
+enum DiaryEntryType {
+  WEIGHT
+  WATER
+  MEASUREMENT
+  MOOD
+  SLEEP
+  FOOD
+  WORKOUT_LOG
+  PROGRESS_PHOTO
+  STEPS
+}
+
+enum MoodLevel {
+  TERRIBLE
+  BAD
+  OKAY
+  GOOD
+  GREAT
+}
+
+model DiaryEntry {
+  id             String         @id @default(cuid())
+  userId         String
+  type           DiaryEntryType
+  date           DateTime       @db.Date
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weightEntry      WeightEntry?
+  waterEntry       WaterEntry?
+  measurementEntry MeasurementEntry?
+  moodEntry        MoodEntry?
+  sleepEntry       SleepEntry?
+  foodEntries      FoodEntry[]
+  workoutLogEntry  WorkoutLogEntry?
+  stepsEntry       StepsEntry?
+  progressPhotos   ProgressPhoto[]
+  comments         DiaryComment[]
+
+  @@index([userId, date])
+  @@index([userId, type])
+  @@map("diary_entries")
+}
+
+model WeightEntry {
+  id           String     @id @default(cuid())
+  diaryEntryId String     @unique
+  /// @zod.number.positive({ message: "Weight must be a positive number" })
+  weightKg     Float
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@map("weight_entries")
+}
+
+model WaterEntry {
+  id           String     @id @default(cuid())
+  diaryEntryId String     @unique
+  /// @zod.number.int().min(0, { message: "Water intake cannot be negative" })
+  totalMl      Int
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@map("water_entries")
+}
+
+model MeasurementEntry {
+  id           String     @id @default(cuid())
+  diaryEntryId String     @unique
+  /// @zod.number.min(0)
+  chestCm      Float?
+  /// @zod.number.min(0)
+  waistCm      Float?
+  /// @zod.number.min(0)
+  hipsCm       Float?
+  /// @zod.number.min(0)
+  bicepCm      Float?
+  /// @zod.number.min(0)
+  thighCm      Float?
+  /// @zod.number.min(0)
+  calfCm       Float?
+  /// @zod.number.min(0)
+  neckCm       Float?
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@map("measurement_entries")
+}
+
+model MoodEntry {
+  id           String     @id @default(cuid())
+  diaryEntryId String     @unique
+  level        MoodLevel
+  /// @zod.string.max(500, { message: "Notes must be at most 500 characters" })
+  notes        String?
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@map("mood_entries")
+}
+
+model SleepEntry {
+  id           String     @id @default(cuid())
+  diaryEntryId String     @unique
+  /// @zod.number.min(0, { message: "Hours slept cannot be negative" }).max(24, { message: "Hours slept cannot exceed 24" })
+  hoursSlept   Float
+  /// @zod.number.int().min(1, { message: "Quality must be at least 1" }).max(5, { message: "Quality must be at most 5" })
+  quality      Int
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@map("sleep_entries")
+}
+
+model FoodEntry {
+  id           String     @id @default(cuid())
+  diaryEntryId String
+  /// @zod.string.min(1, { message: "Food name is required" })
+  name         String
+  mealType     MealType
+  /// @zod.number.int().min(0, { message: "Calories cannot be negative" })
+  calories     Int
+  /// @zod.number.min(0)
+  proteinG     Float?
+  /// @zod.number.min(0)
+  carbsG       Float?
+  /// @zod.number.min(0)
+  fatG         Float?
+  /// @zod.number.min(0)
+  fibreG       Float?
+  /// @zod.number.positive({ message: "Serving size must be positive" })
+  servingSize  Float      @default(1)
+  servingUnit  String     @default("serving")
+
+  // Nutritionix reference for future lookup
+  externalId   String?
+  thumbnailUrl String?
+
+  createdAt    DateTime   @default(now())
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@index([diaryEntryId])
+  @@map("food_entries")
+}
+
+model WorkoutLogEntry {
+  id              String       @id @default(cuid())
+  diaryEntryId    String       @unique
+  workoutPlanId   String?
+  workoutPlanName String?
+  /// @zod.number.int().min(1, { message: "Duration must be at least 1 minute" })
+  durationMinutes Int
+  /// @zod.number.int().min(0, { message: "Calories burned cannot be negative" })
+  caloriesBurned  Int?
+  /// @zod.string.max(500, { message: "Notes must be at most 500 characters" })
+  notes           String?
+
+  diaryEntry      DiaryEntry   @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  workoutPlan     WorkoutPlan? @relation(fields: [workoutPlanId], references: [id], onDelete: SetNull)
+  @@map("workout_log_entries")
+}
+
+model StepsEntry {
+  id           String     @id @default(cuid())
+  diaryEntryId String     @unique
+  /// @zod.number.int().min(0, { message: "Steps cannot be negative" })
+  totalSteps   Int
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@map("steps_entries")
+}
+
+model ProgressPhoto {
+  id           String     @id @default(cuid())
+  diaryEntryId String
+  /// @zod.string.url()
+  imageUrl     String
+  category     String?
+  /// @zod.string.max(500)
+  notes        String?
+  sortOrder    Int        @default(0)
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@index([diaryEntryId])
+  @@map("progress_photos")
+}
+
+model DiaryComment {
+  id           String     @id @default(cuid())
+  diaryEntryId String
+  userId       String
+  /// @zod.string.min(1, { message: "Comment cannot be empty" }).max(1000, { message: "Comment must be at most 1000 characters" })
+  content      String
+  createdAt    DateTime   @default(now())
+
+  diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([diaryEntryId])
+  @@map("diary_comments")
+}
+
+// =============================================================================
+// GOALS
+// =============================================================================
+
+enum GoalType {
+  TARGET
+  HABIT
+}
+
+enum GoalStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+}
+
+model Goal {
+  id               String          @id @default(cuid())
+  userId           String
+  createdById      String
+  /// @zod.string.min(1, { message: "Goal name is required" }).max(200, { message: "Goal name must be at most 200 characters" })
+  name             String
+  /// @zod.string.max(1000, { message: "Description must be at most 1000 characters" })
+  description      String?
+  type             GoalType
+  status           GoalStatus      @default(ACTIVE)
+
+  // TARGET fields
+  targetValue      Float?
+  targetUnit       String?
+  currentValue     Float?
+  entryType        DiaryEntryType?
+  entryField       String?
+
+  // HABIT fields
+  /// @zod.number.int().min(1, { message: "Frequency must be at least 1" }).max(7, { message: "Frequency must be at most 7" })
+  frequencyPerWeek Int?
+  habitEntryType   DiaryEntryType?
+
+  deadline         DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  user             User            @relation("goalUser", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy        User            @relation("goalCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("goals")
+}
+
+// =============================================================================
+// ANALYTICS
+// =============================================================================
+
+model ProfileView {
+  id        String   @id @default(cuid())
+  trainerId String
+  viewerId  String?
+  viewedAt  DateTime @default(now())
+
+  // Relations
+  trainer   TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@index([trainerId])
+  @@index([viewedAt])
+  @@map("profile_views")
+}
+
+// =============================================================================
+// NEWSLETTER
+// =============================================================================
+
+model NewsletterSubscription {
+  id        String   @id @default(cuid())
+  /// @zod.string.email({ message: "Please enter a valid email address" })
+  email     String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("newsletter_subscriptions")
+}

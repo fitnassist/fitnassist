@@ -1,0 +1,39 @@
+{
+  "name": "fitnassist",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fitnassist - Platform for Personal Trainers, Gyms, and Trainees",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently --kill-others -n api,web -c blue,green \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:web": "npm run dev -w @fitnassist/web",
+    "dev:api": "npm run dev -w @fitnassist/api",
+    "build": "npm run build --workspaces --if-present",
+    "build:web": "npm run build -w @fitnassist/web",
+    "build:api": "npm run build -w @fitnassist/api",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:generate": "npm run generate -w @fitnassist/database",
+    "db:migrate": "npm run migrate -w @fitnassist/database",
+    "db:push": "npm run push -w @fitnassist/database",
+    "db:seed": "npm run seed -w @fitnassist/database",
+    "db:studio": "npm run studio -w @fitnassist/database",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "keywords": [
+    "fitness",
+    "personal-trainer",
+    "gym",
+    "booking",
+    "health"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

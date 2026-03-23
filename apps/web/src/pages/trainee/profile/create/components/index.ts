@@ -1,0 +1,1 @@
+export { TraineeProfileForm } from './TraineeProfileForm';

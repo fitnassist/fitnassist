@@ -1,0 +1,86 @@
+export { prisma } from './client';
+
+// Re-export Prisma types and client
+export {
+  PrismaClient,
+  Prisma,
+  // Enums
+  UserRole,
+  SubscriptionTier,
+  TravelOption,
+  ContactRequestType,
+  ContactRequestStatus,
+  Gender,
+  UnitPreference,
+  ExperienceLevel,
+  ActivityLevel,
+  ClientStatus,
+  OnboardingStatus,
+  MuscleGroup,
+  MealType,
+  DiaryEntryType,
+  MoodLevel,
+  GoalType,
+  GoalStatus,
+} from '@prisma/client';
+
+// Re-export model types with explicit names to avoid conflicts
+export type {
+  User,
+  Session,
+  Account,
+  Verification,
+  TrainerProfile,
+  TraineeProfile,
+  ContactRequest,
+  ClientRoster,
+  ClientNote,
+  ConversationPreference,
+  Exercise,
+  Recipe,
+  WorkoutPlan,
+  WorkoutExercise,
+  MealPlan,
+  MealPlanRecipe,
+  GalleryImage,
+  ProfileView,
+  NewsletterSubscription,
+  OnboardingTemplate,
+  OnboardingResponse,
+  DiaryEntry,
+  WeightEntry,
+  WaterEntry,
+  MeasurementEntry,
+  MoodEntry,
+  SleepEntry,
+  FoodEntry,
+  WorkoutLogEntry,
+  StepsEntry,
+  ProgressPhoto,
+  DiaryComment,
+  Goal,
+} from '@prisma/client';
+
+// Re-export generated Zod schemas from model schemas
+export * from './generated/zod/modelSchema';
+
+// Re-export enum schemas (excluding problematic JSON types)
+export {
+  UserRoleSchema,
+  SubscriptionTierSchema,
+  TravelOptionSchema,
+  ContactRequestTypeSchema,
+  ContactRequestStatusSchema,
+  GenderSchema,
+  UnitPreferenceSchema,
+  ExperienceLevelSchema,
+  ActivityLevelSchema,
+  ClientStatusSchema,
+  OnboardingStatusSchema,
+  MuscleGroupSchema,
+  MealTypeSchema,
+  DiaryEntryTypeSchema,
+  MoodLevelSchema,
+  GoalTypeSchema,
+  GoalStatusSchema,
+} from './generated/zod/inputTypeSchemas';
