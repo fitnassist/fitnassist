@@ -10,9 +10,34 @@ export interface Context {
   session: Session | null;
 }
 
+// In-memory session cache to avoid DB lookup on every tRPC call
+const SESSION_CACHE_TTL = 60_000; // 1 minute
+const sessionCache = new Map<string, { data: { user: User; session: Session }; expires: number }>();
+
+// Clean expired entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of sessionCache) {
+    if (entry.expires < now) sessionCache.delete(key);
+  }
+}, 60_000);
+
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<Context> {
+  // Extract session token from cookie for cache key
+  const cookieHeader = opts.req.headers.cookie || '';
+  const tokenMatch = cookieHeader.match(/better-auth\.session_token=([^;]+)/);
+  const cacheKey = tokenMatch?.[1];
+
+  // Check cache first
+  if (cacheKey) {
+    const cached = sessionCache.get(cacheKey);
+    if (cached && cached.expires > Date.now()) {
+      return cached.data;
+    }
+  }
+
   const sessionData = await auth.api.getSession({
     headers: new Headers(opts.req.headers as Record<string, string>),
   });
@@ -24,12 +49,17 @@ export async function createContext(
     };
   }
 
-  // Better Auth user has different fields than our Prisma User
-  // We need to fetch the full user from database or extend Better Auth user
-  return {
+  const result = {
     user: sessionData.user as unknown as User,
     session: sessionData.session as unknown as Session,
   };
+
+  // Cache the session
+  if (cacheKey) {
+    sessionCache.set(cacheKey, { data: result, expires: Date.now() + SESSION_CACHE_TTL });
+  }
+
+  return result;
 }
 
 const t = initTRPC.context<Context>().create({
