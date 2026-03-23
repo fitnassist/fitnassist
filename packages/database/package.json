@@ -9,6 +9,7 @@
     "./zod": "./src/generated/zod/index.ts"
   },
   "scripts": {
+    "postinstall": "prisma generate",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
     "push": "prisma db push",
