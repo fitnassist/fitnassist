@@ -10,10 +10,8 @@ out/
 
 # Environment files
 .env
-.env.local
-.env.*.local
-.env.production
-.env.development
+.env.*
+!.env.example
 
 # IDE
 .vscode/
@@ -44,3 +42,4 @@ packages/database/prisma/*.db-journal
 .cache/
 tmp/
 temp/
+.vercel
