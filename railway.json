@@ -6,7 +6,6 @@
   },
   "deploy": {
     "startCommand": "npm run start -w @fitnassist/api",
-    "healthcheckPath": "/trpc",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
