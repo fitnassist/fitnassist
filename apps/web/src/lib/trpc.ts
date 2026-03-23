@@ -34,7 +34,7 @@ export function createTRPCClient() {
     links: [
       unauthorizedLink,
       httpBatchLink({
-        url: '/trpc',
+        url: `${import.meta.env.VITE_API_URL || ''}/trpc`,
         transformer: superjson,
       }),
     ],

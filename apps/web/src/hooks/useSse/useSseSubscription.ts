@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import type { SseEvent } from '@fitnassist/types';
 
-const SSE_URL = '/api/sse/messages';
+const SSE_URL = `${import.meta.env.VITE_API_URL || ''}/api/sse/messages`;
 const MAX_RETRIES = 5;
 const BASE_DELAY = 1000;
 
