@@ -4,6 +4,8 @@ import { prisma } from './prisma';
 import { sendEmail } from './email';
 import { env } from '../config/env';
 
+const isProduction = env.NODE_ENV === 'production';
+
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
   basePath: '/api/auth',
@@ -12,6 +14,16 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
   }),
+
+  advanced: {
+    crossSubDomainCookies: isProduction ? {
+      enabled: true,
+    } : undefined,
+    defaultCookieAttributes: isProduction ? {
+      sameSite: 'none',
+      secure: true,
+    } : undefined,
+  },
 
   user: {
     additionalFields: {
