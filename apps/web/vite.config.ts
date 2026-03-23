@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '.prisma/client/index-browser': path.resolve(__dirname, '../../node_modules/.prisma/client/index-browser.js'),
     },
   },
   server: {
