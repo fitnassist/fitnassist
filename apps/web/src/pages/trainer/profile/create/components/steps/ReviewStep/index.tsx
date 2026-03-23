@@ -32,11 +32,12 @@ function ReviewSection({ title, icon, onEdit, children }: ReviewSectionProps) {
 interface ReviewStepProps extends WizardStepProps {
   onGoToStep: (step: WizardStep) => void;
   isSubmitting: boolean;
-  onSubmit: () => void;
+  onSubmit: (reviewData: WizardReviewInput) => void;
 }
 
 export function ReviewStep({
   data,
+  onUpdate,
   onBack,
   onGoToStep,
   isSubmitting,
@@ -65,8 +66,8 @@ export function ReviewStep({
     return labels[value] || value;
   };
 
-  const handleFormSubmit = () => {
-    onSubmit();
+  const handleFormSubmit = (formValues: WizardReviewInput) => {
+    onSubmit(formValues);
   };
 
   return (

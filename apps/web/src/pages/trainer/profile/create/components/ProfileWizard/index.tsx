@@ -88,7 +88,7 @@ export function ProfileWizard() {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (reviewData?: { isPublished: boolean }) => {
     setIsSubmitting(true);
     try {
       await createProfileMutation.mutateAsync({
@@ -110,7 +110,7 @@ export function ProfileWizard() {
         qualifications: formData.services.qualifications,
         profileImageUrl: formData.images.profileImageUrl || undefined,
         coverImageUrl: formData.images.coverImageUrl || undefined,
-        isPublished: formData.review.isPublished,
+        isPublished: reviewData?.isPublished ?? formData.review.isPublished,
       });
 
       // Navigate to dashboard on success
