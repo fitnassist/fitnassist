@@ -4,7 +4,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { trpc, createTRPCClient } from '@/lib/trpc';
 import { queryClient } from '@/lib/queryClient';
 import { routes } from '@/config/routes';
-import { MainLayout, AuthLayout, DashboardLayout, TrainerOnboardingGuard } from '@/components/layouts';
+import { MainLayout, AuthLayout, DashboardLayout, TrainerOnboardingGuard, RoleGuard } from '@/components/layouts';
 import { HomePage } from '@/pages/home';
 import { RegisterPage } from '@/pages/auth/register';
 import { LoginPage } from '@/pages/auth/login';
@@ -35,9 +35,14 @@ import { OnboardingPage } from '@/pages/dashboard/onboarding';
 import { OnboardingTemplateFormPage } from '@/pages/dashboard/onboarding/templates/form';
 import { OnboardingCompletePage } from '@/pages/dashboard/onboarding/[responseId]';
 import { SettingsPage } from '@/pages/dashboard/settings';
+import { BookingsPage } from '@/pages/dashboard/bookings';
+import { BookSessionPage } from '@/pages/dashboard/bookings/book';
 import { PrivacyPolicyPage } from '@/pages/privacy';
 import { TermsOfServicePage } from '@/pages/terms';
 import { SupportPage } from '@/pages/support';
+import { PricingPage } from '@/pages/pricing';
+import { AnalyticsPage } from '@/pages/dashboard/analytics';
+import { NotFoundPage } from '@/pages/not-found';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/providers';
 
@@ -57,6 +62,7 @@ function App() {
                   <Route path={routes.privacy} element={<PrivacyPolicyPage />} />
                   <Route path={routes.terms} element={<TermsOfServicePage />} />
                   <Route path={routes.support} element={<SupportPage />} />
+                  <Route path={routes.pricing} element={<PricingPage />} />
                 </Route>
                 {/* Auth routes */}
                 <Route element={<AuthLayout />}>
@@ -73,39 +79,53 @@ function App() {
                 {/* Dashboard routes (protected + onboarding guard) */}
                 <Route element={<DashboardLayout />}>
                   <Route element={<TrainerOnboardingGuard />}>
+                    {/* Shared routes (both roles) */}
                     <Route path={routes.dashboard} element={<DashboardPage />} />
                     <Route path={routes.dashboardRequests} element={<RequestsPage />} />
                     <Route path={routes.dashboardMessages} element={<MessagesPage />} />
                     <Route path="/dashboard/messages/:connectionId" element={<MessagesPage />} />
-                    <Route path={routes.dashboardClients} element={<ClientsPage />} />
-                    <Route path="/dashboard/clients/:id" element={<ClientDetailPage />} />
-                    <Route path={routes.dashboardResources} element={<ResourcesPage />} />
-                    <Route path={routes.dashboardExerciseCreate} element={<ExerciseFormPage />} />
-                    <Route path="/dashboard/resources/exercises/:id/edit" element={<ExerciseFormPage />} />
-                    <Route path={routes.dashboardRecipeCreate} element={<RecipeFormPage />} />
-                    <Route path="/dashboard/resources/recipes/:id/edit" element={<RecipeFormPage />} />
-                    <Route path={routes.dashboardWorkoutPlanCreate} element={<WorkoutPlanFormPage />} />
-                    <Route path="/dashboard/resources/workout-plans/:id/edit" element={<WorkoutPlanFormPage />} />
-                    <Route path={routes.dashboardMealPlanCreate} element={<MealPlanFormPage />} />
-                    <Route path="/dashboard/resources/meal-plans/:id/edit" element={<MealPlanFormPage />} />
-                    <Route path={routes.dashboardOnboarding} element={<OnboardingPage />} />
-                    <Route path={routes.dashboardOnboardingTemplateCreate} element={<OnboardingTemplateFormPage />} />
-                    <Route path="/dashboard/onboarding/templates/:id/edit" element={<OnboardingTemplateFormPage />} />
-                    <Route path="/dashboard/onboarding/:responseId" element={<OnboardingCompletePage />} />
-                    <Route path={routes.dashboardDiary} element={<DiaryPage />} />
-                    <Route path={routes.dashboardGoals} element={<GoalsPage />} />
-                    <Route path={routes.dashboardMyPlans} element={<MyPlansPage />} />
-                    <Route path={routes.dashboardContacts} element={<ContactsPage />} />
+                    <Route path={routes.dashboardBookings} element={<BookingsPage />} />
                     <Route path={routes.dashboardSettings} element={<SettingsPage />} />
-                    <Route path={routes.trainerProfileEdit} element={<ProfileEditPage />} />
-                    <Route path={routes.traineeProfileEdit} element={<TraineeProfileEditPage />} />
-                    <Route path="/trainee/profile/:userId" element={<TraineeProfileViewPage />} />
+
+                    {/* Trainer-only routes */}
+                    <Route element={<RoleGuard allowedRoles={['TRAINER']} />}>
+                      <Route path={routes.dashboardClients} element={<ClientsPage />} />
+                      <Route path="/dashboard/clients/:id" element={<ClientDetailPage />} />
+                      <Route path={routes.dashboardResources} element={<ResourcesPage />} />
+                      <Route path={routes.dashboardExerciseCreate} element={<ExerciseFormPage />} />
+                      <Route path="/dashboard/resources/exercises/:id/edit" element={<ExerciseFormPage />} />
+                      <Route path={routes.dashboardRecipeCreate} element={<RecipeFormPage />} />
+                      <Route path="/dashboard/resources/recipes/:id/edit" element={<RecipeFormPage />} />
+                      <Route path={routes.dashboardWorkoutPlanCreate} element={<WorkoutPlanFormPage />} />
+                      <Route path="/dashboard/resources/workout-plans/:id/edit" element={<WorkoutPlanFormPage />} />
+                      <Route path={routes.dashboardMealPlanCreate} element={<MealPlanFormPage />} />
+                      <Route path="/dashboard/resources/meal-plans/:id/edit" element={<MealPlanFormPage />} />
+                      <Route path={routes.dashboardOnboarding} element={<OnboardingPage />} />
+                      <Route path={routes.dashboardOnboardingTemplateCreate} element={<OnboardingTemplateFormPage />} />
+                      <Route path="/dashboard/onboarding/templates/:id/edit" element={<OnboardingTemplateFormPage />} />
+                      <Route path="/dashboard/onboarding/:responseId" element={<OnboardingCompletePage />} />
+                      <Route path={routes.dashboardAnalytics} element={<AnalyticsPage />} />
+                      <Route path={routes.trainerProfileEdit} element={<ProfileEditPage />} />
+                      <Route path="/trainee/profile/:userId" element={<TraineeProfileViewPage />} />
+                    </Route>
+
+                    {/* Trainee-only routes */}
+                    <Route element={<RoleGuard allowedRoles={['TRAINEE']} />}>
+                      <Route path={routes.dashboardDiary} element={<DiaryPage />} />
+                      <Route path={routes.dashboardGoals} element={<GoalsPage />} />
+                      <Route path={routes.dashboardMyPlans} element={<MyPlansPage />} />
+                      <Route path={routes.dashboardContacts} element={<ContactsPage />} />
+                      <Route path="/dashboard/bookings/book/:trainerId" element={<BookSessionPage />} />
+                      <Route path={routes.traineeProfileEdit} element={<TraineeProfileEditPage />} />
+                    </Route>
                   </Route>
                 </Route>
                 {/* Public trainer profile */}
                 <Route element={<MainLayout />}>
                   <Route path="/trainers/:handle" element={<TrainerPublicProfilePage />} />
                 </Route>
+                {/* 404 catch-all */}
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </BrowserRouter>
           </QueryClientProvider>

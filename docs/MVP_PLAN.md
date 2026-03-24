@@ -157,39 +157,39 @@ For reference, the following is live:
 
 ---
 
-## Phase 6: Booking & Scheduling
+## Phase 6: Booking & Scheduling ✅
 
 **Goal**: Allow trainees to book sessions with PTs, and PTs to manage their calendar.
 
-### 6.1 PT Availability Management
+### 6.1 PT Availability Management ✅
 - Set working hours and recurring availability
 - Block out time slots (holidays, personal time)
 - Set travel options (client travels / PT travels / both)
 
-### 6.2 Session Booking
+### 6.2 Session Booking ✅
 - Trainees browse available slots and book sessions
 - Booking confirmation and reminder notifications
 - Travel time calculation using Google Maps (for mobile PTs)
 - Time slot availability adjusted based on travel between appointments
 
-### 6.3 Booking Management
+### 6.3 Booking Management ✅
 - Calendar view for PTs
 - Cancel/reschedule with approval workflow
 - Cancellation policy enforcement (PT-defined window)
 
 ---
 
-## Phase 7: Subscription & Payments
+## Phase 7: Subscription & Payments ✅
 
 **Goal**: Monetise the platform. Gate premium features behind paid tiers and enable session payments.
 
-### 7.1 Stripe Integration
+### 7.1 Stripe Integration ✅
 - Payment processing infrastructure
 - Subscription management (create, upgrade, downgrade, cancel)
 - Webhook handling for payment events
 - Invoice and receipt generation
 
-### 7.2 Subscription Tiers
+### 7.2 Subscription Tiers ✅
 - **Free**: Basic profile listing, connection requests, messaging
 - **Basic**: Enhanced profile, featured/boosted in search results, gallery, video intro
 - **Pro**: All Basic + booking, payments, client management
@@ -203,6 +203,26 @@ For reference, the following is live:
 ### 7.4 Additional Auth Providers
 - Apple OAuth sign-in
 - Any other social login providers as needed
+
+---
+
+## Phase 7.5: Trainer Analytics Dashboard ✅
+
+**Goal**: Give trainers visibility into business performance via the dashboard.
+
+### 7.5.1 PRO Dashboard Stats ✅
+- Real-time stats row: profile views (30d), active clients, bookings (30d), completion rate
+- Replaced placeholder "Coming soon" stats with live data
+- Cache invalidation on booking/client mutations + SSE for cross-user updates
+
+### 7.5.2 ELITE Analytics Page ✅
+- Dedicated `/dashboard/analytics` page gated behind ELITE tier
+- Profile view trend chart (30-day area chart)
+- Booking analytics (12-week stacked bar chart with completion stats)
+- Client adherence table (diary entries per client with status badges)
+- Goal analytics (horizontal bar chart with completion rates per client)
+- Upgrade prompt for non-ELITE trainers
+- Analytics nav item in sidebar (feature-gated)
 
 ---
 

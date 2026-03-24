@@ -76,6 +76,25 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
         utils.goal.getRecentClientGoalUpdates.invalidate();
         break;
       }
+
+      // --- Booking events ---
+      case 'booking_created':
+      case 'booking_cancelled': {
+        utils.booking.upcoming.invalidate();
+        utils.booking.listByDateRange.invalidate();
+        utils.booking.listByClientRoster.invalidate();
+        utils.availability.getSlots.invalidate();
+        utils.trainer.getDashboardStats.invalidate();
+        utils.analytics.bookingAnalytics.invalidate();
+        break;
+      }
+
+      // --- Notification events ---
+      case 'notification': {
+        utils.notification.getUnreadCount.invalidate();
+        utils.notification.list.invalidate();
+        break;
+      }
     }
   }, [lastEvent, utils]);
 };

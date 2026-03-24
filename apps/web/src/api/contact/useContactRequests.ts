@@ -11,6 +11,7 @@ export function useUpdateContactStatus() {
   return trpc.contact.updateStatus.useMutation({
     onSuccess: () => {
       utils.contact.getMyRequests.invalidate();
+      utils.trainer.getDashboardStats.invalidate();
     },
   });
 }

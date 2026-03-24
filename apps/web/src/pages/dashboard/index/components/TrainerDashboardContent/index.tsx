@@ -5,6 +5,7 @@ import {
   ProfileCard,
   QuickActions,
   ClientActivityFeed,
+  StatsRow,
 } from "./components";
 import type { TrainerDashboardContentProps } from "./TrainerDashboardContent.types";
 
@@ -23,6 +24,7 @@ export const TrainerDashboardContent = ({
 
   return (
     <div className="space-y-6">
+      <StatsRow />
       <ProfileCard profile={profile} />
       <QuickActions profileHandle={profile.handle} badgeCounts={badgeCounts} />
       <ClientActivityFeed />

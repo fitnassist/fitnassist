@@ -46,7 +46,13 @@ export const routes = {
   dashboardOnboardingTemplateCreate: '/dashboard/onboarding/templates/new',
   dashboardOnboardingTemplateEdit: (id: string) => `/dashboard/onboarding/templates/${id}/edit`,
   dashboardOnboardingComplete: (responseId: string) => `/dashboard/onboarding/${responseId}`,
+  dashboardAnalytics: '/dashboard/analytics',
+  dashboardBookings: '/dashboard/bookings',
+  dashboardBookingsBook: (trainerId: string) => `/dashboard/bookings/book/${trainerId}`,
   dashboardSettings: '/dashboard/settings',
+
+  // Pricing
+  pricing: '/pricing',
 
   // Legal & Support
   privacy: '/privacy',

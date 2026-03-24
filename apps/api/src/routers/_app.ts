@@ -18,6 +18,12 @@ import { mealPlanRouter } from './meal-plan.router';
 import { onboardingRouter } from './onboarding.router';
 import { diaryRouter } from './diary.router';
 import { goalRouter } from './goal.router';
+import { subscriptionRouter } from './subscription.router';
+import { sessionLocationRouter } from './session-location.router';
+import { availabilityRouter } from './availability.router';
+import { bookingRouter } from './booking.router';
+import { notificationRouter } from './notification.router';
+import { analyticsRouter } from './analytics.router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -39,6 +45,12 @@ export const appRouter = router({
   onboarding: onboardingRouter,
   diary: diaryRouter,
   goal: goalRouter,
+  subscription: subscriptionRouter,
+  sessionLocation: sessionLocationRouter,
+  availability: availabilityRouter,
+  booking: bookingRouter,
+  notification: notificationRouter,
+  analytics: analyticsRouter,
 });
 
 export type AppRouter = typeof appRouter;

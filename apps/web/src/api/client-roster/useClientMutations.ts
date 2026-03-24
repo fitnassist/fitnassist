@@ -6,6 +6,7 @@ export const useUpdateClientStatus = () => {
     onSuccess: () => {
       utils.clientRoster.list.invalidate();
       utils.clientRoster.stats.invalidate();
+      utils.trainer.getDashboardStats.invalidate();
     },
   });
 };
@@ -172,6 +173,7 @@ export const useDisconnectClient = () => {
       utils.clientRoster.list.invalidate();
       utils.clientRoster.stats.invalidate();
       utils.contact.getMyRequests.invalidate();
+      utils.trainer.getDashboardStats.invalidate();
     },
   });
 };
@@ -183,6 +185,7 @@ export const useDisconnectByConnection = () => {
       utils.clientRoster.list.invalidate();
       utils.clientRoster.stats.invalidate();
       utils.contact.getMyRequests.invalidate();
+      utils.trainer.getDashboardStats.invalidate();
     },
   });
 };

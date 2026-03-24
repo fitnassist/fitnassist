@@ -1,8 +1,19 @@
 import { useMemo } from 'react';
-import { Home, MessageCircle, Phone, User, UserCircle, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target } from 'lucide-react';
+import { Home, MessageCircle, Phone, User, UserCircle, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3 } from 'lucide-react';
 import { routes } from '@/config/routes';
+import {
+  FEATURE_TIER_MAP,
+  hasFeatureAccess as checkAccess,
+} from '@fitnassist/schemas';
+import type { SubscriptionTier } from '@fitnassist/database';
 import type { NavItem } from '@/components/layouts';
 import type { DashboardNavItem, BadgeCounts } from '../DashboardLayout.types';
+
+const TIER_LABELS: Partial<Record<SubscriptionTier, string>> = {
+  FREE: 'Free',
+  PRO: 'Pro',
+  ELITE: 'Elite',
+};
 
 const BASE_NAV_ITEMS: DashboardNavItem[] = [
   {
@@ -28,6 +39,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     href: routes.dashboardClients,
     icon: <Users className="h-5 w-5" />,
     roles: ['TRAINER'] as const,
+    requiredFeature: 'clientManagement',
   },
   {
     label: 'Onboarding',
@@ -35,12 +47,27 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     icon: <ClipboardCheck className="h-5 w-5" />,
     roles: ['TRAINER'] as const,
     badgeKey: 'onboarding' as const,
+    requiredFeature: 'clientManagement',
+  },
+  {
+    label: 'Bookings',
+    href: routes.dashboardBookings,
+    icon: <Calendar className="h-5 w-5" />,
+    requiredFeature: 'booking',
+  },
+  {
+    label: 'Analytics',
+    href: routes.dashboardAnalytics,
+    icon: <BarChart3 className="h-5 w-5" />,
+    roles: ['TRAINER'] as const,
+    requiredFeature: 'advancedAnalytics',
   },
   {
     label: 'Resources',
     href: routes.dashboardResources,
     icon: <BookOpen className="h-5 w-5" />,
     roles: ['TRAINER'] as const,
+    requiredFeature: 'resources',
   },
   {
     label: 'Diary',
@@ -76,7 +103,8 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
 
 export const useNavItems = (
   isTrainer: boolean,
-  badgeCounts: BadgeCounts
+  badgeCounts: BadgeCounts,
+  currentTier: SubscriptionTier = 'FREE'
 ): NavItem[] => {
   return useMemo(() => {
     return BASE_NAV_ITEMS
@@ -86,9 +114,20 @@ export const useNavItems = (
         if (!isTrainer && item.roles.includes('TRAINEE')) return true;
         return false;
       })
-      .map(({ roles: _roles, badgeKey, ...item }) => ({
-        ...item,
-        badge: badgeKey ? badgeCounts[badgeKey] : undefined,
-      }));
-  }, [isTrainer, badgeCounts]);
+      .map(({ roles: _roles, badgeKey, requiredFeature, ...item }) => {
+        // Only gate trainer features — trainees see bookings as gated on their trainer's tier,
+        // but we only show the gate for trainer-side nav
+        const isGated = isTrainer && requiredFeature && !checkAccess(currentTier, requiredFeature);
+        const requiredTier = requiredFeature ? FEATURE_TIER_MAP[requiredFeature] : undefined;
+
+        return {
+          ...item,
+          badge: badgeKey ? badgeCounts[badgeKey] : undefined,
+          disabled: isGated || false,
+          disabledTooltip: isGated && requiredTier
+            ? `Upgrade to ${TIER_LABELS[requiredTier] ?? requiredTier} to unlock`
+            : undefined,
+        };
+      });
+  }, [isTrainer, badgeCounts, currentTier]);
 };

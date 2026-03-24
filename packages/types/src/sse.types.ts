@@ -84,6 +84,42 @@ export interface SseGoalCompletedEvent {
 }
 
 // =============================================================================
+// BOOKING EVENTS
+// =============================================================================
+
+export interface SseBookingCreatedEvent {
+  type: 'booking_created';
+  bookingId: string;
+  date: string;
+  startTime: string;
+}
+
+export interface SseBookingCancelledEvent {
+  type: 'booking_cancelled';
+  bookingId: string;
+  cancelledBy: string;
+  reason?: string;
+}
+
+// =============================================================================
+// NOTIFICATION EVENTS
+// =============================================================================
+
+export interface SseNotificationEvent {
+  type: 'notification';
+  notification: {
+    id: string;
+    type: string;
+    title: string;
+    body: string | null;
+    data: unknown;
+    link: string | null;
+    isRead: boolean;
+    createdAt: Date;
+  };
+}
+
+// =============================================================================
 // SYSTEM EVENTS
 // =============================================================================
 
@@ -105,4 +141,7 @@ export type SseEvent =
   | SseDiaryEntryEvent
   | SseDiaryCommentEvent
   | SseGoalCompletedEvent
+  | SseBookingCreatedEvent
+  | SseBookingCancelledEvent
+  | SseNotificationEvent
   | SseHeartbeatEvent;

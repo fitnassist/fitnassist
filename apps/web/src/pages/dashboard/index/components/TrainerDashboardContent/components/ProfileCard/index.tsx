@@ -4,7 +4,6 @@ import { routes } from "@/config/routes";
 import {
   Button,
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -83,33 +82,6 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-lg bg-muted/50 p-4">
-            <p className="text-sm font-medium text-muted-foreground">
-              Services
-            </p>
-            <p className="text-2xl font-bold">
-              {profile.services?.length || 0}
-            </p>
-          </div>
-          <div className="rounded-lg bg-muted/50 p-4">
-            <p className="text-sm font-medium text-muted-foreground">
-              Qualifications
-            </p>
-            <p className="text-2xl font-bold">
-              {profile.qualifications?.length || 0}
-            </p>
-          </div>
-          <div className="rounded-lg bg-muted/50 p-4">
-            <p className="text-sm font-medium text-muted-foreground">
-              Profile Views
-            </p>
-            <p className="text-2xl font-bold">-</p>
-            <p className="text-xs text-muted-foreground">Coming soon</p>
-          </div>
-        </div>
-      </CardContent>
     </Card>
   );
 };

@@ -1,5 +1,6 @@
 import { router, publicProcedure, protectedProcedure, trainerProcedure } from '../lib/trpc';
 import { trainerService } from '../services/trainer.service';
+import { analyticsService } from '../services/analytics.service';
 import {
   trainerSearchSchema,
   getTrainerByHandleSchema,
@@ -65,5 +66,10 @@ export const trainerRouter = router({
   getStats: trainerProcedure
     .query(async ({ ctx }) => {
       return trainerService.getStats(ctx.user.id);
+    }),
+
+  getDashboardStats: trainerProcedure
+    .query(async ({ ctx }) => {
+      return analyticsService.getDashboardStats(ctx.user.id);
     }),
 });
