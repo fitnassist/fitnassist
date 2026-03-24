@@ -106,6 +106,7 @@ model User {
   emailNotifyConnectionRequests Boolean @default(true)
   emailNotifyMessages           Boolean @default(true)
   emailNotifyMarketing          Boolean @default(false)
+  emailNotifyWeeklyReport       Boolean @default(true)
 
   // Notification Preferences - SMS (default OFF - costs money)
   smsNotifyConnectionRequests   Boolean @default(false)

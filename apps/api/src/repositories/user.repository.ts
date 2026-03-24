@@ -40,6 +40,7 @@ export const userRepository = {
         emailNotifyConnectionRequests: true,
         emailNotifyMessages: true,
         emailNotifyMarketing: true,
+        emailNotifyWeeklyReport: true,
         smsNotifyConnectionRequests: true,
         smsNotifyMessages: true,
         pushNotifyConnectionRequests: true,
@@ -54,6 +55,7 @@ export const userRepository = {
       emailNotifyConnectionRequests?: boolean;
       emailNotifyMessages?: boolean;
       emailNotifyMarketing?: boolean;
+      emailNotifyWeeklyReport?: boolean;
       smsNotifyConnectionRequests?: boolean;
       smsNotifyMessages?: boolean;
       pushNotifyConnectionRequests?: boolean;
@@ -67,6 +69,7 @@ export const userRepository = {
         emailNotifyConnectionRequests: true,
         emailNotifyMessages: true,
         emailNotifyMarketing: true,
+        emailNotifyWeeklyReport: true,
         smsNotifyConnectionRequests: true,
         smsNotifyMessages: true,
         pushNotifyConnectionRequests: true,

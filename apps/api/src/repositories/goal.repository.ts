@@ -90,6 +90,22 @@ export const goalRepository = {
     });
   },
 
+  async findCompletedInRange(userId: string, start: Date, end: Date) {
+    return prisma.goal.findMany({
+      where: {
+        userId,
+        status: 'COMPLETED',
+        updatedAt: { gte: start, lte: end },
+      },
+    });
+  },
+
+  async countActiveGoals(userId: string) {
+    return prisma.goal.count({
+      where: { userId, status: 'ACTIVE' },
+    });
+  },
+
   async getWeeklyHabitProgress(userId: string, habitEntryType: DiaryEntryType, weekStart: Date) {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 7);

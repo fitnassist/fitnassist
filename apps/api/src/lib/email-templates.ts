@@ -79,4 +79,74 @@ export const emailTemplates = {
         </a>
       </p>
     `),
+
+  weeklyReport: (data: {
+    trainerName: string;
+    weekStart: string;
+    weekEnd: string;
+    clients: Array<{
+      name: string;
+      diaryEntries: number;
+      weightEntries: number;
+      foodEntries: number;
+      exerciseEntries: number;
+      goalsCompleted: number;
+      totalGoals: number;
+    }>;
+  }) => {
+    const clientCards = data.clients
+      .map((client) => {
+        const needsAttention = client.diaryEntries === 0;
+        const borderColor = needsAttention ? '#f59e0b' : '#e5e5e5';
+        const attentionBadge = needsAttention
+          ? '<span style="display: inline-block; background: #fef3c7; color: #92400e; font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-left: 8px;">Needs attention</span>'
+          : '';
+
+        const goalText =
+          client.totalGoals > 0
+            ? `${client.goalsCompleted} of ${client.totalGoals} completed`
+            : 'No active goals';
+
+        return `
+          <div style="border: 1px solid ${borderColor}; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+            <p style="margin: 0 0 8px; font-weight: 600;">${client.name}${attentionBadge}</p>
+            <table style="width: 100%; font-size: 13px; color: #555;">
+              <tr>
+                <td style="padding: 2px 0;">Diary entries</td>
+                <td style="padding: 2px 0; text-align: right; font-weight: 500;">${client.diaryEntries}</td>
+              </tr>
+              <tr>
+                <td style="padding: 2px 0;">Weight logs</td>
+                <td style="padding: 2px 0; text-align: right; font-weight: 500;">${client.weightEntries}</td>
+              </tr>
+              <tr>
+                <td style="padding: 2px 0;">Food logs</td>
+                <td style="padding: 2px 0; text-align: right; font-weight: 500;">${client.foodEntries}</td>
+              </tr>
+              <tr>
+                <td style="padding: 2px 0;">Workouts</td>
+                <td style="padding: 2px 0; text-align: right; font-weight: 500;">${client.exerciseEntries}</td>
+              </tr>
+              <tr>
+                <td style="padding: 2px 0;">Goals</td>
+                <td style="padding: 2px 0; text-align: right; font-weight: 500;">${goalText}</td>
+              </tr>
+            </table>
+          </div>
+        `;
+      })
+      .join('');
+
+    return layout(`
+      <h2 style="margin: 0 0 4px;">Weekly Client Report</h2>
+      <p style="margin: 0 0 20px; color: #888; font-size: 14px;">${data.weekStart} &ndash; ${data.weekEnd}</p>
+      <p>Hi ${data.trainerName}, here's a summary of your clients' activity this week.</p>
+      ${clientCards}
+      <p style="margin-top: 24px;">
+        <a href="${dashboardUrl}/clients" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View clients
+        </a>
+      </p>
+    `);
+  },
 };

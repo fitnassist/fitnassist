@@ -39,6 +39,7 @@ export const notificationPreferencesSchema = z.object({
   emailNotifyConnectionRequests: z.boolean(),
   emailNotifyMessages: z.boolean(),
   emailNotifyMarketing: z.boolean(),
+  emailNotifyWeeklyReport: z.boolean(),
   // SMS notifications
   smsNotifyConnectionRequests: z.boolean(),
   smsNotifyMessages: z.boolean(),

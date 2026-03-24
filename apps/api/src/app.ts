@@ -9,6 +9,7 @@ import { auth } from './lib/auth';
 import { env } from './config/env';
 import { notFoundHandler, errorHandler } from './middleware';
 import { sseRouter } from './routes/sse';
+import { cronRouter } from './routes/cron';
 
 const app = express();
 
@@ -35,6 +36,9 @@ app.get('/health', (_req, res) => {
 
 // SSE endpoint (before tRPC so it's not caught by body parsing issues)
 app.use('/api/sse', sseRouter);
+
+// Cron endpoints (external cron service calls these)
+app.use('/api/cron', cronRouter);
 
 // tRPC handler
 app.use(

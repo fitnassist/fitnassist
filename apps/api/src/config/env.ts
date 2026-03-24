@@ -27,6 +27,9 @@ const envSchema = z.object({
 
   // USDA FoodData Central (free key from https://api.data.gov/signup/)
   USDA_API_KEY: z.string().optional(),
+
+  // Cron job authentication
+  CRON_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

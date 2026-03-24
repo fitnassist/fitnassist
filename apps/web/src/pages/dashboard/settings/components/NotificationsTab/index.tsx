@@ -22,8 +22,10 @@ import {
   notificationPreferencesSchema,
   type NotificationPreferencesInput,
 } from '@fitnassist/schemas';
+import { useAuth } from '@/hooks';
 
 export const NotificationsTab = () => {
+  const { isTrainer } = useAuth();
   const { data: preferences, isLoading } = useNotificationPreferences();
   const updateMutation = useUpdateNotificationPreferences();
 
@@ -33,6 +35,7 @@ export const NotificationsTab = () => {
       emailNotifyConnectionRequests: true,
       emailNotifyMessages: true,
       emailNotifyMarketing: false,
+      emailNotifyWeeklyReport: true,
       smsNotifyConnectionRequests: false,
       smsNotifyMessages: false,
       pushNotifyConnectionRequests: true,
@@ -143,6 +146,26 @@ export const NotificationsTab = () => {
               onCheckedChange={(checked) => form.setValue('emailNotifyMarketing', checked)}
             />
           </div>
+
+          {isTrainer && (
+            <>
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="emailNotifyWeeklyReport">Weekly client reports</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive a weekly email summarising your clients' activity.
+                  </p>
+                </div>
+                <Switch
+                  id="emailNotifyWeeklyReport"
+                  checked={form.watch('emailNotifyWeeklyReport')}
+                  onCheckedChange={(checked) => form.setValue('emailNotifyWeeklyReport', checked)}
+                />
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
