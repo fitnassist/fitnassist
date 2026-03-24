@@ -1,4 +1,4 @@
-import { router, trainerProcedure, traineeProcedure } from '../lib/trpc';
+import { router, trainerProcedure, traineeProcedure, requireTier } from '../lib/trpc';
 import { onboardingService } from '../services/onboarding.service';
 import { z } from 'zod';
 import {
@@ -14,6 +14,7 @@ import {
 export const onboardingRouter = router({
   // Trainer: Template management
   createTemplate: trainerProcedure
+    .use(requireTier('PRO'))
     .input(createOnboardingTemplateSchema)
     .mutation(async ({ input, ctx }) => {
       return onboardingService.createTemplate(ctx.user.id, input);
@@ -31,12 +32,14 @@ export const onboardingRouter = router({
     }),
 
   updateTemplate: trainerProcedure
+    .use(requireTier('PRO'))
     .input(updateOnboardingTemplateSchema)
     .mutation(async ({ input, ctx }) => {
       return onboardingService.updateTemplate(ctx.user.id, input);
     }),
 
   deleteTemplate: trainerProcedure
+    .use(requireTier('PRO'))
     .input(deleteOnboardingTemplateSchema)
     .mutation(async ({ input, ctx }) => {
       return onboardingService.deleteTemplate(ctx.user.id, input.id);
@@ -55,6 +58,7 @@ export const onboardingRouter = router({
     }),
 
   reviewResponse: trainerProcedure
+    .use(requireTier('PRO'))
     .input(reviewOnboardingResponseSchema)
     .mutation(async ({ input, ctx }) => {
       return onboardingService.reviewResponse(ctx.user.id, input);

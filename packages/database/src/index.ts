@@ -22,6 +22,11 @@ export {
   MoodLevel,
   GoalType,
   GoalStatus,
+  SubscriptionStatus,
+  BillingPeriod,
+  BookingStatus,
+  DayOfWeek,
+  NotificationType,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -59,6 +64,17 @@ export type {
   ProgressPhoto,
   DiaryComment,
   Goal,
+  Subscription,
+  SessionLocation,
+  Availability,
+  AvailabilityOverride,
+  Booking,
+  TravelTimeCache,
+  ClientWorkoutPlanAssignment,
+  ClientMealPlanAssignment,
+  Message,
+  Notification,
+  PushSubscription,
 } from '@prisma/client';
 
 // Re-export generated Zod schemas from model schemas
@@ -83,4 +99,9 @@ export {
   MoodLevelSchema,
   GoalTypeSchema,
   GoalStatusSchema,
+  SubscriptionStatusSchema,
+  BillingPeriodSchema,
+  BookingStatusSchema,
+  DayOfWeekSchema,
+  NotificationTypeSchema,
 } from './generated/zod/inputTypeSchemas';

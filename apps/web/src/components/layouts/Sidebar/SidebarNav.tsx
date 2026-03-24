@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Lock } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -17,11 +18,30 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
   return (
     <nav className="p-2 space-y-1 flex-1">
       {items.map((item) => {
-        const isActive = currentPath === item.href ||
-          (item.href !== '/dashboard' && currentPath.startsWith(item.href));
-        const hasBadge = item.badge !== undefined && item.badge > 0;
+        const isActive = !item.disabled && (
+          currentPath === item.href ||
+          (item.href !== '/dashboard' && currentPath.startsWith(item.href))
+        );
+        const hasBadge = !item.disabled && item.badge !== undefined && item.badge > 0;
 
-        const linkContent = (
+        const content = item.disabled ? (
+          <div
+            className={cn(
+              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-50',
+              isCollapsed && 'justify-center px-2'
+            )}
+          >
+            <span className="relative">
+              {item.icon}
+            </span>
+            {!isCollapsed && (
+              <>
+                <span className="flex-1">{item.label}</span>
+                <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+              </>
+            )}
+          </div>
+        ) : (
           <Link
             to={item.href}
             className={cn(
@@ -34,7 +54,6 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
           >
             <span className="relative">
               {item.icon}
-              {/* Badge - always positioned on the icon */}
               {hasBadge && (
                 <span className="absolute -top-1.5 -right-1.5 h-4 w-4 flex items-center justify-center rounded-full bg-primary text-[10px] font-medium text-primary-foreground">
                   {item.badge! > 9 ? '9+' : item.badge}
@@ -47,14 +66,17 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
           </Link>
         );
 
-        if (isCollapsed) {
+        // Show tooltip when collapsed OR when disabled
+        if (isCollapsed || item.disabled) {
           return (
             <Tooltip key={item.href} delayDuration={0}>
               <TooltipTrigger asChild>
-                {linkContent}
+                {content}
               </TooltipTrigger>
               <TooltipContent side="right" className="flex items-center gap-2">
-                {item.label}
+                {item.disabled
+                  ? item.disabledTooltip ?? `${item.label} (locked)`
+                  : item.label}
                 {hasBadge && (
                   <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
                     {item.badge! > 9 ? '9+' : item.badge}
@@ -65,7 +87,7 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
           );
         }
 
-        return <div key={item.href}>{linkContent}</div>;
+        return <div key={item.href}>{content}</div>;
       })}
     </nav>
   );

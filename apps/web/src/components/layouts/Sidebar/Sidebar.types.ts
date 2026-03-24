@@ -5,6 +5,8 @@ export interface NavItem {
   href: string;
   icon: ReactNode;
   badge?: number;
+  disabled?: boolean;
+  disabledTooltip?: string;
 }
 
 export interface SidebarUser {

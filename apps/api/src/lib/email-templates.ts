@@ -3,6 +3,7 @@ import { env } from '../config/env';
 const dashboardUrl = `${env.FRONTEND_URL}/dashboard`;
 const messagesUrl = `${dashboardUrl}/messages`;
 const requestsUrl = `${dashboardUrl}/requests`;
+const bookingsUrl = `${dashboardUrl}/bookings`;
 const settingsUrl = `${dashboardUrl}/settings`;
 
 const layout = (content: string) => `
@@ -261,4 +262,120 @@ export const emailTemplates = {
       </p>
     `);
   },
+
+  bookingConfirmation: (data: {
+    recipientName: string;
+    otherPartyName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    durationMin: number;
+    locationName?: string;
+    notes?: string;
+    isTrainer: boolean;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Booking confirmed</h2>
+      <p>Hi ${data.recipientName}, a session has been booked${data.isTrainer ? ` by ${data.otherPartyName}` : ` with ${data.otherPartyName}`}.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Date</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.date}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Time</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime} (${data.durationMin} min)</td>
+          </tr>
+          ${data.locationName ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Location</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.locationName}</td>
+          </tr>` : ''}
+          ${data.notes ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Notes</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.notes}</td>
+          </tr>` : ''}
+        </table>
+      </div>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View bookings
+        </a>
+      </p>
+    `),
+
+  bookingCancellation: (data: {
+    recipientName: string;
+    cancelledByName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    reason?: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Booking cancelled</h2>
+      <p>Hi ${data.recipientName}, a session has been cancelled by ${data.cancelledByName}.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Date</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.date}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Time</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime}</td>
+          </tr>
+          ${data.reason ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Reason</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.reason}</td>
+          </tr>` : ''}
+        </table>
+      </div>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View bookings
+        </a>
+      </p>
+    `),
+
+  bookingReminder: (data: {
+    recipientName: string;
+    otherPartyName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    durationMin: number;
+    locationName?: string;
+    notes?: string;
+    isTrainer: boolean;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Session tomorrow</h2>
+      <p>Hi ${data.recipientName}, this is a reminder that you have a session ${data.isTrainer ? `with ${data.otherPartyName}` : `with ${data.otherPartyName}`} tomorrow.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Date</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.date}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Time</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime} (${data.durationMin} min)</td>
+          </tr>
+          ${data.locationName ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Location</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.locationName}</td>
+          </tr>` : ''}
+          ${data.notes ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Notes</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.notes}</td>
+          </tr>` : ''}
+        </table>
+      </div>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View bookings
+        </a>
+      </p>
+    `),
 };

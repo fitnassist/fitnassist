@@ -7,6 +7,7 @@ import { notificationService } from './notification.service';
 import { clientRosterService } from './client-roster.service';
 import { clientRosterRepository } from '../repositories/client-roster.repository';
 import { onboardingService } from './onboarding.service';
+import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import type { CallbackRequestInput, ConnectionRequestInput } from '@fitnassist/schemas';
 import type { ContactRequestStatus } from '@fitnassist/database';
@@ -73,6 +74,15 @@ export const contactService = {
       data.phone,
       data.message,
     );
+
+    // In-app notification (fire and forget)
+    inAppNotificationService.notify({
+      userId: trainer.user.id,
+      type: 'CONNECTION_REQUEST',
+      title: `New callback request from ${sender.name}`,
+      body: data.message || undefined,
+      link: '/dashboard/requests',
+    }).catch(console.error);
 
     return request;
   },
@@ -147,6 +157,15 @@ export const contactService = {
       sender.email,
       data.message,
     );
+
+    // In-app notification (fire and forget)
+    inAppNotificationService.notify({
+      userId: trainer.user.id,
+      type: 'CONNECTION_REQUEST',
+      title: `Connection request from ${sender.name}`,
+      body: data.message || undefined,
+      link: '/dashboard/requests',
+    }).catch(console.error);
 
     return request;
   },
@@ -244,6 +263,16 @@ export const contactService = {
       );
     }
 
+    // In-app notification (fire and forget)
+    if (request.senderId) {
+      inAppNotificationService.notify({
+        userId: request.senderId,
+        type: 'CONNECTION_ACCEPTED',
+        title: `${request.trainer.displayName} accepted your request`,
+        link: '/dashboard/messages',
+      }).catch(console.error);
+    }
+
     return updatedRequest;
   },
 
@@ -298,6 +327,16 @@ export const contactService = {
         request.email,
         request.trainer.displayName,
       );
+    }
+
+    // In-app notification (fire and forget)
+    if (request.senderId) {
+      inAppNotificationService.notify({
+        userId: request.senderId,
+        type: 'CONNECTION_DECLINED',
+        title: `${request.trainer.displayName} declined your request`,
+        link: '/dashboard/contacts',
+      }).catch(console.error);
     }
 
     return updatedRequest;

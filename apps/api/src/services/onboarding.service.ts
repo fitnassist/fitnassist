@@ -2,6 +2,8 @@ import { TRPCError } from '@trpc/server';
 import { onboardingRepository } from '../repositories/onboarding.repository';
 import { trainerRepository } from '../repositories/trainer.repository';
 import { clientRosterRepository } from '../repositories/client-roster.repository';
+import { inAppNotificationService } from './in-app-notification.service';
+import { prisma } from '../lib/prisma';
 import type { CreateOnboardingTemplateInput, UpdateOnboardingTemplateInput, SubmitOnboardingResponseInput, ReviewOnboardingResponseInput, Question } from '@fitnassist/schemas';
 
 export const onboardingService = {
@@ -184,11 +186,25 @@ export const onboardingService = {
       throw new TRPCError({ code: 'BAD_REQUEST', message: 'You must agree to the waiver' });
     }
 
-    return onboardingRepository.submitResponse(data.responseId, {
+    const result = await onboardingRepository.submitResponse(data.responseId, {
       answers: data.answers,
       waiverSigned: data.waiverSigned,
       waiverSignedName: data.waiverSignedName,
     });
+
+    // Notify trainer (fire and forget)
+    const trainerUserId = response.clientRoster.connection.trainer?.userId;
+    if (trainerUserId) {
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+      inAppNotificationService.notify({
+        userId: trainerUserId,
+        type: 'ONBOARDING_SUBMITTED',
+        title: `${user?.name ?? 'A client'} submitted onboarding form`,
+        link: '/dashboard/onboarding?tab=review',
+      }).catch(console.error);
+    }
+
+    return result;
   },
 
   // ==========================================================================
@@ -231,6 +247,17 @@ export const onboardingService = {
 
     // Update response status
     const updated = await onboardingRepository.reviewResponse(data.responseId, data.decision, data.reviewNotes);
+
+    // Notify client (fire and forget)
+    const clientUserId = response.clientRoster.connection.sender?.id;
+    if (clientUserId) {
+      inAppNotificationService.notify({
+        userId: clientUserId,
+        type: 'ONBOARDING_REVIEWED',
+        title: 'Your onboarding form was reviewed',
+        link: '/dashboard',
+      }).catch(console.error);
+    }
 
     if (data.decision === 'REJECTED') {
       // Any rejection → client goes INACTIVE

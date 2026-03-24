@@ -4,6 +4,8 @@ import type { CreateExpressContextOptions } from '@trpc/server/adapters/express'
 import type { User, Session } from '@fitnassist/database';
 import { auth } from './auth';
 import { prisma } from './prisma';
+import type { SubscriptionTier } from '@fitnassist/database';
+import { hasTierAccess } from '../config/features';
 
 export interface Context {
   user: User | null;
@@ -156,3 +158,48 @@ const isTrainee = middleware(({ ctx, next }) => {
 });
 
 export const traineeProcedure = t.procedure.use(isTrainee);
+
+// Tier-gating middleware — must be used after trainerProcedure.
+// Inlines the tier check to avoid circular imports with subscription.service.
+export const requireTier = (requiredTier: SubscriptionTier) => {
+  return middleware(async ({ ctx, next }) => {
+    const trainerProfile = await prisma.trainerProfile.findUnique({
+      where: { userId: ctx.user!.id },
+      select: { id: true },
+    });
+
+    if (!trainerProfile) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Trainer profile not found',
+      });
+    }
+
+    const subscription = await prisma.subscription.findUnique({
+      where: { trainerId: trainerProfile.id },
+    });
+
+    let effectiveTier: SubscriptionTier = 'FREE';
+    if (subscription) {
+      if (subscription.status === 'TRIALING' && subscription.trialEndDate && new Date() < subscription.trialEndDate) {
+        effectiveTier = 'PRO'; // Trial grants PRO access
+      } else if (subscription.status === 'ACTIVE' || subscription.status === 'PAST_DUE') {
+        effectiveTier = subscription.tier;
+      }
+    }
+
+    if (!hasTierAccess(effectiveTier, requiredTier)) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: `This feature requires a ${requiredTier} subscription or higher`,
+      });
+    }
+
+    return next({
+      ctx: {
+        user: ctx.user!,
+        session: ctx.session!,
+      },
+    });
+  });
+};

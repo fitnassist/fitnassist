@@ -1,0 +1,17 @@
+name: Booking Reminders
+
+on:
+  schedule:
+    - cron: '0 7 * * *' # Every day at 7:00 UTC
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send booking reminders
+        run: |
+          curl -f -X POST \
+            "${{ secrets.API_URL }}/api/cron/booking-reminders" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

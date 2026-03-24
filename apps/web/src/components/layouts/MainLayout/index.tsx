@@ -34,6 +34,9 @@ export function MainLayout() {
               <Link to={routes.trainers}>
                 <Button variant="ghost">Find a Trainer</Button>
               </Link>
+              <Link to={routes.pricing}>
+                <Button variant="ghost">Pricing</Button>
+              </Link>
 
               {isLoading ? (
                 <div className="h-9 w-20 bg-muted animate-pulse rounded-md" />
@@ -102,6 +105,13 @@ export function MainLayout() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Find a Trainer
+            </Link>
+            <Link
+              to={routes.pricing}
+              className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-muted"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Pricing
             </Link>
 
             {isLoading ? null : isAuthenticated ? (

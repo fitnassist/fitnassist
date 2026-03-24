@@ -2,10 +2,28 @@ import { BookOpen, Dumbbell, UtensilsCrossed, ClipboardList, Salad } from 'lucid
 import { ResponsiveTabs, TabsContent } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { useTabParam } from '@/hooks';
+import { useFeatureAccess } from '@/hooks/useFeatureAccess';
+import { UpgradePrompt } from '@/components/UpgradePrompt';
 import { ExerciseList, RecipeList, WorkoutPlanList, MealPlanList } from './components';
 
 export const ResourcesPage = () => {
   const [activeTab, setActiveTab] = useTabParam('exercises');
+  const { hasAccess, requiredTier } = useFeatureAccess('resources');
+
+  if (!hasAccess) {
+    return (
+      <PageLayout>
+        <PageLayout.Header
+          title="Resources"
+          description="Manage your exercise library, recipes, and plans."
+          icon={<BookOpen className="h-6 w-6 sm:h-8 sm:w-8" />}
+        />
+        <PageLayout.Content>
+          <UpgradePrompt requiredTier={requiredTier} featureName="Resources" />
+        </PageLayout.Content>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>

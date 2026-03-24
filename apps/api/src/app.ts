@@ -10,6 +10,7 @@ import { env } from './config/env';
 import { notFoundHandler, errorHandler } from './middleware';
 import { sseRouter } from './routes/sse';
 import { cronRouter } from './routes/cron';
+import { stripeWebhookRouter } from './routes/stripe-webhook';
 
 const app = express();
 
@@ -25,6 +26,9 @@ app.use(cors({
 // Better Auth routes (must be before body parsing for proper handling)
 // Use regex to match all paths under /api/auth (including /api/auth itself)
 app.all(/^\/api\/auth(\/.*)?$/, toNodeHandler(auth));
+
+// Stripe webhook route (needs raw body, must be before express.json())
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhookRouter);
 
 // Body parsing
 app.use(express.json());

@@ -13,6 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui';
+import { NotificationBell } from '../NotificationBell';
 
 interface DashboardHeaderProps {
   isDark: boolean;
@@ -55,6 +56,8 @@ export const DashboardHeader = ({ isDark, onToggleTheme, user, onSignOut }: Dash
                 <Moon className="h-5 w-5" />
               )}
             </Button>
+
+            <NotificationBell />
 
             {user && onSignOut && (
               <div className="lg:hidden flex items-center">

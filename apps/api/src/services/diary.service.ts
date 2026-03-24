@@ -4,6 +4,7 @@ import { clientRosterRepository } from '../repositories/client-roster.repository
 import { trainerRepository } from '../repositories/trainer.repository';
 import { foodSearch } from '../lib/foodSearch';
 import { goalService } from './goal.service';
+import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
 import type { DiaryEntryType, MoodLevel, MealType } from '@fitnassist/database';
@@ -58,30 +59,49 @@ const verifyReadAccess = async (callerId: string, targetUserId: string): Promise
 const parseDate = (dateStr: string): Date => new Date(dateStr + 'T00:00:00.000Z');
 
 /**
+ * Gets trainer info for a given trainee, including roster IDs for links.
+ */
+const getTrainerRosters = async (traineeUserId: string) => {
+  const rosters = await clientRosterRepository.findByTraineeUserId(traineeUserId);
+  return rosters.map(r => ({
+    trainerUserId: r.trainer.userId,
+    clientRosterId: r.id,
+  }));
+};
+
+/**
  * Gets trainer userIds for a given trainee.
  */
 const getTrainerUserIds = async (traineeUserId: string): Promise<string[]> => {
-  const rosters = await clientRosterRepository.findByTraineeUserId(traineeUserId);
-  if (rosters.length === 0) return [];
+  const rosters = await getTrainerRosters(traineeUserId);
+  return rosters.map(r => r.trainerUserId);
+};
 
-  const trainerIds = rosters.map(r => r.trainerId);
-  const trainers = await prisma.trainerProfile.findMany({
-    where: { id: { in: trainerIds } },
-    select: { userId: true },
-  });
-  return trainers.map(t => t.userId);
+const ENTRY_TYPE_LABELS: Record<string, string> = {
+  WEIGHT: 'weight',
+  WATER: 'water intake',
+  MEASUREMENT: 'measurements',
+  MOOD: 'mood',
+  SLEEP: 'sleep',
+  FOOD: 'food',
+  WORKOUT_LOG: 'a workout',
+  PROGRESS_PHOTO: 'progress photos',
+  STEPS: 'steps',
 };
 
 /**
  * Broadcasts a diary entry SSE event to the trainee's trainer(s).
+ * Also sends an in-app notification for each entry.
  */
 const broadcastDiaryEntry = async (userId: string, entryType: string, date: string) => {
-  const [trainerUserIds, user] = await Promise.all([
-    getTrainerUserIds(userId),
+  const [trainerRosters, user] = await Promise.all([
+    getTrainerRosters(userId),
     prisma.user.findUnique({ where: { id: userId }, select: { name: true } }),
   ]);
 
-  if (trainerUserIds.length === 0 || !user) return;
+  if (trainerRosters.length === 0 || !user) return;
+
+  const trainerUserIds = trainerRosters.map(r => r.trainerUserId);
 
   const event: SseDiaryEntryEvent = {
     type: 'diary_entry',
@@ -92,6 +112,17 @@ const broadcastDiaryEntry = async (userId: string, entryType: string, date: stri
   };
 
   sseManager.broadcastToUsers(trainerUserIds, 'message', event);
+
+  // In-app notification to trainer(s)
+  const label = ENTRY_TYPE_LABELS[entryType] ?? entryType.toLowerCase();
+  for (const roster of trainerRosters) {
+    inAppNotificationService.notify({
+      userId: roster.trainerUserId,
+      type: 'DIARY_ENTRY',
+      title: `${user.name} logged ${label}`,
+      link: `/dashboard/clients/${roster.clientRosterId}?tab=progress`,
+    }).catch(console.error);
+  }
 };
 
 /**
@@ -247,6 +278,30 @@ export const diaryService = {
       ? entry.date.toISOString().slice(0, 10)
       : String(entry.date).slice(0, 10);
     broadcastDiaryComment(callerId, diaryEntryId, entry.userId, dateStr).catch(() => {});
+
+    // In-app notification (fire and forget) — don't notify yourself
+    if (callerId !== entry.userId) {
+      const commenter = await prisma.user.findUnique({ where: { id: callerId }, select: { name: true } });
+      inAppNotificationService.notify({
+        userId: entry.userId,
+        type: 'DIARY_COMMENT',
+        title: `${commenter?.name ?? 'Someone'} commented on your diary`,
+        link: '/dashboard/diary',
+      }).catch(console.error);
+    } else {
+      // Trainee commented on own diary -> notify their trainers
+      const trainerRosters = await getTrainerRosters(entry.userId);
+      const commenter = await prisma.user.findUnique({ where: { id: callerId }, select: { name: true } });
+      for (const roster of trainerRosters) {
+        inAppNotificationService.notify({
+          userId: roster.trainerUserId,
+          type: 'DIARY_COMMENT',
+          title: `${commenter?.name ?? 'A client'} commented on their diary`,
+          link: `/dashboard/clients/${roster.clientRosterId}?tab=progress`,
+        }).catch(console.error);
+      }
+    }
+
     return comment;
   },
 

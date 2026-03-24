@@ -31,7 +31,15 @@
       "Bash(ls /Users/simon.sturgess/Code/fitnassist/apps/web/src/pages/dashboard/clients/\\\\[id\\\\]/components/)",
       "Bash(ls -la /Users/simon.sturgess/Code/fitnassist/apps/web/src/pages/dashboard/clients/[id]/)",
       "Bash(find /Users/simon.sturgess/Code/fitnassist/apps/web/src/pages/dashboard/clients/[id]/components/ClientProgress -type f)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(railway project:*)",
+      "Bash(railway --help 2>&1)",
+      "Bash(railway service:*)",
+      "Bash(railway logs:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(vercel --prod 2>&1)",
+      "Bash(ls -la /Users/simon.sturgess/Code/fitnassist/apps/api/src/routers/*.router.ts)"
     ]
   }
 }

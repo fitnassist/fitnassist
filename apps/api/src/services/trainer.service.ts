@@ -1,7 +1,9 @@
 import { TRPCError } from '@trpc/server';
 import { trainerRepository, type TrainerSearchParams } from '../repositories/trainer.repository';
+import { userRepository } from '../repositories/user.repository';
 import type { UpdateTrainerProfileInput, CreateTrainerProfileInput } from '@fitnassist/schemas';
 import { geocodePostcode, formatUKPostcode } from '../lib/geocoding';
+import { subscriptionService } from './subscription.service';
 
 export const trainerService = {
   async getById(id: string) {
@@ -75,12 +77,29 @@ export const trainerService = {
       }
     }
 
-    return trainerRepository.create(userId, {
+    const profile = await trainerRepository.create(userId, {
       ...data,
       postcode,
       latitude,
       longitude,
     });
+
+    // Start 30-day Pro trial for new trainers
+    try {
+      const user = await userRepository.findById(userId);
+      if (user) {
+        await subscriptionService.createTrialSubscription(
+          profile.id,
+          user.email,
+          user.name ?? profile.displayName
+        );
+      }
+    } catch (error) {
+      // Don't fail profile creation if trial setup fails
+      console.error('[Subscription] Failed to create trial for trainer:', error);
+    }
+
+    return profile;
   },
 
   async hasProfile(userId: string): Promise<boolean> {

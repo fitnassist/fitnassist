@@ -1,11 +1,15 @@
+import { useEffect } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { routes } from '@/config/routes';
 import { Sidebar } from '@/components/layouts';
 import { useTheme } from '@/providers';
 import { useAuth, useSse } from '@/hooks';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { trpc } from '@/lib/trpc';
+import { useSubscription } from '@/api/subscription';
 import { useBadgeCounts, useNavItems } from './hooks';
 import { DashboardHeader, MobileBottomNav } from './components';
+import { TrialBanner } from '@/components/TrialBanner';
 
 export type { DashboardContext, BadgeCounts } from './DashboardLayout.types';
 
@@ -20,7 +24,7 @@ export const DashboardLayout = () => {
   });
 
   // Fetch trainee profile for avatar (only for trainees)
-  const isTrainee = !isTrainer;
+  const isTrainee = user?.role === 'TRAINEE';
   const { data: traineeProfile } = trpc.trainee.getMyProfile.useQuery(undefined, {
     enabled: isTrainee && isAuthenticated,
   });
@@ -28,11 +32,23 @@ export const DashboardLayout = () => {
   // Global SSE connection for real-time updates
   const { isConnected: sseConnected } = useSse();
 
+  // Prompt for push notification permission on first login
+  const { isSupported: pushSupported, permission: pushPermission, requestPermission } = usePushNotifications();
+  useEffect(() => {
+    if (isAuthenticated && pushSupported && pushPermission === 'default') {
+      requestPermission();
+    }
+  }, [isAuthenticated, pushSupported, pushPermission, requestPermission]);
+
+  // Get subscription tier for feature gating
+  const { data: subscriptionData } = useSubscription();
+  const currentTier = subscriptionData?.effectiveTier ?? 'FREE';
+
   // Get badge counts from custom hook
   const badgeCounts = useBadgeCounts(isAuthenticated, isTrainer, sseConnected);
 
-  // Get filtered nav items with badges
-  const filteredNavItems = useNavItems(isTrainer, badgeCounts);
+  // Get filtered nav items with badges and feature gating
+  const filteredNavItems = useNavItems(isTrainer, badgeCounts, currentTier);
 
   // Use profile image from trainer/trainee profile, otherwise fallback to user image
   const profileImage = isTrainer
@@ -58,6 +74,7 @@ export const DashboardLayout = () => {
 
   return (
     <div className="fixed inset-0 flex flex-col">
+      {isTrainer && <TrialBanner />}
       <DashboardHeader
         isDark={isDark}
         onToggleTheme={toggleTheme}

@@ -21,7 +21,10 @@ export const createGoalSchema = z.object({
   frequencyPerWeek: z.number().int().min(1).max(7).optional(),
   habitEntryType: z.enum(['WEIGHT', 'WATER', 'MEASUREMENT', 'MOOD', 'SLEEP', 'FOOD', 'WORKOUT_LOG', 'PROGRESS_PHOTO', 'STEPS']).optional(),
 
-  deadline: z.string().date().optional(),
+  deadline: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().date().optional(),
+  ),
 }).refine((data) => {
   if (data.type === 'TARGET') {
     return data.targetValue !== undefined && data.targetUnit !== undefined;

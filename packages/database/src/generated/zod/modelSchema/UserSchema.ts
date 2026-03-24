@@ -19,10 +19,18 @@ export const UserSchema = z.object({
   emailNotifyMessages: z.boolean(),
   emailNotifyMarketing: z.boolean(),
   emailNotifyWeeklyReport: z.boolean(),
+  emailNotifyBookings: z.boolean(),
+  emailNotifyBookingReminders: z.boolean(),
   smsNotifyConnectionRequests: z.boolean(),
   smsNotifyMessages: z.boolean(),
   pushNotifyConnectionRequests: z.boolean(),
   pushNotifyMessages: z.boolean(),
+  pushNotifyBookings: z.boolean(),
+  pushNotifyBookingReminders: z.boolean(),
+  pushNotifyPlanAssignments: z.boolean(),
+  pushNotifyOnboarding: z.boolean(),
+  pushNotifyDiary: z.boolean(),
+  pushNotifyGoals: z.boolean(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -41,10 +49,18 @@ export const UserOptionalDefaultsSchema = UserSchema.merge(z.object({
   emailNotifyMessages: z.boolean().optional(),
   emailNotifyMarketing: z.boolean().optional(),
   emailNotifyWeeklyReport: z.boolean().optional(),
+  emailNotifyBookings: z.boolean().optional(),
+  emailNotifyBookingReminders: z.boolean().optional(),
   smsNotifyConnectionRequests: z.boolean().optional(),
   smsNotifyMessages: z.boolean().optional(),
   pushNotifyConnectionRequests: z.boolean().optional(),
   pushNotifyMessages: z.boolean().optional(),
+  pushNotifyBookings: z.boolean().optional(),
+  pushNotifyBookingReminders: z.boolean().optional(),
+  pushNotifyPlanAssignments: z.boolean().optional(),
+  pushNotifyOnboarding: z.boolean().optional(),
+  pushNotifyDiary: z.boolean().optional(),
+  pushNotifyGoals: z.boolean().optional(),
 }))
 
 export type UserOptionalDefaults = z.infer<typeof UserOptionalDefaultsSchema>

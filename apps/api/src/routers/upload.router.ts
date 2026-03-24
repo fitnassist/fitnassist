@@ -2,8 +2,14 @@ import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { router, protectedProcedure } from '../lib/trpc';
 import { cloudinaryService, type UploadType } from '../lib/cloudinary';
+import { subscriptionService } from '../services/subscription.service';
+import { trainerRepository } from '../repositories/trainer.repository';
+import { hasTierAccess } from '../config/features.js';
 
 const uploadTypeSchema = z.enum(['profile', 'cover', 'gallery', 'video-intro', 'exercise-video', 'exercise-thumbnail', 'recipe-image', 'progress-photo']);
+
+// Upload types that require PRO tier
+const PRO_UPLOAD_TYPES = new Set(['gallery', 'video-intro', 'exercise-video', 'exercise-thumbnail', 'recipe-image']);
 
 export const uploadRouter = router({
   /**
@@ -15,7 +21,20 @@ export const uploadRouter = router({
         type: uploadTypeSchema,
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      // Check tier for gated upload types
+      if (PRO_UPLOAD_TYPES.has(input.type)) {
+        const profile = await trainerRepository.findByUserId(ctx.user.id);
+        if (profile) {
+          const tier = await subscriptionService.getEffectiveTier(profile.id);
+          if (!hasTierAccess(tier, 'PRO')) {
+            throw new TRPCError({
+              code: 'FORBIDDEN',
+              message: 'Upgrade to Pro to upload this content',
+            });
+          }
+        }
+      }
       if (!cloudinaryService.isConfigured) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',

@@ -9,8 +9,8 @@
     "./zod": "./src/generated/zod/index.ts"
   },
   "scripts": {
-    "postinstall": "prisma generate",
-    "generate": "prisma generate",
+    "postinstall": "prisma generate && tsx scripts/fix-zod-imports.ts",
+    "generate": "prisma generate && tsx scripts/fix-zod-imports.ts",
     "migrate": "prisma migrate dev",
     "push": "prisma db push",
     "seed": "tsx prisma/seed.ts",

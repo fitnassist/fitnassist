@@ -41,10 +41,18 @@ export const userRepository = {
         emailNotifyMessages: true,
         emailNotifyMarketing: true,
         emailNotifyWeeklyReport: true,
+        emailNotifyBookings: true,
+        emailNotifyBookingReminders: true,
         smsNotifyConnectionRequests: true,
         smsNotifyMessages: true,
         pushNotifyConnectionRequests: true,
         pushNotifyMessages: true,
+        pushNotifyBookings: true,
+        pushNotifyBookingReminders: true,
+        pushNotifyPlanAssignments: true,
+        pushNotifyOnboarding: true,
+        pushNotifyDiary: true,
+        pushNotifyGoals: true,
       },
     });
   },
@@ -56,10 +64,18 @@ export const userRepository = {
       emailNotifyMessages?: boolean;
       emailNotifyMarketing?: boolean;
       emailNotifyWeeklyReport?: boolean;
+      emailNotifyBookings?: boolean;
+      emailNotifyBookingReminders?: boolean;
       smsNotifyConnectionRequests?: boolean;
       smsNotifyMessages?: boolean;
       pushNotifyConnectionRequests?: boolean;
       pushNotifyMessages?: boolean;
+      pushNotifyBookings?: boolean;
+      pushNotifyBookingReminders?: boolean;
+      pushNotifyPlanAssignments?: boolean;
+      pushNotifyOnboarding?: boolean;
+      pushNotifyDiary?: boolean;
+      pushNotifyGoals?: boolean;
     }
   ) {
     return prisma.user.update({
@@ -70,10 +86,18 @@ export const userRepository = {
         emailNotifyMessages: true,
         emailNotifyMarketing: true,
         emailNotifyWeeklyReport: true,
+        emailNotifyBookings: true,
+        emailNotifyBookingReminders: true,
         smsNotifyConnectionRequests: true,
         smsNotifyMessages: true,
         pushNotifyConnectionRequests: true,
         pushNotifyMessages: true,
+        pushNotifyBookings: true,
+        pushNotifyBookingReminders: true,
+        pushNotifyPlanAssignments: true,
+        pushNotifyOnboarding: true,
+        pushNotifyDiary: true,
+        pushNotifyGoals: true,
       },
     });
   },

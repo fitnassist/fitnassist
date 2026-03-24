@@ -39,6 +39,8 @@ export const TrainerProfileSchema = z.object({
   hourlyRateMax: z.number().int().min(0, { message: "Rate must be a positive number" }).nullable(),
   acceptingClients: z.boolean(),
   isPublished: z.boolean(),
+  travelBufferMin: z.number().int().min(0).max(120),
+  smartTravelEnabled: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -56,6 +58,8 @@ export const TrainerProfileOptionalDefaultsSchema = TrainerProfileSchema.merge(z
   country: z.string().max(2).optional(),
   acceptingClients: z.boolean().optional(),
   isPublished: z.boolean().optional(),
+  travelBufferMin: z.number().int().min(0).max(120).optional(),
+  smartTravelEnabled: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }))

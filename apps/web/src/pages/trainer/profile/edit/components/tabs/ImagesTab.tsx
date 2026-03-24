@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { wizardImagesSchema, type WizardImagesInput } from '@fitnassist/schemas';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, ImageUpload, GalleryUpload, VideoUpload } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
-import { useState } from 'react';
+import { useFeatureAccess } from '@/hooks/useFeatureAccess';
+import { UpgradePrompt } from '@/components/UpgradePrompt';
 import type { GalleryImage } from '@/components/ui';
 
 interface ImagesTabProps {
@@ -18,6 +20,7 @@ interface ImagesTabProps {
 export function ImagesTab({ profile }: ImagesTabProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const { hasAccess: hasGalleryAccess, requiredTier: galleryTier } = useFeatureAccess('gallery');
 
   const utils = trpc.useUtils();
   const updateMutation = trpc.trainer.update.useMutation({
@@ -201,44 +204,52 @@ export function ImagesTab({ profile }: ImagesTabProps) {
       </Card>
 
       {/* Gallery Photos */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Gallery</CardTitle>
-          <CardDescription>
-            Showcase your work, training environment, and client transformations.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <GalleryUpload
-            images={mappedGalleryImages}
-            onUpload={handleGalleryUpload}
-            onRemove={handleGalleryRemove}
-            onReorder={handleGalleryReorder}
-            maxImages={6}
-            maxSizeMB={10}
-          />
-        </CardContent>
-      </Card>
+      {hasGalleryAccess ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Gallery</CardTitle>
+            <CardDescription>
+              Showcase your work, training environment, and client transformations.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <GalleryUpload
+              images={mappedGalleryImages}
+              onUpload={handleGalleryUpload}
+              onRemove={handleGalleryRemove}
+              onReorder={handleGalleryReorder}
+              maxImages={6}
+              maxSizeMB={10}
+            />
+          </CardContent>
+        </Card>
+      ) : (
+        <UpgradePrompt requiredTier={galleryTier} featureName="Gallery" />
+      )}
 
       {/* Video Introduction */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Video Introduction</CardTitle>
-          <CardDescription>
-            Record a short video introducing yourself to potential clients.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <VideoUpload
-            value={profile.videoIntroUrl || undefined}
-            onChange={() => {}}
-            onUpload={handleVideoUpload}
-            onDelete={handleVideoDelete}
-            description="A 30-60 second intro video works best."
-            maxSizeMB={50}
-          />
-        </CardContent>
-      </Card>
+      {hasGalleryAccess ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Video Introduction</CardTitle>
+            <CardDescription>
+              Record a short video introducing yourself to potential clients.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <VideoUpload
+              value={profile.videoIntroUrl || undefined}
+              onChange={() => {}}
+              onUpload={handleVideoUpload}
+              onDelete={handleVideoDelete}
+              description="A 30-60 second intro video works best."
+              maxSizeMB={50}
+            />
+          </CardContent>
+        </Card>
+      ) : (
+        <UpgradePrompt requiredTier={galleryTier} featureName="Video Introduction" />
+      )}
     </div>
   );
 }

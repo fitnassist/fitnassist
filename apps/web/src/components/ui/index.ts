@@ -45,6 +45,8 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
 } from './dropdown-menu';
+export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from './popover';
+export { ScrollArea, ScrollBar } from './scroll-area';
 export { Switch } from './switch';
 export { Select, type SelectOption } from './select';
 export {

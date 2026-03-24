@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
-import { router, trainerProcedure, publicProcedure } from '../lib/trpc';
+import { router, trainerProcedure, publicProcedure, requireTier } from '../lib/trpc';
 import { galleryRepository } from '../repositories/gallery.repository';
 import { trainerRepository } from '../repositories/trainer.repository';
 import { cloudinaryService } from '../lib/cloudinary';
@@ -13,6 +13,7 @@ export const galleryRouter = router({
     }),
 
   add: trainerProcedure
+    .use(requireTier('PRO'))
     .input(z.object({ url: z.string().url() }))
     .mutation(async ({ input, ctx }) => {
       const profile = await trainerRepository.findByUserId(ctx.user.id);
@@ -31,6 +32,7 @@ export const galleryRouter = router({
     }),
 
   remove: trainerProcedure
+    .use(requireTier('PRO'))
     .input(z.object({ id: z.string().cuid() }))
     .mutation(async ({ input, ctx }) => {
       const profile = await trainerRepository.findByUserId(ctx.user.id);
@@ -53,6 +55,7 @@ export const galleryRouter = router({
     }),
 
   reorder: trainerProcedure
+    .use(requireTier('PRO'))
     .input(z.object({ imageIds: z.array(z.string().cuid()) }))
     .mutation(async ({ input, ctx }) => {
       const profile = await trainerRepository.findByUserId(ctx.user.id);

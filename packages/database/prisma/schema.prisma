@@ -38,6 +38,39 @@ enum SubscriptionTier {
   FREE
   BASIC
   PRO
+  ELITE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+  INCOMPLETE
+}
+
+enum BillingPeriod {
+  MONTHLY
+  ANNUAL
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED_BY_TRAINER
+  CANCELLED_BY_CLIENT
+  COMPLETED
+  NO_SHOW
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
 }
 
 enum TravelOption {
@@ -70,6 +103,28 @@ enum ActivityLevel {
   MODERATELY_ACTIVE
   VERY_ACTIVE
   EXTREMELY_ACTIVE
+}
+
+enum NotificationType {
+  BOOKING_CREATED
+  BOOKING_CANCELLED
+  BOOKING_COMPLETED
+  BOOKING_REMINDER
+  CONNECTION_REQUEST
+  CONNECTION_ACCEPTED
+  CONNECTION_DECLINED
+  NEW_MESSAGE
+  PLAN_ASSIGNED
+  PLAN_UNASSIGNED
+  ONBOARDING_SUBMITTED
+  ONBOARDING_REVIEWED
+  GOAL_CREATED
+  GOAL_COMPLETED
+  CLIENT_DISCONNECTED
+  DIARY_ENTRY
+  DIARY_COMMENT
+  TRIAL_EXPIRING
+  PAYMENT_FAILED
 }
 
 enum ContactRequestType {
@@ -107,14 +162,22 @@ model User {
   emailNotifyMessages           Boolean @default(true)
   emailNotifyMarketing          Boolean @default(false)
   emailNotifyWeeklyReport       Boolean @default(true)
+  emailNotifyBookings           Boolean @default(true)
+  emailNotifyBookingReminders   Boolean @default(true)
 
   // Notification Preferences - SMS (default OFF - costs money)
   smsNotifyConnectionRequests   Boolean @default(false)
   smsNotifyMessages             Boolean @default(false)
 
-  // Notification Preferences - Push (for future mobile app)
+  // Notification Preferences - Push
   pushNotifyConnectionRequests  Boolean @default(true)
   pushNotifyMessages            Boolean @default(true)
+  pushNotifyBookings            Boolean @default(true)
+  pushNotifyBookingReminders    Boolean @default(true)
+  pushNotifyPlanAssignments     Boolean @default(true)
+  pushNotifyOnboarding          Boolean @default(true)
+  pushNotifyDiary               Boolean @default(true)
+  pushNotifyGoals               Boolean @default(true)
 
   // Relations
   trainerProfile   TrainerProfile?
@@ -128,6 +191,8 @@ model User {
   diaryComments  DiaryComment[]
   goals          Goal[]       @relation("goalUser")
   createdGoals   Goal[]       @relation("goalCreator")
+  notifications  Notification[]
+  pushSubscriptions PushSubscription[]
 
   @@map("users")
 }
@@ -245,6 +310,11 @@ model TrainerProfile {
   acceptingClients Boolean          @default(true)
   isPublished      Boolean          @default(false)
 
+  // Booking settings
+  /// @zod.number.int().min(0).max(120)
+  travelBufferMin      Int              @default(15)
+  smartTravelEnabled   Boolean          @default(false)
+
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -259,6 +329,11 @@ model TrainerProfile {
   recipes          Recipe[]
   workoutPlans     WorkoutPlan[]
   mealPlans        MealPlan[]
+  subscription           Subscription?
+  sessionLocations       SessionLocation[]
+  availabilities         Availability[]
+  availabilityOverrides  AvailabilityOverride[]
+  bookings               Booking[]
 
   @@index([latitude, longitude])
   @@index([city])
@@ -513,6 +588,7 @@ model ClientRoster {
   mealPlanAssignments    ClientMealPlanAssignment[]
   onboardingResponses    OnboardingResponse[]
   clientNotes    ClientNote[]
+  bookings       Booking[]
 
   @@unique([trainerId, connectionId])
   @@index([trainerId])
@@ -1040,4 +1116,198 @@ model NewsletterSubscription {
   createdAt DateTime @default(now())
 
   @@map("newsletter_subscriptions")
+}
+
+// =============================================================================
+// SUBSCRIPTIONS
+// =============================================================================
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  trainerId            String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  stripePriceId        String?
+  status               SubscriptionStatus @default(TRIALING)
+  tier                 SubscriptionTier   @default(FREE)
+  billingPeriod        BillingPeriod?
+  trialStartDate       DateTime?
+  trialEndDate         DateTime?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  trainer              TrainerProfile     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+// =============================================================================
+// BOOKING & SCHEDULING
+// =============================================================================
+
+model SessionLocation {
+  id           String         @id @default(cuid())
+  trainerId    String
+  /// @zod.string.min(2).max(100)
+  name         String
+  /// @zod.string.max(200)
+  addressLine1 String?
+  /// @zod.string.max(100)
+  city         String?
+  /// @zod.string.max(20)
+  postcode     String?
+  /// @zod.number.min(-90).max(90)
+  latitude     Float?
+  /// @zod.number.min(-180).max(180)
+  longitude    Float?
+  placeId      String?
+  isDefault    Boolean        @default(false)
+  isActive     Boolean        @default(true)
+  sortOrder    Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  trainer      TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  bookings     Booking[]
+
+  @@index([trainerId])
+  @@map("session_locations")
+}
+
+model Availability {
+  id                 String         @id @default(cuid())
+  trainerId          String
+  dayOfWeek          DayOfWeek
+  /// @zod.string.regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+  startTime          String
+  /// @zod.string.regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+  endTime            String
+  /// @zod.number.int().min(15).max(180)
+  sessionDurationMin Int            @default(60)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  trainer            TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@index([trainerId, dayOfWeek])
+  @@map("availabilities")
+}
+
+model AvailabilityOverride {
+  id        String         @id @default(cuid())
+  trainerId String
+  date      DateTime       @db.Date
+  isBlocked Boolean        @default(true)
+  /// @zod.string.regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+  startTime String?
+  /// @zod.string.regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+  endTime   String?
+  /// @zod.string.max(200)
+  reason    String?
+  createdAt DateTime       @default(now())
+
+  trainer   TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@index([trainerId, date])
+  @@map("availability_overrides")
+}
+
+model Booking {
+  id                 String          @id @default(cuid())
+  trainerId          String
+  clientRosterId     String
+  locationId         String?
+  date               DateTime        @db.Date
+  /// @zod.string.regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+  startTime          String
+  /// @zod.string.regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+  endTime            String
+  /// @zod.number.int().min(15).max(180)
+  durationMin        Int
+  /// @zod.string.max(200)
+  clientAddress      String?
+  /// @zod.string.max(20)
+  clientPostcode     String?
+  clientLatitude     Float?
+  clientLongitude    Float?
+  status             BookingStatus   @default(CONFIRMED)
+  /// @zod.string.max(500)
+  cancellationReason String?
+  cancelledAt        DateTime?
+  reminderSentAt     DateTime?
+  /// @zod.string.max(500)
+  notes              String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  trainer            TrainerProfile  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  clientRoster       ClientRoster    @relation(fields: [clientRosterId], references: [id], onDelete: Cascade)
+  location           SessionLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+
+  @@index([trainerId, date])
+  @@index([clientRosterId])
+  @@index([date, status])
+  @@map("bookings")
+}
+
+model TravelTimeCache {
+  id              String   @id @default(cuid())
+  originLat       Float
+  originLng       Float
+  destLat         Float
+  destLng         Float
+  durationSeconds Int
+  distanceMeters  Int
+  fetchedAt       DateTime @default(now())
+  expiresAt       DateTime
+
+  @@unique([originLat, originLng, destLat, destLng])
+  @@index([expiresAt])
+  @@map("travel_time_cache")
+}
+
+// =============================================================================
+// NOTIFICATIONS
+// =============================================================================
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  type        NotificationType
+  /// @zod.string.max(200)
+  title       String
+  /// @zod.string.max(500)
+  body        String?
+  data        Json?
+  link        String?
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  isDismissed Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead, isDismissed])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_subscriptions")
 }

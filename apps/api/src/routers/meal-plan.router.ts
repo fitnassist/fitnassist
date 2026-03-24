@@ -1,4 +1,4 @@
-import { router, trainerProcedure } from '../lib/trpc';
+import { router, trainerProcedure, requireTier } from '../lib/trpc';
 import { mealPlanService } from '../services/meal-plan.service';
 import {
   mealPlanListSchema,
@@ -23,12 +23,14 @@ export const mealPlanRouter = router({
     }),
 
   create: trainerProcedure
+    .use(requireTier('PRO'))
     .input(createMealPlanSchema)
     .mutation(async ({ input, ctx }) => {
       return mealPlanService.create(ctx.user.id, input);
     }),
 
   update: trainerProcedure
+    .use(requireTier('PRO'))
     .input(updateMealPlanSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, ...data } = input;
@@ -36,12 +38,14 @@ export const mealPlanRouter = router({
     }),
 
   delete: trainerProcedure
+    .use(requireTier('PRO'))
     .input(deleteMealPlanSchema)
     .mutation(async ({ input, ctx }) => {
       return mealPlanService.delete(ctx.user.id, input.id);
     }),
 
   setRecipes: trainerProcedure
+    .use(requireTier('PRO'))
     .input(setMealPlanRecipesSchema)
     .mutation(async ({ input, ctx }) => {
       return mealPlanService.setRecipes(ctx.user.id, input.id, input.recipes);

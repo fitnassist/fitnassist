@@ -4,6 +4,8 @@ import { contactRepository } from '../repositories/contact.repository';
 import { trainerRepository } from '../repositories/trainer.repository';
 import { workoutPlanRepository } from '../repositories/workout-plan.repository';
 import { mealPlanRepository } from '../repositories/meal-plan.repository';
+import { inAppNotificationService } from './in-app-notification.service';
+import { prisma } from '../lib/prisma';
 import type { ClientStatus, ContactRequestStatus } from '@fitnassist/database';
 
 const verifyTrainerOwnsClient = async (userId: string, clientId: string) => {
@@ -99,25 +101,87 @@ export const clientRosterService = {
 
   // Plan assignment methods
   async assignWorkoutPlan(userId: string, clientRosterId: string, workoutPlanId: string) {
-    const { trainer } = await verifyTrainerOwnsClient(userId, clientRosterId);
+    const { client, trainer } = await verifyTrainerOwnsClient(userId, clientRosterId);
     await verifyTrainerOwnsPlan(trainer.id, 'workout', workoutPlanId);
-    return clientRosterRepository.assignWorkoutPlan(clientRosterId, workoutPlanId);
+    const result = await clientRosterRepository.assignWorkoutPlan(clientRosterId, workoutPlanId);
+
+    // Notify client (fire and forget)
+    const clientUserId = client.connection?.senderId;
+    if (clientUserId) {
+      const [plan, trainerProfile] = await Promise.all([
+        workoutPlanRepository.findById(workoutPlanId),
+        prisma.trainerProfile.findUnique({ where: { id: trainer.id }, select: { displayName: true } }),
+      ]);
+      inAppNotificationService.notify({
+        userId: clientUserId,
+        type: 'PLAN_ASSIGNED',
+        title: `${trainerProfile?.displayName ?? 'Your trainer'} assigned workout plan: ${plan?.name ?? 'Workout Plan'}`,
+        link: '/dashboard/my-plans',
+      }).catch(console.error);
+    }
+
+    return result;
   },
 
   async unassignWorkoutPlan(userId: string, clientRosterId: string, workoutPlanId: string) {
-    await verifyTrainerOwnsClient(userId, clientRosterId);
-    return clientRosterRepository.unassignWorkoutPlan(clientRosterId, workoutPlanId);
+    const { client } = await verifyTrainerOwnsClient(userId, clientRosterId);
+    const result = await clientRosterRepository.unassignWorkoutPlan(clientRosterId, workoutPlanId);
+
+    // Notify client (fire and forget)
+    const clientUserId = client.connection?.senderId;
+    if (clientUserId) {
+      const plan = await workoutPlanRepository.findById(workoutPlanId);
+      inAppNotificationService.notify({
+        userId: clientUserId,
+        type: 'PLAN_UNASSIGNED',
+        title: `Workout plan removed: ${plan?.name ?? 'Workout Plan'}`,
+        link: '/dashboard/my-plans',
+      }).catch(console.error);
+    }
+
+    return result;
   },
 
   async assignMealPlan(userId: string, clientRosterId: string, mealPlanId: string) {
-    const { trainer } = await verifyTrainerOwnsClient(userId, clientRosterId);
+    const { client, trainer } = await verifyTrainerOwnsClient(userId, clientRosterId);
     await verifyTrainerOwnsPlan(trainer.id, 'meal', mealPlanId);
-    return clientRosterRepository.assignMealPlan(clientRosterId, mealPlanId);
+    const result = await clientRosterRepository.assignMealPlan(clientRosterId, mealPlanId);
+
+    // Notify client (fire and forget)
+    const clientUserId = client.connection?.senderId;
+    if (clientUserId) {
+      const [plan, trainerProfile] = await Promise.all([
+        mealPlanRepository.findById(mealPlanId),
+        prisma.trainerProfile.findUnique({ where: { id: trainer.id }, select: { displayName: true } }),
+      ]);
+      inAppNotificationService.notify({
+        userId: clientUserId,
+        type: 'PLAN_ASSIGNED',
+        title: `${trainerProfile?.displayName ?? 'Your trainer'} assigned meal plan: ${plan?.name ?? 'Meal Plan'}`,
+        link: '/dashboard/my-plans',
+      }).catch(console.error);
+    }
+
+    return result;
   },
 
   async unassignMealPlan(userId: string, clientRosterId: string, mealPlanId: string) {
-    await verifyTrainerOwnsClient(userId, clientRosterId);
-    return clientRosterRepository.unassignMealPlan(clientRosterId, mealPlanId);
+    const { client } = await verifyTrainerOwnsClient(userId, clientRosterId);
+    const result = await clientRosterRepository.unassignMealPlan(clientRosterId, mealPlanId);
+
+    // Notify client (fire and forget)
+    const clientUserId = client.connection?.senderId;
+    if (clientUserId) {
+      const plan = await mealPlanRepository.findById(mealPlanId);
+      inAppNotificationService.notify({
+        userId: clientUserId,
+        type: 'PLAN_UNASSIGNED',
+        title: `Meal plan removed: ${plan?.name ?? 'Meal Plan'}`,
+        link: '/dashboard/my-plans',
+      }).catch(console.error);
+    }
+
+    return result;
   },
 
   async bulkAssignPlan(userId: string, clientIds: string[], data: {
@@ -153,6 +217,10 @@ export const clientRosterService = {
     return clientRosterRepository.findByTraineeUserId(userId);
   },
 
+  async getMyTrainers(userId: string) {
+    return clientRosterRepository.findMyTrainers(userId);
+  },
+
   async disconnectByTrainer(userId: string, clientId: string) {
     const { client } = await verifyTrainerOwnsClient(userId, clientId);
 
@@ -162,6 +230,21 @@ export const clientRosterService = {
 
     await clientRosterRepository.updateStatus(clientId, 'DISCONNECTED');
     await contactRepository.updateStatus(client.connectionId, 'CLOSED' as ContactRequestStatus);
+
+    // Notify client (fire and forget)
+    const clientUserId = client.connection?.senderId;
+    if (clientUserId) {
+      const trainerProfile = await prisma.trainerProfile.findUnique({
+        where: { userId },
+        select: { displayName: true },
+      });
+      inAppNotificationService.notify({
+        userId: clientUserId,
+        type: 'CLIENT_DISCONNECTED',
+        title: `${trainerProfile?.displayName ?? 'Your trainer'} ended the connection`,
+        link: '/dashboard/contacts',
+      }).catch(console.error);
+    }
 
     return { success: true };
   },
@@ -181,6 +264,21 @@ export const clientRosterService = {
 
     await clientRosterRepository.updateStatus(roster.id, 'DISCONNECTED');
     await contactRepository.updateStatus(connectionId, 'CLOSED' as ContactRequestStatus);
+
+    // Notify client (fire and forget)
+    const clientUserId = client.connection?.senderId;
+    if (clientUserId) {
+      const trainerProfile = await prisma.trainerProfile.findUnique({
+        where: { userId },
+        select: { displayName: true },
+      });
+      inAppNotificationService.notify({
+        userId: clientUserId,
+        type: 'CLIENT_DISCONNECTED',
+        title: `${trainerProfile?.displayName ?? 'Your trainer'} ended the connection`,
+        link: '/dashboard/contacts',
+      }).catch(console.error);
+    }
 
     return { success: true };
   },
@@ -203,6 +301,18 @@ export const clientRosterService = {
 
     await clientRosterRepository.updateStatus(roster.id, 'DISCONNECTED');
     await contactRepository.updateStatus(connectionId, 'CLOSED' as ContactRequestStatus);
+
+    // Notify trainer (fire and forget)
+    const trainerUserId = connection.trainer?.userId;
+    if (trainerUserId) {
+      const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+      inAppNotificationService.notify({
+        userId: trainerUserId,
+        type: 'CLIENT_DISCONNECTED',
+        title: `${user?.name ?? 'A client'} disconnected`,
+        link: '/dashboard/clients',
+      }).catch(console.error);
+    }
 
     return { success: true };
   },

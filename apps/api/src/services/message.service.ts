@@ -4,6 +4,7 @@ import { contactRepository } from '../repositories/contact.repository';
 import { conversationPreferenceRepository } from '../repositories/conversation-preference.repository';
 import { userRepository } from '../repositories/user.repository';
 import { notificationService } from './notification.service';
+import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import type { SendMessageInput } from '@fitnassist/schemas';
 import type { SseNewMessageEvent, SseMessagesReadEvent } from '@fitnassist/types';
@@ -66,9 +67,17 @@ export const messageService = {
           sender.name,
           data.content,
           data.connectionId,
-        ).catch(() => {
-          // Don't fail the message send if notification fails
-        });
+        ).catch(() => {});
+
+        // In-app notification (deduplicated per connection)
+        inAppNotificationService.notifyIfNotExists({
+          userId: recipientUserId,
+          type: 'NEW_MESSAGE',
+          title: `New message from ${sender.name}`,
+          body: data.content.length > 100 ? data.content.slice(0, 100) + '...' : data.content,
+          data: { connectionId: data.connectionId },
+          link: `/dashboard/messages/${data.connectionId}`,
+        }).catch(() => {});
       }
     }
 

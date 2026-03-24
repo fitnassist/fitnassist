@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, Clock, XCircle, User, Unlink } from 'lucide-react';
+import { MessageCircle, Clock, XCircle, User, Unlink, Calendar } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -81,6 +81,14 @@ export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }:
             <span className="hidden sm:inline">Message</span>
           </Button>
         </Link>
+        {isTrainee && (
+          <Link to={routes.dashboardBookingsBook(contact.trainer.id)}>
+            <Button variant="outline" size="sm">
+              <Calendar className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Book</span>
+            </Button>
+          </Link>
+        )}
         {onDisconnect && (
           <Button
             variant="outline"

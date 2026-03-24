@@ -46,6 +46,15 @@ export const notificationPreferencesSchema = z.object({
   // Push notifications
   pushNotifyConnectionRequests: z.boolean(),
   pushNotifyMessages: z.boolean(),
+  pushNotifyBookings: z.boolean(),
+  pushNotifyBookingReminders: z.boolean(),
+  pushNotifyPlanAssignments: z.boolean(),
+  pushNotifyOnboarding: z.boolean(),
+  pushNotifyDiary: z.boolean(),
+  pushNotifyGoals: z.boolean(),
+  // Booking notifications
+  emailNotifyBookings: z.boolean(),
+  emailNotifyBookingReminders: z.boolean(),
 });
 
 export type NotificationPreferencesInput = z.infer<typeof notificationPreferencesSchema>;

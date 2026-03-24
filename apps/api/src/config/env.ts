@@ -28,6 +28,19 @@ const envSchema = z.object({
   // USDA FoodData Central (free key from https://api.data.gov/signup/)
   USDA_API_KEY: z.string().optional(),
 
+  // Stripe
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  STRIPE_PRICE_ID_PRO_MONTHLY: z.string().optional(),
+  STRIPE_PRICE_ID_PRO_ANNUAL: z.string().optional(),
+  STRIPE_PRICE_ID_ELITE_MONTHLY: z.string().optional(),
+  STRIPE_PRICE_ID_ELITE_ANNUAL: z.string().optional(),
+
+  // Web Push (VAPID keys)
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().optional(),
+
   // Cron job authentication
   CRON_SECRET: z.string().optional(),
 });

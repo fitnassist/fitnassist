@@ -9,10 +9,13 @@ import {
 import { PageLayout } from '@/components/layouts';
 import { useClients, useClientStats, useUpdateClientStatus } from '@/api/client-roster';
 import { useDebounce } from '@/hooks';
+import { useFeatureAccess } from '@/hooks/useFeatureAccess';
+import { UpgradePrompt } from '@/components/UpgradePrompt';
 import { ClientCard, ClientFilters } from './components';
 type ActiveClientStatus = 'ONBOARDING' | 'ACTIVE' | 'INACTIVE' | 'ON_HOLD';
 
 export const ClientsPage = () => {
+  const { hasAccess, requiredTier } = useFeatureAccess('clientManagement');
   const [status, setStatus] = useState<ActiveClientStatus | undefined>(undefined);
   const [search, setSearch] = useState('');
   const [showDisconnected, setShowDisconnected] = useState(false);
@@ -52,6 +55,21 @@ export const ClientsPage = () => {
       )}
     </div>
   ) : null;
+
+  if (!hasAccess) {
+    return (
+      <PageLayout>
+        <PageLayout.Header
+          title="Clients"
+          description="Manage your connected clients"
+          icon={<Users className="h-6 w-6 sm:h-8 sm:w-8" />}
+        />
+        <PageLayout.Content>
+          <UpgradePrompt requiredTier={requiredTier} featureName="Client Management" />
+        </PageLayout.Content>
+      </PageLayout>
+    );
+  }
 
   if (isLoading) {
     return (

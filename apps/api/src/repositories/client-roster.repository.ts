@@ -248,6 +248,20 @@ export const clientRosterRepository = {
     });
   },
 
+  async findMyTrainers(userId: string) {
+    return prisma.clientRoster.findMany({
+      where: {
+        connection: { senderId: userId },
+        status: { in: ['ACTIVE', 'ONBOARDING'] },
+      },
+      include: {
+        trainer: {
+          select: { id: true, displayName: true, profileImageUrl: true, userId: true },
+        },
+      },
+    });
+  },
+
   async findByTraineeUserId(userId: string) {
     return prisma.clientRoster.findMany({
       where: {
@@ -260,7 +274,7 @@ export const clientRosterRepository = {
       include: {
         trainer: {
           include: {
-            user: { select: { name: true } },
+            user: { select: { id: true, name: true } },
           },
         },
         ...planAssignmentIncludes,

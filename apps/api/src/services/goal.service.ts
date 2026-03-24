@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { goalRepository } from '../repositories/goal.repository';
 import { clientRosterRepository } from '../repositories/client-roster.repository';
 import { trainerRepository } from '../repositories/trainer.repository';
+import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
 import type { DiaryEntryType, GoalStatus } from '@fitnassist/database';
@@ -104,12 +105,30 @@ export const goalService = {
     const userId = await resolveUserId(callerId, data.clientRosterId);
     const { clientRosterId: _, deadline, ...rest } = data;
 
-    return goalRepository.create({
+    const goal = await goalRepository.create({
       ...rest,
       userId,
       createdById: callerId,
       deadline: deadline ? new Date(deadline + 'T00:00:00.000Z') : undefined,
     });
+
+    // Notify trainer(s) when a client creates their own goal
+    if (callerId === userId) {
+      const rosters = await clientRosterRepository.findByTraineeUserId(userId);
+      if (rosters.length > 0) {
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+        for (const roster of rosters) {
+          inAppNotificationService.notify({
+            userId: roster.trainer.userId,
+            type: 'GOAL_CREATED',
+            title: `${user?.name ?? 'A client'} set a new goal: ${goal.name}`,
+            link: `/dashboard/clients/${roster.id}?tab=progress`,
+          }).catch(console.error);
+        }
+      }
+    }
+
+    return goal;
   },
 
   async listGoals(callerId: string, data: {
@@ -179,6 +198,34 @@ export const goalService = {
       completedAt: new Date(),
     });
     broadcastGoalCompleted(goal.userId, goal.name).catch(() => {});
+
+    // In-app notification to the other party (fire and forget)
+    const notifyUserId = callerId === goal.userId ? null : goal.userId;
+    if (notifyUserId) {
+      const user = await prisma.user.findUnique({ where: { id: callerId }, select: { name: true } });
+      inAppNotificationService.notify({
+        userId: notifyUserId,
+        type: 'GOAL_COMPLETED',
+        title: `${user?.name ?? 'Someone'} completed: ${goal.name}`,
+        link: '/dashboard/goals',
+      }).catch(console.error);
+    }
+    // Also notify trainer(s) if the trainee completed their own goal
+    if (callerId === goal.userId) {
+      const rosters = await clientRosterRepository.findByTraineeUserId(goal.userId);
+      if (rosters.length > 0) {
+        const user = await prisma.user.findUnique({ where: { id: goal.userId }, select: { name: true } });
+        for (const roster of rosters) {
+          inAppNotificationService.notify({
+            userId: roster.trainer.userId,
+            type: 'GOAL_COMPLETED',
+            title: `${user?.name ?? 'A client'} completed: ${goal.name}`,
+            link: `/dashboard/clients/${roster.id}?tab=progress`,
+          }).catch(console.error);
+        }
+      }
+    }
+
     return result;
   },
 

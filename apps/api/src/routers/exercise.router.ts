@@ -1,4 +1,4 @@
-import { router, trainerProcedure } from '../lib/trpc';
+import { router, trainerProcedure, requireTier } from '../lib/trpc';
 import { exerciseService } from '../services/exercise.service';
 import {
   exerciseListSchema,
@@ -22,12 +22,14 @@ export const exerciseRouter = router({
     }),
 
   create: trainerProcedure
+    .use(requireTier('PRO'))
     .input(createExerciseSchema)
     .mutation(async ({ input, ctx }) => {
       return exerciseService.create(ctx.user.id, input);
     }),
 
   update: trainerProcedure
+    .use(requireTier('PRO'))
     .input(updateExerciseSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, ...data } = input;
@@ -35,6 +37,7 @@ export const exerciseRouter = router({
     }),
 
   delete: trainerProcedure
+    .use(requireTier('PRO'))
     .input(deleteExerciseSchema)
     .mutation(async ({ input, ctx }) => {
       return exerciseService.delete(ctx.user.id, input.id);

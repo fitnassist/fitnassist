@@ -46,6 +46,10 @@ export {
   MoodLevelSchema,
   GoalTypeSchema,
   GoalStatusSchema,
+  SubscriptionStatusSchema,
+  BillingPeriodSchema,
+  BookingStatusSchema,
+  DayOfWeekSchema,
   GoalSchema,
   GoalOptionalDefaultsSchema,
   DiaryEntrySchema,
@@ -99,6 +103,10 @@ export * from './forms/onboarding.schema';
 export * from './forms/conversation.schema';
 export * from './forms/diary.schema';
 export * from './forms/goal.schema';
+export * from './forms/subscription.schema';
+export * from './forms/session-location.schema';
+export * from './forms/availability.schema';
+export * from './forms/booking.schema';
 
 // =============================================================================
 // CONSTANTS

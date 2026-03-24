@@ -1,11 +1,24 @@
 import { Settings } from 'lucide-react';
 import { ResponsiveTabs, TabsContent } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
-import { useTabParam } from '@/hooks';
-import { AccountTab, NotificationsTab, DangerZoneTab } from './components';
+import { useTabParam, useAuth } from '@/hooks';
+import { AccountTab, NotificationsTab, DangerZoneTab, SubscriptionTab, SchedulingTab } from './components';
+import { useFeatureAccess } from '@/hooks/useFeatureAccess';
+import { UpgradePrompt } from '@/components/UpgradePrompt';
 
 export const SettingsPage = () => {
   const [activeTab, setActiveTab] = useTabParam('account');
+  const { isTrainer } = useAuth();
+
+  const { hasAccess: hasBookingAccess } = useFeatureAccess('booking');
+
+  const tabOptions = [
+    { value: 'account', label: 'Account' },
+    { value: 'notifications', label: 'Notifications' },
+    ...(isTrainer ? [{ value: 'subscription', label: 'Subscription' }] : []),
+    ...(isTrainer ? [{ value: 'scheduling', label: 'Scheduling' }] : []),
+    { value: 'danger', label: 'Danger Zone' },
+  ];
 
   return (
     <PageLayout>
@@ -17,11 +30,7 @@ export const SettingsPage = () => {
       <ResponsiveTabs
         value={activeTab}
         onValueChange={setActiveTab}
-        options={[
-          { value: 'account', label: 'Account' },
-          { value: 'notifications', label: 'Notifications' },
-          { value: 'danger', label: 'Danger Zone' },
-        ]}
+        options={tabOptions}
         tabsListClassName="mb-6"
       >
         <TabsContent value="account">
@@ -30,6 +39,20 @@ export const SettingsPage = () => {
         <TabsContent value="notifications">
           <NotificationsTab />
         </TabsContent>
+        {isTrainer && (
+          <TabsContent value="subscription">
+            <SubscriptionTab />
+          </TabsContent>
+        )}
+        {isTrainer && (
+          <TabsContent value="scheduling">
+            {hasBookingAccess ? (
+              <SchedulingTab />
+            ) : (
+              <UpgradePrompt requiredTier="PRO" featureName="Booking & Scheduling" />
+            )}
+          </TabsContent>
+        )}
         <TabsContent value="danger">
           <DangerZoneTab />
         </TabsContent>
