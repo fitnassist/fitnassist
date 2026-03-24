@@ -9,9 +9,16 @@ jobs:
   send-reports:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger weekly reports
+      - name: Trigger trainer weekly reports
         run: |
           curl -f -X POST \
             "${{ secrets.API_URL }}/api/cron/weekly-reports" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
+
+      - name: Trigger client weekly reports
+        run: |
+          curl -f -X POST \
+            "${{ secrets.API_URL }}/api/cron/client-weekly-reports" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json"

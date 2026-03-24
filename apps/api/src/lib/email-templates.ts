@@ -149,4 +149,116 @@ export const emailTemplates = {
       </p>
     `);
   },
+
+  clientWeeklyProgress: (data: {
+    clientName: string;
+    weekStart: string;
+    weekEnd: string;
+    weightChange: { current: number; previous: number; unit: string } | null;
+    diaryStats: {
+      totalEntries: number;
+      foodEntries: number;
+      workoutEntries: number;
+      waterEntries: number;
+      stepsEntries: number;
+      sleepEntries: number;
+    };
+    goalsCompleted: number;
+    activeGoals: number;
+    streak: number;
+  }) => {
+    const weightSection = data.weightChange
+      ? (() => {
+          const diff = data.weightChange.current - data.weightChange.previous;
+          const diffAbs = Math.abs(diff).toFixed(1);
+          const arrow = diff < 0 ? '&#9660;' : diff > 0 ? '&#9650;' : '';
+          const diffColor = diff < 0 ? '#16a34a' : diff > 0 ? '#dc2626' : '#555';
+          const diffText =
+            diff !== 0
+              ? `<span style="color: ${diffColor}; font-size: 13px;"> ${arrow} ${diffAbs} ${data.weightChange.unit}</span>`
+              : '';
+          return `
+            <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+              <p style="margin: 0 0 4px; font-size: 13px; color: #888;">Current Weight</p>
+              <p style="margin: 0; font-size: 20px; font-weight: 600;">
+                ${data.weightChange.current.toFixed(1)} ${data.weightChange.unit}${diffText}
+              </p>
+            </div>
+          `;
+        })()
+      : '';
+
+    const lowActivity = data.diaryStats.totalEntries < 2;
+    const encouragement = lowActivity
+      ? '<p style="background: #fef3c7; padding: 12px; border-radius: 6px; font-size: 13px; color: #92400e;">Every small step counts &mdash; try logging one thing tomorrow!</p>'
+      : '';
+
+    const streakSection =
+      data.streak > 0
+        ? `<p style="font-size: 14px; color: #555;">You logged activity <strong>${data.streak} day${data.streak !== 1 ? 's' : ''}</strong> in a row!</p>`
+        : '';
+
+    const goalsSection =
+      data.goalsCompleted > 0 || data.activeGoals > 0
+        ? `
+          <div style="margin-bottom: 16px;">
+            <p style="margin: 0 0 8px; font-weight: 600;">Goals</p>
+            <table style="width: 100%; font-size: 13px; color: #555;">
+              <tr>
+                <td style="padding: 2px 0;">Completed this week</td>
+                <td style="padding: 2px 0; text-align: right; font-weight: 500;">${data.goalsCompleted}</td>
+              </tr>
+              <tr>
+                <td style="padding: 2px 0;">Still active</td>
+                <td style="padding: 2px 0; text-align: right; font-weight: 500;">${data.activeGoals}</td>
+              </tr>
+            </table>
+          </div>
+        `
+        : '';
+
+    return layout(`
+      <h2 style="margin: 0 0 4px;">Your Weekly Progress</h2>
+      <p style="margin: 0 0 20px; color: #888; font-size: 14px;">${data.weekStart} &ndash; ${data.weekEnd}</p>
+      <p>Hi ${data.clientName}, here's a summary of your activity this week.</p>
+      ${weightSection}
+      <div style="border: 1px solid #e5e5e5; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+        <p style="margin: 0 0 8px; font-weight: 600;">Activity Overview</p>
+        <table style="width: 100%; font-size: 13px; color: #555;">
+          <tr>
+            <td style="padding: 2px 0;">Total entries</td>
+            <td style="padding: 2px 0; text-align: right; font-weight: 500;">${data.diaryStats.totalEntries}</td>
+          </tr>
+          <tr>
+            <td style="padding: 2px 0;">Food logs</td>
+            <td style="padding: 2px 0; text-align: right; font-weight: 500;">${data.diaryStats.foodEntries}</td>
+          </tr>
+          <tr>
+            <td style="padding: 2px 0;">Workouts</td>
+            <td style="padding: 2px 0; text-align: right; font-weight: 500;">${data.diaryStats.workoutEntries}</td>
+          </tr>
+          <tr>
+            <td style="padding: 2px 0;">Water logs</td>
+            <td style="padding: 2px 0; text-align: right; font-weight: 500;">${data.diaryStats.waterEntries}</td>
+          </tr>
+          <tr>
+            <td style="padding: 2px 0;">Steps logs</td>
+            <td style="padding: 2px 0; text-align: right; font-weight: 500;">${data.diaryStats.stepsEntries}</td>
+          </tr>
+          <tr>
+            <td style="padding: 2px 0;">Sleep logs</td>
+            <td style="padding: 2px 0; text-align: right; font-weight: 500;">${data.diaryStats.sleepEntries}</td>
+          </tr>
+        </table>
+      </div>
+      ${goalsSection}
+      ${streakSection}
+      ${encouragement}
+      <p style="margin-top: 24px;">
+        <a href="${dashboardUrl}/diary" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View your diary
+        </a>
+      </p>
+    `);
+  },
 };

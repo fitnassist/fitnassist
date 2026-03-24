@@ -147,25 +147,25 @@ export const NotificationsTab = () => {
             />
           </div>
 
-          {isTrainer && (
-            <>
-              <Separator />
+          <Separator />
 
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="emailNotifyWeeklyReport">Weekly client reports</Label>
-                  <p className="text-sm text-muted-foreground">
-                    Receive a weekly email summarising your clients' activity.
-                  </p>
-                </div>
-                <Switch
-                  id="emailNotifyWeeklyReport"
-                  checked={form.watch('emailNotifyWeeklyReport')}
-                  onCheckedChange={(checked) => form.setValue('emailNotifyWeeklyReport', checked)}
-                />
-              </div>
-            </>
-          )}
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="emailNotifyWeeklyReport">
+                {isTrainer ? 'Weekly client reports' : 'Weekly progress summary'}
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                {isTrainer
+                  ? "Receive a weekly email summarising your clients' activity."
+                  : 'Receive a weekly email summarising your progress.'}
+              </p>
+            </div>
+            <Switch
+              id="emailNotifyWeeklyReport"
+              checked={form.watch('emailNotifyWeeklyReport')}
+              onCheckedChange={(checked) => form.setValue('emailNotifyWeeklyReport', checked)}
+            />
+          </div>
         </CardContent>
       </Card>
 
