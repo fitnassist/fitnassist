@@ -5,6 +5,14 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://api-production-2bff.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/trpc/:path*",
+      "destination": "https://api-production-2bff.up.railway.app/trpc/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

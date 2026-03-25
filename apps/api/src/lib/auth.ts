@@ -16,13 +16,10 @@ export const auth = betterAuth({
   }),
 
   advanced: {
-    crossSubDomainCookies: isProduction ? {
-      enabled: true,
-    } : undefined,
-    defaultCookieAttributes: isProduction ? {
-      sameSite: 'none',
-      secure: true,
-    } : undefined,
+    defaultCookieAttributes: {
+      sameSite: 'lax',
+      secure: isProduction,
+    },
   },
 
   user: {
