@@ -24,10 +24,13 @@ import {
   Switch,
   ImageUpload,
   Select,
+  AddressAutocomplete,
+  type AddressDetails,
   type SelectOption,
 } from "@/components/ui";
 import { trpc } from "@/lib/trpc";
 import { routes } from "@/config/routes";
+import { env } from "@/config/env";
 import { useAuth } from "@/hooks";
 import { feetInchesToCm, lbsToKg } from "@/lib/unitConversion";
 
@@ -231,19 +234,43 @@ export const TraineeProfileForm = () => {
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
-              placeholder="e.g. London, UK"
-              {...register("location")}
-            />
-            {errors.location && (
-              <p className="text-sm text-destructive">
-                {errors.location.message}
-              </p>
-            )}
-          </div>
+          <AddressAutocomplete
+            apiKey={env.GOOGLE_MAPS_API_KEY}
+            label="Address"
+            value={{
+              addressLine1: watch("addressLine1") || "",
+              addressLine2: watch("addressLine2") || "",
+              city: watch("city") || "",
+              county: watch("county") || "",
+              postcode: watch("postcode") || "",
+              country: watch("country") || "GB",
+              placeId: watch("placeId") || "",
+              latitude: watch("latitude") || 0,
+              longitude: watch("longitude") || 0,
+            }}
+            onChange={(address: AddressDetails | null) => {
+              if (address) {
+                setValue("addressLine1", address.addressLine1, { shouldDirty: true });
+                setValue("addressLine2", address.addressLine2, { shouldDirty: true });
+                setValue("city", address.city, { shouldDirty: true });
+                setValue("county", address.county, { shouldDirty: true });
+                setValue("postcode", address.postcode, { shouldDirty: true });
+                setValue("country", address.country, { shouldDirty: true });
+                setValue("placeId", address.placeId, { shouldDirty: true });
+                setValue("latitude", address.latitude, { shouldDirty: true });
+                setValue("longitude", address.longitude, { shouldDirty: true });
+              } else {
+                setValue("addressLine1", "", { shouldDirty: true });
+                setValue("addressLine2", "", { shouldDirty: true });
+                setValue("city", "", { shouldDirty: true });
+                setValue("county", "", { shouldDirty: true });
+                setValue("postcode", "", { shouldDirty: true });
+                setValue("placeId", "", { shouldDirty: true });
+                setValue("latitude", undefined, { shouldDirty: true });
+                setValue("longitude", undefined, { shouldDirty: true });
+              }
+            }}
+          />
         </CardContent>
       </Card>
 

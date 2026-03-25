@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import { GoalTypeSchema } from '../inputTypeSchemas/GoalTypeSchema'
 import { GoalStatusSchema } from '../inputTypeSchemas/GoalStatusSchema'
 import { DiaryEntryTypeSchema } from '../inputTypeSchemas/DiaryEntryTypeSchema'

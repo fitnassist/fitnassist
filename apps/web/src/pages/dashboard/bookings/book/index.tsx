@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
+import type { AddressDetails } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { useAvailableDates, useAvailableSlots } from '@/api/availability';
 import { useCreateBooking } from '@/api/booking';
@@ -29,9 +30,11 @@ export const BookSessionPage = () => {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
-  const [clientAddress, setClientAddress] = useState('');
-  const [clientPostcode, setClientPostcode] = useState('');
+  const [clientAddressDetails, setClientAddressDetails] = useState<AddressDetails | null>(null);
   const [notes, setNotes] = useState('');
+
+  // Get trainee profile for "Use my address" feature
+  const { data: traineeProfile } = trpc.trainee.getMyProfile.useQuery();
 
   // Date range for available dates (current month view)
   const startDate = useMemo(() => {
@@ -88,8 +91,10 @@ export const BookSessionPage = () => {
         startTime: selectedSlot,
         durationMin: selectedSlotObj.durationMin,
         locationId: selectedLocationId ?? undefined,
-        clientAddress: clientAddress || undefined,
-        clientPostcode: clientPostcode || undefined,
+        clientAddress: clientAddressDetails?.addressLine1 || undefined,
+        clientPostcode: clientAddressDetails?.postcode || undefined,
+        clientLatitude: clientAddressDetails?.latitude || undefined,
+        clientLongitude: clientAddressDetails?.longitude || undefined,
         notes: notes || undefined,
       },
       {
@@ -176,18 +181,18 @@ export const BookSessionPage = () => {
                 setSelectedLocationId(id);
                 setStep('confirm');
               }}
-              clientAddress={clientAddress}
-              onClientAddressChange={setClientAddress}
-              clientPostcode={clientPostcode}
-              onClientPostcodeChange={setClientPostcode}
+              onClientAddressChange={(address) => {
+                setClientAddressDetails(address);
+              }}
+              traineeAddress={traineeProfile}
               showClientAddress
             />
-            {(clientAddress || !trainerLocations?.length) && (
+            {(clientAddressDetails || !trainerLocations?.length) && (
               <button
                 className="text-sm text-primary mt-3 hover:underline"
                 onClick={() => setStep('confirm')}
               >
-                Continue without selecting a location
+                Continue with this address
               </button>
             )}
             <button
@@ -205,7 +210,7 @@ export const BookSessionPage = () => {
             startTime={selectedSlot}
             durationMin={selectedSlotObj.durationMin}
             locationName={trainerLocations?.find((l) => l.id === selectedLocationId)?.name}
-            clientAddress={clientAddress}
+            clientAddress={clientAddressDetails ? [clientAddressDetails.addressLine1, clientAddressDetails.city, clientAddressDetails.postcode].filter(Boolean).join(', ') : ''}
             notes={notes}
             onNotesChange={setNotes}
             onConfirm={handleConfirm}

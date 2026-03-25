@@ -687,6 +687,22 @@ model TraineeProfile {
   /// @zod.number.int().min(0)
   dailyWaterTargetMl  Int?
 
+  // Address (structured — replaces freetext location)
+  /// @zod.string.max(100)
+  addressLine1     String?
+  /// @zod.string.max(100)
+  addressLine2     String?
+  /// @zod.string.max(100)
+  city             String?
+  /// @zod.string.max(50)
+  county           String?
+  /// @zod.string.max(20)
+  postcode         String?
+  country          String?          @default("GB")
+  placeId          String?
+  latitude         Float?
+  longitude        Float?
+
   // Other
   /// @zod.string.max(200)
   location         String?

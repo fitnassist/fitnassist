@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { MapPin, Plus, Trash2, Star } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label } from '@/components/ui';
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label, AddressAutocomplete, type AddressDetails } from '@/components/ui';
 import { ConfirmDialog } from '@/components/ui';
+import { env } from '@/config/env';
 import {
   useSessionLocations,
   useCreateSessionLocation,
@@ -17,21 +18,25 @@ export const SessionLocationList = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
-  const [addressLine1, setAddressLine1] = useState('');
-  const [city, setCity] = useState('');
-  const [postcode, setPostcode] = useState('');
+  const [addressDetails, setAddressDetails] = useState<AddressDetails | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const handleCreate = () => {
     createMutation.mutate(
-      { name, addressLine1: addressLine1 || undefined, city: city || undefined, postcode: postcode || undefined },
+      {
+        name,
+        addressLine1: addressDetails?.addressLine1 || undefined,
+        city: addressDetails?.city || undefined,
+        postcode: addressDetails?.postcode || undefined,
+        latitude: addressDetails?.latitude || undefined,
+        longitude: addressDetails?.longitude || undefined,
+        placeId: addressDetails?.placeId || undefined,
+      },
       {
         onSuccess: () => {
           setShowForm(false);
           setName('');
-          setAddressLine1('');
-          setCity('');
-          setPostcode('');
+          setAddressDetails(null);
         },
       }
     );
@@ -73,20 +78,12 @@ export const SessionLocationList = () => {
                 <Label className="text-xs">Name</Label>
                 <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Home Gym" className="h-8" />
               </div>
-              <div>
-                <Label className="text-xs">Address</Label>
-                <Input value={addressLine1} onChange={(e) => setAddressLine1(e.target.value)} placeholder="Address line" className="h-8" />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs">City</Label>
-                  <Input value={city} onChange={(e) => setCity(e.target.value)} className="h-8" />
-                </div>
-                <div>
-                  <Label className="text-xs">Postcode</Label>
-                  <Input value={postcode} onChange={(e) => setPostcode(e.target.value)} className="h-8" />
-                </div>
-              </div>
+              <AddressAutocomplete
+                apiKey={env.GOOGLE_MAPS_API_KEY}
+                label="Address"
+                value={addressDetails ?? undefined}
+                onChange={(address) => setAddressDetails(address)}
+              />
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleCreate} disabled={!name || createMutation.isPending}>
                   {createMutation.isPending ? 'Adding...' : 'Add Location'}

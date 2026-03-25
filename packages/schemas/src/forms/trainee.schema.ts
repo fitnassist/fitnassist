@@ -34,6 +34,17 @@ export const createTraineeProfileSchema = z.object({
   dailyFatTargetG: z.number().min(0).optional(),
   dailyWaterTargetMl: z.number().int().min(0).optional(),
 
+  // Address (structured)
+  addressLine1: z.string().max(100).optional().or(z.literal('')),
+  addressLine2: z.string().max(100).optional().or(z.literal('')),
+  city: z.string().max(100).optional().or(z.literal('')),
+  county: z.string().max(50).optional().or(z.literal('')),
+  postcode: z.string().max(20).optional().or(z.literal('')),
+  country: z.string().optional().or(z.literal('')),
+  placeId: z.string().optional().or(z.literal('')),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
+
   // Other
   location: z.string().max(200).optional().or(z.literal('')),
   isPublic: z.boolean().default(false),

@@ -35,6 +35,13 @@ export const traineeService = {
       fitnessGoalNotes: rest.fitnessGoalNotes || undefined,
       medicalNotes: rest.medicalNotes || undefined,
       location: rest.location || undefined,
+      addressLine1: rest.addressLine1 || undefined,
+      addressLine2: rest.addressLine2 || undefined,
+      city: rest.city || undefined,
+      county: rest.county || undefined,
+      postcode: rest.postcode || undefined,
+      country: rest.country || undefined,
+      placeId: rest.placeId || undefined,
     });
   },
 

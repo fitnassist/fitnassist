@@ -56,6 +56,7 @@ export function ProfileWizard() {
   const [formData, setFormData] = useState<WizardFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const utils = trpc.useUtils();
   const createProfileMutation = trpc.trainer.create.useMutation();
 
   const currentStep = WIZARD_STEPS[currentStepIndex]!;
@@ -113,7 +114,9 @@ export function ProfileWizard() {
         isPublished: reviewData?.isPublished ?? formData.review.isPublished,
       });
 
-      // Navigate to dashboard on success
+      // Invalidate profile cache so onboarding guard knows we have a profile
+      await utils.trainer.hasProfile.invalidate();
+      await utils.trainer.getMyProfile.invalidate();
       navigate(routes.dashboard);
     } catch (error) {
       // Error will be handled by tRPC/React Query

@@ -1,4 +1,3 @@
-import { z } from 'zod';
 
 
 export const ExperienceLevelSchema = z.enum(['BEGINNER','INTERMEDIATE','ADVANCED']);

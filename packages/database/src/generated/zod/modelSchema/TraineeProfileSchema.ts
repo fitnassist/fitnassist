@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import { GenderSchema } from '../inputTypeSchemas/GenderSchema'
 import { UnitPreferenceSchema } from '../inputTypeSchemas/UnitPreferenceSchema'
 import { ExperienceLevelSchema } from '../inputTypeSchemas/ExperienceLevelSchema'
@@ -30,6 +29,15 @@ export const TraineeProfileSchema = z.object({
   dailyCarbsTargetG: z.number().min(0).nullable(),
   dailyFatTargetG: z.number().min(0).nullable(),
   dailyWaterTargetMl: z.number().int().min(0).nullable(),
+  addressLine1: z.string().max(100).nullable(),
+  addressLine2: z.string().max(100).nullable(),
+  city: z.string().max(100).nullable(),
+  county: z.string().max(50).nullable(),
+  postcode: z.string().max(20).nullable(),
+  country: z.string(),
+  placeId: z.string().nullable(),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
   location: z.string().max(200).nullable(),
   isPublic: z.boolean(),
   createdAt: z.coerce.date(),
@@ -45,6 +53,7 @@ export type TraineeProfile = z.infer<typeof TraineeProfileSchema>
 export const TraineeProfileOptionalDefaultsSchema = TraineeProfileSchema.merge(z.object({
   unitPreference: UnitPreferenceSchema.optional(),
   id: z.string().cuid().optional(),
+  country: z.string().optional(),
   isPublic: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),

@@ -1,4 +1,3 @@
-import { z } from 'zod';
 
 
 export const ClientWorkoutPlanAssignmentScalarFieldEnumSchema = z.enum(['id','clientRosterId','workoutPlanId','assignedAt']);
