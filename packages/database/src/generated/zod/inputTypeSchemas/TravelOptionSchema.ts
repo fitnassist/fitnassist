@@ -1,3 +1,4 @@
+import { z } from 'zod';
 
 
 export const TravelOptionSchema = z.enum(['CLIENT_TRAVELS','TRAINER_TRAVELS','BOTH']);

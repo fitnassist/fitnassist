@@ -1,3 +1,4 @@
+import { z } from 'zod';
 
 
 export const ClientNoteScalarFieldEnumSchema = z.enum(['id','clientRosterId','content','createdAt']);

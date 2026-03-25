@@ -1,3 +1,4 @@
+import { z } from 'zod';
 
 
 export const UserRoleSchema = z.enum(['TRAINEE','TRAINER','GYM','ADMIN']);

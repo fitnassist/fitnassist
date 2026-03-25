@@ -1,3 +1,4 @@
+import { z } from 'zod';
 
 
 export const ContactRequestStatusSchema = z.enum(['PENDING','ACCEPTED','DECLINED','RESPONDED','CLOSED']);

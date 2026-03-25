@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { MuscleGroupSchema } from '../inputTypeSchemas/MuscleGroupSchema'
 import { ExperienceLevelSchema } from '../inputTypeSchemas/ExperienceLevelSchema'
 

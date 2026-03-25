@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 
 export const JsonValueSchema: z.ZodType<Prisma.JsonValue> = z.lazy(() =>

@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { GenderSchema } from '../inputTypeSchemas/GenderSchema'
 import { UnitPreferenceSchema } from '../inputTypeSchemas/UnitPreferenceSchema'
 import { ExperienceLevelSchema } from '../inputTypeSchemas/ExperienceLevelSchema'

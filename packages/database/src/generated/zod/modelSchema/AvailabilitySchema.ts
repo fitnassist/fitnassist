@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { DayOfWeekSchema } from '../inputTypeSchemas/DayOfWeekSchema'
 
 /////////////////////////////////////////

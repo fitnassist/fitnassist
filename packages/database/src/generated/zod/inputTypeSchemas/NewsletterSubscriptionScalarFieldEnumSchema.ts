@@ -1,3 +1,4 @@
+import { z } from 'zod';
 
 
 export const NewsletterSubscriptionScalarFieldEnumSchema = z.enum(['id','email','createdAt']);
