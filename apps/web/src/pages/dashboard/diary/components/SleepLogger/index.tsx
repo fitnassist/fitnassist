@@ -101,7 +101,6 @@ export const SleepLogger = ({ date, entry }: SleepLoggerProps) => {
           </div>
           <Button
             type="submit"
-            size="sm"
             className="w-full"
             disabled={!hours || quality < 1 || logSleep.isPending}
           >

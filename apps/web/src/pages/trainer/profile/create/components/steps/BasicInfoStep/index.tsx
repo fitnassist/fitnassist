@@ -40,7 +40,7 @@ export function BasicInfoStep({
           {errors.handle && (
             <p className="text-sm text-destructive">{errors.handle.message}</p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className="mt-1.5 text-xs text-muted-foreground">
             This will be your unique profile URL. Use lowercase letters, numbers, and hyphens only.
           </p>
         </div>
@@ -55,7 +55,7 @@ export function BasicInfoStep({
           {errors.displayName && (
             <p className="text-sm text-destructive">{errors.displayName.message}</p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className="mt-1.5 text-xs text-muted-foreground">
             This is the name that will be displayed on your profile.
           </p>
         </div>
@@ -72,7 +72,7 @@ export function BasicInfoStep({
           {errors.bio && (
             <p className="text-sm text-destructive">{errors.bio.message}</p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className="mt-1.5 text-xs text-muted-foreground">
             Max 2000 characters. This will appear on your public profile.
           </p>
         </div>

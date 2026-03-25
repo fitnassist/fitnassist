@@ -113,7 +113,7 @@ export function LocationStep({
           {errors.phoneNumber && (
             <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
           )}
-          <p className="text-xs text-muted-foreground">
+          <p className="mt-1.5 text-xs text-muted-foreground">
             Used for SMS appointment reminders. Never shared publicly.
           </p>
         </div>

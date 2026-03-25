@@ -76,7 +76,7 @@ export const SessionLocationList = () => {
             <div className="space-y-3 p-3 border rounded-lg bg-muted/50">
               <div>
                 <Label className="text-xs">Name</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Home Gym" className="h-8" />
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Home Gym" />
               </div>
               <AddressAutocomplete
                 apiKey={env.GOOGLE_MAPS_API_KEY}
@@ -85,10 +85,10 @@ export const SessionLocationList = () => {
                 onChange={(address) => setAddressDetails(address)}
               />
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleCreate} disabled={!name || createMutation.isPending}>
+                <Button onClick={handleCreate} disabled={!name || createMutation.isPending}>
                   {createMutation.isPending ? 'Adding...' : 'Add Location'}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+                <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
               </div>
             </div>
           )}

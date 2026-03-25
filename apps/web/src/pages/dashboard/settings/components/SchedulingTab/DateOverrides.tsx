@@ -61,17 +61,17 @@ export const DateOverrides = () => {
             <div className="space-y-3 p-3 border rounded-lg bg-muted/50">
               <div>
                 <Label className="text-xs">Date</Label>
-                <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-8" />
+                <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               </div>
               <div>
                 <Label className="text-xs">Reason (optional)</Label>
-                <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g., Holiday" className="h-8" />
+                <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g., Holiday" />
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleCreate} disabled={!date || createMutation.isPending}>
+                <Button onClick={handleCreate} disabled={!date || createMutation.isPending}>
                   {createMutation.isPending ? 'Blocking...' : 'Block Date'}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+                <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
               </div>
             </div>
           )}

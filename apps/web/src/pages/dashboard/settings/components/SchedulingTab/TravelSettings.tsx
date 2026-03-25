@@ -83,7 +83,7 @@ export const TravelSettings = () => {
         </div>
 
         <div className="flex items-center gap-3 pt-2">
-          <Button onClick={handleSave} disabled={updateMutation.isPending} size="sm">
+          <Button onClick={handleSave} disabled={updateMutation.isPending}>
             {updateMutation.isPending ? 'Saving...' : 'Save'}
           </Button>
           {saved && <span className="text-sm text-green-600">Saved!</span>}

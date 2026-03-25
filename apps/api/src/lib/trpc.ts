@@ -40,9 +40,15 @@ export async function createContext(
     }
   }
 
-  const sessionData = await auth.api.getSession({
-    headers: new Headers(opts.req.headers as Record<string, string>),
-  });
+  let sessionData;
+  try {
+    sessionData = await auth.api.getSession({
+      headers: new Headers(opts.req.headers as Record<string, string>),
+    });
+  } catch (error) {
+    console.error('[tRPC] Session lookup failed:', error);
+    return { user: null, session: null };
+  }
 
   if (!sessionData) {
     return {

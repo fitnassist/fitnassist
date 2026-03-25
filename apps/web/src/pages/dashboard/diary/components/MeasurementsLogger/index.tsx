@@ -146,7 +146,6 @@ export const MeasurementsLogger = ({ date, entry, unitPreference }: Measurements
             ))}
             <Button
               type="submit"
-              size="sm"
               className="w-full"
               disabled={logMeasurements.isPending}
             >

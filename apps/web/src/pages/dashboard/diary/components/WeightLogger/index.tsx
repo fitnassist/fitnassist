@@ -82,7 +82,6 @@ export const WeightLogger = ({ date, entry, unitPreference }: WeightLoggerProps)
           />
           <Button
             type="submit"
-            size="sm"
             disabled={!value || logWeight.isPending}
           >
             {currentWeight ? 'Update' : 'Log'}

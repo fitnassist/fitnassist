@@ -173,10 +173,10 @@ export const WorkoutLogger = ({ date, entries }: WorkoutLoggerProps) => {
             </div>
 
             <div className="flex gap-2">
-              <Button type="submit" size="sm" className="flex-1" disabled={logWorkout.isPending}>
+              <Button type="submit" className="flex-1" disabled={logWorkout.isPending}>
                 {logWorkout.isPending ? 'Saving...' : 'Save Workout'}
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => setShowForm(false)}>
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                 Cancel
               </Button>
             </div>

@@ -141,7 +141,7 @@ export const WeeklyScheduleBuilder = () => {
         })}
 
         <div className="flex items-center gap-3 pt-2">
-          <Button onClick={handleSave} disabled={setWeekly.isPending} size="sm">
+          <Button onClick={handleSave} disabled={setWeekly.isPending}>
             {setWeekly.isPending ? 'Saving...' : 'Save Schedule'}
           </Button>
           {saved && <span className="text-sm text-green-600">Saved!</span>}
