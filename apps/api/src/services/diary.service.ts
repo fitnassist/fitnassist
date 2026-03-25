@@ -4,10 +4,11 @@ import { clientRosterRepository } from '../repositories/client-roster.repository
 import { trainerRepository } from '../repositories/trainer.repository';
 import { foodSearch } from '../lib/foodSearch';
 import { goalService } from './goal.service';
+import { personalBestService } from './personal-best.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
-import type { DiaryEntryType, MoodLevel, MealType } from '@fitnassist/database';
+import type { DiaryEntryType, MoodLevel, MealType, ActivityType } from '@fitnassist/database';
 import type { SseDiaryEntryEvent, SseDiaryCommentEvent } from '@fitnassist/types';
 
 /**
@@ -87,6 +88,7 @@ const ENTRY_TYPE_LABELS: Record<string, string> = {
   WORKOUT_LOG: 'a workout',
   PROGRESS_PHOTO: 'progress photos',
   STEPS: 'steps',
+  ACTIVITY: 'an activity',
 };
 
 /**
@@ -156,6 +158,7 @@ export const diaryService = {
     const userId = await resolveUserId(callerId, data.clientRosterId);
     const result = await diaryRepository.upsertWeight(userId, parseDate(data.date), data.weightKg);
     goalService.checkAutoProgress(userId, 'WEIGHT', data.weightKg).catch(() => {});
+    personalBestService.checkWeightPB(userId, data.weightKg, parseDate(data.date)).catch(() => {});
     broadcastDiaryEntry(userId, 'WEIGHT', data.date).catch(() => {});
     return result;
   },
@@ -213,6 +216,7 @@ export const diaryService = {
     const { clientRosterId: _, date, ...workoutData } = data;
     const result = await diaryRepository.createWorkoutLog(userId, parseDate(date), workoutData);
     goalService.checkAutoProgress(userId, 'WORKOUT_LOG').catch(() => {});
+    personalBestService.checkWorkoutPB(userId, data.durationMinutes, parseDate(date)).catch(() => {});
     broadcastDiaryEntry(userId, 'WORKOUT_LOG', date).catch(() => {});
     return result;
   },
@@ -222,8 +226,54 @@ export const diaryService = {
     const userId = await resolveUserId(callerId, data.clientRosterId);
     const result = await diaryRepository.upsertSteps(userId, parseDate(data.date), data.totalSteps);
     goalService.checkAutoProgress(userId, 'STEPS').catch(() => {});
+    personalBestService.checkStepsPB(userId, data.totalSteps, parseDate(data.date)).catch(() => {});
     broadcastDiaryEntry(userId, 'STEPS', data.date).catch(() => {});
     return result;
+  },
+
+  // ---- Activity ----
+  async logActivity(callerId: string, data: {
+    clientRosterId?: string;
+    date: string;
+    activityType: ActivityType;
+    activityName?: string;
+    distanceKm?: number;
+    durationSeconds: number;
+    elevationGainM?: number;
+    caloriesBurned?: number;
+    notes?: string;
+  }) {
+    const userId = await resolveUserId(callerId, data.clientRosterId);
+    const { clientRosterId: _, date, ...activityData } = data;
+
+    // Calculate average pace if distance is provided
+    const avgPaceSecPerKm = activityData.distanceKm && activityData.distanceKm > 0
+      ? Math.round(activityData.durationSeconds / activityData.distanceKm)
+      : undefined;
+
+    const result = await diaryRepository.createActivity(userId, parseDate(date), {
+      ...activityData,
+      avgPaceSecPerKm,
+    });
+
+    goalService.checkAutoProgress(userId, 'ACTIVITY').catch(() => {});
+    personalBestService.checkActivityPBs(
+      userId,
+      data.activityType,
+      data.distanceKm,
+      data.durationSeconds,
+      result.id,
+      parseDate(date),
+    ).catch(() => {});
+    broadcastDiaryEntry(userId, 'ACTIVITY', date).catch(() => {});
+    return result;
+  },
+
+  // ---- Personal Bests ----
+  async getPersonalBests(callerId: string, userId?: string) {
+    const targetUserId = userId || callerId;
+    await verifyReadAccess(callerId, targetUserId);
+    return personalBestService.getPersonalBests(targetUserId);
   },
 
   // ---- Progress Photos ----

@@ -15,6 +15,8 @@ import {
   WorkoutLogger,
   StepsTracker,
   ProgressPhotos,
+  ActivityLogger,
+  PersonalBests,
   DiaryComments,
 } from "./components";
 
@@ -45,6 +47,7 @@ export const DiaryPage = () => {
     sleepEntry,
     foodEntry,
     workoutEntries,
+    activityEntries,
     stepsEntry,
     progressPhotoEntries,
   } = useDiaryPage();
@@ -112,12 +115,16 @@ export const DiaryPage = () => {
               </div>
             </TabsContent>
 
-            {/* Activity: workouts, mood, sleep */}
+            {/* Activity: workouts, activities, mood, sleep */}
             <TabsContent value="activity">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <WorkoutLogger date={selectedDate} entries={workoutEntries} />
+                <ActivityLogger date={selectedDate} entries={activityEntries} />
                 <SleepLogger date={selectedDate} entry={sleepEntry} />
                 <MoodLogger date={selectedDate} entry={moodEntry} />
+              </div>
+              <div className="mt-4">
+                <PersonalBests />
               </div>
             </TabsContent>
           </ResponsiveTabs>

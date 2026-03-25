@@ -106,3 +106,67 @@ export const formatDuration = (minutes: number) => {
   const mins = minutes % 60;
   return mins > 0 ? `${hrs}h ${mins}min` : `${hrs}h`;
 };
+
+// =============================================================================
+// ACTIVITY HELPERS
+// =============================================================================
+
+export const ACTIVITY_TYPE_LABELS: Record<string, string> = {
+  RUN: 'Run',
+  WALK: 'Walk',
+  CYCLE: 'Cycle',
+  SWIM: 'Swim',
+  HIKE: 'Hike',
+  OTHER: 'Other',
+};
+
+export const ACTIVITY_TYPE_OPTIONS = Object.entries(ACTIVITY_TYPE_LABELS).map(([value, label]) => ({
+  value,
+  label,
+}));
+
+export const formatPace = (secPerKm: number) => {
+  const mins = Math.floor(secPerKm / 60);
+  const secs = Math.round(secPerKm % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')} /km`;
+};
+
+export const formatActivityDuration = (seconds: number) => {
+  if (seconds < 60) return `${seconds}s`;
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  if (hrs > 0) {
+    return mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+  }
+  return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+};
+
+export const formatDistance = (km: number) => {
+  if (km < 1) return `${Math.round(km * 1000)}m`;
+  return `${km.toFixed(2)} km`;
+};
+
+// =============================================================================
+// PERSONAL BEST HELPERS
+// =============================================================================
+
+export const formatPBValue = (value: number, unit: string) => {
+  switch (unit) {
+    case 'seconds': {
+      const hrs = Math.floor(value / 3600);
+      const mins = Math.floor((value % 3600) / 60);
+      const secs = Math.round(value % 60);
+      if (hrs > 0) return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    case 'km':
+      return `${value.toFixed(2)} km`;
+    case 'kg':
+      return `${value} kg`;
+    case 'steps':
+      return `${value.toLocaleString()} steps`;
+    default:
+      return `${value} ${unit}`;
+  }
+};

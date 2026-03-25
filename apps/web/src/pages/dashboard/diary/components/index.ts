@@ -8,5 +8,7 @@ export { FoodLogger } from './FoodLogger';
 export { WorkoutLogger } from './WorkoutLogger';
 export { StepsTracker } from './StepsTracker';
 export { ProgressPhotos } from './ProgressPhotos';
+export { ActivityLogger } from './ActivityLogger';
+export { PersonalBests } from './PersonalBests';
 export { Trends } from './Trends';
 export { DiaryComments } from './DiaryComments';

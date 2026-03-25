@@ -21,6 +21,8 @@ export {
   useAddDiaryComment,
   useDiaryComments,
   useDeleteDiaryComment,
+  useLogActivity,
+  usePersonalBests,
   useDeleteDiaryEntry,
   useRecentClientActivity,
 } from './useDiary';

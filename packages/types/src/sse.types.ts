@@ -73,6 +73,17 @@ export interface SseDiaryCommentEvent {
 }
 
 // =============================================================================
+// PERSONAL BEST EVENTS
+// =============================================================================
+
+export interface SsePersonalBestEvent {
+  type: 'personal_best';
+  userId: string;
+  userName: string;
+  label: string;
+}
+
+// =============================================================================
 // GOAL EVENTS
 // =============================================================================
 
@@ -140,6 +151,7 @@ export type SseEvent =
   | SseConnectionDeclinedEvent
   | SseDiaryEntryEvent
   | SseDiaryCommentEvent
+  | SsePersonalBestEvent
   | SseGoalCompletedEvent
   | SseBookingCreatedEvent
   | SseBookingCancelledEvent

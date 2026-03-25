@@ -34,6 +34,7 @@ export const useLogWeight = () => {
     onSuccess: (_data, variables) => {
       utils.diary.getEntries.invalidate({ date: variables.date });
       utils.diary.getRange.invalidate();
+      utils.diary.getPersonalBests.invalidate();
     },
   });
 };
@@ -144,12 +145,39 @@ export const useLogWorkout = () => {
       utils.diary.getEntries.invalidate({ date: variables.date });
       utils.diary.getDailyNutrition.invalidate({ date: variables.date });
       utils.diary.getRange.invalidate();
+      utils.diary.getPersonalBests.invalidate();
     },
   });
 };
 
 export const useMyWorkoutPlans = () => {
   return trpc.diary.getMyWorkoutPlans.useQuery();
+};
+
+// =============================================================================
+// ACTIVITY
+// =============================================================================
+
+export const useLogActivity = () => {
+  const utils = trpc.useUtils();
+  return trpc.diary.logActivity.useMutation({
+    onSuccess: (_data, variables) => {
+      utils.diary.getEntries.invalidate({ date: variables.date });
+      utils.diary.getRange.invalidate();
+      utils.diary.getPersonalBests.invalidate();
+    },
+  });
+};
+
+// =============================================================================
+// PERSONAL BESTS
+// =============================================================================
+
+export const usePersonalBests = (userId?: string) => {
+  return trpc.diary.getPersonalBests.useQuery(
+    { userId },
+    { enabled: true }
+  );
 };
 
 // =============================================================================
@@ -162,6 +190,7 @@ export const useLogSteps = () => {
     onSuccess: (_data, variables) => {
       utils.diary.getEntries.invalidate({ date: variables.date });
       utils.diary.getRange.invalidate();
+      utils.diary.getPersonalBests.invalidate();
     },
   });
 };

@@ -70,6 +70,12 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
         break;
       }
 
+      // --- Personal best events ---
+      case 'personal_best': {
+        utils.diary.getPersonalBests.invalidate();
+        break;
+      }
+
       // --- Goal events ---
       case 'goal_completed': {
         utils.goal.list.invalidate();

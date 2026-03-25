@@ -13,6 +13,7 @@ export const useDiaryPage = () => {
   const sleepEntry = entries?.find(e => e.type === 'SLEEP');
   const foodEntry = entries?.find(e => e.type === 'FOOD');
   const workoutEntries = entries?.filter(e => e.type === 'WORKOUT_LOG') ?? [];
+  const activityEntries = entries?.filter(e => e.type === 'ACTIVITY') ?? [];
   const stepsEntry = entries?.find(e => e.type === 'STEPS');
   const progressPhotoEntries = entries?.filter(e => e.type === 'PROGRESS_PHOTO') ?? [];
 
@@ -28,6 +29,7 @@ export const useDiaryPage = () => {
     sleepEntry,
     foodEntry,
     workoutEntries,
+    activityEntries,
     stepsEntry,
     progressPhotoEntries,
   };

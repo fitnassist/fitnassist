@@ -480,7 +480,7 @@ model Goal {
 
 ---
 
-## Phase 4: Progress Photos
+## Phase 4: Progress Photos ✅
 
 **Goal:** Trainees upload progress photos. Side-by-side comparison with drag slider.
 
@@ -540,7 +540,7 @@ pages/dashboard/diary/components/
 
 ---
 
-## Phase 5: Charts & Trends
+## Phase 5: Charts & Trends ✅
 
 **Goal:** Visualise progress over time with interactive charts.
 
@@ -582,7 +582,7 @@ pages/dashboard/diary/components/
 
 ---
 
-## Phase 6: PT View — Progress Tab + Comments
+## Phase 6: PT View — Progress Tab + Comments ✅
 
 **Goal:** PTs see client progress on the client detail page. PTs can comment on diary entries.
 

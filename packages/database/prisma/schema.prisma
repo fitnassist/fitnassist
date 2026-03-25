@@ -193,6 +193,7 @@ model User {
   createdGoals   Goal[]       @relation("goalCreator")
   notifications  Notification[]
   pushSubscriptions PushSubscription[]
+  personalBests  PersonalBest[]
 
   @@map("users")
 }
@@ -865,6 +866,33 @@ enum DiaryEntryType {
   WORKOUT_LOG
   PROGRESS_PHOTO
   STEPS
+  ACTIVITY
+}
+
+enum ActivityType {
+  RUN
+  WALK
+  CYCLE
+  SWIM
+  HIKE
+  OTHER
+}
+
+enum ActivitySource {
+  MANUAL
+  STRAVA
+  GARMIN
+  APPLE_HEALTH
+  GOOGLE_FIT
+}
+
+enum PersonalBestCategory {
+  FASTEST_DISTANCE
+  LONGEST_DISTANCE
+  LONGEST_DURATION
+  HEAVIEST_WEIGHT
+  MOST_STEPS
+  CUSTOM
 }
 
 enum MoodLevel {
@@ -893,6 +921,7 @@ model DiaryEntry {
   foodEntries      FoodEntry[]
   workoutLogEntry  WorkoutLogEntry?
   stepsEntry       StepsEntry?
+  activityEntry    ActivityEntry?
   progressPhotos   ProgressPhoto[]
   comments         DiaryComment[]
 
@@ -1024,6 +1053,39 @@ model StepsEntry {
   @@map("steps_entries")
 }
 
+model ActivityEntry {
+  id              String         @id @default(cuid())
+  diaryEntryId    String         @unique
+  activityType    ActivityType
+  /// @zod.number.min(0)
+  distanceKm      Float?
+  /// @zod.number.int().min(1)
+  durationSeconds Int
+  avgPaceSecPerKm Int?
+  /// @zod.number.min(0)
+  elevationGainM  Float?
+  /// @zod.number.int().min(0)
+  caloriesBurned  Int?
+  /// @zod.string.max(500)
+  notes           String?
+  source          ActivitySource @default(MANUAL)
+  /// @zod.string.max(100)
+  activityName    String?
+
+  // Future GPS/mobile app fields
+  routePolyline   String?        @db.Text
+  startLatitude   Float?
+  startLongitude  Float?
+  endLatitude     Float?
+  endLongitude    Float?
+  avgHeartRate    Int?
+  maxHeartRate    Int?
+  externalId      String?
+
+  diaryEntry      DiaryEntry     @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  @@map("activity_entries")
+}
+
 model ProgressPhoto {
   id           String     @id @default(cuid())
   diaryEntryId String
@@ -1101,6 +1163,34 @@ model Goal {
 
   @@index([userId, status])
   @@map("goals")
+}
+
+// =============================================================================
+// PERSONAL BESTS
+// =============================================================================
+
+model PersonalBest {
+  id              String                @id @default(cuid())
+  userId          String
+  category        PersonalBestCategory
+  activityType    ActivityType?
+  distanceKm      Float?
+  value           Float
+  unit            String
+  /// @zod.string.max(200)
+  label           String
+  achievedAt      DateTime              @db.Date
+  previousValue   Float?
+  previousDate    DateTime?             @db.Date
+  diaryEntryId    String?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, category, activityType, distanceKm])
+  @@index([userId])
+  @@map("personal_bests")
 }
 
 // =============================================================================

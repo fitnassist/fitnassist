@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import type { DiaryEntryType, MoodLevel } from '@fitnassist/database';
+import type { DiaryEntryType, MoodLevel, ActivityType } from '@fitnassist/database';
 
 const DIARY_ENTRY_INCLUDE = {
   weightEntry: true,
@@ -14,6 +14,7 @@ const DIARY_ENTRY_INCLUDE = {
     include: { workoutPlan: { select: { id: true, name: true } } },
   },
   stepsEntry: true,
+  activityEntry: true,
   progressPhotos: {
     orderBy: { sortOrder: 'asc' as const },
   },
@@ -327,6 +328,30 @@ export const diaryRepository = {
         date,
         type: 'WORKOUT_LOG',
         workoutLogEntry: {
+          create: data,
+        },
+      },
+      include: DIARY_ENTRY_INCLUDE,
+    });
+  },
+
+  // ---- Activity ----
+  async createActivity(userId: string, date: Date, data: {
+    activityType: ActivityType;
+    activityName?: string;
+    distanceKm?: number;
+    durationSeconds: number;
+    avgPaceSecPerKm?: number;
+    elevationGainM?: number;
+    caloriesBurned?: number;
+    notes?: string;
+  }) {
+    return prisma.diaryEntry.create({
+      data: {
+        userId,
+        date,
+        type: 'ACTIVITY',
+        activityEntry: {
           create: data,
         },
       },

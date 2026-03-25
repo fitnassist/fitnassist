@@ -24,6 +24,8 @@ import {
   deleteDiaryCommentSchema,
   deleteProgressPhotoSchema,
   getRecentClientActivitySchema,
+  logActivitySchema,
+  getPersonalBestsSchema,
 } from '@fitnassist/schemas';
 
 export const diaryRouter = router({
@@ -99,6 +101,20 @@ export const diaryRouter = router({
     .input(logWorkoutSchema)
     .mutation(async ({ input, ctx }) => {
       return diaryService.logWorkout(ctx.user.id, input);
+    }),
+
+  // ---- Activity ----
+  logActivity: protectedProcedure
+    .input(logActivitySchema)
+    .mutation(async ({ input, ctx }) => {
+      return diaryService.logActivity(ctx.user.id, input);
+    }),
+
+  // ---- Personal Bests ----
+  getPersonalBests: protectedProcedure
+    .input(getPersonalBestsSchema)
+    .query(async ({ input, ctx }) => {
+      return diaryService.getPersonalBests(ctx.user.id, input.userId);
     }),
 
   // ---- Steps ----

@@ -10,14 +10,18 @@ import { NutritionChart } from './NutritionChart';
 import { WaterChart } from './WaterChart';
 import { MoodChart } from './MoodChart';
 import { SleepChart } from './SleepChart';
+import { ActivityChart } from './ActivityChart';
+import { StepsChart } from './StepsChart';
 
-type ChartType = 'weight' | 'measurements' | 'nutrition' | 'water' | 'mood' | 'sleep';
+type ChartType = 'weight' | 'measurements' | 'nutrition' | 'water' | 'mood' | 'sleep' | 'activity' | 'steps';
 
 const CHART_TABS: Array<{ key: ChartType; label: string }> = [
   { key: 'weight', label: 'Weight' },
   { key: 'measurements', label: 'Measurements' },
   { key: 'nutrition', label: 'Nutrition' },
   { key: 'water', label: 'Water' },
+  { key: 'activity', label: 'Activity' },
+  { key: 'steps', label: 'Steps' },
   { key: 'mood', label: 'Mood' },
   { key: 'sleep', label: 'Sleep' },
 ];
@@ -75,6 +79,19 @@ export const Trends = ({ unitPreference }: TrendsProps) => {
       quality: e.sleepEntry!.quality,
     }));
 
+  const activityData = (entries ?? [])
+    .filter(e => e.type === 'ACTIVITY' && e.activityEntry)
+    .map(e => ({
+      date: e.date as unknown as string,
+      activityType: (e as { activityEntry: { activityType: string } }).activityEntry.activityType,
+      distanceKm: (e as { activityEntry: { distanceKm: number | null } }).activityEntry.distanceKm,
+      durationSeconds: (e as { activityEntry: { durationSeconds: number } }).activityEntry.durationSeconds,
+    }));
+
+  const stepsData = (entries ?? [])
+    .filter(e => e.type === 'STEPS' && e.stepsEntry)
+    .map(e => ({ date: e.date as unknown as string, totalSteps: e.stepsEntry!.totalSteps }));
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -111,6 +128,8 @@ export const Trends = ({ unitPreference }: TrendsProps) => {
         {activeChart === 'water' && <WaterChart data={waterData} />}
         {activeChart === 'mood' && <MoodChart data={moodData} />}
         {activeChart === 'sleep' && <SleepChart data={sleepData} />}
+        {activeChart === 'activity' && <ActivityChart data={activityData} />}
+        {activeChart === 'steps' && <StepsChart data={stepsData} />}
       </CardContent>
     </Card>
   );

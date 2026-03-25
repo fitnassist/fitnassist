@@ -112,7 +112,7 @@ export const getDiaryRangeSchema = z.object({
   userId: z.string().min(1).optional(),
   startDate: z.string().date(),
   endDate: z.string().date(),
-  type: z.enum(['WEIGHT', 'WATER', 'MEASUREMENT', 'MOOD', 'SLEEP', 'FOOD', 'WORKOUT_LOG', 'PROGRESS_PHOTO', 'STEPS']).optional(),
+  type: z.enum(['WEIGHT', 'WATER', 'MEASUREMENT', 'MOOD', 'SLEEP', 'FOOD', 'WORKOUT_LOG', 'PROGRESS_PHOTO', 'STEPS', 'ACTIVITY']).optional(),
 });
 export type GetDiaryRangeInput = z.infer<typeof getDiaryRangeSchema>;
 
@@ -130,6 +130,32 @@ export const logWorkoutSchema = z.object({
   notes: z.string().max(500).optional(),
 });
 export type LogWorkoutInput = z.infer<typeof logWorkoutSchema>;
+
+// =============================================================================
+// ACTIVITY
+// =============================================================================
+
+export const logActivitySchema = z.object({
+  clientRosterId: z.string().cuid().optional(),
+  date: z.string().date(),
+  activityType: z.enum(['RUN', 'WALK', 'CYCLE', 'SWIM', 'HIKE', 'OTHER']),
+  activityName: z.string().max(100).optional(),
+  distanceKm: z.number().min(0).optional(),
+  durationSeconds: z.number().int().min(1, { message: 'Duration must be at least 1 second' }),
+  elevationGainM: z.number().min(0).optional(),
+  caloriesBurned: z.number().int().min(0).optional(),
+  notes: z.string().max(500).optional(),
+});
+export type LogActivityInput = z.infer<typeof logActivitySchema>;
+
+// =============================================================================
+// PERSONAL BESTS
+// =============================================================================
+
+export const getPersonalBestsSchema = z.object({
+  userId: z.string().min(1).optional(),
+});
+export type GetPersonalBestsInput = z.infer<typeof getPersonalBestsSchema>;
 
 // =============================================================================
 // STEPS

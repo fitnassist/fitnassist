@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format, subDays, isToday as isTodayFns, isYesterday } from 'date-fns';
-import { TrendingUp, Target, MessageSquare, Send, Trash2, Plus, Scale, Droplets, Ruler, SmilePlus, Moon, UtensilsCrossed, Dumbbell, Footprints, Camera } from 'lucide-react';
+import { TrendingUp, Target, MessageSquare, Send, Trash2, Plus, Scale, Droplets, Ruler, SmilePlus, Moon, UtensilsCrossed, Dumbbell, Footprints, Camera, Bike } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Badge, ConfirmDialog, Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui';
 import { CreateGoalForm } from '@/components/goals';
 import { trpc } from '@/lib/trpc';
@@ -12,21 +12,26 @@ import { NutritionChart } from '@/pages/dashboard/diary/components/Trends/Nutrit
 import { WaterChart } from '@/pages/dashboard/diary/components/Trends/WaterChart';
 import { MoodChart } from '@/pages/dashboard/diary/components/Trends/MoodChart';
 import { SleepChart } from '@/pages/dashboard/diary/components/Trends/SleepChart';
+import { ActivityChart } from '@/pages/dashboard/diary/components/Trends/ActivityChart';
+import { StepsChart } from '@/pages/dashboard/diary/components/Trends/StepsChart';
+import { PersonalBests } from '@/pages/dashboard/diary/components/PersonalBests';
 import { DiaryDatePicker } from '@/pages/dashboard/diary/components';
-import { getMoodEmoji, getSleepQualityLabel, formatWeight, formatWater, formatMeasurement, formatDuration, today } from '@/pages/dashboard/diary/diary.utils';
+import { getMoodEmoji, getSleepQualityLabel, formatWeight, formatWater, formatMeasurement, formatDuration, formatActivityDuration, formatDistance, formatPace, ACTIVITY_TYPE_LABELS, today } from '@/pages/dashboard/diary/diary.utils';
 
 interface ClientProgressProps {
   clientRosterId: string;
   traineeUserId: string;
 }
 
-type ChartType = 'weight' | 'measurements' | 'nutrition' | 'water' | 'mood' | 'sleep';
+type ChartType = 'weight' | 'measurements' | 'nutrition' | 'water' | 'mood' | 'sleep' | 'activity' | 'steps';
 
 const CHART_TABS: Array<{ key: ChartType; label: string }> = [
   { key: 'weight', label: 'Weight' },
   { key: 'measurements', label: 'Measurements' },
   { key: 'nutrition', label: 'Nutrition' },
   { key: 'water', label: 'Water' },
+  { key: 'activity', label: 'Activity' },
+  { key: 'steps', label: 'Steps' },
   { key: 'mood', label: 'Mood' },
   { key: 'sleep', label: 'Sleep' },
 ];
@@ -56,6 +61,14 @@ type DiaryEntry = {
     workoutPlan?: { name: string } | null;
   } | null;
   stepsEntry?: { totalSteps: number } | null;
+  activityEntry?: {
+    activityType: string;
+    activityName: string | null;
+    distanceKm: number | null;
+    durationSeconds: number;
+    avgPaceSecPerKm: number | null;
+    caloriesBurned: number | null;
+  } | null;
   progressPhotos?: Array<{ id: string; imageUrl: string; category: string | null }>;
   comments?: Array<{
     id: string;
@@ -74,6 +87,7 @@ const ENTRY_ICONS: Record<string, { icon: typeof Scale; color: string }> = {
   FOOD: { icon: UtensilsCrossed, color: 'text-red-500' },
   WORKOUT_LOG: { icon: Dumbbell, color: 'text-violet-500' },
   STEPS: { icon: Footprints, color: 'text-teal-500' },
+  ACTIVITY: { icon: Bike, color: 'text-blue-500' },
   PROGRESS_PHOTO: { icon: Camera, color: 'text-pink-500' },
 };
 
@@ -143,6 +157,19 @@ export const ClientProgress = ({ clientRosterId, traineeUserId }: ClientProgress
   const sleepData = (clientEntries ?? [])
     .filter(e => e.type === 'SLEEP' && e.sleepEntry)
     .map(e => ({ date: e.date as unknown as string, hoursSlept: e.sleepEntry!.hoursSlept, quality: e.sleepEntry!.quality }));
+
+  const activityData = (clientEntries ?? [])
+    .filter(e => e.type === 'ACTIVITY' && e.activityEntry)
+    .map(e => ({
+      date: e.date as unknown as string,
+      activityType: (e as unknown as { activityEntry: { activityType: string } }).activityEntry.activityType,
+      distanceKm: (e as unknown as { activityEntry: { distanceKm: number | null } }).activityEntry.distanceKm,
+      durationSeconds: (e as unknown as { activityEntry: { durationSeconds: number } }).activityEntry.durationSeconds,
+    }));
+
+  const stepsData = (clientEntries ?? [])
+    .filter(e => e.type === 'STEPS' && e.stepsEntry)
+    .map(e => ({ date: e.date as unknown as string, totalSteps: e.stepsEntry!.totalSteps }));
 
   return (
     <div className="space-y-6">
@@ -214,6 +241,9 @@ export const ClientProgress = ({ clientRosterId, traineeUserId }: ClientProgress
         </CardContent>
       </Card>
 
+      {/* Personal Bests */}
+      <PersonalBests userId={traineeUserId} />
+
       {/* Charts */}
       <Card>
         <CardHeader className="pb-3">
@@ -247,6 +277,8 @@ export const ClientProgress = ({ clientRosterId, traineeUserId }: ClientProgress
           {activeChart === 'water' && <WaterChart data={waterData} />}
           {activeChart === 'mood' && <MoodChart data={moodData} />}
           {activeChart === 'sleep' && <SleepChart data={sleepData} />}
+          {activeChart === 'activity' && <ActivityChart data={activityData} />}
+          {activeChart === 'steps' && <StepsChart data={stepsData} />}
         </CardContent>
       </Card>
 
@@ -415,6 +447,15 @@ const getEntryContent = (entry: DiaryEntry, unitPreference: 'METRIC' | 'IMPERIAL
         .filter(([k, v]) => v != null && k.endsWith('Cm'))
         .map(([k, v]) => `${k.replace('Cm', '')}: ${formatMeasurement(v as number, unitPreference)}`);
       return parts.length > 0 ? { label: 'Measurements', value: parts.join(', ') } : null;
+    }
+    case 'ACTIVITY': {
+      if (!entry.activityEntry) return null;
+      const act = entry.activityEntry;
+      const name = act.activityName || ACTIVITY_TYPE_LABELS[act.activityType] || act.activityType;
+      const parts = [formatActivityDuration(act.durationSeconds)];
+      if (act.distanceKm != null && act.distanceKm > 0) parts.push(formatDistance(act.distanceKm));
+      if (act.avgPaceSecPerKm != null && act.avgPaceSecPerKm > 0) parts.push(formatPace(act.avgPaceSecPerKm));
+      return { label: 'Activity', value: `${name} — ${parts.join(', ')}` };
     }
     case 'PROGRESS_PHOTO':
       return entry.progressPhotos && entry.progressPhotos.length > 0

@@ -93,9 +93,10 @@ For reference, the following is live:
 - Waivers and consent forms
 - PT approves/rejects client after induction
 
-### 3.4 Client Progress Tracking (in progress — see `docs/plans/PROGRESS_DIARY_TRACKING_PLAN.md`)
+### 3.4 Client Progress Tracking ✅
 - PT can view client statistics and progress
 - Assign goals and track completion
+- Diary entries, comments, progress photos, trends charts
 
 ---
 
@@ -103,11 +104,12 @@ For reference, the following is live:
 
 **Goal**: Give trainees standalone value from the platform beyond PT discovery. Keeps users engaged between sessions.
 
-### 4.1 Goals & Tracking (in progress — see `docs/plans/PROGRESS_DIARY_TRACKING_PLAN.md`)
-- Set fitness goals (weight, strength, endurance targets)
+### 4.1 Goals & Tracking (mostly complete)
+- Set fitness goals (weight, strength, endurance targets) ✅
 - Weight tracking with history/charts ✅
-- Exercise diary / workout logging
-- Personal bests tracking
+- Exercise diary / workout logging ✅
+- Activity logging (runs, walks, cycles, swims, hikes) ✅
+- Personal bests tracking ✅
 
 ### 4.2 Nutrition ✅
 - Calorie tracker / daily intake logging ✅
@@ -115,14 +117,15 @@ For reference, the following is live:
 - Saved recipes collection ✅
 - Meal plans (premium content from PTs) ✅
 
-### 4.3 Stats Dashboard (in progress — see `docs/plans/PROGRESS_DIARY_TRACKING_PLAN.md`)
+### 4.3 Stats Dashboard ✅
 - Unified dashboard: weight, steps, sleep, workouts
 - Weekly/monthly progress views
-- Trend visualisations
+- Trend visualisations (6 chart types: weight, measurements, nutrition, water, mood, sleep, activity, steps)
 
-### 4.4 Weekly Reports
+### 4.4 Weekly Reports ✅
 - Automated email reports with activity breakdown
 - Summary of workouts, nutrition, goal progress
+- Cron job + email templates + GitHub Actions automation
 
 ---
 
