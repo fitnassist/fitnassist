@@ -86,7 +86,7 @@ export const TravelSettings = () => {
           <Button onClick={handleSave} disabled={updateMutation.isPending}>
             {updateMutation.isPending ? 'Saving...' : 'Save'}
           </Button>
-          {saved && <span className="text-sm text-green-600">Saved!</span>}
+          {saved && <span className="text-sm text-green-600 dark:text-green-400">Saved!</span>}
         </div>
       </CardContent>
     </Card>

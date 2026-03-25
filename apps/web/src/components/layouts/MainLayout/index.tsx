@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Outlet, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { Sun, Moon, User, LogOut, Menu, X } from "lucide-react";
 import { routes } from "@/config/routes";
 import { Button } from "@/components/ui";
@@ -10,12 +10,31 @@ import { cn } from "@/lib/utils";
 export function MainLayout() {
   const { isDark, toggleTheme } = useTheme();
   const { user, isAuthenticated, isLoading, signOut } = useAuth();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const noHeroPages = [routes.trainers];
+  const alwaysSolid = noHeroPages.some((p) => location.pathname === p);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-background">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <header
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          scrolled || alwaysSolid ? "bg-[hsl(230,25%,10%)] shadow-lg" : "bg-transparent",
+        )}
+      >
+        <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link to={routes.home} className="text-xl font-bold text-primary">
               Fitnassist
@@ -28,30 +47,48 @@ export function MainLayout() {
                 size="icon"
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
+                className="text-white/80 hover:text-white hover:bg-white/10"
               >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {isDark ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </Button>
               <Link to={routes.trainers}>
-                <Button variant="ghost">Find a Trainer</Button>
+                <Button
+                  variant="ghost"
+                  className="text-white/80 hover:text-white hover:bg-white/10 uppercase text-xs tracking-wider font-semibold"
+                >
+                  Find a Trainer
+                </Button>
               </Link>
               <Link to={routes.pricing}>
-                <Button variant="ghost">Pricing</Button>
+                <Button
+                  variant="ghost"
+                  className="text-white/80 hover:text-white hover:bg-white/10 uppercase text-xs tracking-wider font-semibold"
+                >
+                  Pricing
+                </Button>
               </Link>
 
               {isLoading ? (
-                <div className="h-9 w-20 bg-muted animate-pulse rounded-md" />
+                <div className="h-9 w-20 bg-white/10 animate-pulse rounded-md" />
               ) : isAuthenticated ? (
                 <>
                   <Link to={routes.dashboard}>
-                    <Button variant="ghost" className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      className="flex items-center gap-2 text-white/80 hover:text-white hover:bg-white/10 uppercase text-xs tracking-wider font-semibold"
+                    >
                       <User className="h-4 w-4" />
-                      {user?.name || 'Dashboard'}
+                      {user?.name || "Dashboard"}
                     </Button>
                   </Link>
                   <Button
                     variant="ghost"
                     onClick={signOut}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 text-white/80 hover:text-white hover:bg-white/10 uppercase text-xs tracking-wider font-semibold"
                   >
                     <LogOut className="h-4 w-4" />
                     Sign Out
@@ -60,10 +97,17 @@ export function MainLayout() {
               ) : (
                 <>
                   <Link to={routes.login}>
-                    <Button variant="ghost">Login</Button>
+                    <Button
+                      variant="ghost"
+                      className="text-white/80 hover:text-white hover:bg-white/10 uppercase text-xs tracking-wider font-semibold"
+                    >
+                      Login
+                    </Button>
                   </Link>
                   <Link to={routes.register}>
-                    <Button>Sign Up</Button>
+                    <Button className="uppercase text-xs tracking-wider font-semibold">
+                      Sign Up
+                    </Button>
                   </Link>
                 </>
               )}
@@ -76,16 +120,26 @@ export function MainLayout() {
                 size="icon"
                 onClick={toggleTheme}
                 aria-label="Toggle theme"
+                className="text-white/80 hover:text-white hover:bg-white/10"
               >
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                {isDark ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle menu"
+                className="text-white/80 hover:text-white hover:bg-white/10"
               >
-                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {mobileMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </Button>
             </div>
           </div>
@@ -94,21 +148,21 @@ export function MainLayout() {
         {/* Mobile menu dropdown */}
         <div
           className={cn(
-            'sm:hidden border-t bg-background overflow-hidden transition-all duration-200',
-            mobileMenuOpen ? 'max-h-64' : 'max-h-0 border-t-0'
+            "sm:hidden bg-[hsl(230,25%,10%)] overflow-hidden transition-all duration-200",
+            mobileMenuOpen ? "max-h-64" : "max-h-0",
           )}
         >
           <div className="px-4 py-3 space-y-1">
             <Link
               to={routes.trainers}
-              className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-muted"
+              className="block px-3 py-2 rounded-md text-sm font-semibold uppercase tracking-wider text-white/80 hover:bg-white/10 hover:text-white"
               onClick={() => setMobileMenuOpen(false)}
             >
               Find a Trainer
             </Link>
             <Link
               to={routes.pricing}
-              className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-muted"
+              className="block px-3 py-2 rounded-md text-sm font-semibold uppercase tracking-wider text-white/80 hover:bg-white/10 hover:text-white"
               onClick={() => setMobileMenuOpen(false)}
             >
               Pricing
@@ -118,15 +172,18 @@ export function MainLayout() {
               <>
                 <Link
                   to={routes.dashboard}
-                  className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium hover:bg-muted"
+                  className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-semibold uppercase tracking-wider text-white/80 hover:bg-white/10 hover:text-white"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <User className="h-4 w-4" />
-                  {user?.name || 'Dashboard'}
+                  {user?.name || "Dashboard"}
                 </Link>
                 <button
-                  onClick={() => { signOut(); setMobileMenuOpen(false); }}
-                  className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm font-medium hover:bg-muted text-destructive"
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm font-semibold uppercase tracking-wider hover:bg-white/10 text-red-400"
                 >
                   <LogOut className="h-4 w-4" />
                   Sign Out
@@ -136,14 +193,14 @@ export function MainLayout() {
               <>
                 <Link
                   to={routes.login}
-                  className="block px-3 py-2 rounded-md text-sm font-medium hover:bg-muted"
+                  className="block px-3 py-2 rounded-md text-sm font-semibold uppercase tracking-wider text-white/80 hover:bg-white/10 hover:text-white"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
                   to={routes.register}
-                  className="block px-3 py-2 rounded-md text-sm font-medium text-primary hover:bg-muted"
+                  className="block px-3 py-2 rounded-md text-sm font-semibold uppercase tracking-wider text-coral hover:bg-white/10"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Sign Up
@@ -158,31 +215,58 @@ export function MainLayout() {
         <Outlet />
       </main>
 
-      <footer className="border-t bg-muted py-6 sm:py-8">
+      <footer className="bg-gradient-to-br from-[#20415c] to-[#5a0c30] py-8 sm:py-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <p className="text-sm text-muted-foreground">
-              {new Date().getFullYear()} Fitnassist. All rights reserved.
-            </p>
-            <nav className="mt-3 flex gap-4 sm:gap-6 md:mt-0">
-              <Link
-                to={routes.privacy}
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Privacy Policy
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+            <div>
+              <Link to={routes.home} className="text-xl font-bold text-primary">
+                Fitnassist
               </Link>
-              <Link
-                to={routes.terms}
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                to={routes.support}
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Contact Support
-              </Link>
+              <p className="text-sm text-white/50 mt-2">
+                {new Date().getFullYear()} Fitnassist. All rights reserved.
+              </p>
+            </div>
+            <nav className="flex gap-8 sm:gap-12">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                  Product
+                </p>
+                <Link
+                  to={routes.trainers}
+                  className="block text-sm text-white/50 hover:text-white/80"
+                >
+                  Find a Trainer
+                </Link>
+                <Link
+                  to={routes.pricing}
+                  className="block text-sm text-white/50 hover:text-white/80"
+                >
+                  Pricing
+                </Link>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
+                  Company
+                </p>
+                <Link
+                  to={routes.privacy}
+                  className="block text-sm text-white/50 hover:text-white/80"
+                >
+                  Privacy Policy
+                </Link>
+                <Link
+                  to={routes.terms}
+                  className="block text-sm text-white/50 hover:text-white/80"
+                >
+                  Terms of Service
+                </Link>
+                <Link
+                  to={routes.support}
+                  className="block text-sm text-white/50 hover:text-white/80"
+                >
+                  Support
+                </Link>
+              </div>
             </nav>
           </div>
         </div>

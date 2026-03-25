@@ -28,12 +28,12 @@ interface BookingCardProps {
   isTrainer: boolean;
 }
 
-const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  CONFIRMED: 'default',
-  COMPLETED: 'secondary',
+const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline'> = {
+  CONFIRMED: 'info',
+  COMPLETED: 'success',
   CANCELLED_BY_TRAINER: 'destructive',
   CANCELLED_BY_CLIENT: 'destructive',
-  NO_SHOW: 'outline',
+  NO_SHOW: 'warning',
 };
 
 const STATUS_LABELS: Record<string, string> = {

@@ -9,6 +9,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { format } from "date-fns";
+import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
 interface WaterChartProps {
   data: Array<{ date: string; totalMl: number }>;
@@ -39,7 +40,9 @@ export const WaterChart = ({ data, targetMl = 2000 }: WaterChartProps) => {
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
         <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}ml`} />
         <Tooltip
-          contentStyle={{ fontSize: 12, borderRadius: 8 }}
+          contentStyle={CHART_TOOLTIP_STYLE}
+          itemStyle={{ color: '#fff' }}
+          labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
           formatter={(v) => [`${v}ml`, "Water"]}
         />
         <Bar dataKey="ml" fill="#06b6d4" radius={[4, 4, 0, 0]} />

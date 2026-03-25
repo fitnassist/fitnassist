@@ -6,6 +6,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
+  Badge,
   Button,
   Card,
   CardContent,
@@ -42,18 +43,18 @@ export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }:
   const renderActions = () => {
     if (variant === 'pending') {
       return (
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+        <Badge variant="warning" className="gap-1">
           <Clock className="h-3 w-3" />
           Awaiting response
-        </span>
+        </Badge>
       );
     }
     if (variant === 'declined') {
       return (
-        <span className="inline-flex items-center gap-1 text-xs font-medium text-destructive bg-destructive/10 px-2 py-1 rounded-full">
+        <Badge variant="destructive" className="gap-1">
           <XCircle className="h-3 w-3" />
           Declined
-        </span>
+        </Badge>
       );
     }
     // Connected state

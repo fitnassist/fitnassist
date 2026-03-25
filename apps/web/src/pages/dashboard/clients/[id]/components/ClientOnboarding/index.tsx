@@ -20,7 +20,7 @@ interface ClientOnboardingProps {
 const STATUS_DISPLAY: Record<OnboardingStatus, { label: string; icon: typeof Clock; className: string }> = {
   PENDING: { label: 'Pending', icon: Clock, className: 'text-amber-600' },
   SUBMITTED: { label: 'Awaiting Review', icon: FileText, className: 'text-blue-600' },
-  APPROVED: { label: 'Approved', icon: CheckCircle, className: 'text-green-600' },
+  APPROVED: { label: 'Approved', icon: CheckCircle, className: 'text-green-600 dark:text-green-400' },
   REJECTED: { label: 'Rejected', icon: XCircle, className: 'text-red-600' },
 };
 
@@ -98,7 +98,7 @@ const ResponseCard = ({ response }: ResponseCardProps) => {
             <div className="flex items-center gap-2">
               {response.waiverSigned ? (
                 <>
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <span className="text-sm">
                     Waiver signed by <strong>{response.waiverSignedName}</strong>
                     {response.waiverSignedAt && (

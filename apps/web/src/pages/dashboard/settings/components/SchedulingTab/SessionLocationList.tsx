@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MapPin, Plus, Trash2, Star } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label, AddressAutocomplete, type AddressDetails } from '@/components/ui';
+import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label, AddressAutocomplete, type AddressDetails, Badge } from '@/components/ui';
 import { ConfirmDialog } from '@/components/ui';
 import { env } from '@/config/env';
 import {
@@ -103,10 +103,10 @@ export const SessionLocationList = () => {
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-sm">{loc.name}</span>
                   {loc.isDefault && (
-                    <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">Default</span>
+                    <Badge>Default</Badge>
                   )}
                   {!loc.isActive && (
-                    <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded-full">Inactive</span>
+                    <Badge variant="secondary">Inactive</Badge>
                   )}
                 </div>
                 {(loc.addressLine1 || loc.city || loc.postcode) && (

@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { format } from 'date-fns';
 import { ACTIVITY_TYPE_LABELS, formatDistance, formatActivityDuration } from '../../diary.utils';
+import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
 interface ActivityChartProps {
   data: Array<{
@@ -56,7 +57,7 @@ export const ActivityChart = ({ data }: ActivityChartProps) => {
               onClick={() => setFilter(opt.value)}
               className={`rounded-md px-2 py-0.5 text-[10px] font-medium transition-colors ${
                 filter === opt.value
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary text-gray-900'
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
@@ -71,7 +72,7 @@ export const ActivityChart = ({ data }: ActivityChartProps) => {
               onClick={() => setMetric(m)}
               className={`rounded-md px-2 py-0.5 text-[10px] font-medium transition-colors ${
                 metric === m
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary text-gray-900'
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
@@ -90,7 +91,9 @@ export const ActivityChart = ({ data }: ActivityChartProps) => {
             tickFormatter={(v) => metric === 'distance' ? `${v}km` : `${Math.round(v)}m`}
           />
           <Tooltip
-            contentStyle={{ fontSize: 12, borderRadius: 8 }}
+            contentStyle={CHART_TOOLTIP_STYLE}
+            itemStyle={{ color: '#fff' }}
+            labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
             formatter={(v) => [
               metric === 'distance' ? formatDistance(Number(v)) : formatActivityDuration(Math.round(Number(v) * 60)),
               metric === 'distance' ? 'Distance' : 'Duration',

@@ -1,5 +1,6 @@
 import { ResponsiveContainer, ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import { format } from 'date-fns';
+import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
 interface SleepChartProps {
   data: Array<{ date: string; hoursSlept: number; quality: number }>;
@@ -23,7 +24,7 @@ export const SleepChart = ({ data }: SleepChartProps) => {
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
         <YAxis yAxisId="hours" tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}h`} />
         <YAxis yAxisId="quality" orientation="right" domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 11 }} />
-        <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+        <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#fff' }} labelStyle={{ color: 'rgba(255,255,255,0.7)' }} />
         <Legend wrapperStyle={{ fontSize: 11 }} />
         <Bar yAxisId="hours" dataKey="Hours" fill="#6366f1" radius={[4, 4, 0, 0]} />
         <Line yAxisId="quality" type="monotone" dataKey="Quality" stroke="#f59e0b" strokeWidth={2} dot={{ r: 3 }} />

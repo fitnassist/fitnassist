@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { routes } from '@/config/routes';
+import { HeroBanner } from '@/components/HeroBanner';
 
 export const PrivacyPolicyPage = () => {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:py-16 sm:px-6 lg:px-8">
-      <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Privacy Policy</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Last updated: 22 March 2026</p>
+    <div>
+      <HeroBanner title="Privacy Policy" imageUrl="https://images.unsplash.com/photo-1557683316-973673baf926?w=1920&q=80" size="small" />
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:py-16 sm:px-6 lg:px-8">
+        <p className="text-sm text-muted-foreground">Last updated: 22 March 2026</p>
 
       <div className="mt-8 space-y-8 text-muted-foreground">
         <section>
@@ -149,6 +151,7 @@ export const PrivacyPolicyPage = () => {
             .
           </p>
         </section>
+      </div>
       </div>
     </div>
   );

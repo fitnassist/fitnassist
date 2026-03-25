@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MapPin, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback, Select, type SelectOption } from '@/components/ui';
+import { Avatar, AvatarImage, AvatarFallback, Badge, Select, type SelectOption } from '@/components/ui';
 import { routes } from '@/config/routes';
 import { getServiceLabel } from '@/pages/trainer/public/public.utils';
 
@@ -224,17 +224,14 @@ const TrainerCard = ({ trainer, isSelected, onSelect }: TrainerCardProps) => {
           {displayedServices.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {displayedServices.map((service) => (
-                <span
-                  key={service}
-                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-secondary text-secondary-foreground"
-                >
+                <Badge key={service}>
                   {getServiceLabel(service)}
-                </span>
+                </Badge>
               ))}
               {moreServices > 0 && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
+                <Badge variant="secondary">
                   +{moreServices} more
-                </span>
+                </Badge>
               )}
             </div>
           )}

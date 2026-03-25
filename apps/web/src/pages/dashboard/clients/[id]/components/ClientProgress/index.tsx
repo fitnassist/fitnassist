@@ -14,6 +14,7 @@ import { MoodChart } from '@/pages/dashboard/diary/components/Trends/MoodChart';
 import { SleepChart } from '@/pages/dashboard/diary/components/Trends/SleepChart';
 import { ActivityChart } from '@/pages/dashboard/diary/components/Trends/ActivityChart';
 import { StepsChart } from '@/pages/dashboard/diary/components/Trends/StepsChart';
+import { ChartTabBar } from '@/pages/dashboard/diary/components/Trends/ChartTabBar';
 import { PersonalBests } from '@/pages/dashboard/diary/components/PersonalBests';
 import { DiaryDatePicker } from '@/pages/dashboard/diary/components';
 import { getMoodEmoji, getSleepQualityLabel, formatWeight, formatWater, formatMeasurement, formatDuration, formatActivityDuration, formatDistance, formatPace, ACTIVITY_TYPE_LABELS, today } from '@/pages/dashboard/diary/diary.utils';
@@ -256,21 +257,7 @@ export const ClientProgress = ({ clientRosterId, traineeUserId }: ClientProgress
           </div>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 flex flex-wrap gap-1.5">
-            {CHART_TABS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setActiveChart(key)}
-                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  activeChart === key
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <ChartTabBar tabs={CHART_TABS} activeTab={activeChart} onTabChange={setActiveChart} />
           {activeChart === 'weight' && <WeightChart data={weightData} unitPreference={unitPreference} />}
           {activeChart === 'measurements' && <MeasurementChart data={measurementData} unitPreference={unitPreference} />}
           {activeChart === 'nutrition' && <NutritionChart data={nutritionData} />}

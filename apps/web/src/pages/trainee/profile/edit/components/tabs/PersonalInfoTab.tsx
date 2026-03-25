@@ -249,7 +249,7 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
           )}
 
           {successMessage && (
-            <p className="text-sm text-green-600">{successMessage}</p>
+            <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
           )}
 
           <div className="flex justify-end">

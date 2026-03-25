@@ -15,6 +15,7 @@ import {
   ImageUpload,
   Select,
   type SelectOption,
+  SelectableBadge,
 } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { routes } from '@/config/routes';
@@ -407,15 +408,13 @@ export const RecipeFormPage = () => {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {COMMON_RECIPE_TAGS.map((tag) => (
-                <Button
+                <SelectableBadge
                   key={tag}
-                  type="button"
-                  variant={tags.includes(tag) ? 'default' : 'outline'}
-                  size="sm"
+                  selected={tags.includes(tag)}
                   onClick={() => toggleTag(tag)}
                 >
                   {tag}
-                </Button>
+                </SelectableBadge>
               ))}
             </div>
           </CardContent>

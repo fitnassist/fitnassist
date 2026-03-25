@@ -7,6 +7,7 @@ import {
   DialogTitle,
   Button,
   Input,
+  Badge,
 } from '@/components/ui';
 import { useSearchFood, useMyRecipes } from '@/api/diary';
 import { useDebounce } from '@/hooks';
@@ -155,9 +156,7 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
                 <BookOpen className="h-3.5 w-3.5" />
                 My Recipes
                 {myRecipes && myRecipes.length > 0 && (
-                  <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
-                    {myRecipes.length}
-                  </span>
+                  <Badge className="ml-1">{myRecipes.length}</Badge>
                 )}
               </button>
             </div>

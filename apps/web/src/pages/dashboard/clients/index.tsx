@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Users } from 'lucide-react';
 import {
+  Badge,
   Card,
   CardContent,
   SkeletonHeader,
@@ -36,22 +37,14 @@ export const ClientsPage = () => {
   const statsBadges = stats ? (
     <div className="flex items-center gap-2 text-sm flex-wrap">
       {stats.onboarding > 0 && (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium">
-          {stats.onboarding} onboarding
-        </span>
+        <Badge variant="info">{stats.onboarding} onboarding</Badge>
       )}
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-medium">
-        {stats.active} active
-      </span>
+      <Badge variant="success">{stats.active} active</Badge>
       {stats.onHold > 0 && (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">
-          {stats.onHold} on hold
-        </span>
+        <Badge variant="warning">{stats.onHold} on hold</Badge>
       )}
       {stats.inactive > 0 && (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-50 text-gray-600 font-medium">
-          {stats.inactive} inactive
-        </span>
+        <Badge variant="secondary">{stats.inactive} inactive</Badge>
       )}
     </div>
   ) : null;

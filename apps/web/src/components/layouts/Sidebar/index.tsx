@@ -13,7 +13,7 @@ export function Sidebar({ navItems, user, onSignOut, currentPath }: SidebarProps
     <TooltipProvider>
       <aside
         className={cn(
-          'border-r bg-muted/30 hidden lg:flex lg:flex-col transition-all duration-300',
+          'border-r bg-background hidden lg:flex lg:flex-col transition-[width] duration-300',
           isCollapsed ? 'w-16' : 'w-64'
         )}
       >

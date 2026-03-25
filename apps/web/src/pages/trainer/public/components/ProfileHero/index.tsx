@@ -15,7 +15,7 @@ export function ProfileHero({ trainer }: ProfileHeroProps) {
   return (
     <div className="relative">
       {/* Cover Image */}
-      <div className="relative h-48 sm:h-64 lg:h-80 w-full overflow-hidden">
+      <div className="relative h-64 sm:h-80 lg:h-96 w-full overflow-hidden">
         {trainer.coverImageUrl ? (
           <img
             src={trainer.coverImageUrl}
@@ -23,10 +23,9 @@ export function ProfileHero({ trainer }: ProfileHeroProps) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="h-full w-full bg-gradient-to-br from-primary/20 via-primary/10 to-background" />
+          <div className="h-full w-full bg-gradient-to-br from-[#20415c] to-[#5a0c30]" />
         )}
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#20415c]/60 to-[#5a0c30]/60" />
       </div>
 
       {/* Profile Info Overlay */}
@@ -68,7 +67,7 @@ export function ProfileHero({ trainer }: ProfileHeroProps) {
                 </span>
               )}
               {trainer.acceptingClients ? (
-                <span className="flex items-center gap-1 text-sm text-green-600">
+                <span className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                   <UserCheck className="h-3.5 w-3.5" />
                   Accepting clients
                 </span>

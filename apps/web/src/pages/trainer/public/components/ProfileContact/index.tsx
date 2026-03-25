@@ -115,7 +115,7 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
     return (
       <Card>
         <CardContent className="py-8 text-center space-y-4">
-          <CheckCircle className="h-12 w-12 mx-auto text-green-600" />
+          <CheckCircle className="h-12 w-12 mx-auto text-green-600 dark:text-green-400" />
           <p className="text-sm text-muted-foreground">{successMessage}</p>
           <Button variant="outline" onClick={() => setSuccessMessage(null)}>
             Done
@@ -165,7 +165,7 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
+            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
             Connected
           </CardTitle>
         </CardHeader>

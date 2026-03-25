@@ -11,6 +11,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import {
+  Badge,
   Button,
   Card,
   CardContent,
@@ -84,37 +85,37 @@ export const RequestsPage = () => {
     switch (status) {
       case 'PENDING':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+          <Badge variant="warning">
             <Clock className="h-3 w-3" />
             Pending
-          </span>
+          </Badge>
         );
       case 'ACCEPTED':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+          <Badge variant="success">
             <CheckCircle className="h-3 w-3" />
             Accepted
-          </span>
+          </Badge>
         );
       case 'DECLINED':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full">
+          <Badge variant="destructive">
             <XCircle className="h-3 w-3" />
             Declined
-          </span>
+          </Badge>
         );
       case 'RESPONDED':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+          <Badge variant="info">
             <CheckCircle className="h-3 w-3" />
             Responded
-          </span>
+          </Badge>
         );
       case 'CLOSED':
         return (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-600 bg-gray-50 px-2 py-0.5 rounded-full">
+          <Badge variant="secondary">
             Closed
-          </span>
+          </Badge>
         );
     }
   };

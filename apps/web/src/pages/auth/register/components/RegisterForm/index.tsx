@@ -4,9 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { registerFormSchema, type RegisterFormInput } from '@fitnassist/schemas';
-import { Button, Input, Label } from '@/components/ui';
+import { Button, Input } from '@/components/ui';
 import { signUp } from '@/lib/auth-client';
 import type { RegisterFormProps } from './RegisterForm.types';
+
+const inputClass = "bg-white/10 border-white/20 text-white placeholder:text-white/40";
 
 export function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [error, setError] = useState<string | null>(null);
@@ -56,10 +58,10 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   if (isSuccess) {
     return (
       <div className="text-center space-y-4">
-        <div className="text-green-600 font-medium">
+        <div className="text-primary font-medium">
           Registration successful!
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-white/60">
           Please check your email to verify your account before signing in.
         </p>
       </div>
@@ -67,95 +69,109 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {error && (
-        <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+        <div className="bg-red-500/20 text-red-200 text-sm p-3 rounded-md">
           {error}
         </div>
       )}
 
       <div>
-        <Label htmlFor="name">Name</Label>
+        <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+          Name
+        </label>
         <Input
           id="name"
           type="text"
           placeholder="Your name"
+          className={inputClass}
           {...register('name')}
           disabled={isLoading}
         />
         {errors.name && (
-          <p className="text-sm text-destructive">{errors.name.message}</p>
+          <p className="text-sm text-red-300 mt-1">{errors.name.message}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="email">Email</Label>
+        <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+          Email Address
+        </label>
         <Input
           id="email"
           type="email"
           placeholder="you@example.com"
+          className={inputClass}
           {...register('email')}
           disabled={isLoading}
         />
         {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
+          <p className="text-sm text-red-300 mt-1">{errors.email.message}</p>
         )}
       </div>
 
       <div>
-        <Label htmlFor="password">Password</Label>
+        <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+          Password
+        </label>
         <div className="relative">
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="Create a password"
+            className={inputClass}
             {...register('password')}
             disabled={isLoading}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80"
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         {errors.password && (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
+          <p className="text-sm text-red-300 mt-1">{errors.password.message}</p>
         )}
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-white/40 mt-1">
           At least 8 characters with uppercase, lowercase, and a number
         </p>
       </div>
 
       <div>
-        <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <label htmlFor="confirmPassword" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+          Confirm Password
+        </label>
         <div className="relative">
           <Input
             id="confirmPassword"
             type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Confirm your password"
+            className={inputClass}
             {...register('confirmPassword')}
             disabled={isLoading}
           />
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80"
             aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
           >
             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         {errors.confirmPassword && (
-          <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+          <p className="text-sm text-red-300 mt-1">{errors.confirmPassword.message}</p>
         )}
       </div>
 
       <div>
-        <Label>I am a</Label>
-        <div className="flex gap-4">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+          I am a
+        </label>
+        <div className="flex gap-6">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
@@ -164,7 +180,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
               disabled={isLoading}
               className="w-4 h-4 accent-primary"
             />
-            <span className="text-sm">Trainee</span>
+            <span className="text-sm text-white/80">Trainee</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -174,16 +190,22 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
               disabled={isLoading}
               className="w-4 h-4 accent-primary"
             />
-            <span className="text-sm">Personal Trainer</span>
+            <span className="text-sm text-white/80">Personal Trainer</span>
           </label>
         </div>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? 'Creating account...' : 'Create account'}
-      </Button>
+      <div className="text-center pt-2">
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="rounded-full px-10 uppercase tracking-wider font-semibold"
+        >
+          {isLoading ? 'Creating account...' : 'Sign Up'}
+        </Button>
+      </div>
 
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-white/60">
         Already have an account?{' '}
         <Link to="/login" className="text-primary hover:underline">
           Sign in

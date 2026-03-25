@@ -1,12 +1,12 @@
 import { Dumbbell } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { getServiceLabel } from '../../public.utils';
 
 interface ProfileServicesProps {
   services: string[];
 }
 
-export function ProfileServices({ services }: ProfileServicesProps) {
+export const ProfileServices = ({ services }: ProfileServicesProps) => {
   if (!services || services.length === 0) {
     return null;
   }
@@ -22,15 +22,12 @@ export function ProfileServices({ services }: ProfileServicesProps) {
       <CardContent>
         <div className="flex flex-wrap gap-2">
           {services.map((service) => (
-            <span
-              key={service}
-              className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
-            >
+            <Badge key={service}>
               {getServiceLabel(service)}
-            </span>
+            </Badge>
           ))}
         </div>
       </CardContent>
     </Card>
   );
-}
+};

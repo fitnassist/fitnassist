@@ -1,4 +1,5 @@
 export { Badge, badgeVariants, type BadgeProps } from './badge';
+export { SelectableBadge, type SelectableBadgeProps } from './selectable-badge';
 export { Button, buttonVariants, type ButtonProps } from './button';
 export { Input, type InputProps } from './input';
 export { Label } from './label';

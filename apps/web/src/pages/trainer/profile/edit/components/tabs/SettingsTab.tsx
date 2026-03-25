@@ -86,8 +86,8 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
               {profile.isPublished ? (
-                <div className="rounded-full bg-green-100 p-2">
-                  <Eye className="h-5 w-5 text-green-600" />
+                <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-2">
+                  <Eye className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
               ) : (
                 <div className="rounded-full bg-amber-100 p-2">
@@ -138,8 +138,8 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
               {profile.acceptingClients ? (
-                <div className="rounded-full bg-green-100 p-2">
-                  <UserCheck className="h-5 w-5 text-green-600" />
+                <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-2">
+                  <UserCheck className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
               ) : (
                 <div className="rounded-full bg-amber-100 p-2">

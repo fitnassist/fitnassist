@@ -1,5 +1,5 @@
-import { useNavigate } from 'react-router-dom';
-import { LogOut, Settings, ChevronUp } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { LogOut, Settings, ChevronUp } from "lucide-react";
 import {
   Avatar,
   AvatarFallback,
@@ -13,9 +13,9 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from '@/components/ui';
-import { routes } from '@/config/routes';
-import type { SidebarUser } from './Sidebar.types';
+} from "@/components/ui";
+import { routes } from "@/config/routes";
+import type { SidebarUser } from "./Sidebar.types";
 
 interface SidebarUserMenuProps {
   user: SidebarUser;
@@ -23,15 +23,20 @@ interface SidebarUserMenuProps {
   isCollapsed: boolean;
 }
 
-export const SidebarUserMenu = ({ user, onSignOut, isCollapsed }: SidebarUserMenuProps) => {
+export const SidebarUserMenu = ({
+  user,
+  onSignOut,
+  isCollapsed,
+}: SidebarUserMenuProps) => {
   const navigate = useNavigate();
 
-  const initials = user.name
-    ?.split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || 'U';
+  const initials =
+    user.name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "U";
 
   const avatarContent = (
     <Avatar className="h-10 w-10 cursor-pointer">
@@ -41,7 +46,11 @@ export const SidebarUserMenu = ({ user, onSignOut, isCollapsed }: SidebarUserMen
   );
 
   const menuContent = (
-    <DropdownMenuContent side={isCollapsed ? 'right' : 'top'} align="end" className="w-56">
+    <DropdownMenuContent
+      side="top"
+      align={isCollapsed ? "start" : "center"}
+      className="w-56 mb-3"
+    >
       <DropdownMenuLabel>
         <div className="flex flex-col space-y-1">
           <p className="text-sm font-medium">{user.name}</p>
@@ -57,7 +66,10 @@ export const SidebarUserMenu = ({ user, onSignOut, isCollapsed }: SidebarUserMen
         Settings
       </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem onClick={onSignOut} className="text-destructive cursor-pointer">
+      <DropdownMenuItem
+        onClick={onSignOut}
+        className="text-destructive cursor-pointer"
+      >
         <LogOut className="mr-2 h-4 w-4" />
         Sign out
       </DropdownMenuItem>
@@ -70,13 +82,9 @@ export const SidebarUserMenu = ({ user, onSignOut, isCollapsed }: SidebarUserMen
         <DropdownMenu>
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                {avatarContent}
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>{avatarContent}</DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent side="right">
-              {user.name}
-            </TooltipContent>
+            <TooltipContent side="right">{user.name}</TooltipContent>
           </Tooltip>
           {menuContent}
         </DropdownMenu>
@@ -85,10 +93,10 @@ export const SidebarUserMenu = ({ user, onSignOut, isCollapsed }: SidebarUserMen
   }
 
   return (
-    <div className="p-4 border-t">
+    <div className="border-t">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex items-center gap-3 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors">
+          <button className="flex items-center gap-3 w-full text-left hover:bg-muted/50 p-3 transition-colors outline-none">
             {avatarContent}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{user.name}</p>

@@ -2,42 +2,37 @@ import { Link } from 'react-router-dom';
 import { MapPin, CheckCircle, MessageCircle } from 'lucide-react';
 import { routes } from '@/config/routes';
 import { Button, Card, CardContent } from '@/components/ui';
+import { HeroBanner } from '@/components/HeroBanner';
 
-export function HomePage() {
+export const HomePage = () => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary/5 to-background py-12 sm:py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-              Find Your Perfect
-              <span className="text-primary"> Personal Trainer</span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-              Connect with qualified personal trainers in your area. Whether you're
-              looking to build muscle, lose weight, or improve your overall fitness,
-              we'll help you find the right trainer for your goals.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-4">
-              <Link to={routes.trainers}>
-                <Button size="lg">Find a Trainer</Button>
-              </Link>
-              <Link to={routes.register}>
-                <Button variant="outline" size="lg">
-                  I'm a Trainer
-                </Button>
-              </Link>
-            </div>
-          </div>
+      <HeroBanner title="Welcome to Fitness" imageUrl="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80">
+        <p className="mx-auto mt-6 max-w-2xl text-lg text-white/70">
+          Connect with qualified personal trainers in your area. Whether you're
+          looking to build muscle, lose weight, or improve your overall fitness,
+          we'll help you find the right trainer for your goals.
+        </p>
+        <div className="mt-10 flex items-center justify-center gap-4">
+          <Link to={routes.trainers}>
+            <Button size="lg" className="uppercase tracking-wider font-semibold">
+              Find a Trainer
+            </Button>
+          </Link>
+          <Link to={routes.register}>
+            <Button variant="outline" size="lg" className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white uppercase tracking-wider font-semibold">
+              I'm a Trainer
+            </Button>
+          </Link>
         </div>
-      </section>
+      </HeroBanner>
 
       {/* Features Section */}
       <section className="py-12 sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-foreground">Why Fitnassist?</h2>
+            <h2 className="text-3xl font-light text-foreground uppercase tracking-wide">Why Fitnassist?</h2>
             <p className="mt-4 text-lg text-muted-foreground">
               Everything you need to find and connect with the best personal trainers
             </p>

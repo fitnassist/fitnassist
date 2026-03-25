@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Pencil, Trash2, UtensilsCrossed, Clock, Flame, Users } from 'lucide-react';
-import { Card, CardContent, Button } from '@/components/ui';
+import { Card, CardContent, Button, Badge } from '@/components/ui';
 import { routes } from '@/config/routes';
 
 interface RecipeCardProps {
@@ -114,17 +114,14 @@ export const RecipeCard = ({ recipe, onDelete, isDeleting }: RecipeCardProps) =>
             {recipe.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {recipe.tags.slice(0, 4).map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-secondary text-secondary-foreground"
-                  >
+                  <Badge key={tag}>
                     {tag}
-                  </span>
+                  </Badge>
                 ))}
                 {recipe.tags.length > 4 && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
+                  <Badge variant="secondary">
                     +{recipe.tags.length - 4} more
-                  </span>
+                  </Badge>
                 )}
               </div>
             )}

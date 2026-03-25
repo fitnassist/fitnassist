@@ -14,6 +14,7 @@ import {
   Textarea,
   ImageUpload,
   VideoUpload,
+  SelectableBadge,
 } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { routes } from '@/config/routes';
@@ -333,15 +334,13 @@ export const ExerciseFormPage = () => {
               <Label>Muscle Groups</Label>
               <div className="flex flex-wrap gap-2">
                 {MUSCLE_GROUP_OPTIONS.map((opt) => (
-                  <Button
+                  <SelectableBadge
                     key={opt.value}
-                    type="button"
-                    variant={muscleGroups.includes(opt.value as MuscleGroup) ? 'default' : 'outline'}
-                    size="sm"
+                    selected={muscleGroups.includes(opt.value as MuscleGroup)}
                     onClick={() => toggleMuscleGroup(opt.value as MuscleGroup)}
                   >
                     {opt.label}
-                  </Button>
+                  </SelectableBadge>
                 ))}
               </div>
             </div>
@@ -351,15 +350,13 @@ export const ExerciseFormPage = () => {
               <Label>Equipment</Label>
               <div className="flex flex-wrap gap-2">
                 {COMMON_EQUIPMENT.map((eq) => (
-                  <Button
+                  <SelectableBadge
                     key={eq}
-                    type="button"
-                    variant={equipment.includes(eq) ? 'default' : 'outline'}
-                    size="sm"
+                    selected={equipment.includes(eq)}
                     onClick={() => toggleEquipment(eq)}
                   >
                     {eq}
-                  </Button>
+                  </SelectableBadge>
                 ))}
               </div>
             </div>

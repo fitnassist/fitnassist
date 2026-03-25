@@ -66,9 +66,9 @@ export const GoalCard = ({ goal }: GoalCardProps) => {
   const statusBadge = () => {
     switch (goal.status) {
       case 'COMPLETED':
-        return <Badge variant="default" className="bg-green-500/10 text-green-600 hover:bg-green-500/20">Completed</Badge>;
+        return <Badge variant="success">Completed</Badge>;
       case 'ABANDONED':
-        return <Badge variant="secondary">Abandoned</Badge>;
+        return <Badge variant="destructive">Abandoned</Badge>;
       default:
         return null;
     }
@@ -116,7 +116,7 @@ export const GoalCard = ({ goal }: GoalCardProps) => {
               <div className="mt-1.5 flex flex-wrap items-center gap-3">
                 {deadlineInfo()}
                 {goal.completedAt && (
-                  <span className="flex items-center gap-1 text-xs text-green-600">
+                  <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
                     <Check className="h-3 w-3" />
                     Completed {format(goal.completedAt instanceof Date ? goal.completedAt : new Date(goal.completedAt), 'd MMM yyyy')}
                   </span>

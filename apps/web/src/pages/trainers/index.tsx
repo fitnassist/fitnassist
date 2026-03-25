@@ -158,7 +158,7 @@ export const TrainersPage = () => {
   const trainers = data?.trainers || [];
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)]">
+    <div className="flex flex-col min-h-screen md:h-screen pt-16">
       {/* Search Bar */}
       <SearchBar
         location={location}

@@ -10,6 +10,7 @@ import {
   Avatar,
   AvatarImage,
   AvatarFallback,
+  Badge,
 } from "@/components/ui";
 import { getInitials } from "../../TrainerDashboardContent.utils";
 import type { TrainerProfile } from "../../TrainerDashboardContent.types";
@@ -39,15 +40,15 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
               <CardTitle className="flex items-center gap-2 flex-wrap">
                 {profile.displayName}
                 {profile.isPublished ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                    <CheckCircle className="h-3 w-3" />
+                  <Badge variant="success">
+                    <CheckCircle className="h-3 w-3 mr-1" />
                     Published
-                  </span>
+                  </Badge>
                 ) : (
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
-                    <Clock className="h-3 w-3" />
+                  <Badge variant="warning">
+                    <Clock className="h-3 w-3 mr-1" />
                     Draft
-                  </span>
+                  </Badge>
                 )}
               </CardTitle>
               <CardDescription className="mt-1 truncate">

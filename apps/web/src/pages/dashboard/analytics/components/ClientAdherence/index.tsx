@@ -4,7 +4,7 @@ import { useClientAdherence } from '@/api/analytics';
 import { routes } from '@/config/routes';
 
 const getAdherenceStatus = (entries: number) => {
-  if (entries >= 5) return { label: 'Good', className: 'bg-green-100 text-green-700' };
+  if (entries >= 5) return { label: 'Good', className: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' };
   if (entries >= 3) return { label: 'Fair', className: 'bg-amber-100 text-amber-700' };
   return { label: 'Low', className: 'bg-red-100 text-red-700' };
 };

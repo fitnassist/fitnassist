@@ -1,5 +1,6 @@
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import { format } from 'date-fns';
+import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
 const MEASUREMENT_COLORS: Record<string, string> = {
   chestCm: '#ef4444',
@@ -69,7 +70,7 @@ export const MeasurementChart = ({ data, unitPreference }: MeasurementChartProps
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
         <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}${unit}`} />
-        <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+        <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#fff' }} labelStyle={{ color: 'rgba(255,255,255,0.7)' }} />
         <Legend wrapperStyle={{ fontSize: 11 }} />
         {fields.map(field => (
           <Line

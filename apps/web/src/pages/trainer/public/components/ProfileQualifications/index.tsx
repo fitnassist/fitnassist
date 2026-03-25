@@ -1,12 +1,12 @@
 import { Award } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { getQualificationLabel } from '../../public.utils';
 
 interface ProfileQualificationsProps {
   qualifications: string[];
 }
 
-export function ProfileQualifications({ qualifications }: ProfileQualificationsProps) {
+export const ProfileQualifications = ({ qualifications }: ProfileQualificationsProps) => {
   if (!qualifications || qualifications.length === 0) {
     return null;
   }
@@ -22,15 +22,12 @@ export function ProfileQualifications({ qualifications }: ProfileQualificationsP
       <CardContent>
         <div className="flex flex-wrap gap-2">
           {qualifications.map((qualification) => (
-            <span
-              key={qualification}
-              className="inline-flex items-center rounded-full bg-secondary px-3 py-1 text-sm font-medium text-secondary-foreground"
-            >
+            <Badge key={qualification} variant="secondary">
               {getQualificationLabel(qualification)}
-            </span>
+            </Badge>
           ))}
         </div>
       </CardContent>
     </Card>
   );
-}
+};

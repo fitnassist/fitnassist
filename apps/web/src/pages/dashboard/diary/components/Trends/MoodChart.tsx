@@ -1,5 +1,6 @@
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { format } from 'date-fns';
+import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
 const MOOD_VALUES: Record<string, number> = {
   TERRIBLE: 1,
@@ -43,7 +44,9 @@ export const MoodChart = ({ data }: MoodChartProps) => {
           tickFormatter={(v) => MOOD_LABELS[v] ?? ''}
         />
         <Tooltip
-          contentStyle={{ fontSize: 12, borderRadius: 8 }}
+          contentStyle={CHART_TOOLTIP_STYLE}
+          itemStyle={{ color: '#fff' }}
+          labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
           formatter={(v) => [MOOD_LABELS[v as number] ?? v, 'Mood']}
         />
         <Line

@@ -37,15 +37,15 @@ function getZoomForRadius(radiusMiles: number): number {
   return Math.max(7, Math.min(13, zoom)); // Clamp between 7 and 13
 }
 
-// Brand colors
+// Brand colors (coral)
 const COLORS = {
   light: {
-    primary: '#520df2', // hsl(258, 90%, 50%)
-    primaryHover: '#4109c4',
+    primary: '#d8345b', // coral
+    primaryHover: '#c22d50',
   },
   dark: {
-    primary: '#7c3aed', // hsl(258, 90%, 60%)
-    primaryHover: '#6d28d9',
+    primary: '#d8345b',
+    primaryHover: '#c22d50',
   },
 };
 

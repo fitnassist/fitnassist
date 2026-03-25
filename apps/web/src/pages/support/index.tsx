@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Send, CheckCircle } from 'lucide-react';
 import { supportContactSchema, type SupportContactInput } from '@fitnassist/schemas';
 import { Button, Input, Label, Textarea, Card, CardContent } from '@/components/ui';
+import { HeroBanner } from '@/components/HeroBanner';
 import { trpc } from '@/lib/trpc';
 
 const SUBJECT_OPTIONS = [
@@ -60,13 +61,14 @@ export const SupportPage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:py-16 sm:px-6 lg:px-8">
-      <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Contact Support</h1>
-      <p className="mt-2 text-muted-foreground">
-        Have a question, issue, or feedback? Fill out the form below and we'll get back to you.
-      </p>
+    <div>
+      <HeroBanner title="Support" imageUrl="https://images.unsplash.com/photo-1557683316-973673baf926?w=1920&q=80" size="small" />
+      <div className="mx-auto max-w-2xl px-4 py-8 sm:py-16 sm:px-6 lg:px-8">
+        <p className="text-muted-foreground">
+          Have a question, issue, or feedback? Fill out the form below and we'll get back to you.
+        </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
         <div>
           <Label htmlFor="name">Name</Label>
           <Input id="name" placeholder="Your name" {...register('name')} />
@@ -134,7 +136,8 @@ export const SupportPage = () => {
             </>
           )}
         </Button>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

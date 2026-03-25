@@ -4,14 +4,15 @@ import {
   Card,
   CardContent,
   Button,
+  Badge,
 } from '@/components/ui';
 import { routes } from '@/config/routes';
 import { MUSCLE_GROUP_OPTIONS } from '@fitnassist/schemas';
 
-const DIFFICULTY_STYLES: Record<string, { label: string; className: string }> = {
-  BEGINNER: { label: 'Beginner', className: 'text-green-600 bg-green-50' },
-  INTERMEDIATE: { label: 'Intermediate', className: 'text-amber-600 bg-amber-50' },
-  ADVANCED: { label: 'Advanced', className: 'text-red-600 bg-red-50' },
+const DIFFICULTY_STYLES: Record<string, { label: string; variant: 'success' | 'warning' | 'destructive' }> = {
+  BEGINNER: { label: 'Beginner', variant: 'success' },
+  INTERMEDIATE: { label: 'Intermediate', variant: 'warning' },
+  ADVANCED: { label: 'Advanced', variant: 'destructive' },
 };
 
 interface ExerciseCardProps {
@@ -70,9 +71,9 @@ export const ExerciseCard = ({ exercise, onDelete, isDeleting }: ExerciseCardPro
                     </span>
                   )}
                   {difficultyStyle && (
-                    <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${difficultyStyle.className}`}>
+                    <Badge variant={difficultyStyle.variant} className="flex-shrink-0">
                       {difficultyStyle.label}
-                    </span>
+                    </Badge>
                   )}
                 </div>
                 {exercise.description && (
@@ -105,25 +106,19 @@ export const ExerciseCard = ({ exercise, onDelete, isDeleting }: ExerciseCardPro
             {(exercise.muscleGroups.length > 0 || exercise.equipment.length > 0) && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {exercise.muscleGroups.slice(0, 3).map((mg) => (
-                  <span
-                    key={mg}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary"
-                  >
+                  <Badge key={mg}>
                     {getMuscleGroupLabel(mg)}
-                  </span>
+                  </Badge>
                 ))}
                 {exercise.equipment.slice(0, 2).map((eq) => (
-                  <span
-                    key={eq}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-secondary text-secondary-foreground"
-                  >
+                  <Badge key={eq} variant="secondary">
                     {eq}
-                  </span>
+                  </Badge>
                 ))}
                 {(exercise.muscleGroups.length > 3 || exercise.equipment.length > 2) && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
+                  <Badge variant="secondary">
                     +{Math.max(0, exercise.muscleGroups.length - 3) + Math.max(0, exercise.equipment.length - 2)} more
-                  </span>
+                  </Badge>
                 )}
               </div>
             )}

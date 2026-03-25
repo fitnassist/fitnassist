@@ -144,37 +144,54 @@ export const MessageThread = ({
             </p>
           </div>
         ) : (
-          messages.map((msg) => {
+          messages.map((msg, index) => {
             const isOwn = msg.senderId === userId;
             const senderInitials = getInitials(msg.sender.name);
             const senderAvatarUrl = getSenderAvatarUrl(msg.sender);
 
+            const prevMsg = messages[index - 1];
+            const nextMsg = messages[index + 1];
+            const isFirstInGroup = !prevMsg || prevMsg.senderId !== msg.senderId;
+            const isLastInGroup = !nextMsg || nextMsg.senderId !== msg.senderId;
+
             return (
               <div
                 key={msg.id}
-                className={cn('flex gap-3', isOwn && 'flex-row-reverse')}
+                className={cn(
+                  'flex items-end gap-2',
+                  isOwn && 'flex-row-reverse',
+                  !isFirstInGroup && '-mt-2'
+                )}
               >
-                <Avatar className="h-8 w-8 flex-shrink-0">
-                  {senderAvatarUrl && (
-                    <AvatarImage src={senderAvatarUrl} alt={msg.sender.name} />
-                  )}
-                  <AvatarFallback className="text-xs">{senderInitials}</AvatarFallback>
-                </Avatar>
-                <div
-                  className={cn(
-                    'max-w-[70%] rounded-lg px-4 py-2',
-                    isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                  )}
-                >
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  <p
+                {/* Avatar: visible only on first message in group, invisible spacer otherwise */}
+                {isFirstInGroup ? (
+                  <Avatar className="h-8 w-8 flex-shrink-0">
+                    {senderAvatarUrl && (
+                      <AvatarImage src={senderAvatarUrl} alt={msg.sender.name} />
+                    )}
+                    <AvatarFallback className="text-xs">{senderInitials}</AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <div className="w-8 flex-shrink-0" />
+                )}
+
+                <div>
+                  <div
                     className={cn(
-                      'text-xs mt-1',
-                      isOwn ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                      'w-fit rounded-2xl px-3 py-1.5',
+                      isOwn ? 'bg-coral text-white ml-auto' : 'bg-muted'
                     )}
                   >
-                    {formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}
-                  </p>
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  </div>
+                  {isLastInGroup && (
+                    <p className={cn(
+                      'text-xs mt-2 px-3 text-muted-foreground',
+                      isOwn && 'text-right'
+                    )}>
+                      {formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}
+                    </p>
+                  )}
                 </div>
               </div>
             );

@@ -14,6 +14,7 @@ import {
   ConfirmDialog,
   Select,
   type SelectOption,
+  Badge,
 } from '@/components/ui';
 import { routes } from '@/config/routes';
 import type { ClientStatus } from '@fitnassist/database';
@@ -100,9 +101,9 @@ export const ClientOverview = ({ client, onStatusChange, isUpdating, onDisconnec
               </div>
 
               {isDisconnected ? (
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-red-600 bg-red-50 px-3 py-1 rounded-full">
+                <Badge variant="destructive">
                   Disconnected
-                </span>
+                </Badge>
               ) : (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <div className="w-40">
@@ -181,12 +182,7 @@ export const ClientOverview = ({ client, onStatusChange, isUpdating, onDisconnec
                 <p className="text-sm font-medium text-muted-foreground mb-1">Fitness Goals</p>
                 <div className="flex flex-wrap gap-1">
                   {profile.fitnessGoals.map((goal) => (
-                    <span
-                      key={goal}
-                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-secondary text-secondary-foreground"
-                    >
-                      {goal}
-                    </span>
+                    <Badge key={goal}>{goal}</Badge>
                   ))}
                 </div>
               </div>

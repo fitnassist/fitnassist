@@ -12,6 +12,7 @@ import { MoodChart } from './MoodChart';
 import { SleepChart } from './SleepChart';
 import { ActivityChart } from './ActivityChart';
 import { StepsChart } from './StepsChart';
+import { ChartTabBar } from './ChartTabBar';
 
 type ChartType = 'weight' | 'measurements' | 'nutrition' | 'water' | 'mood' | 'sleep' | 'activity' | 'steps';
 
@@ -105,21 +106,7 @@ export const Trends = ({ unitPreference }: TrendsProps) => {
       </CardHeader>
       <CardContent>
         {/* Chart type tabs */}
-        <div className="mb-4 flex flex-wrap gap-1.5">
-          {CHART_TABS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setActiveChart(key)}
-              className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                activeChart === key
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <ChartTabBar tabs={CHART_TABS} activeTab={activeChart} onTabChange={setActiveChart} />
 
         {/* Active chart */}
         {activeChart === 'weight' && <WeightChart data={weightData} unitPreference={unitPreference} />}

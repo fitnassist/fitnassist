@@ -1,5 +1,6 @@
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine, CartesianGrid } from 'recharts';
 import { format } from 'date-fns';
+import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
 interface WeightChartProps {
   data: Array<{ date: string; weightKg: number }>;
@@ -37,7 +38,9 @@ export const WeightChart = ({ data, goalWeight, unitPreference }: WeightChartPro
           tickFormatter={(v) => `${v}${unit}`}
         />
         <Tooltip
-          contentStyle={{ fontSize: 12, borderRadius: 8 }}
+          contentStyle={CHART_TOOLTIP_STYLE}
+          itemStyle={{ color: '#fff' }}
+          labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
           formatter={(value) => [`${value} ${unit}`, 'Weight']}
         />
         <Line

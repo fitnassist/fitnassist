@@ -37,7 +37,7 @@ export const DashboardHeader = ({ isDark, onToggleTheme, user, onSignOut }: Dash
     .slice(0, 2) || 'U';
 
   return (
-    <header className="border-b bg-background sticky top-0 z-50 flex-shrink-0">
+    <header className="border-b border-white/10 bg-[hsl(230,25%,10%)] sticky top-0 z-50 flex-shrink-0">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
           <Link to={routes.dashboard} className="text-xl font-bold text-primary">
@@ -49,6 +49,7 @@ export const DashboardHeader = ({ isDark, onToggleTheme, user, onSignOut }: Dash
               size="icon"
               onClick={onToggleTheme}
               aria-label="Toggle theme"
+              className="text-white/80 hover:text-white hover:bg-white/10"
             >
               {isDark ? (
                 <Sun className="h-5 w-5" />

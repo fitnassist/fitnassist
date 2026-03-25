@@ -65,7 +65,7 @@ const ConversationRow = ({
       <div
         className={cn(
           "w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left border-b group",
-          isActive && "bg-muted",
+          isActive && "border-r-2 border-r-primary",
         )}
       >
         <button
@@ -80,7 +80,7 @@ const ConversationRow = ({
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             {connection.unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-primary-foreground rounded-full text-xs flex items-center justify-center font-medium">
+              <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary text-gray-900 rounded-full text-xs flex items-center justify-center font-medium">
                 {connection.unreadCount}
               </span>
             )}

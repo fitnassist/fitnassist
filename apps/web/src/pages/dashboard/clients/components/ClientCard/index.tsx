@@ -23,6 +23,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Badge,
 } from "@/components/ui";
 import { routes } from "@/config/routes";
 import type { ClientStatus } from "@fitnassist/database";
@@ -56,15 +57,15 @@ interface ClientCardProps {
   onStatusChange: (id: string, status: ActiveClientStatus) => void;
 }
 
-const STATUS_STYLES: Record<
+const STATUS_BADGES: Record<
   ClientStatus,
-  { label: string; className: string }
+  { label: string; variant: 'info' | 'success' | 'warning' | 'secondary' | 'destructive' }
 > = {
-  ONBOARDING: { label: "Onboarding", className: "text-blue-600 bg-blue-50" },
-  ACTIVE: { label: "Active", className: "text-green-600 bg-green-50" },
-  ON_HOLD: { label: "On Hold", className: "text-amber-600 bg-amber-50" },
-  INACTIVE: { label: "Inactive", className: "text-gray-600 bg-gray-50" },
-  DISCONNECTED: { label: "Disconnected", className: "text-red-600 bg-red-50" },
+  ONBOARDING: { label: "Onboarding", variant: "info" },
+  ACTIVE: { label: "Active", variant: "success" },
+  ON_HOLD: { label: "On Hold", variant: "warning" },
+  INACTIVE: { label: "Inactive", variant: "secondary" },
+  DISCONNECTED: { label: "Disconnected", variant: "destructive" },
 };
 
 const getInitials = (name: string) =>
@@ -89,7 +90,7 @@ export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
   const experienceLevel = sender?.traineeProfile?.experienceLevel;
   const fitnessGoals = sender?.traineeProfile?.fitnessGoals || [];
   const lastMessageDate = connection.messages[0]?.createdAt;
-  const statusStyle = STATUS_STYLES[client.status];
+  const statusBadge = STATUS_BADGES[client.status];
   const isDisconnected = client.status === "DISCONNECTED";
 
   const statusOptions: {
@@ -122,11 +123,9 @@ export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
                   >
                     {displayName}
                   </Link>
-                  <span
-                    className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full ${statusStyle.className}`}
-                  >
-                    {statusStyle.label}
-                  </span>
+                  <Badge variant={statusBadge.variant}>
+                    {statusBadge.label}
+                  </Badge>
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                   {experienceLevel && (
@@ -178,9 +177,7 @@ export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
                             onClick={() => onStatusChange(client.id, value)}
                             disabled={client.status === value}
                           >
-                            <Icon
-                              className={`h-4 w-4 mr-2 ${STATUS_STYLES[value].className.split(" ")[0]}`}
-                            />
+                            <Icon className="h-4 w-4 mr-2" />
                             {label}
                             {client.status === value && (
                               <Check className="h-4 w-4 ml-auto" />
@@ -197,17 +194,12 @@ export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
             {fitnessGoals.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {fitnessGoals.slice(0, 3).map((goal) => (
-                  <span
-                    key={goal}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-secondary text-secondary-foreground"
-                  >
-                    {goal}
-                  </span>
+                  <Badge key={goal}>{goal}</Badge>
                 ))}
                 {fitnessGoals.length > 3 && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-muted text-muted-foreground">
+                  <Badge variant="secondary">
                     +{fitnessGoals.length - 3} more
-                  </span>
+                  </Badge>
                 )}
               </div>
             )}

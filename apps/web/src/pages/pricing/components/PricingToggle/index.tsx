@@ -6,33 +6,43 @@ interface PricingToggleProps {
 }
 
 export const PricingToggle = ({ billingPeriod, onChange }: PricingToggleProps) => {
+  const isAnnual = billingPeriod === 'ANNUAL';
+
   return (
-    <div className="flex items-center justify-center gap-3">
-      <button
-        type="button"
-        onClick={() => onChange('MONTHLY')}
+    <div className="flex items-center justify-center gap-4">
+      <span
         className={cn(
-          'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-          billingPeriod === 'MONTHLY'
-            ? 'bg-primary text-primary-foreground'
-            : 'text-muted-foreground hover:text-foreground'
+          'text-sm font-semibold uppercase tracking-wider cursor-pointer transition-colors',
+          !isAnnual ? 'text-white' : 'text-white/50'
         )}
+        onClick={() => onChange('MONTHLY')}
       >
         Monthly
-      </button>
+      </span>
       <button
         type="button"
-        onClick={() => onChange('ANNUAL')}
+        onClick={() => onChange(isAnnual ? 'MONTHLY' : 'ANNUAL')}
         className={cn(
-          'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-          billingPeriod === 'ANNUAL'
-            ? 'bg-primary text-primary-foreground'
-            : 'text-muted-foreground hover:text-foreground'
+          'relative inline-flex h-7 w-12 items-center rounded-full transition-colors',
+          isAnnual ? 'bg-primary' : 'bg-white/30'
         )}
       >
-        Annual
-        <span className="ml-1.5 text-xs opacity-80">Save ~17%</span>
+        <span
+          className={cn(
+            'inline-block h-5 w-5 rounded-full bg-white transition-transform',
+            isAnnual ? 'translate-x-6' : 'translate-x-1'
+          )}
+        />
       </button>
+      <span
+        className={cn(
+          'text-sm font-semibold uppercase tracking-wider cursor-pointer transition-colors',
+          isAnnual ? 'text-white' : 'text-white/50'
+        )}
+        onClick={() => onChange('ANNUAL')}
+      >
+        Yearly <span className="text-xs font-normal">(2 Months Free)</span>
+      </span>
     </div>
   );
 };

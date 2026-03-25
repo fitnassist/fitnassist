@@ -144,7 +144,7 @@ export const WeeklyScheduleBuilder = () => {
           <Button onClick={handleSave} disabled={setWeekly.isPending}>
             {setWeekly.isPending ? 'Saving...' : 'Save Schedule'}
           </Button>
-          {saved && <span className="text-sm text-green-600">Saved!</span>}
+          {saved && <span className="text-sm text-green-600 dark:text-green-400">Saved!</span>}
         </div>
       </CardContent>
     </Card>

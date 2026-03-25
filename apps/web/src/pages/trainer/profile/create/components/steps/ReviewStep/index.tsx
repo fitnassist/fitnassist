@@ -2,7 +2,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MapPin, Briefcase, Award, Image } from 'lucide-react';
 import { wizardReviewSchema, type WizardReviewInput, TRAINER_SERVICES, TRAINER_QUALIFICATIONS } from '@fitnassist/schemas';
-import { Button, Card, CardContent, Separator } from '@/components/ui';
+import { Badge, Button, Card, CardContent, Separator } from '@/components/ui';
 import type { WizardStepProps, WizardStep } from '../../ProfileWizard/ProfileWizard.types';
 
 interface ReviewSectionProps {
@@ -12,7 +12,7 @@ interface ReviewSectionProps {
   children: React.ReactNode;
 }
 
-function ReviewSection({ title, icon, onEdit, children }: ReviewSectionProps) {
+const ReviewSection = ({ title, icon, onEdit, children }: ReviewSectionProps) => {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -27,7 +27,7 @@ function ReviewSection({ title, icon, onEdit, children }: ReviewSectionProps) {
       <div className="rounded-lg bg-muted/50 p-4">{children}</div>
     </div>
   );
-}
+};
 
 interface ReviewStepProps extends WizardStepProps {
   onGoToStep: (step: WizardStep) => void;
@@ -35,14 +35,14 @@ interface ReviewStepProps extends WizardStepProps {
   onSubmit: (reviewData: WizardReviewInput) => void;
 }
 
-export function ReviewStep({
+export const ReviewStep = ({
   data,
   onUpdate,
   onBack,
   onGoToStep,
   isSubmitting,
   onSubmit,
-}: ReviewStepProps) {
+}: ReviewStepProps) => {
   const {
     control,
     handleSubmit,
@@ -146,12 +146,9 @@ export function ReviewStep({
               <p className="mb-1 font-medium">Services:</p>
               <div className="flex flex-wrap gap-1">
                 {data.services.services.map((s) => (
-                  <span
-                    key={s}
-                    className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary"
-                  >
+                  <Badge key={s}>
                     {getServiceLabel(s)}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -159,12 +156,9 @@ export function ReviewStep({
               <p className="mb-1 font-medium">Qualifications:</p>
               <div className="flex flex-wrap gap-1">
                 {data.services.qualifications.map((q) => (
-                  <span
-                    key={q}
-                    className="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-xs"
-                  >
+                  <Badge key={q} variant="secondary">
                     {getQualificationLabel(q)}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -243,4 +237,4 @@ export function ReviewStep({
       </div>
     </form>
   );
-}
+};

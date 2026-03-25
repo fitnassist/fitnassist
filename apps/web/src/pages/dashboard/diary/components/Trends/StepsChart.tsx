@@ -9,6 +9,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { format } from 'date-fns';
+import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
 interface StepsChartProps {
   data: Array<{ date: string; totalSteps: number }>;
@@ -36,7 +37,9 @@ export const StepsChart = ({ data, goalSteps = 10000 }: StepsChartProps) => {
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
         <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : `${v}`} />
         <Tooltip
-          contentStyle={{ fontSize: 12, borderRadius: 8 }}
+          contentStyle={CHART_TOOLTIP_STYLE}
+          itemStyle={{ color: '#fff' }}
+          labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
           formatter={(v) => [`${Number(v).toLocaleString()} steps`, 'Steps']}
         />
         <Bar dataKey="steps" fill="#14b8a6" radius={[4, 4, 0, 0]} />

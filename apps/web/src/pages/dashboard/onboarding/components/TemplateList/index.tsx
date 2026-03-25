@@ -5,6 +5,7 @@ import {
   Button,
   Card,
   CardContent,
+  Badge,
 } from '@/components/ui';
 import { routes } from '@/config/routes';
 import { useOnboardingTemplates, useDeleteOnboardingTemplate } from '@/api/onboarding';
@@ -62,7 +63,7 @@ export const TemplateList = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 min-w-0">
                     {template.isActive ? (
-                      <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
                     ) : (
                       <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                     )}
@@ -70,9 +71,7 @@ export const TemplateList = () => {
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium truncate">{template.name}</h3>
                         {template.isActive && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-medium">
-                            Active
-                          </span>
+                          <Badge variant="success">Active</Badge>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">

@@ -48,7 +48,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps) {
   if (isSuccess) {
     return (
       <div className="text-center space-y-4">
-        <div className="text-green-600 font-medium">
+        <div className="text-green-600 dark:text-green-400 font-medium">
           Check your email
         </div>
         <p className="text-sm text-muted-foreground">

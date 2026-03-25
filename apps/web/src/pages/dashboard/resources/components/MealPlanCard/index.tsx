@@ -28,7 +28,7 @@ export const MealPlanCard = ({ plan, onDelete, isDeleting }: MealPlanCardProps) 
         <CardContent className="p-3 sm:p-4">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-green-500/10 flex items-center justify-center">
-              <Salad className="h-6 w-6 sm:h-7 sm:w-7 text-green-600" />
+              <Salad className="h-6 w-6 sm:h-7 sm:w-7 text-green-600 dark:text-green-400" />
             </div>
 
             <div className="flex-1 min-w-0">

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Target, Repeat, ChevronRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from '@/components/ui';
 import { useGoals } from '@/api/goal';
 import { routes } from '@/config/routes';
 
@@ -39,9 +39,9 @@ export const ActiveGoalsSummary = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-base">
               Goals
-              <span className="ml-2 rounded-full bg-blue-500/10 px-1.5 py-0.5 text-xs font-normal text-blue-500">
+              <Badge variant="info" className="ml-2">
                 {activeGoals.length}
-              </span>
+              </Badge>
             </CardTitle>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </div>

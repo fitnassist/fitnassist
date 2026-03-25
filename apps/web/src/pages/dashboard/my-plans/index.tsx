@@ -377,7 +377,7 @@ export const MyPlansPage = () => {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg flex items-center gap-2">
-                        <Salad className="h-5 w-5 text-green-600" />
+                        <Salad className="h-5 w-5 text-green-600 dark:text-green-400" />
                         {plan.name}
                       </CardTitle>
                       <span className="text-xs text-muted-foreground">
@@ -401,7 +401,7 @@ export const MyPlansPage = () => {
                             className="w-full flex items-center gap-3 p-3 border rounded-lg hover:bg-accent/50 transition-colors text-left"
                           >
                             <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                              <UtensilsCrossed className="h-4 w-4 text-green-600" />
+                              <UtensilsCrossed className="h-4 w-4 text-green-600 dark:text-green-400" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm">{mr.recipe.name}</p>
