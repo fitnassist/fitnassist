@@ -117,11 +117,13 @@ export const DiaryPage = () => {
 
             {/* Activity: workouts, activities, mood, sleep */}
             <TabsContent value="activity">
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <WorkoutLogger date={selectedDate} entries={workoutEntries} />
+              <div className="grid gap-4 sm:grid-cols-2">
                 <ActivityLogger date={selectedDate} entries={activityEntries} />
-                <SleepLogger date={selectedDate} entry={sleepEntry} />
                 <MoodLogger date={selectedDate} entry={moodEntry} />
+                <SleepLogger date={selectedDate} entry={sleepEntry} />
+              </div>
+              <div className="mt-4">
+                <WorkoutLogger date={selectedDate} entries={workoutEntries} />
               </div>
               <div className="mt-4">
                 <PersonalBests />

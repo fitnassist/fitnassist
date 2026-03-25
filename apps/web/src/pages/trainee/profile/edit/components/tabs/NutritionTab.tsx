@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { updateTraineeProfileSchema, WEEKLY_WEIGHT_GOAL_OPTIONS } from '@fitnassist/schemas';
-import { calculateNutritionTargets } from '@fitnassist/utils';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  updateTraineeProfileSchema,
+  WEEKLY_WEIGHT_GOAL_OPTIONS,
+} from "@fitnassist/schemas";
+import { calculateNutritionTargets } from "@fitnassist/utils";
 import {
   Button,
   Card,
@@ -14,8 +17,8 @@ import {
   Input,
   Label,
   Switch,
-} from '@/components/ui';
-import { trpc } from '@/lib/trpc';
+} from "@/components/ui";
+import { trpc } from "@/lib/trpc";
 
 const nutritionSchema = updateTraineeProfileSchema.pick({
   weeklyWeightGoalKg: true,
@@ -46,9 +49,9 @@ interface NutritionTabProps {
 
 export const NutritionTab = ({ profile }: NutritionTabProps) => {
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
   const [useManualOverride, setUseManualOverride] = useState(
-    profile?.dailyCalorieTarget != null
+    profile?.dailyCalorieTarget != null,
   );
 
   const utils = trpc.useUtils();
@@ -56,13 +59,16 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
     onSuccess: () => {
       utils.trainee.getMyProfile.invalidate();
       utils.trainee.getNutritionTargets.invalidate();
-      setSuccessMessage('Nutrition targets updated');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      setSuccessMessage("Nutrition targets updated");
+      setTimeout(() => setSuccessMessage(""), 3000);
     },
   });
 
   const calculated = profile
-    ? calculateNutritionTargets({ ...profile, currentWeightKg: profile.startWeightKg })
+    ? calculateNutritionTargets({
+        ...profile,
+        currentWeightKg: profile.startWeightKg,
+      })
     : null;
 
   const {
@@ -83,7 +89,7 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
     },
   });
 
-  const weeklyGoal = watch('weeklyWeightGoalKg');
+  const weeklyGoal = watch("weeklyWeightGoalKg");
 
   // Recalculate preview when weekly goal changes
   const previewCalc = profile
@@ -99,10 +105,10 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
   // When switching off manual override, clear the manual fields
   useEffect(() => {
     if (!useManualOverride) {
-      setValue('dailyCalorieTarget', undefined, { shouldDirty: true });
-      setValue('dailyProteinTargetG', undefined, { shouldDirty: true });
-      setValue('dailyCarbsTargetG', undefined, { shouldDirty: true });
-      setValue('dailyFatTargetG', undefined, { shouldDirty: true });
+      setValue("dailyCalorieTarget", undefined, { shouldDirty: true });
+      setValue("dailyProteinTargetG", undefined, { shouldDirty: true });
+      setValue("dailyCarbsTargetG", undefined, { shouldDirty: true });
+      setValue("dailyFatTargetG", undefined, { shouldDirty: true });
     }
   }, [useManualOverride, setValue]);
 
@@ -127,14 +133,20 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
     }
   };
 
-  const missingFields = !profile?.startWeightKg || !profile?.heightCm || !profile?.dateOfBirth || !profile?.gender || !profile?.activityLevel;
+  const missingFields =
+    !profile?.startWeightKg ||
+    !profile?.heightCm ||
+    !profile?.dateOfBirth ||
+    !profile?.gender ||
+    !profile?.activityLevel;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Nutrition Targets</CardTitle>
         <CardDescription>
-          Set your weekly weight goal and daily nutrition targets. Targets are auto-calculated from your profile, or you can set them manually.
+          Set your weekly weight goal and daily nutrition targets. Targets are
+          auto-calculated from your profile, or you can set them manually.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -144,7 +156,7 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
             <Label>Weekly Weight Goal</Label>
             <select
               className="mt-1.5 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              {...register('weeklyWeightGoalKg', { valueAsNumber: true })}
+              {...register("weeklyWeightGoalKg", { valueAsNumber: true })}
               defaultValue={profile?.weeklyWeightGoalKg ?? 0}
             >
               {WEEKLY_WEIGHT_GOAL_OPTIONS.map((opt) => (
@@ -154,29 +166,39 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
               ))}
             </select>
             {errors.weeklyWeightGoalKg && (
-              <p className="mt-1 text-sm text-destructive">{errors.weeklyWeightGoalKg.message}</p>
+              <p className="mt-1 text-sm text-destructive">
+                {errors.weeklyWeightGoalKg.message}
+              </p>
             )}
           </div>
 
           {/* Auto-calculated targets display */}
           {missingFields ? (
             <div className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-              To auto-calculate your targets, fill in your weight, height, date of birth, gender, and activity level in the Metrics and Personal tabs.
+              To auto-calculate your targets, fill in your weight, height, date
+              of birth, gender, and activity level in the Metrics and Personal
+              tabs.
             </div>
           ) : effectiveCalc ? (
             <div className="rounded-md bg-muted/50 p-4">
               <p className="text-sm font-medium">Calculated Daily Targets</p>
               <div className="mt-2 grid grid-cols-4 gap-3 text-center">
                 <div>
-                  <p className="text-lg font-semibold">{effectiveCalc.calories}</p>
+                  <p className="text-lg font-semibold">
+                    {effectiveCalc.calories}
+                  </p>
                   <p className="text-xs text-muted-foreground">kcal</p>
                 </div>
                 <div>
-                  <p className="text-lg font-semibold">{effectiveCalc.proteinG}g</p>
+                  <p className="text-lg font-semibold">
+                    {effectiveCalc.proteinG}g
+                  </p>
                   <p className="text-xs text-muted-foreground">Protein</p>
                 </div>
                 <div>
-                  <p className="text-lg font-semibold">{effectiveCalc.carbsG}g</p>
+                  <p className="text-lg font-semibold">
+                    {effectiveCalc.carbsG}g
+                  </p>
                   <p className="text-xs text-muted-foreground">Carbs</p>
                 </div>
                 <div>
@@ -193,7 +215,7 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
               checked={useManualOverride}
               onCheckedChange={setUseManualOverride}
             />
-            <Label>Set custom targets manually</Label>
+            <Label className="mb-0">Set custom targets manually</Label>
           </div>
 
           {/* Manual override fields */}
@@ -203,11 +225,15 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
                 <Label>Daily Calories (kcal)</Label>
                 <Input
                   type="number"
-                  placeholder={effectiveCalc ? String(effectiveCalc.calories) : '2000'}
-                  {...register('dailyCalorieTarget', { valueAsNumber: true })}
+                  placeholder={
+                    effectiveCalc ? String(effectiveCalc.calories) : "2000"
+                  }
+                  {...register("dailyCalorieTarget", { valueAsNumber: true })}
                 />
                 {errors.dailyCalorieTarget && (
-                  <p className="mt-1 text-sm text-destructive">{errors.dailyCalorieTarget.message}</p>
+                  <p className="mt-1 text-sm text-destructive">
+                    {errors.dailyCalorieTarget.message}
+                  </p>
                 )}
               </div>
               <div>
@@ -215,11 +241,15 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
                 <Input
                   type="number"
                   step="0.1"
-                  placeholder={effectiveCalc ? String(effectiveCalc.proteinG) : '150'}
-                  {...register('dailyProteinTargetG', { valueAsNumber: true })}
+                  placeholder={
+                    effectiveCalc ? String(effectiveCalc.proteinG) : "150"
+                  }
+                  {...register("dailyProteinTargetG", { valueAsNumber: true })}
                 />
                 {errors.dailyProteinTargetG && (
-                  <p className="mt-1 text-sm text-destructive">{errors.dailyProteinTargetG.message}</p>
+                  <p className="mt-1 text-sm text-destructive">
+                    {errors.dailyProteinTargetG.message}
+                  </p>
                 )}
               </div>
               <div>
@@ -227,11 +257,15 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
                 <Input
                   type="number"
                   step="0.1"
-                  placeholder={effectiveCalc ? String(effectiveCalc.carbsG) : '200'}
-                  {...register('dailyCarbsTargetG', { valueAsNumber: true })}
+                  placeholder={
+                    effectiveCalc ? String(effectiveCalc.carbsG) : "200"
+                  }
+                  {...register("dailyCarbsTargetG", { valueAsNumber: true })}
                 />
                 {errors.dailyCarbsTargetG && (
-                  <p className="mt-1 text-sm text-destructive">{errors.dailyCarbsTargetG.message}</p>
+                  <p className="mt-1 text-sm text-destructive">
+                    {errors.dailyCarbsTargetG.message}
+                  </p>
                 )}
               </div>
               <div>
@@ -239,11 +273,15 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
                 <Input
                   type="number"
                   step="0.1"
-                  placeholder={effectiveCalc ? String(effectiveCalc.fatG) : '65'}
-                  {...register('dailyFatTargetG', { valueAsNumber: true })}
+                  placeholder={
+                    effectiveCalc ? String(effectiveCalc.fatG) : "65"
+                  }
+                  {...register("dailyFatTargetG", { valueAsNumber: true })}
                 />
                 {errors.dailyFatTargetG && (
-                  <p className="mt-1 text-sm text-destructive">{errors.dailyFatTargetG.message}</p>
+                  <p className="mt-1 text-sm text-destructive">
+                    {errors.dailyFatTargetG.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -256,15 +294,19 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
               type="number"
               step="100"
               placeholder="2500"
-              {...register('dailyWaterTargetMl', { valueAsNumber: true })}
+              {...register("dailyWaterTargetMl", { valueAsNumber: true })}
             />
             {errors.dailyWaterTargetMl && (
-              <p className="mt-1 text-sm text-destructive">{errors.dailyWaterTargetMl.message}</p>
+              <p className="mt-1 text-sm text-destructive">
+                {errors.dailyWaterTargetMl.message}
+              </p>
             )}
           </div>
 
           {updateMutation.error && (
-            <p className="text-sm text-destructive">{updateMutation.error.message}</p>
+            <p className="text-sm text-destructive">
+              {updateMutation.error.message}
+            </p>
           )}
 
           {successMessage && (
@@ -273,7 +315,7 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
 
           <div className="flex justify-end">
             <Button type="submit" disabled={isSaving || !isDirty}>
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              {isSaving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </form>

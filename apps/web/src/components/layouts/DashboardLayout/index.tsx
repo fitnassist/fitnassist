@@ -40,8 +40,8 @@ export const DashboardLayout = () => {
     }
   }, [isAuthenticated, pushSupported, pushPermission, requestPermission]);
 
-  // Get subscription tier for feature gating
-  const { data: subscriptionData } = useSubscription();
+  // Get subscription tier for feature gating (trainers only)
+  const { data: subscriptionData } = useSubscription(isTrainer);
   const currentTier = subscriptionData?.effectiveTier ?? 'FREE';
 
   // Get badge counts from custom hook
