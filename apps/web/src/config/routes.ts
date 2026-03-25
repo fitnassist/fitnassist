@@ -9,7 +9,7 @@ export const routes = {
 
   // Trainers
   trainers: '/trainers',
-  // Public trainer profile (e.g., fitnassist.com/trainers/john-smith)
+  // Public trainer profile (e.g., fitnassist.co/trainers/john-smith)
   trainerPublicProfile: (handle: string) => `/trainers/${handle}`,
 
   // Trainer Profile Setup

@@ -52,7 +52,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
               </CardTitle>
               <CardDescription className="mt-1 truncate">
                 <span className="text-muted-foreground">
-                  fitnassist.com/trainers/
+                  fitnassist.co/trainers/
                 </span>
                 <span className="font-medium text-foreground">
                   {profile.handle}

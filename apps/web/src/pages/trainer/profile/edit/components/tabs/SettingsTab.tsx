@@ -232,7 +232,7 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
         <CardContent>
           <div className="flex items-center gap-2 rounded-lg border bg-muted/50 p-3">
             <code className="flex-1 text-sm">
-              fitnassist.com/trainers/{profile.handle}
+              fitnassist.co/trainers/{profile.handle}
             </code>
             <Link
               to={routes.trainerPublicProfile(profile.handle)}

@@ -85,7 +85,7 @@ export function ReviewStep({
             </p>
             <p>
               <span className="font-medium">Profile URL:</span>{' '}
-              fitnassist.com/{data.basicInfo.handle}
+              fitnassist.co/{data.basicInfo.handle}
             </p>
             {data.basicInfo.bio && (
               <p>

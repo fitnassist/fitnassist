@@ -29,7 +29,7 @@ export function BasicInfoStep({
         <div>
           <Label htmlFor="handle">Profile URL</Label>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">fitnassist.com/trainers/</span>
+            <span className="text-sm text-muted-foreground">fitnassist.co/trainers/</span>
             <Input
               id="handle"
               placeholder="your-handle"

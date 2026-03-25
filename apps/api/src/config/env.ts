@@ -12,7 +12,7 @@ const envSchema = z.object({
   // Email (Resend)
   RESEND_API_KEY: z.string().optional(),
   FROM_EMAIL: z.string().default('onboarding@resend.dev'),
-  SUPPORT_EMAIL: z.string().default('support@fitnassist.com'),
+  SUPPORT_EMAIL: z.string().default('support@fitnassist.co'),
 
   // Frontend
   FRONTEND_URL: z.string().default('http://localhost:3000'),
