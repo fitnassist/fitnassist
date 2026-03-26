@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { friendshipRepository } from '../repositories/friendship.repository';
+import { traineeRepository } from '../repositories/trainee.repository';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
@@ -11,6 +12,15 @@ export const friendshipService = {
       throw new TRPCError({
         code: 'BAD_REQUEST',
         message: 'You cannot send a friend request to yourself',
+      });
+    }
+
+    // Requester must have a trainee profile with a handle
+    const requesterProfile = await traineeRepository.findByUserId(requesterId);
+    if (!requesterProfile?.handle) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'You need to set up your profile and handle before sending friend requests',
       });
     }
 

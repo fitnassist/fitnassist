@@ -5,6 +5,7 @@ import { useFriends, useRemoveFriend } from '@/api/friendship';
 import { useAuth } from '@/hooks';
 import { routes } from '@/config/routes';
 import { UserCard } from '../UserCard';
+import { hasVisibleFriendProfile } from '../../friends.utils';
 
 export const FriendsList = () => {
   const { user } = useAuth();
@@ -45,9 +46,12 @@ export const FriendsList = () => {
             ? friendship.addressee
             : friendship.requester;
 
-        const handle = friend.traineeProfile?.handle;
-        const avatarUrl = friend.traineeProfile?.avatarUrl ?? friend.image;
-        const profileUrl = routes.traineePublicProfile(handle ?? friend.id);
+        const tp = friend.traineeProfile;
+        const handle = tp?.handle;
+        const avatarUrl = tp?.avatarUrl ?? friend.image;
+        const profileUrl = hasVisibleFriendProfile(tp)
+          ? routes.traineePublicProfile(handle ?? friend.id)
+          : undefined;
 
         return (
           <UserCard

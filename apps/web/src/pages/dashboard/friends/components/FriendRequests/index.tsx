@@ -8,6 +8,7 @@ import {
 } from '@/api/friendship';
 import { routes } from '@/config/routes';
 import { UserCard } from '../UserCard';
+import { hasVisibleFriendProfile } from '../../friends.utils';
 
 export const FriendRequests = () => {
   const {
@@ -72,9 +73,12 @@ export const FriendRequests = () => {
           <>
             {pendingRequests.map((friendship) => {
               const requester = friendship.requester;
-              const handle = requester.traineeProfile?.handle;
-              const avatarUrl = requester.traineeProfile?.avatarUrl ?? requester.image;
-              const profileUrl = routes.traineePublicProfile(handle ?? requester.id);
+              const tp = requester.traineeProfile;
+              const handle = tp?.handle;
+              const avatarUrl = tp?.avatarUrl ?? requester.image;
+              const profileUrl = hasVisibleFriendProfile(tp)
+                ? routes.traineePublicProfile(handle ?? requester.id)
+                : undefined;
 
               return (
                 <UserCard
@@ -131,9 +135,12 @@ export const FriendRequests = () => {
           <>
             {sentRequests.map((friendship) => {
               const addressee = friendship.addressee;
-              const handle = addressee.traineeProfile?.handle;
-              const avatarUrl = addressee.traineeProfile?.avatarUrl ?? addressee.image;
-              const profileUrl = routes.traineePublicProfile(handle ?? addressee.id);
+              const tp = addressee.traineeProfile;
+              const handle = tp?.handle;
+              const avatarUrl = tp?.avatarUrl ?? addressee.image;
+              const profileUrl = hasVisibleFriendProfile(tp)
+                ? routes.traineePublicProfile(handle ?? addressee.id)
+                : undefined;
 
               return (
                 <UserCard

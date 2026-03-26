@@ -9,6 +9,13 @@ const otherUserSelect = {
     select: {
       avatarUrl: true,
       handle: true,
+      privacyBio: true,
+      privacyLocation: true,
+      privacyBodyMetrics: true,
+      privacyGoals: true,
+      privacyPersonalBests: true,
+      privacyProgressPhotos: true,
+      privacyStats: true,
     },
   },
 };
