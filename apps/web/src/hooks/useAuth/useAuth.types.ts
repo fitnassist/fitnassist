@@ -15,4 +15,5 @@ export interface UseAuthReturn {
   isTrainer: boolean;
   isTrainee: boolean;
   signOut: () => Promise<void>;
+  refetchSession: () => void;
 }

@@ -28,8 +28,7 @@ const nameFormSchema = z.object({
 });
 
 export const AccountTab = () => {
-  const { user } = useAuth();
-  const utils = trpc.useUtils();
+  const { user, refetchSession } = useAuth();
   const [nameSuccess, setNameSuccess] = useState(false);
   const [emailSuccess, setEmailSuccess] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -39,7 +38,7 @@ export const AccountTab = () => {
   const updateName = trpc.user.updateName.useMutation({
     onSuccess: () => {
       setNameSuccess(true);
-      utils.invalidate();
+      refetchSession();
     },
   });
 

@@ -6,7 +6,7 @@ import type { UserRole } from '@fitnassist/types';
 import type { AuthUser, UseAuthReturn } from './useAuth.types';
 
 export function useAuth(): UseAuthReturn {
-  const { data, isPending } = useSession();
+  const { data, isPending, refetch: refetchSession } = useSession();
   const navigate = useNavigate();
 
   const user: AuthUser | null = data?.user
@@ -32,6 +32,7 @@ export function useAuth(): UseAuthReturn {
     isTrainer: user?.role === 'TRAINER',
     isTrainee: user?.role === 'TRAINEE',
     signOut: handleSignOut,
+    refetchSession,
   };
 }
 
