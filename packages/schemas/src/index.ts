@@ -59,6 +59,7 @@ export {
   ActivityTypeSchema,
   ActivitySourceSchema,
   PersonalBestCategorySchema,
+  VisibilitySchema,
   DiaryEntrySchema,
   DiaryEntryOptionalDefaultsSchema,
   WeightEntrySchema,

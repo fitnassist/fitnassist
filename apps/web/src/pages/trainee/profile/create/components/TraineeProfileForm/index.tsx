@@ -99,7 +99,6 @@ export const TraineeProfileForm = () => {
     defaultValues: {
       unitPreference: "METRIC",
       fitnessGoals: [],
-      isPublic: false,
       avatarUrl: user?.image || "",
     },
   });
@@ -545,18 +544,12 @@ export const TraineeProfileForm = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div>
-              <p className="font-medium">Make profile public</p>
-              <p className="text-sm text-muted-foreground">
-                When enabled, any trainer can view your profile. When disabled,
-                only your connected trainers can see it.
-              </p>
-            </div>
-            <Switch
-              checked={watch("isPublic")}
-              onCheckedChange={(checked) => setValue("isPublic", checked)}
-            />
+          <div className="rounded-lg border p-4">
+            <p className="font-medium">Privacy settings</p>
+            <p className="text-sm text-muted-foreground">
+              After creating your profile, you can configure detailed privacy settings
+              from the Privacy tab to control exactly who can see each part of your profile.
+            </p>
           </div>
         </CardContent>
       </Card>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { GENDER_OPTIONS, updateTraineeProfileSchema } from '@fitnassist/schemas';
 import {
   Button,
@@ -21,12 +22,15 @@ import {
 } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { env } from '@/config/env';
+import { useCheckHandleAvailability } from '@/api/trainee';
+import { useDebounce } from '@/hooks';
 
 const personalInfoSchema = updateTraineeProfileSchema.pick({
   avatarUrl: true,
   bio: true,
   dateOfBirth: true,
   gender: true,
+  handle: true,
   addressLine1: true,
   addressLine2: true,
   city: true,
@@ -46,6 +50,7 @@ interface PersonalInfoTabProps {
     bio: string | null;
     dateOfBirth: string | Date | null;
     gender: string | null;
+    handle: string | null;
     addressLine1: string | null;
     addressLine2: string | null;
     city: string | null;
@@ -117,6 +122,7 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
       bio: profile?.bio || '',
       dateOfBirth: dobString,
       gender: (profile?.gender as PersonalInfoInput['gender']) || undefined,
+      handle: profile?.handle || '',
       addressLine1: profile?.addressLine1 || '',
       addressLine2: profile?.addressLine2 || '',
       city: profile?.city || '',
@@ -128,6 +134,13 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
       longitude: profile?.longitude ?? undefined,
     },
   });
+
+  const handleValue = watch('handle') || '';
+  const debouncedHandle = useDebounce(handleValue, 500);
+  const isHandleChanged = debouncedHandle !== (profile?.handle || '');
+  const { data: handleCheck, isLoading: isCheckingHandle } = useCheckHandleAvailability(
+    isHandleChanged ? debouncedHandle : '',
+  );
 
   const mutation = profile ? updateMutation : createMutation;
 
@@ -164,6 +177,46 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
               />
             )}
           />
+
+          <div>
+            <Label htmlFor="handle">Handle</Label>
+            <p className="text-xs text-muted-foreground mb-1.5">
+              Your unique public profile URL. Only lowercase letters, numbers, hyphens, and underscores.
+            </p>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">@</span>
+              <Input
+                id="handle"
+                placeholder="your-handle"
+                className="pl-7"
+                {...register('handle')}
+              />
+              {handleValue.length >= 3 && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {isCheckingHandle ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  ) : isHandleChanged && handleCheck ? (
+                    handleCheck.available ? (
+                      <CheckCircle className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-destructive" />
+                    )
+                  ) : null}
+                </span>
+              )}
+            </div>
+            {errors.handle && (
+              <p className="text-sm text-destructive">{errors.handle.message}</p>
+            )}
+            {isHandleChanged && handleCheck && !handleCheck.available && (
+              <p className="text-sm text-destructive">{handleCheck.reason}</p>
+            )}
+            {handleValue && !errors.handle && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Your profile will be at fitnassist.co/users/{handleValue}
+              </p>
+            )}
+          </div>
 
           <div>
             <Label htmlFor="bio">Bio</Label>

@@ -5,7 +5,7 @@ import { HeroBanner } from '@/components/HeroBanner';
 export const TermsOfServicePage = () => {
   return (
     <div>
-      <HeroBanner title="Terms of Service" imageUrl="https://images.unsplash.com/photo-1557683316-973673baf926?w=1920&q=80" size="small" />
+      <HeroBanner title="Terms of Service" imageUrl="/images/hero-terms.jpg" size="small" />
       <div className="mx-auto max-w-4xl px-4 py-8 sm:py-16 sm:px-6 lg:px-8">
         <p className="text-sm text-muted-foreground">Last updated: 22 March 2026</p>
 
@@ -131,7 +131,7 @@ export const TermsOfServicePage = () => {
           <h2 className="text-xl font-semibold text-foreground">10. Termination</h2>
           <p className="mt-2">
             You may delete your account at any time through your{' '}
-            <Link to={routes.dashboardSettings} className="text-primary hover:underline">
+            <Link to={routes.dashboardSettings} className="text-coral hover:underline">
               account settings
             </Link>
             . We reserve the right to suspend or terminate your account if you violate these terms,
@@ -160,7 +160,7 @@ export const TermsOfServicePage = () => {
           <h2 className="text-xl font-semibold text-foreground">13. Contact Us</h2>
           <p className="mt-2">
             If you have any questions about these Terms of Service, please{' '}
-            <Link to={routes.support} className="text-primary hover:underline">
+            <Link to={routes.support} className="text-coral hover:underline">
               contact us
             </Link>
             .

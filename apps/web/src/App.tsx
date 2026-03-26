@@ -20,6 +20,7 @@ import { TraineeProfileCreatePage } from '@/pages/trainee/profile/create';
 import { TraineeProfileEditPage } from '@/pages/trainee/profile/edit';
 import { TraineeProfileViewPage } from '@/pages/trainee/profile/view';
 import { TrainerPublicProfilePage } from '@/pages/trainer/public';
+import { TraineePublicProfilePage } from '@/pages/trainee/public';
 import { TrainersPage } from '@/pages/trainers';
 import { ClientsPage } from '@/pages/dashboard/clients';
 import { ClientDetailPage } from '@/pages/dashboard/clients/[id]';
@@ -120,9 +121,10 @@ function App() {
                     </Route>
                   </Route>
                 </Route>
-                {/* Public trainer profile */}
+                {/* Public profiles */}
                 <Route element={<MainLayout />}>
                   <Route path="/trainers/:handle" element={<TrainerPublicProfilePage />} />
+                  <Route path="/users/:handle" element={<TraineePublicProfilePage />} />
                 </Route>
                 {/* 404 catch-all */}
                 <Route path="*" element={<NotFoundPage />} />

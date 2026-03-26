@@ -63,6 +63,7 @@ export { UnitPreferenceSchema } from './UnitPreferenceSchema';
 export { ExperienceLevelSchema } from './ExperienceLevelSchema';
 export { ActivityLevelSchema } from './ActivityLevelSchema';
 export { NotificationTypeSchema } from './NotificationTypeSchema';
+export { VisibilitySchema } from './VisibilitySchema';
 export { ContactRequestTypeSchema } from './ContactRequestTypeSchema';
 export { ContactRequestStatusSchema } from './ContactRequestStatusSchema';
 export { MuscleGroupSchema } from './MuscleGroupSchema';

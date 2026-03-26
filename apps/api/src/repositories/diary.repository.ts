@@ -526,4 +526,35 @@ export const diaryRepository = {
       include: DIARY_ENTRY_INCLUDE,
     });
   },
+
+  // ---- Public profile queries ----
+
+  async findRecentByUserId(userId: string, limit: number) {
+    return prisma.diaryEntry.findMany({
+      where: { userId },
+      include: DIARY_ENTRY_INCLUDE,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  },
+
+  async findProgressPhotosByUserId(userId: string, limit: number) {
+    return prisma.diaryEntry.findMany({
+      where: { userId, type: 'PROGRESS_PHOTO' },
+      include: {
+        progressPhotos: { orderBy: { sortOrder: 'asc' } },
+      },
+      orderBy: { date: 'desc' },
+      take: limit,
+    });
+  },
+
+  async findWeightHistory(userId: string, limit: number) {
+    return prisma.diaryEntry.findMany({
+      where: { userId, type: 'WEIGHT' },
+      include: { weightEntry: true },
+      orderBy: { date: 'desc' },
+      take: limit,
+    });
+  },
 };

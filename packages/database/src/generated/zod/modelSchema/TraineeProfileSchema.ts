@@ -3,6 +3,7 @@ import { GenderSchema } from '../inputTypeSchemas/GenderSchema'
 import { UnitPreferenceSchema } from '../inputTypeSchemas/UnitPreferenceSchema'
 import { ExperienceLevelSchema } from '../inputTypeSchemas/ExperienceLevelSchema'
 import { ActivityLevelSchema } from '../inputTypeSchemas/ActivityLevelSchema'
+import { VisibilitySchema } from '../inputTypeSchemas/VisibilitySchema'
 
 /////////////////////////////////////////
 // TRAINEE PROFILE SCHEMA
@@ -13,8 +14,20 @@ export const TraineeProfileSchema = z.object({
   unitPreference: UnitPreferenceSchema,
   experienceLevel: ExperienceLevelSchema.nullable(),
   activityLevel: ActivityLevelSchema.nullable(),
+  privacyBio: VisibilitySchema,
+  privacyLocation: VisibilitySchema,
+  privacyFitnessGoals: VisibilitySchema,
+  privacyDiaryActivity: VisibilitySchema,
+  privacyProgressPhotos: VisibilitySchema,
+  privacyWeight: VisibilitySchema,
+  privacyMeasurements: VisibilitySchema,
+  privacyGoals: VisibilitySchema,
+  privacyPersonalBests: VisibilitySchema,
+  privacyStats: VisibilitySchema,
+  privacyNutrition: VisibilitySchema,
   id: z.string().cuid(),
   userId: z.string(),
+  handle: z.string().min(3, { message: "Handle must be at least 3 characters" }).max(30, { message: "Handle must be at most 30 characters" }).regex(/^[a-z0-9_-]+$/, { message: "Handle can only contain lowercase letters, numbers, hyphens, or underscores" }).nullable(),
   avatarUrl: z.string().url({ message: "Must be a valid URL" }).nullable(),
   bio: z.string().max(2000, { message: "Bio must be at most 2000 characters" }).nullable(),
   dateOfBirth: z.coerce.date().nullable(),
@@ -40,7 +53,6 @@ export const TraineeProfileSchema = z.object({
   latitude: z.number().nullable(),
   longitude: z.number().nullable(),
   location: z.string().max(200).nullable(),
-  isPublic: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -53,9 +65,19 @@ export type TraineeProfile = z.infer<typeof TraineeProfileSchema>
 
 export const TraineeProfileOptionalDefaultsSchema = TraineeProfileSchema.merge(z.object({
   unitPreference: UnitPreferenceSchema.optional(),
+  privacyBio: VisibilitySchema.optional(),
+  privacyLocation: VisibilitySchema.optional(),
+  privacyFitnessGoals: VisibilitySchema.optional(),
+  privacyDiaryActivity: VisibilitySchema.optional(),
+  privacyProgressPhotos: VisibilitySchema.optional(),
+  privacyWeight: VisibilitySchema.optional(),
+  privacyMeasurements: VisibilitySchema.optional(),
+  privacyGoals: VisibilitySchema.optional(),
+  privacyPersonalBests: VisibilitySchema.optional(),
+  privacyStats: VisibilitySchema.optional(),
+  privacyNutrition: VisibilitySchema.optional(),
   id: z.string().cuid().optional(),
   country: z.string().optional(),
-  isPublic: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }))

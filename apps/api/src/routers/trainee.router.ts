@@ -1,7 +1,13 @@
 import { z } from 'zod';
-import { router, protectedProcedure, traineeProcedure, trainerProcedure } from '../lib/trpc';
+import { router, publicProcedure, protectedProcedure, traineeProcedure, trainerProcedure } from '../lib/trpc';
 import { traineeService } from '../services/trainee.service';
-import { createTraineeProfileSchema, updateTraineeProfileSchema } from '@fitnassist/schemas';
+import {
+  createTraineeProfileSchema,
+  updateTraineeProfileSchema,
+  updatePrivacySettingsSchema,
+  setHandleSchema,
+  checkHandleSchema,
+} from '@fitnassist/schemas';
 import { calculateNutritionTargets } from '@fitnassist/utils';
 import { diaryRepository } from '../repositories/diary.repository';
 
@@ -63,9 +69,49 @@ export const traineeRouter = router({
       return { calculated, manual, effective };
     }),
 
+  // Trainer viewing a trainee's profile (privacy-filtered)
   getProfile: trainerProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input, ctx }) => {
       return traineeService.getProfileForTrainer(input.userId, ctx.user.id);
+    }),
+
+  // Public profile by handle (privacy-filtered based on viewer relationship)
+  getByHandle: publicProcedure
+    .input(z.object({ handle: z.string() }))
+    .query(async ({ input, ctx }) => {
+      return traineeService.getByHandle(input.handle, ctx.user?.id);
+    }),
+
+  // Handle management
+  setHandle: traineeProcedure
+    .input(setHandleSchema)
+    .mutation(async ({ input, ctx }) => {
+      return traineeService.setHandle(ctx.user.id, input.handle);
+    }),
+
+  checkHandleAvailability: publicProcedure
+    .input(checkHandleSchema)
+    .query(async ({ input, ctx }) => {
+      return traineeService.checkHandleAvailability(input.handle, ctx.user?.id);
+    }),
+
+  // Public profile data (goals, PBs, activity, photos, weight, stats)
+  getPublicProfileData: publicProcedure
+    .input(z.object({ handle: z.string() }))
+    .query(async ({ input, ctx }) => {
+      return traineeService.getPublicProfileData(input.handle, ctx.user?.id);
+    }),
+
+  // Privacy settings
+  getPrivacySettings: traineeProcedure
+    .query(async ({ ctx }) => {
+      return traineeService.getPrivacySettings(ctx.user.id);
+    }),
+
+  updatePrivacySettings: traineeProcedure
+    .input(updatePrivacySettingsSchema)
+    .mutation(async ({ input, ctx }) => {
+      return traineeService.updatePrivacySettings(ctx.user.id, input);
     }),
 });

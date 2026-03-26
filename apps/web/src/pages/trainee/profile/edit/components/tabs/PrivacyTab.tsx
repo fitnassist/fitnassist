@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Shield, Check, Loader2, AlertCircle } from 'lucide-react';
 import {
   Button,
   Card,
@@ -7,90 +7,133 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Label,
 } from '@/components/ui';
-import { trpc } from '@/lib/trpc';
+import { Select } from '@/components/ui';
+import { usePrivacySettings, useUpdatePrivacySettings } from '@/api/trainee';
+import { PRIVACY_SETTINGS, VISIBILITY_OPTIONS } from '@fitnassist/schemas';
+import type { VisibilityLevel } from '@fitnassist/schemas';
 
-interface PrivacyTabProps {
-  profile: {
-    isPublic: boolean;
-  } | null;
-}
+const visibilitySelectOptions = VISIBILITY_OPTIONS.map((opt) => ({
+  value: opt.value,
+  label: opt.label,
+}));
 
-export const PrivacyTab = ({ profile }: PrivacyTabProps) => {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const isPublic = profile?.isPublic ?? false;
+export const PrivacyTab = () => {
+  const { data: settings, isLoading } = usePrivacySettings();
+  const updateMutation = useUpdatePrivacySettings();
 
-  const utils = trpc.useUtils();
-  const createMutation = trpc.trainee.create.useMutation({
-    onSuccess: () => {
-      utils.trainee.getMyProfile.invalidate();
-      utils.trainee.hasProfile.invalidate();
-    },
-  });
-  const updateMutation = trpc.trainee.update.useMutation({
-    onSuccess: () => {
-      utils.trainee.getMyProfile.invalidate();
-    },
-  });
+  const [localSettings, setLocalSettings] = useState<Record<string, VisibilityLevel> | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  const mutation = profile ? updateMutation : createMutation;
-
-  const handleToggleVisibility = async () => {
-    setIsUpdating(true);
-    try {
-      await mutation.mutateAsync({ isPublic: !isPublic });
-    } finally {
-      setIsUpdating(false);
+  useEffect(() => {
+    if (settings && !localSettings) {
+      setLocalSettings(settings as Record<string, VisibilityLevel>);
     }
+  }, [settings, localSettings]);
+
+  const handleChange = useCallback(
+    (key: string, value: VisibilityLevel) => {
+      setLocalSettings((prev) => {
+        if (!prev) return prev;
+        const updated = { ...prev, [key]: value };
+        return updated;
+      });
+      setHasChanges(true);
+    },
+    [],
+  );
+
+  const handleSave = async () => {
+    if (!localSettings) return;
+    await updateMutation.mutateAsync(localSettings as Parameters<typeof updateMutation.mutateAsync>[0]);
+    setHasChanges(false);
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!settings || !localSettings) {
+    return (
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center gap-2 py-12 text-muted-foreground">
+          <AlertCircle className="h-6 w-6" />
+          <p className="text-sm">Create your profile first to manage privacy settings.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Profile Privacy</CardTitle>
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-muted-foreground" />
+          <CardTitle>Privacy Settings</CardTitle>
+        </div>
         <CardDescription>
-          Control who can see your profile information.
+          Control who can see different parts of your profile. Each setting determines the minimum relationship needed to view that information.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between rounded-lg border p-4">
-          <div className="flex items-center gap-3">
-            {isPublic ? (
-              <div className="rounded-full bg-green-100 dark:bg-green-900/30 p-2">
-                <Eye className="h-5 w-5 text-green-600 dark:text-green-400" />
+      <CardContent className="space-y-1">
+        <div className="divide-y">
+          {PRIVACY_SETTINGS.map((setting) => (
+            <div
+              key={setting.key}
+              className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="space-y-0.5">
+                <Label className="text-sm font-medium">{setting.label}</Label>
+                <p className="text-xs text-muted-foreground">{setting.description}</p>
               </div>
-            ) : (
-              <div className="rounded-full bg-amber-100 p-2">
-                <EyeOff className="h-5 w-5 text-amber-600" />
+              <div className="w-full sm:w-48">
+                <Select
+                  options={visibilitySelectOptions}
+                  value={visibilitySelectOptions.find(
+                    (opt) => opt.value === localSettings[setting.key],
+                  )}
+                  onChange={(opt) => {
+                    if (opt) handleChange(setting.key, opt.value as VisibilityLevel);
+                  }}
+                  isSearchable={false}
+                  menuPlacement="auto"
+                />
               </div>
-            )}
-            <div>
-              <p className="font-medium">
-                {isPublic ? 'Profile is Public' : 'Profile is Private'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {isPublic
-                  ? 'Any trainer can view your profile information.'
-                  : 'Only your connected trainers can see your profile.'}
-              </p>
             </div>
-          </div>
-          <Button
-            variant={isPublic ? 'outline' : 'default'}
-            onClick={handleToggleVisibility}
-            disabled={isUpdating}
-          >
-            {isUpdating
-              ? 'Updating...'
-              : isPublic
-              ? 'Make Private'
-              : 'Make Public'}
-          </Button>
+          ))}
         </div>
 
-        {mutation.error && (
-          <p className="text-sm text-destructive">{mutation.error.message}</p>
-        )}
+        <div className="flex items-center justify-end gap-3 pt-4">
+          {updateMutation.error && (
+            <p className="text-sm text-destructive">{updateMutation.error.message}</p>
+          )}
+          {updateMutation.isSuccess && !hasChanges && (
+            <p className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+              <Check className="h-4 w-4" />
+              Saved
+            </p>
+          )}
+          <Button
+            onClick={handleSave}
+            disabled={!hasChanges || updateMutation.isPending}
+          >
+            {updateMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              'Save Privacy Settings'
+            )}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

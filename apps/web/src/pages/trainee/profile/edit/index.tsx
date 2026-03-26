@@ -54,7 +54,7 @@ export const TraineeProfileEditPage = () => {
           <NutritionTab profile={profile ?? null} />
         </TabsContent>
         <TabsContent value="privacy">
-          <PrivacyTab profile={profile ?? null} />
+          <PrivacyTab />
         </TabsContent>
       </ResponsiveTabs>
     </PageLayout>

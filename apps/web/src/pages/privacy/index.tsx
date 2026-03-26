@@ -5,7 +5,7 @@ import { HeroBanner } from '@/components/HeroBanner';
 export const PrivacyPolicyPage = () => {
   return (
     <div>
-      <HeroBanner title="Privacy Policy" imageUrl="https://images.unsplash.com/photo-1557683316-973673baf926?w=1920&q=80" size="small" />
+      <HeroBanner title="Privacy Policy" imageUrl="/images/hero-privacy.jpg" size="small" />
       <div className="mx-auto max-w-4xl px-4 py-8 sm:py-16 sm:px-6 lg:px-8">
         <p className="text-sm text-muted-foreground">Last updated: 22 March 2026</p>
 
@@ -114,11 +114,11 @@ export const PrivacyPolicyPage = () => {
           </ul>
           <p className="mt-2">
             You can exercise these rights through your{' '}
-            <Link to={routes.dashboardSettings} className="text-primary hover:underline">
+            <Link to={routes.dashboardSettings} className="text-coral hover:underline">
               account settings
             </Link>{' '}
             or by contacting us through our{' '}
-            <Link to={routes.support} className="text-primary hover:underline">
+            <Link to={routes.support} className="text-coral hover:underline">
               support page
             </Link>
             .
@@ -145,7 +145,7 @@ export const PrivacyPolicyPage = () => {
           <h2 className="text-xl font-semibold text-foreground">10. Contact Us</h2>
           <p className="mt-2">
             If you have any questions about this Privacy Policy, please{' '}
-            <Link to={routes.support} className="text-primary hover:underline">
+            <Link to={routes.support} className="text-coral hover:underline">
               contact us
             </Link>
             .

@@ -15,9 +15,12 @@ interface ProgressPhotosProps {
       notes: string | null;
     }>;
   }>;
+  readOnly?: boolean;
+  variant?: 'default' | 'profile';
 }
 
-export const ProgressPhotos = ({ date, entries }: ProgressPhotosProps) => {
+export const ProgressPhotos = ({ date, entries, readOnly, variant = 'default' }: ProgressPhotosProps) => {
+  const isProfile = variant === 'profile';
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [viewIndex, setViewIndex] = useState<number | null>(null);
@@ -72,45 +75,53 @@ export const ProgressPhotos = ({ date, entries }: ProgressPhotosProps) => {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Camera className="h-4 w-4 text-pink-500" />
+          <CardTitle className={isProfile
+            ? 'flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider'
+            : 'flex items-center gap-2 text-base'
+          }>
+            <Camera className={isProfile ? 'h-5 w-5' : 'h-4 w-4 text-pink-500'} />
             Progress Photos
             {allPhotos.length > 0 && (
               <span className="text-xs font-normal text-muted-foreground">({allPhotos.length})</span>
             )}
           </CardTitle>
-          <label className="flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted">
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) handleUpload(file);
-                e.target.value = '';
-              }}
-              disabled={isUploading}
-            />
-            {isUploading ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            ) : (
-              <Camera className="h-3.5 w-3.5" />
-            )}
-            {isUploading ? 'Uploading...' : 'Add Photo'}
-          </label>
+          {!readOnly && (
+            <label className="flex cursor-pointer items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors hover:bg-muted">
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleUpload(file);
+                  e.target.value = '';
+                }}
+                disabled={isUploading}
+              />
+              {isUploading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Camera className="h-3.5 w-3.5" />
+              )}
+              {isUploading ? 'Uploading...' : 'Add Photo'}
+            </label>
+          )}
         </div>
       </CardHeader>
       <CardContent>
         {/* Thumbnail grid + drop zone */}
         <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-          className={`rounded-lg border-2 border-dashed p-3 transition-colors ${
-            isDragging
-              ? 'border-primary bg-primary/5'
-              : 'border-muted-foreground/20'
-          }`}
+          onDragOver={readOnly ? undefined : (e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={readOnly ? undefined : () => setIsDragging(false)}
+          onDrop={readOnly ? undefined : handleDrop}
+          className={readOnly
+            ? 'rounded-lg p-3'
+            : `rounded-lg border-2 border-dashed p-3 transition-colors ${
+                isDragging
+                  ? 'border-primary bg-primary/5'
+                  : 'border-muted-foreground/20'
+              }`
+          }
         >
           {allPhotos.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -129,20 +140,24 @@ export const ProgressPhotos = ({ date, entries }: ProgressPhotosProps) => {
                       className="h-full w-full object-cover"
                     />
                   </button>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setDeletePhotoId(photo.id); }}
-                    className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-destructive group-hover:opacity-100"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
+                  {!readOnly && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDeletePhotoId(photo.id); }}
+                      className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-destructive group-hover:opacity-100"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
-          ) : (
+          ) : !readOnly ? (
             <div className="flex flex-col items-center gap-1.5 py-4 text-muted-foreground">
               <Upload className="h-5 w-5" />
               <p className="text-xs">Drop photos here or use the button above</p>
             </div>
+          ) : (
+            <p className="py-4 text-center text-sm text-muted-foreground">No progress photos</p>
           )}
         </div>
       </CardContent>

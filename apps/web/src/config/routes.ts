@@ -20,6 +20,8 @@ export const routes = {
   traineeProfileCreate: '/trainee/profile/create',
   traineeProfileEdit: '/trainee/profile/edit',
   traineeProfileView: (userId: string) => `/trainee/profile/${userId}`,
+  // Public trainee profile (e.g., fitnassist.co/users/jane-doe)
+  traineePublicProfile: (handle: string) => `/users/${handle}`,
 
   // Dashboard
   dashboard: '/dashboard',

@@ -85,7 +85,7 @@ export const HomePage = () => {
   return (
     <div>
       {/* Hero Section */}
-      <HeroBanner title="Welcome to Fitness" imageUrl="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1920&q=80">
+      <HeroBanner title="Welcome to Fitness" imageUrl="/images/hero-home.jpg">
         <p className="mx-auto mt-6 max-w-2xl text-lg text-white/70">
           Your all-in-one fitness platform. Track nutrition, workouts, and wellness — or
           find a personal trainer to guide your journey. For trainers, manage clients and

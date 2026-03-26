@@ -5,8 +5,20 @@ import { Card, CardContent, CardHeader, CardTitle, Button } from '@/components/u
 import { usePersonalBests } from '@/api/diary';
 import { formatPBValue } from '../../diary.utils';
 
+interface PersonalBestItem {
+  id: string;
+  label: string;
+  value: number;
+  unit: string;
+  category: string;
+  achievedAt: string | Date;
+  previousValue?: number | null;
+}
+
 interface PersonalBestsProps {
   userId?: string;
+  data?: PersonalBestItem[];
+  variant?: 'default' | 'profile';
 }
 
 const CATEGORY_ORDER: Record<string, number> = {
@@ -27,9 +39,11 @@ const CATEGORY_LABELS: Record<string, string> = {
   CUSTOM: 'Other',
 };
 
-export const PersonalBests = ({ userId }: PersonalBestsProps) => {
+export const PersonalBests = ({ userId, data: externalData, variant = 'default' }: PersonalBestsProps) => {
+  const isProfile = variant === 'profile';
   const [isExpanded, setIsExpanded] = useState(true);
-  const { data: pbs } = usePersonalBests(userId);
+  const { data: fetchedPbs } = usePersonalBests(userId, !externalData);
+  const pbs = externalData ?? fetchedPbs;
 
   const sortedPBs = [...(pbs ?? [])].sort((a, b) => {
     const orderA = CATEGORY_ORDER[a.category] ?? 99;
@@ -49,8 +63,11 @@ export const PersonalBests = ({ userId }: PersonalBestsProps) => {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Trophy className="h-4 w-4 text-yellow-500" />
+          <CardTitle className={isProfile
+            ? 'flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider'
+            : 'flex items-center gap-2 text-base'
+          }>
+            <Trophy className={isProfile ? 'h-5 w-5' : 'h-4 w-4 text-yellow-500'} />
             Personal Bests
           </CardTitle>
           <Button

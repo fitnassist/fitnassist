@@ -1,10 +1,26 @@
 import { z } from 'zod';
 
 // =============================================================================
+// VISIBILITY ENUM (matches Prisma Visibility enum)
+// =============================================================================
+
+export const visibilityEnum = z.enum(['ONLY_ME', 'MY_PT', 'PT_AND_FRIENDS', 'EVERYONE']);
+export type VisibilityLevel = z.infer<typeof visibilityEnum>;
+
+// =============================================================================
 // TRAINEE PROFILE SCHEMAS
 // =============================================================================
 
 export const createTraineeProfileSchema = z.object({
+  // Handle (optional on create — can set later)
+  handle: z
+    .string()
+    .min(3, 'Handle must be at least 3 characters')
+    .max(30, 'Handle must be at most 30 characters')
+    .regex(/^[a-z0-9_-]+$/, 'Handle can only contain lowercase letters, numbers, hyphens, or underscores')
+    .optional()
+    .or(z.literal('')),
+
   // Personal info
   avatarUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   bio: z.string().max(2000, 'Bio must be at most 2000 characters').optional().or(z.literal('')),
@@ -47,7 +63,19 @@ export const createTraineeProfileSchema = z.object({
 
   // Other
   location: z.string().max(200).optional().or(z.literal('')),
-  isPublic: z.boolean().default(false),
+
+  // Privacy settings
+  privacyBio: visibilityEnum.optional(),
+  privacyLocation: visibilityEnum.optional(),
+  privacyFitnessGoals: visibilityEnum.optional(),
+  privacyDiaryActivity: visibilityEnum.optional(),
+  privacyProgressPhotos: visibilityEnum.optional(),
+  privacyWeight: visibilityEnum.optional(),
+  privacyMeasurements: visibilityEnum.optional(),
+  privacyGoals: visibilityEnum.optional(),
+  privacyPersonalBests: visibilityEnum.optional(),
+  privacyStats: visibilityEnum.optional(),
+  privacyNutrition: visibilityEnum.optional(),
 });
 
 export type CreateTraineeProfileInput = z.infer<typeof createTraineeProfileSchema>;
@@ -55,3 +83,45 @@ export type CreateTraineeProfileInput = z.infer<typeof createTraineeProfileSchem
 export const updateTraineeProfileSchema = createTraineeProfileSchema.partial();
 
 export type UpdateTraineeProfileInput = z.infer<typeof updateTraineeProfileSchema>;
+
+// =============================================================================
+// PRIVACY SETTINGS SCHEMA (for dedicated privacy update)
+// =============================================================================
+
+export const updatePrivacySettingsSchema = z.object({
+  privacyBio: visibilityEnum,
+  privacyLocation: visibilityEnum,
+  privacyFitnessGoals: visibilityEnum,
+  privacyDiaryActivity: visibilityEnum,
+  privacyProgressPhotos: visibilityEnum,
+  privacyWeight: visibilityEnum,
+  privacyMeasurements: visibilityEnum,
+  privacyGoals: visibilityEnum,
+  privacyPersonalBests: visibilityEnum,
+  privacyStats: visibilityEnum,
+  privacyNutrition: visibilityEnum,
+});
+
+export type UpdatePrivacySettingsInput = z.infer<typeof updatePrivacySettingsSchema>;
+
+// =============================================================================
+// HANDLE SCHEMAS
+// =============================================================================
+
+export const setHandleSchema = z.object({
+  handle: z
+    .string()
+    .min(3, 'Handle must be at least 3 characters')
+    .max(30, 'Handle must be at most 30 characters')
+    .regex(/^[a-z0-9_-]+$/, 'Handle can only contain lowercase letters, numbers, hyphens, or underscores'),
+});
+
+export type SetHandleInput = z.infer<typeof setHandleSchema>;
+
+export const checkHandleSchema = z.object({
+  handle: z
+    .string()
+    .min(3, 'Handle must be at least 3 characters')
+    .max(30, 'Handle must be at most 30 characters')
+    .regex(/^[a-z0-9_-]+$/, 'Handle can only contain lowercase letters, numbers, hyphens, or underscores'),
+});

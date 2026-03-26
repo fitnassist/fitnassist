@@ -62,7 +62,7 @@ export const SupportPage = () => {
 
   return (
     <div>
-      <HeroBanner title="Support" imageUrl="https://images.unsplash.com/photo-1557683316-973673baf926?w=1920&q=80" size="small" />
+      <HeroBanner title="Support" imageUrl="/images/hero-support.jpg" size="small" />
       <div className="mx-auto max-w-2xl px-4 py-8 sm:py-16 sm:px-6 lg:px-8">
         <p className="text-muted-foreground">
           Have a question, issue, or feedback? Fill out the form below and we'll get back to you.

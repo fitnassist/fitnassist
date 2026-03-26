@@ -173,10 +173,10 @@ export const useLogActivity = () => {
 // PERSONAL BESTS
 // =============================================================================
 
-export const usePersonalBests = (userId?: string) => {
+export const usePersonalBests = (userId?: string, enabled = true) => {
   return trpc.diary.getPersonalBests.useQuery(
     { userId },
-    { enabled: true }
+    { enabled }
   );
 };
 

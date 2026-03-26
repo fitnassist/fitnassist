@@ -30,6 +30,7 @@ export {
   ActivityType,
   ActivitySource,
   PersonalBestCategory,
+  Visibility,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -112,4 +113,5 @@ export {
   ActivityTypeSchema,
   ActivitySourceSchema,
   PersonalBestCategorySchema,
+  VisibilitySchema,
 } from './generated/zod/inputTypeSchemas';

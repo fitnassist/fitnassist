@@ -31,6 +31,8 @@ interface GoalCardProps {
     createdAt: Date;
     weeklyProgress?: number;
   };
+  readOnly?: boolean;
+  compact?: boolean;
 }
 
 const ENTRY_TYPE_LABELS: Record<string, string> = {
@@ -42,7 +44,7 @@ const ENTRY_TYPE_LABELS: Record<string, string> = {
   MEASUREMENT: 'Measurements',
 };
 
-export const GoalCard = ({ goal }: GoalCardProps) => {
+export const GoalCard = ({ goal, readOnly, compact }: GoalCardProps) => {
   const [showComplete, setShowComplete] = useState(false);
   const [showAbandon, setShowAbandon] = useState(false);
   const completeGoal = useCompleteGoal();
@@ -94,10 +96,9 @@ export const GoalCard = ({ goal }: GoalCardProps) => {
     );
   };
 
-  return (
-    <Card className={goal.status !== 'ACTIVE' ? 'opacity-60' : undefined}>
-      <CardContent className="p-4 sm:p-5">
-        <div className="flex items-start justify-between gap-3">
+  const content = (
+    <div className={compact ? undefined : 'p-4 sm:p-5'}>
+      <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3">
             <div className={`mt-0.5 shrink-0 rounded-md p-2 ${isTarget ? 'bg-blue-500/10 text-blue-500' : 'bg-purple-500/10 text-purple-500'}`}>
               {isTarget ? <Target className="h-5 w-5" /> : <Repeat className="h-5 w-5" />}
@@ -125,7 +126,7 @@ export const GoalCard = ({ goal }: GoalCardProps) => {
             </div>
           </div>
 
-          {isActive && (
+          {isActive && !readOnly && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
@@ -187,23 +188,36 @@ export const GoalCard = ({ goal }: GoalCardProps) => {
           )}
         </div>
 
-        <ConfirmDialog
-          open={showComplete}
-          onOpenChange={setShowComplete}
-          title="Complete goal?"
-          description={`Mark "${goal.name}" as completed?`}
-          onConfirm={() => completeGoal.mutate({ id: goal.id })}
-          isLoading={completeGoal.isPending}
-        />
-        <ConfirmDialog
-          open={showAbandon}
-          onOpenChange={setShowAbandon}
-          title="Abandon goal?"
-          description={`This will mark "${goal.name}" as abandoned. You can't undo this.`}
-          onConfirm={() => abandonGoal.mutate({ id: goal.id })}
-          isLoading={abandonGoal.isPending}
-          variant="destructive"
-        />
+        {!readOnly && (
+          <>
+            <ConfirmDialog
+              open={showComplete}
+              onOpenChange={setShowComplete}
+              title="Complete goal?"
+              description={`Mark "${goal.name}" as completed?`}
+              onConfirm={() => completeGoal.mutate({ id: goal.id })}
+              isLoading={completeGoal.isPending}
+            />
+            <ConfirmDialog
+              open={showAbandon}
+              onOpenChange={setShowAbandon}
+              title="Abandon goal?"
+              description={`This will mark "${goal.name}" as abandoned. You can't undo this.`}
+              onConfirm={() => abandonGoal.mutate({ id: goal.id })}
+              isLoading={abandonGoal.isPending}
+              variant="destructive"
+            />
+          </>
+        )}
+    </div>
+  );
+
+  if (compact) return content;
+
+  return (
+    <Card className={goal.status !== 'ACTIVE' ? 'opacity-60' : undefined}>
+      <CardContent className="p-0">
+        {content}
       </CardContent>
     </Card>
   );

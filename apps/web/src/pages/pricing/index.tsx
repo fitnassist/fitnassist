@@ -56,7 +56,7 @@ export const PricingPage = () => {
   return (
     <div>
       {/* Hero banner */}
-      <HeroBanner title="Pricing" imageUrl="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1920&q=80" />
+      <HeroBanner title="Pricing" imageUrl="/images/hero-pricing.jpg" />
 
       {/* Intro section - white bg */}
       <section className="py-12 sm:py-16">

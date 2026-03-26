@@ -127,6 +127,13 @@ enum NotificationType {
   PAYMENT_FAILED
 }
 
+enum Visibility {
+  ONLY_ME
+  MY_PT
+  PT_AND_FRIENDS
+  EVERYONE
+}
+
 enum ContactRequestType {
   CALLBACK_REQUEST
   CONNECTION_REQUEST
@@ -646,6 +653,9 @@ model TraineeProfile {
   id               String           @id @default(cuid())
   userId           String           @unique
 
+  /// @zod.string.min(3, { message: "Handle must be at least 3 characters" }).max(30, { message: "Handle must be at most 30 characters" }).regex(/^[a-z0-9_-]+$/, { message: "Handle can only contain lowercase letters, numbers, hyphens, or underscores" })
+  handle           String?          @unique
+
   // Personal info
   /// @zod.string.url({ message: "Must be a valid URL" })
   avatarUrl        String?
@@ -707,7 +717,21 @@ model TraineeProfile {
   // Other
   /// @zod.string.max(200)
   location         String?
-  isPublic         Boolean          @default(false)
+
+  // Privacy settings — controls visibility of each data category
+  // ONLY_ME = only the trainee, MY_PT = trainee + connected trainer,
+  // PT_AND_FRIENDS = trainee + PT + friends, EVERYONE = public
+  privacyBio             Visibility @default(EVERYONE)
+  privacyLocation        Visibility @default(EVERYONE)
+  privacyFitnessGoals    Visibility @default(EVERYONE)
+  privacyDiaryActivity   Visibility @default(MY_PT)
+  privacyProgressPhotos  Visibility @default(ONLY_ME)
+  privacyWeight          Visibility @default(MY_PT)
+  privacyMeasurements    Visibility @default(ONLY_ME)
+  privacyGoals           Visibility @default(PT_AND_FRIENDS)
+  privacyPersonalBests   Visibility @default(PT_AND_FRIENDS)
+  privacyStats           Visibility @default(PT_AND_FRIENDS)
+  privacyNutrition       Visibility @default(MY_PT)
 
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
