@@ -60,27 +60,28 @@ const getInitials = (name: string) =>
 const getDiaryDetail = (props: DiaryFeedCardProps): string | null => {
   switch (props.type) {
     case 'WEIGHT':
-      return props.weightEntry ? `${props.weightEntry.weightKg} kg` : null;
+      return props.weightEntry?.weightKg != null ? `${props.weightEntry.weightKg} kg` : null;
     case 'WATER':
-      return props.waterEntry ? `${props.waterEntry.totalMl} ml` : null;
+      return props.waterEntry?.totalMl != null ? `${props.waterEntry.totalMl} ml` : null;
     case 'MOOD':
-      return props.moodEntry
+      return props.moodEntry?.level
         ? `${props.moodEntry.level.toLowerCase().replace('_', ' ')}${props.moodEntry.notes ? ` — ${props.moodEntry.notes}` : ''}`
         : null;
     case 'SLEEP':
-      return props.sleepEntry ? `${props.sleepEntry.hoursSlept} hours` : null;
+      return props.sleepEntry?.hoursSlept != null ? `${props.sleepEntry.hoursSlept} hours` : null;
     case 'STEPS':
-      return props.stepsEntry ? `${props.stepsEntry.count.toLocaleString()} steps` : null;
-    case 'ACTIVITY':
-      if (!props.activityEntry) return null;
+      return props.stepsEntry?.count != null ? `${props.stepsEntry.count.toLocaleString()} steps` : null;
+    case 'ACTIVITY': {
+      if (!props.activityEntry?.activityType) return null;
       const parts = [
         props.activityEntry.activityType.toLowerCase(),
-        `${props.activityEntry.durationMinutes} min`,
+        `${props.activityEntry.durationMinutes ?? 0} min`,
       ];
       if (props.activityEntry.distanceKm) parts.push(`${props.activityEntry.distanceKm} km`);
       return parts.join(' · ');
+    }
     case 'WORKOUT_LOG':
-      return props.workoutLogEntry?.workoutPlan?.name ?? 'Free workout';
+      return props.workoutLogEntry?.workoutPlan?.name ?? (props.workoutLogEntry ? 'Free workout' : null);
     case 'FOOD':
       return props.foodEntryCount ? `${props.foodEntryCount} items logged` : null;
     default:
