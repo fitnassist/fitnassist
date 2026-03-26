@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, ChevronUp } from "lucide-react";
+import { LogOut, Settings, ChevronUp, UserCircle } from "lucide-react";
 import {
   Avatar,
   AvatarFallback,
@@ -58,6 +58,13 @@ export const SidebarUserMenu = ({
         </div>
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
+      <DropdownMenuItem
+        onClick={() => navigate(user.role === 'Trainer' ? routes.trainerProfileEdit : routes.traineeProfileEdit)}
+        className="cursor-pointer"
+      >
+        <UserCircle className="mr-2 h-4 w-4" />
+        My Profile
+      </DropdownMenuItem>
       <DropdownMenuItem
         onClick={() => navigate(routes.dashboardSettings)}
         className="cursor-pointer"

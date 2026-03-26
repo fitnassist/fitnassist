@@ -203,15 +203,13 @@ export const MobileBottomNav = ({
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {isTrainee && (
-                  <DropdownMenuItem
-                    onClick={() => navigate(routes.traineeProfileEdit)}
-                    className="cursor-pointer"
-                  >
-                    <UserCircle className="mr-2 h-4 w-4" />
-                    My Profile
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem
+                  onClick={() => navigate(isTrainee ? routes.traineeProfileEdit : routes.trainerProfileEdit)}
+                  className="cursor-pointer"
+                >
+                  <UserCircle className="mr-2 h-4 w-4" />
+                  My Profile
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => navigate(routes.dashboardSettings)}
                   className="cursor-pointer"
