@@ -140,6 +140,14 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
         utils.diary.getEntries.invalidate();
         break;
       }
+
+      // --- Badge events ---
+      case 'badge_earned': {
+        utils.badge.getUserBadges.invalidate();
+        utils.badge.getShowcaseBadges.invalidate();
+        utils.badge.getMyShowcaseBadgeIds.invalidate();
+        break;
+      }
     }
   }, [lastEvent, utils]);
 };

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Home, MessageCircle, Phone, User, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3, Heart, Rss, Trophy } from 'lucide-react';
+import { Home, MessageCircle, Phone, User, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3, Heart, Rss, Trophy, Award } from 'lucide-react';
 import { routes } from '@/config/routes';
 import {
   FEATURE_TIER_MAP,
@@ -115,6 +115,12 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     label: 'Leaderboards',
     href: routes.dashboardLeaderboards,
     icon: <Trophy className="h-5 w-5" />,
+    roles: ['TRAINEE'] as const,
+  },
+  {
+    label: 'Achievements',
+    href: routes.dashboardAchievements,
+    icon: <Award className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
   },
 ];

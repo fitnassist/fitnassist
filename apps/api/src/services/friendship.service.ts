@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { friendshipRepository } from '../repositories/friendship.repository';
 import { traineeRepository } from '../repositories/trainee.repository';
+import { badgeService } from './badge.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
@@ -151,6 +152,9 @@ export const friendshipService = {
       title: `${addressee?.name ?? 'Someone'} accepted your friend request`,
       link: '/dashboard/friends',
     }).catch(console.error);
+
+    badgeService.checkAndAwardBadges(userId, 'FRIENDSHIP').catch(() => {});
+    badgeService.checkAndAwardBadges(friendship.requesterId, 'FRIENDSHIP').catch(() => {});
 
     return updated;
   },

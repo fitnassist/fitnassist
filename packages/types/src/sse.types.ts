@@ -177,6 +177,16 @@ export interface SseDiaryEntryLikedEvent {
 }
 
 // =============================================================================
+// BADGE EVENTS
+// =============================================================================
+
+export interface SseBadgeEarnedEvent {
+  type: 'badge_earned';
+  badgeId: string;
+  badgeName: string;
+}
+
+// =============================================================================
 // SYSTEM EVENTS
 // =============================================================================
 
@@ -208,4 +218,5 @@ export type SseEvent =
   | SseNewPostEvent
   | SsePostLikedEvent
   | SseDiaryEntryLikedEvent
+  | SseBadgeEarnedEvent
   | SseHeartbeatEvent;

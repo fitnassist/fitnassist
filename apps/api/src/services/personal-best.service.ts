@@ -1,4 +1,5 @@
 import { personalBestRepository } from '../repositories/personal-best.repository';
+import { badgeService } from './badge.service';
 import { sseManager } from '../lib/sse';
 import { inAppNotificationService } from './in-app-notification.service';
 import { prisma } from '../lib/prisma';
@@ -103,6 +104,7 @@ const tryUpsertPB = async (params: {
   });
 
   broadcastPB(params.userId, params.label).catch(() => {});
+  badgeService.checkAndAwardBadges(params.userId, 'PERSONAL_BEST').catch(() => {});
   return true;
 };
 

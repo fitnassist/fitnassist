@@ -130,6 +130,7 @@ enum NotificationType {
   NEW_FOLLOWER
   POST_LIKED
   DIARY_ENTRY_LIKED
+  BADGE_EARNED
 }
 
 enum FriendshipStatus {
@@ -226,6 +227,7 @@ model User {
   posts            Post[]
   postLikes        PostLike[]
   diaryEntryLikes  DiaryEntryLike[]
+  badges           UserBadge[]
 
   @@map("users")
 }
@@ -767,6 +769,7 @@ model TraineeProfile {
 
   lastFeedViewedAt DateTime?
   leaderboardOptIn Boolean          @default(false)
+  showcaseBadgeIds String[]         @default([])
 
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -1563,4 +1566,21 @@ model DiaryEntryLike {
   @@unique([diaryEntryId, userId])
   @@index([diaryEntryId])
   @@map("diary_entry_likes")
+}
+
+// =============================================================================
+// ACHIEVEMENTS & BADGES
+// =============================================================================
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
 }

@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { goalRepository } from '../repositories/goal.repository';
 import { clientRosterRepository } from '../repositories/client-roster.repository';
 import { trainerRepository } from '../repositories/trainer.repository';
+import { badgeService } from './badge.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
@@ -225,6 +226,8 @@ export const goalService = {
         }
       }
     }
+
+    badgeService.checkAndAwardBadges(goal.userId, 'GOAL_COMPLETED').catch(() => {});
 
     return result;
   },

@@ -50,6 +50,7 @@ export { FriendshipScalarFieldEnumSchema } from './FriendshipScalarFieldEnumSche
 export { PostScalarFieldEnumSchema } from './PostScalarFieldEnumSchema';
 export { PostLikeScalarFieldEnumSchema } from './PostLikeScalarFieldEnumSchema';
 export { DiaryEntryLikeScalarFieldEnumSchema } from './DiaryEntryLikeScalarFieldEnumSchema';
+export { UserBadgeScalarFieldEnumSchema } from './UserBadgeScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { NullableJsonNullValueInputSchema } from './NullableJsonNullValueInputSchema';
 export { JsonNullValueInputSchema } from './JsonNullValueInputSchema';

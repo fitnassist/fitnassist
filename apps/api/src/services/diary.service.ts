@@ -5,6 +5,7 @@ import { trainerRepository } from '../repositories/trainer.repository';
 import { foodSearch } from '../lib/foodSearch';
 import { goalService } from './goal.service';
 import { personalBestService } from './personal-best.service';
+import { badgeService } from './badge.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
@@ -160,6 +161,7 @@ export const diaryService = {
     goalService.checkAutoProgress(userId, 'WEIGHT', data.weightKg).catch(() => {});
     personalBestService.checkWeightPB(userId, data.weightKg, parseDate(data.date)).catch(() => {});
     broadcastDiaryEntry(userId, 'WEIGHT', data.date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
   },
 
@@ -167,6 +169,7 @@ export const diaryService = {
     const userId = await resolveUserId(callerId, data.clientRosterId);
     const result = await diaryRepository.upsertWater(userId, parseDate(data.date), data.totalMl);
     broadcastDiaryEntry(userId, 'WATER', data.date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
   },
 
@@ -185,6 +188,7 @@ export const diaryService = {
     const { clientRosterId: _, date, ...measurements } = data;
     const result = await diaryRepository.upsertMeasurements(userId, parseDate(date), measurements);
     broadcastDiaryEntry(userId, 'MEASUREMENT', date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
   },
 
@@ -192,6 +196,7 @@ export const diaryService = {
     const userId = await resolveUserId(callerId, data.clientRosterId);
     const result = await diaryRepository.upsertMood(userId, parseDate(data.date), data.level, data.notes);
     broadcastDiaryEntry(userId, 'MOOD', data.date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
   },
 
@@ -199,6 +204,7 @@ export const diaryService = {
     const userId = await resolveUserId(callerId, data.clientRosterId);
     const result = await diaryRepository.upsertSleep(userId, parseDate(data.date), data.hoursSlept, data.quality);
     broadcastDiaryEntry(userId, 'SLEEP', data.date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
   },
 
@@ -218,6 +224,7 @@ export const diaryService = {
     goalService.checkAutoProgress(userId, 'WORKOUT_LOG').catch(() => {});
     personalBestService.checkWorkoutPB(userId, data.durationMinutes, parseDate(date)).catch(() => {});
     broadcastDiaryEntry(userId, 'WORKOUT_LOG', date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
   },
 
@@ -228,6 +235,7 @@ export const diaryService = {
     goalService.checkAutoProgress(userId, 'STEPS').catch(() => {});
     personalBestService.checkStepsPB(userId, data.totalSteps, parseDate(data.date)).catch(() => {});
     broadcastDiaryEntry(userId, 'STEPS', data.date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
   },
 
@@ -266,6 +274,7 @@ export const diaryService = {
       parseDate(date),
     ).catch(() => {});
     broadcastDiaryEntry(userId, 'ACTIVITY', date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
   },
 
@@ -291,6 +300,7 @@ export const diaryService = {
     const diaryEntry = await diaryRepository.getOrCreateProgressPhotoDiaryEntry(userId, parseDate(data.date));
     await diaryRepository.createProgressPhotos(diaryEntry.id, data.photos);
     broadcastDiaryEntry(userId, 'PROGRESS_PHOTO', data.date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return diaryRepository.findById(diaryEntry.id);
   },
 
@@ -463,6 +473,7 @@ export const diaryService = {
     const diaryEntry = await diaryRepository.getOrCreateFoodDiaryEntry(userId, parseDate(data.date));
     await diaryRepository.createFoodEntries(diaryEntry.id, data.items);
     broadcastDiaryEntry(userId, 'FOOD', data.date).catch(() => {});
+    badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return diaryRepository.findById(diaryEntry.id);
   },
 

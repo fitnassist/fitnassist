@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { followRepository } from '../repositories/follow.repository';
 import { trainerRepository } from '../repositories/trainer.repository';
+import { badgeService } from './badge.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
@@ -56,6 +57,8 @@ export const followService = {
       body: undefined,
       link: `/dashboard/followers`,
     }).catch(console.error);
+
+    badgeService.checkAndAwardBadges(followerId, 'FOLLOW').catch(() => {});
 
     return follow;
   },

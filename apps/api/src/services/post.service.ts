@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import type { DiaryEntryType, Visibility } from '@fitnassist/database';
 import { postRepository } from '../repositories/post.repository';
 import { friendshipRepository } from '../repositories/friendship.repository';
+import { badgeService } from './badge.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
@@ -96,6 +97,8 @@ export const postService = {
         authorName: post.user.name,
       });
     }
+
+    badgeService.checkAndAwardBadges(userId, 'POST').catch(() => {});
 
     return {
       ...post,
@@ -285,6 +288,8 @@ export const postService = {
         title: `${liker?.name ?? 'Someone'} liked your post`,
         link: '/dashboard/feed',
       }).catch(console.error);
+
+      badgeService.checkAndAwardBadges(post.userId, 'LIKE_RECEIVED').catch(() => {});
     }
 
     return { success: true };
@@ -354,6 +359,8 @@ export const postService = {
         title: `${liker?.name ?? 'Someone'} liked your diary entry`,
         link: '/dashboard/diary',
       }).catch(console.error);
+
+      badgeService.checkAndAwardBadges(diaryEntry.userId, 'LIKE_RECEIVED').catch(() => {});
     }
 
     return { success: true };
