@@ -9,7 +9,7 @@ export const ProfileVideoIntro = ({ videoUrl }: ProfileVideoIntroProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider">
           <Video className="h-5 w-5" />
           Introduction
         </CardTitle>

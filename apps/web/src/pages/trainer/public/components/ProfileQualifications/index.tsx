@@ -14,7 +14,7 @@ export const ProfileQualifications = ({ qualifications }: ProfileQualificationsP
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider">
           <Award className="h-5 w-5" />
           Qualifications
         </CardTitle>

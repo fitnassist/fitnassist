@@ -14,7 +14,7 @@ export const ProfileServices = ({ services }: ProfileServicesProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider">
           <Dumbbell className="h-5 w-5" />
           Services
         </CardTitle>

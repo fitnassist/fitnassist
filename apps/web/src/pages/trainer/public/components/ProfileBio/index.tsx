@@ -12,7 +12,7 @@ export function ProfileBio({ bio }: ProfileBioProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>About</CardTitle>
+        <CardTitle className="text-lg sm:text-xl font-light uppercase tracking-wider">About</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground whitespace-pre-wrap">{bio}</p>

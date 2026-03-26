@@ -21,7 +21,7 @@ export const ProfileGallery = ({ images }: ProfileGalleryProps) => {
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider">
             <Images className="h-5 w-5" />
             Gallery
           </CardTitle>

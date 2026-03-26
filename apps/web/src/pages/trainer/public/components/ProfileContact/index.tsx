@@ -130,7 +130,7 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider">
             <MessageCircle className="h-5 w-5" />
             Get in Touch
           </CardTitle>
@@ -164,7 +164,7 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider">
             <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
             Connected
           </CardTitle>
@@ -190,7 +190,7 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider">
             <MessageCircle className="h-5 w-5" />
             Request Pending
           </CardTitle>
@@ -212,7 +212,7 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
     <>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider">
             <MessageCircle className="h-5 w-5" />
             Get in Touch
           </CardTitle>
