@@ -1,10 +1,26 @@
 import { TRPCError } from '@trpc/server';
-import type { Visibility } from '@fitnassist/database';
+import type { DiaryEntryType, Visibility } from '@fitnassist/database';
 import { postRepository } from '../repositories/post.repository';
 import { friendshipRepository } from '../repositories/friendship.repository';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
+
+// Map diary entry types to the privacy field that controls their visibility
+const DIARY_TYPE_PRIVACY_FIELD: Record<DiaryEntryType, string> = {
+  WEIGHT: 'privacyTrendWeight',
+  WATER: 'privacyTrendWater',
+  MEASUREMENT: 'privacyTrendMeasurements',
+  MOOD: 'privacyTrendMood',
+  SLEEP: 'privacyTrendSleep',
+  FOOD: 'privacyTrendNutrition',
+  WORKOUT_LOG: 'privacyTrendActivity',
+  PROGRESS_PHOTO: 'privacyProgressPhotos',
+  STEPS: 'privacyTrendSteps',
+  ACTIVITY: 'privacyTrendActivity',
+};
+
+const FRIEND_VISIBLE_LEVELS: Visibility[] = ['PT_AND_FRIENDS', 'EVERYONE'];
 
 const getFriendIds = async (userId: string): Promise<string[]> => {
   const friendships = await prisma.friendship.findMany({
@@ -113,7 +129,98 @@ export const postService = {
       getFollowingIds(userId),
     ]);
 
-    return postRepository.getFeed(userId, friendIds, followingIds, cursor, limit);
+    // Parse cursor — format: "timestamp|type|id" or just a post ID for backwards compat
+    let postCursor: string | undefined;
+    let diaryCursorDate: Date | undefined;
+
+    if (cursor) {
+      const pipeIdx = cursor.indexOf('|');
+      if (pipeIdx !== -1) {
+        const parts = cursor.split('|');
+        if (parts[0]) diaryCursorDate = new Date(parts[0]);
+        if (parts[2]) postCursor = parts[2];
+      } else {
+        postCursor = cursor;
+      }
+    }
+
+    // Get posts
+    const postsResult = await postRepository.getFeed(
+      userId, friendIds, followingIds, postCursor, limit
+    );
+
+    // Get diary entries from friends based on their privacy settings
+    let allowedDiaryTypes: DiaryEntryType[] = [];
+
+    if (friendIds.length > 0) {
+      // Get friends' privacy settings to determine which diary types are visible
+      const friendProfiles = await prisma.traineeProfile.findMany({
+        where: { userId: { in: friendIds } },
+        select: {
+          userId: true,
+          privacyTrendWeight: true,
+          privacyTrendMeasurements: true,
+          privacyTrendNutrition: true,
+          privacyTrendWater: true,
+          privacyTrendMood: true,
+          privacyTrendSleep: true,
+          privacyTrendActivity: true,
+          privacyTrendSteps: true,
+          privacyProgressPhotos: true,
+        },
+      });
+
+      // Build set of diary types that at least one friend has made visible
+      const visibleTypes = new Set<DiaryEntryType>();
+      for (const profile of friendProfiles) {
+        for (const [diaryType, privacyField] of Object.entries(DIARY_TYPE_PRIVACY_FIELD)) {
+          const value = profile[privacyField as keyof typeof profile] as Visibility;
+          if (FRIEND_VISIBLE_LEVELS.includes(value)) {
+            visibleTypes.add(diaryType as DiaryEntryType);
+          }
+        }
+      }
+      allowedDiaryTypes = Array.from(visibleTypes);
+    }
+
+    const diaryEntries = await postRepository.getFeedDiaryEntries(
+      friendIds, userId, allowedDiaryTypes, diaryCursorDate, limit
+    );
+
+    // Merge posts and diary entries, sorted by createdAt desc
+    const postItems = postsResult.items.map((p) => ({
+      ...p,
+      itemType: 'post' as const,
+      sortDate: new Date(p.createdAt),
+    }));
+
+    const diaryItems = diaryEntries.map((d) => ({
+      ...d,
+      itemType: 'diary_entry' as const,
+      sortDate: new Date(d.createdAt),
+    }));
+
+    const merged = [...postItems, ...diaryItems]
+      .sort((a, b) => b.sortDate.getTime() - a.sortDate.getTime())
+      .slice(0, limit);
+
+    // Determine if there are more items
+    const hasMorePosts = postsResult.nextCursor !== undefined;
+    const hasMoreDiary = diaryEntries.length >= limit;
+    const hasMore = hasMorePosts || hasMoreDiary;
+
+    // Build composite cursor from the last item
+    let nextCursor: string | undefined;
+    if (hasMore && merged.length > 0) {
+      const last = merged[merged.length - 1]!;
+      const lastPostId = postsResult.nextCursor ?? postsResult.items[postsResult.items.length - 1]?.id ?? '';
+      nextCursor = `${last.sortDate.toISOString()}|${last.itemType}|${lastPostId}`;
+    }
+
+    return {
+      items: merged.map(({ sortDate: _sortDate, ...item }) => item),
+      nextCursor,
+    };
   },
 
   async getUserPosts(

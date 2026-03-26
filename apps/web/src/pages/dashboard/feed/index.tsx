@@ -2,13 +2,13 @@ import { Loader2 } from 'lucide-react';
 import { PageLayout } from '@/components/layouts';
 import { Button } from '@/components/ui';
 import { useFeed } from '@/api/post';
-import { CreatePostForm, PostCard, FeedEmpty } from './components';
+import { CreatePostForm, PostCard, DiaryFeedCard, FeedEmpty } from './components';
 
 export const FeedPage = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useFeed();
 
-  const posts = data?.pages.flatMap((page) => page.items) ?? [];
+  const items = data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
     <PageLayout>
@@ -24,24 +24,46 @@ export const FeedPage = () => {
             <div className="flex justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             </div>
-          ) : posts.length === 0 ? (
+          ) : items.length === 0 ? (
             <FeedEmpty />
           ) : (
             <>
-              {posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  id={post.id}
-                  content={post.content}
-                  imageUrl={post.imageUrl}
-                  type={post.type}
-                  visibility={post.visibility}
-                  createdAt={post.createdAt as unknown as string}
-                  user={post.user}
-                  hasLiked={post.hasLiked}
-                  likeCount={post.likeCount}
-                />
-              ))}
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {items.map((item: any) =>
+                item.itemType === 'post' ? (
+                  <PostCard
+                    key={`post-${item.id}`}
+                    id={item.id}
+                    content={item.content}
+                    imageUrl={item.imageUrl}
+                    type={item.type}
+                    visibility={item.visibility}
+                    createdAt={String(item.createdAt)}
+                    user={item.user}
+                    hasLiked={item.hasLiked}
+                    likeCount={item.likeCount}
+                  />
+                ) : (
+                  <DiaryFeedCard
+                    key={`diary-${item.id}`}
+                    id={item.id}
+                    type={item.type}
+                    date={String(item.date)}
+                    createdAt={String(item.createdAt)}
+                    hasLiked={item.hasLiked}
+                    likeCount={item.likeCount}
+                    user={item.user}
+                    weightEntry={item.weightEntry}
+                    waterEntry={item.waterEntry}
+                    moodEntry={item.moodEntry}
+                    sleepEntry={item.sleepEntry}
+                    stepsEntry={item.stepsEntry}
+                    activityEntry={item.activityEntry}
+                    workoutLogEntry={item.workoutLogEntry}
+                    foodEntryCount={item.foodEntryCount}
+                  />
+                )
+              )}
 
               {hasNextPage && (
                 <div className="flex justify-center pt-2">

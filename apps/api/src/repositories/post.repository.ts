@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import type { PostType, Visibility } from '@fitnassist/database';
+import type { DiaryEntryType, PostType, Visibility } from '@fitnassist/database';
 
 const postAuthorSelect = {
   id: true,
@@ -211,5 +211,60 @@ export const postRepository = {
     return prisma.diaryEntryLike.count({
       where: { diaryEntryId },
     });
+  },
+
+  async getFeedDiaryEntries(
+    friendIds: string[],
+    viewerId: string,
+    allowedEntryTypes: DiaryEntryType[],
+    beforeDate?: Date,
+    limit = 20
+  ) {
+    if (friendIds.length === 0 || allowedEntryTypes.length === 0) {
+      return [];
+    }
+
+    const items = await prisma.diaryEntry.findMany({
+      where: {
+        userId: { in: friendIds },
+        type: { in: allowedEntryTypes },
+        ...(beforeDate ? { createdAt: { lt: beforeDate } } : {}),
+      },
+      include: {
+        user: {
+          select: {
+            ...postAuthorSelect,
+          },
+        },
+        weightEntry: true,
+        waterEntry: true,
+        moodEntry: true,
+        sleepEntry: true,
+        stepsEntry: true,
+        activityEntry: true,
+        workoutLogEntry: {
+          include: { workoutPlan: { select: { id: true, name: true } } },
+        },
+        foodEntries: { take: 0 }, // Just need count, handled below
+        _count: {
+          select: { likes: true, foodEntries: true },
+        },
+        likes: {
+          where: { userId: viewerId },
+          select: { id: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+
+    return items.map((item) => ({
+      ...item,
+      hasLiked: item.likes.length > 0,
+      likeCount: item._count.likes,
+      foodEntryCount: item._count.foodEntries,
+      likes: undefined,
+      _count: undefined,
+    }));
   },
 };
