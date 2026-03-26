@@ -30,7 +30,7 @@ export const PricingPage = () => {
   return (
     <div>
       {/* Hero banner */}
-      <HeroBanner title="Pricing" imageUrl="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1920&q=80" />
+      <HeroBanner title="Pricing" imageUrl="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1920&q=80" />
 
       {/* Intro section - white bg */}
       <section className="py-12 sm:py-16">
@@ -118,7 +118,7 @@ export const PricingPage = () => {
           <p className="text-muted-foreground leading-relaxed mb-4">
             Use Fitnassist on your own or pair up with a trainer who can view your diary, set goals,
             and keep you accountable. Find out how Fitnassist can help you{' '}
-            <Link to={routes.trainers} className="text-primary hover:underline">reach your goals</Link>.
+            <Link to={routes.trainers} className="text-coral hover:underline">reach your goals</Link>.
           </p>
           <p className="text-muted-foreground leading-relaxed mb-8">
             Fitnassist is <strong>FREE</strong> for trainees, forever. Ready to start your fitness journey?

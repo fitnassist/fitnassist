@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { Sun, Moon, User, LogOut, Menu, X } from "lucide-react";
 import { routes } from "@/config/routes";
 import { Button } from "@/components/ui";
+import { Logo } from "@/components/Logo";
 import { useTheme } from "@/providers";
 import { useAuth } from "@/hooks";
 import { cn } from "@/lib/utils";
@@ -31,14 +32,12 @@ export function MainLayout() {
       <header
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          scrolled || alwaysSolid ? "bg-[hsl(230,25%,10%)] shadow-lg" : "bg-transparent",
+          scrolled || alwaysSolid || mobileMenuOpen ? "bg-[hsl(230,25%,10%)] shadow-lg" : "bg-transparent",
         )}
       >
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
-            <Link to={routes.home} className="text-xl font-bold text-primary">
-              Fitnassist
-            </Link>
+            <Logo />
 
             {/* Desktop nav */}
             <nav className="hidden sm:flex items-center gap-4">
@@ -148,7 +147,7 @@ export function MainLayout() {
         {/* Mobile menu dropdown */}
         <div
           className={cn(
-            "sm:hidden bg-[hsl(230,25%,10%)] overflow-hidden transition-all duration-200",
+            "sm:hidden bg-[hsl(230,25%,12%)] overflow-hidden transition-all duration-200",
             mobileMenuOpen ? "max-h-64" : "max-h-0",
           )}
         >
@@ -219,9 +218,7 @@ export function MainLayout() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
             <div>
-              <Link to={routes.home} className="text-xl font-bold text-primary">
-                Fitnassist
-              </Link>
+              <Logo />
               <p className="text-sm text-white/50 mt-2">
                 {new Date().getFullYear()} Fitnassist. All rights reserved.
               </p>
