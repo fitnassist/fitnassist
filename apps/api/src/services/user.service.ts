@@ -3,6 +3,10 @@ import { userRepository } from '../repositories/user.repository';
 import type { NotificationPreferencesInput } from '@fitnassist/schemas';
 
 export const userService = {
+  async updateName(userId: string, name: string) {
+    return userRepository.update(userId, { name });
+  },
+
   async getNotificationPreferences(userId: string) {
     const preferences = await userRepository.getNotificationPreferences(userId);
 

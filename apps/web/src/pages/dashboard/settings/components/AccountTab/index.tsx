@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Mail, Lock } from 'lucide-react';
+import { z } from 'zod';
+import { Loader2, Mail, Lock, User } from 'lucide-react';
 import {
   Button,
   Card,
@@ -13,6 +14,8 @@ import {
   Label,
 } from '@/components/ui';
 import { changeEmail, changePassword } from '@/lib/auth-client';
+import { trpc } from '@/lib/trpc';
+import { useAuth } from '@/hooks';
 import {
   changeEmailFormSchema,
   changePasswordFormSchema,
@@ -20,11 +23,30 @@ import {
   type ChangePasswordFormInput,
 } from '@fitnassist/schemas';
 
+const nameFormSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+});
+
 export const AccountTab = () => {
+  const { user } = useAuth();
+  const utils = trpc.useUtils();
+  const [nameSuccess, setNameSuccess] = useState(false);
   const [emailSuccess, setEmailSuccess] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  const updateName = trpc.user.updateName.useMutation({
+    onSuccess: () => {
+      setNameSuccess(true);
+      utils.invalidate();
+    },
+  });
+
+  const nameForm = useForm<z.infer<typeof nameFormSchema>>({
+    resolver: zodResolver(nameFormSchema),
+    defaultValues: { name: user?.name ?? '' },
+  });
 
   const emailForm = useForm<ChangeEmailFormInput>({
     resolver: zodResolver(changeEmailFormSchema),
@@ -84,6 +106,61 @@ export const AccountTab = () => {
 
   return (
     <div className="space-y-6">
+      {/* Change Name */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5" />
+            Display Name
+          </CardTitle>
+          <CardDescription>
+            Update the name displayed on your profile and throughout the site.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            onSubmit={nameForm.handleSubmit((data) => {
+              setNameSuccess(false);
+              updateName.mutate(data);
+            })}
+            className="space-y-4"
+          >
+            {nameSuccess && (
+              <div className="p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200 text-sm">
+                Name updated successfully!
+              </div>
+            )}
+
+            {updateName.error && (
+              <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-lg text-red-800 dark:text-red-200 text-sm">
+                {updateName.error.message}
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="displayName">Name</Label>
+              <Input
+                id="displayName"
+                placeholder="Your name"
+                {...nameForm.register('name')}
+              />
+              {nameForm.formState.errors.name && (
+                <p className="text-sm text-destructive">
+                  {nameForm.formState.errors.name.message}
+                </p>
+              )}
+            </div>
+
+            <Button type="submit" disabled={updateName.isPending}>
+              {updateName.isPending && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Update Name
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
       {/* Change Email */}
       <Card>
         <CardHeader>
