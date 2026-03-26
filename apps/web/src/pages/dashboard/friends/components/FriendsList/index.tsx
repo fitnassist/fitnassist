@@ -47,7 +47,7 @@ export const FriendsList = () => {
 
         const handle = friend.traineeProfile?.handle;
         const avatarUrl = friend.traineeProfile?.avatarUrl ?? friend.image;
-        const profileUrl = handle ? routes.traineePublicProfile(handle) : undefined;
+        const profileUrl = routes.traineePublicProfile(handle ?? friend.id);
 
         return (
           <UserCard

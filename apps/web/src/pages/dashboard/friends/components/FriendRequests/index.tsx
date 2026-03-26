@@ -74,7 +74,7 @@ export const FriendRequests = () => {
               const requester = friendship.requester;
               const handle = requester.traineeProfile?.handle;
               const avatarUrl = requester.traineeProfile?.avatarUrl ?? requester.image;
-              const profileUrl = handle ? routes.traineePublicProfile(handle) : undefined;
+              const profileUrl = routes.traineePublicProfile(handle ?? requester.id);
 
               return (
                 <UserCard
@@ -133,7 +133,7 @@ export const FriendRequests = () => {
               const addressee = friendship.addressee;
               const handle = addressee.traineeProfile?.handle;
               const avatarUrl = addressee.traineeProfile?.avatarUrl ?? addressee.image;
-              const profileUrl = handle ? routes.traineePublicProfile(handle) : undefined;
+              const profileUrl = routes.traineePublicProfile(handle ?? addressee.id);
 
               return (
                 <UserCard

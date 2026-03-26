@@ -16,6 +16,20 @@ export const traineeRepository = {
     });
   },
 
+  async findByHandleOrUserId(identifier: string) {
+    // Try handle first, then userId
+    const byHandle = await prisma.traineeProfile.findUnique({
+      where: { handle: identifier },
+      include: { user: true },
+    });
+    if (byHandle) return byHandle;
+
+    return prisma.traineeProfile.findUnique({
+      where: { userId: identifier },
+      include: { user: true },
+    });
+  },
+
   async isHandleAvailable(handle: string, excludeUserId?: string) {
     const existing = await prisma.traineeProfile.findUnique({
       where: { handle },

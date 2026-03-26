@@ -76,7 +76,7 @@ export const traineeRouter = router({
       return traineeService.getProfileForTrainer(input.userId, ctx.user.id);
     }),
 
-  // Public profile by handle (privacy-filtered based on viewer relationship)
+  // Public profile by handle or userId (privacy-filtered based on viewer relationship)
   getByHandle: publicProcedure
     .input(z.object({ handle: z.string() }))
     .query(async ({ input, ctx }) => {

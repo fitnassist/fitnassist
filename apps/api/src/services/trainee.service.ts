@@ -100,8 +100,8 @@ export const traineeService = {
     return filterProfileByPrivacy(profile, viewerRelationship);
   },
 
-  async getByHandle(handle: string, viewerUserId?: string) {
-    const profile = await traineeRepository.findByHandle(handle);
+  async getByHandle(identifier: string, viewerUserId?: string) {
+    const profile = await traineeRepository.findByHandleOrUserId(identifier);
     if (!profile) {
       throw new TRPCError({
         code: 'NOT_FOUND',
@@ -215,8 +215,8 @@ export const traineeService = {
    * Get public profile data (goals, PBs, recent activity, etc.) for a handle.
    * Each section is gated by the profile's privacy settings relative to the viewer.
    */
-  async getPublicProfileData(handle: string, viewerUserId?: string) {
-    const profile = await traineeRepository.findByHandle(handle);
+  async getPublicProfileData(identifier: string, viewerUserId?: string) {
+    const profile = await traineeRepository.findByHandleOrUserId(identifier);
     if (!profile) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
     }
