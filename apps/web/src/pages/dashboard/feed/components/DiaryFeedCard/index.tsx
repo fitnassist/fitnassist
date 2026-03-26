@@ -147,6 +147,7 @@ export const DiaryFeedCard = (props: DiaryFeedCardProps) => {
           onLike={() => likeDiaryEntry.mutate({ diaryEntryId: props.id })}
           onUnlike={() => unlikeDiaryEntry.mutate({ diaryEntryId: props.id })}
           disabled={likeDiaryEntry.isPending || unlikeDiaryEntry.isPending}
+          diaryEntryId={props.id}
         />
       </div>
     </div>

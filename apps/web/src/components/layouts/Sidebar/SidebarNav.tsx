@@ -27,32 +27,26 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
         const content = item.disabled ? (
           <div
             className={cn(
-              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-50',
-              isCollapsed && 'justify-center px-2'
+              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-50 overflow-hidden',
             )}
           >
-            <span className="relative">
+            <span className="relative shrink-0">
               {item.icon}
             </span>
-            {!isCollapsed && (
-              <>
-                <span className="flex-1">{item.label}</span>
-                <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-              </>
-            )}
+            <span className="flex-1 whitespace-nowrap overflow-hidden">{item.label}</span>
+            <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
           </div>
         ) : (
           <Link
             to={item.href}
             className={cn(
-              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-              isCollapsed && 'justify-center px-2',
+              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors overflow-hidden',
               isActive
                 ? 'text-coral'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
-            <span className="relative">
+            <span className="relative shrink-0">
               {item.icon}
               {hasBadge && (
                 <span className="absolute -top-1.5 -right-1.5 h-4 w-4 flex items-center justify-center rounded-full bg-coral text-[10px] font-medium text-white">
@@ -60,9 +54,7 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
                 </span>
               )}
             </span>
-            {!isCollapsed && (
-              <span>{item.label}</span>
-            )}
+            <span className="whitespace-nowrap overflow-hidden">{item.label}</span>
           </Link>
         );
 

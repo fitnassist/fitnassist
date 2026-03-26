@@ -213,6 +213,32 @@ export const postRepository = {
     });
   },
 
+  async getPostLikers(postId: string, limit = 10) {
+    return prisma.postLike.findMany({
+      where: { postId },
+      select: {
+        user: {
+          select: { id: true, name: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  },
+
+  async getDiaryEntryLikers(diaryEntryId: string, limit = 10) {
+    return prisma.diaryEntryLike.findMany({
+      where: { diaryEntryId },
+      select: {
+        user: {
+          select: { id: true, name: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  },
+
   async getFeedDiaryEntries(
     friendIds: string[],
     viewerId: string,

@@ -160,6 +160,7 @@ export const PostCard = ({
           onLike={() => likePost.mutate({ postId: id })}
           onUnlike={() => unlikePost.mutate({ postId: id })}
           disabled={likePost.isPending || unlikePost.isPending}
+          postId={id}
         />
       </div>
 

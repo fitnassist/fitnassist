@@ -75,6 +75,14 @@ export const useUserPosts = (userId: string, limit = 20, enabled = true) => {
   );
 };
 
+export const usePostLikers = (postId: string, enabled = true) => {
+  return trpc.post.getPostLikers.useQuery({ postId }, { enabled });
+};
+
+export const useDiaryEntryLikers = (diaryEntryId: string, enabled = true) => {
+  return trpc.post.getDiaryEntryLikers.useQuery({ diaryEntryId }, { enabled });
+};
+
 export const useNewFeedCount = (enabled = true) => {
   return trpc.post.getNewFeedCount.useQuery(undefined, { enabled });
 };

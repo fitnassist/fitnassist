@@ -442,6 +442,16 @@ export const postService = {
     return { success: true };
   },
 
+  async getPostLikers(postId: string) {
+    const likers = await postRepository.getPostLikers(postId);
+    return likers.map((l) => ({ id: l.user.id, name: l.user.name }));
+  },
+
+  async getDiaryEntryLikers(diaryEntryId: string) {
+    const likers = await postRepository.getDiaryEntryLikers(diaryEntryId);
+    return likers.map((l) => ({ id: l.user.id, name: l.user.name }));
+  },
+
   async unlikeDiaryEntry(userId: string, diaryEntryId: string) {
     const diaryEntry = await prisma.diaryEntry.findUnique({
       where: { id: diaryEntryId },

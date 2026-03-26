@@ -66,6 +66,18 @@ export const postRouter = router({
       return postService.unlikeDiaryEntry(ctx.user.id, input.diaryEntryId);
     }),
 
+  getPostLikers: protectedProcedure
+    .input(z.object({ postId: z.string() }))
+    .query(async ({ input }) => {
+      return postService.getPostLikers(input.postId);
+    }),
+
+  getDiaryEntryLikers: protectedProcedure
+    .input(z.object({ diaryEntryId: z.string() }))
+    .query(async ({ input }) => {
+      return postService.getDiaryEntryLikers(input.diaryEntryId);
+    }),
+
   getNewFeedCount: protectedProcedure
     .query(async ({ ctx }) => {
       return postService.getNewFeedCount(ctx.user.id);
