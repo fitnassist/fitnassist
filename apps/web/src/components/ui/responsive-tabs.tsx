@@ -7,6 +7,7 @@ interface TabOption {
   value: string;
   label: string;
   icon?: React.ReactNode;
+  badge?: number;
 }
 
 interface ResponsiveTabsProps {
@@ -43,7 +44,7 @@ export const ResponsiveTabs = ({
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {option.label}{option.badge ? ` (${option.badge})` : ''}
             </option>
           ))}
         </select>
@@ -56,6 +57,11 @@ export const ResponsiveTabs = ({
           <TabsTrigger key={option.value} value={option.value} className="gap-2">
             {option.icon}
             {option.label}
+            {option.badge ? (
+              <span className="ml-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-coral text-[10px] font-semibold text-white px-1">
+                {option.badge > 9 ? '9+' : option.badge}
+              </span>
+            ) : null}
           </TabsTrigger>
         ))}
       </TabsList>

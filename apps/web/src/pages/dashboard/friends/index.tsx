@@ -1,19 +1,20 @@
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { Users, UserPlus, Heart } from 'lucide-react';
-import { Button } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
+import { ResponsiveTabs, TabsContent } from '@/components/ui';
+import { useTabParam } from '@/hooks';
+import { usePendingFriendCount } from '@/api/friendship';
 import { FriendsList, FriendRequests, FollowingList } from './components';
 
-const TABS = [
-  { key: 'friends', label: 'Friends', icon: Users },
-  { key: 'requests', label: 'Requests', icon: UserPlus },
-  { key: 'following', label: 'Following', icon: Heart },
-] as const;
-
-type TabKey = (typeof TABS)[number]['key'];
-
 export const FriendsPage = () => {
-  const [activeTab, setActiveTab] = useState<TabKey>('friends');
+  const [tab, setTab] = useTabParam('friends');
+  const { data: pendingCount } = usePendingFriendCount();
+
+  const tabOptions = useMemo(() => [
+    { value: 'friends', label: 'Friends', icon: <Users className="h-4 w-4" /> },
+    { value: 'requests', label: 'Requests', icon: <UserPlus className="h-4 w-4" />, badge: pendingCount || undefined },
+    { value: 'following', label: 'Following', icon: <Heart className="h-4 w-4" /> },
+  ], [pendingCount]);
 
   return (
     <PageLayout>
@@ -22,29 +23,17 @@ export const FriendsPage = () => {
         description="Manage your friends and trainers you follow."
       />
       <PageLayout.Content>
-        {/* Tab navigation */}
-        <div className="flex gap-2 border-b pb-2">
-          {TABS.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <Button
-                key={tab.key}
-                variant={activeTab === tab.key ? 'default' : 'ghost'}
-                size="sm"
-                onClick={() => setActiveTab(tab.key)}
-                className="gap-2"
-              >
-                <Icon className="h-4 w-4" />
-                {tab.label}
-              </Button>
-            );
-          })}
-        </div>
-
-        {/* Tab content */}
-        {activeTab === 'friends' && <FriendsList />}
-        {activeTab === 'requests' && <FriendRequests />}
-        {activeTab === 'following' && <FollowingList />}
+        <ResponsiveTabs value={tab} onValueChange={setTab} options={tabOptions}>
+          <TabsContent value="friends">
+            <FriendsList />
+          </TabsContent>
+          <TabsContent value="requests">
+            <FriendRequests />
+          </TabsContent>
+          <TabsContent value="following">
+            <FollowingList />
+          </TabsContent>
+        </ResponsiveTabs>
       </PageLayout.Content>
     </PageLayout>
   );

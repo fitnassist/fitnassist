@@ -10,5 +10,6 @@ export {
   useSentRequests,
   useFriendshipStatus,
   useAreFriends,
+  usePendingFriendCount,
   useBlockedUsers,
 } from './useFriendship';
