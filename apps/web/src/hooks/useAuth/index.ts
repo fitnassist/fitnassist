@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useSession, signOut } from '@/lib/auth-client';
+import { queryClient } from '@/lib/queryClient';
 import { routes } from '@/config/routes';
 import type { UserRole } from '@fitnassist/types';
 import type { AuthUser, UseAuthReturn } from './useAuth.types';
@@ -20,6 +21,7 @@ export function useAuth(): UseAuthReturn {
 
   const handleSignOut = async () => {
     await signOut();
+    queryClient.clear();
     navigate(routes.home);
   };
 
