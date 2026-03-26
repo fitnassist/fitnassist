@@ -3,6 +3,7 @@ import type { BadgeTrigger } from '@fitnassist/schemas';
 import { prisma } from '../lib/prisma';
 import { sseManager } from '../lib/sse';
 import { inAppNotificationService } from './in-app-notification.service';
+import { clientRosterRepository } from '../repositories/client-roster.repository';
 
 // ============================================================================
 // CRITERIA CHECKERS
@@ -509,6 +510,26 @@ export const badgeService = {
         title: `Badge earned: ${badge.name}`,
         body: badge.description,
         link: '/dashboard/achievements',
+      }).catch(console.error);
+    }
+
+    // Notify trainer(s) that their client earned badge(s)
+    if (allNewBadgeIds.length > 0) {
+      clientRosterRepository.findByTraineeUserId(userId).then(async (rosters) => {
+        if (rosters.length === 0) return;
+        const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+        const badgeNames = allNewBadgeIds
+          .map((id) => BADGE_MAP.get(id)?.name)
+          .filter(Boolean)
+          .join(', ');
+        for (const roster of rosters) {
+          inAppNotificationService.notify({
+            userId: roster.trainer.userId,
+            type: 'BADGE_EARNED',
+            title: `${user?.name ?? 'A client'} earned: ${badgeNames}`,
+            link: `/dashboard/clients/${roster.id}?tab=progress`,
+          }).catch(console.error);
+        }
       }).catch(console.error);
     }
 

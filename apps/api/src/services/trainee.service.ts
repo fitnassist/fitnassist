@@ -6,6 +6,7 @@ import { friendshipRepository } from '../repositories/friendship.repository';
 import { goalRepository } from '../repositories/goal.repository';
 import { personalBestRepository } from '../repositories/personal-best.repository';
 import { diaryRepository } from '../repositories/diary.repository';
+import { badgeService } from './badge.service';
 import type { CreateTraineeProfileInput, UpdateTraineeProfileInput, UpdatePrivacySettingsInput } from '@fitnassist/schemas';
 import { canView } from '@fitnassist/schemas';
 import type { ViewerRelationship } from '@fitnassist/schemas';
@@ -247,7 +248,7 @@ export const traineeService = {
     };
     const needsDiaryFetch = Object.values(trendVisibility).some(Boolean);
 
-    const [goals, personalBests, allDiaryEntries, progressPhotos] = await Promise.all([
+    const [goals, personalBests, allDiaryEntries, progressPhotos, showcaseBadges] = await Promise.all([
       check(profile.privacyGoals)
         ? goalRepository.findByUserId(profile.userId)
         : Promise.resolve([]),
@@ -260,6 +261,7 @@ export const traineeService = {
       check(profile.privacyProgressPhotos)
         ? diaryRepository.findProgressPhotosByUserId(profile.userId, 12)
         : Promise.resolve([]),
+      badgeService.getShowcaseBadges(profile.userId),
     ]);
 
     // Filter diary entries by per-type trend privacy
@@ -328,6 +330,7 @@ export const traineeService = {
         })),
       ) : null,
       stats,
+      showcaseBadges,
       trendVisibility,
       viewerRelationship,
     };

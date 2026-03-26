@@ -45,6 +45,7 @@ import { StepsChart } from "@/pages/dashboard/diary/components/Trends/StepsChart
 import { ChartTabBar } from "@/pages/dashboard/diary/components/Trends/ChartTabBar";
 import { TrendDateRange } from "@/pages/dashboard/diary/components/Trends/TrendDateRange";
 import { ProfileHeader, AddFriendButton } from "./components";
+import { ShowcaseBadges } from "./components/ShowcaseBadges";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -381,6 +382,11 @@ export const TraineePublicProfilePage = () => {
 
           {/* ── Sidebar ── */}
           <div className="space-y-6">
+            {/* Showcase Badges */}
+            {profileData?.showcaseBadges && profileData.showcaseBadges.length > 0 && (
+              <ShowcaseBadges badges={profileData.showcaseBadges} />
+            )}
+
             {/* Stats */}
             {stats && (
               <Card>
