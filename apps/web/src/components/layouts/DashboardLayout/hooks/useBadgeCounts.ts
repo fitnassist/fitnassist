@@ -22,9 +22,16 @@ export const useBadgeCounts = (isAuthenticated: boolean, isTrainer: boolean, sse
     refetchInterval: BADGE_POLL_INTERVAL,
   });
 
+  // Fetch pending friend request count for trainees
+  const { data: pendingFriendRequests } = trpc.friendship.getPendingCount.useQuery(undefined, {
+    enabled: !isTrainer && isAuthenticated,
+    refetchInterval: sseConnected ? false : BADGE_POLL_INTERVAL,
+  });
+
   return {
     messages: unreadMessages?.count ?? 0,
     requests: pendingRequests?.count ?? 0,
     onboarding: pendingOnboarding ?? 0,
+    friendRequests: pendingFriendRequests ?? 0,
   };
 };

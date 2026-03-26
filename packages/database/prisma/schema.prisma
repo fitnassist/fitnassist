@@ -125,6 +125,16 @@ enum NotificationType {
   DIARY_COMMENT
   TRIAL_EXPIRING
   PAYMENT_FAILED
+  FRIEND_REQUEST
+  FRIEND_ACCEPTED
+  NEW_FOLLOWER
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  BLOCKED
 }
 
 enum Visibility {
@@ -201,6 +211,10 @@ model User {
   notifications  Notification[]
   pushSubscriptions PushSubscription[]
   personalBests  PersonalBest[]
+  following      Follow[]     @relation("following")
+  followers      Follow[]     @relation("followers")
+  friendRequestsSent     Friendship[] @relation("friendRequestsSent")
+  friendRequestsReceived Friendship[] @relation("friendRequestsReceived")
 
   @@map("users")
 }
@@ -1447,4 +1461,40 @@ model PushSubscription {
 
   @@index([userId])
   @@map("push_subscriptions")
+}
+
+// =============================================================================
+// SOCIAL — FOLLOWS & FRIENDSHIPS
+// =============================================================================
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower    User @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+model Friendship {
+  id          String           @id @default(cuid())
+  requesterId String
+  addresseeId String
+  status      FriendshipStatus @default(PENDING)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  requester   User @relation("friendRequestsSent", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee   User @relation("friendRequestsReceived", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId, status])
+  @@index([addresseeId, status])
+  @@map("friendships")
 }

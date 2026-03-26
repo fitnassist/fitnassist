@@ -101,6 +101,27 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
         utils.notification.list.invalidate();
         break;
       }
+
+      // --- Social events ---
+      case 'friend_request': {
+        utils.friendship.getPendingRequests.invalidate();
+        utils.friendship.getPendingCount.invalidate();
+        utils.friendship.getStatus.invalidate();
+        break;
+      }
+
+      case 'friend_accepted': {
+        utils.friendship.getFriends.invalidate();
+        utils.friendship.getSentRequests.invalidate();
+        utils.friendship.getStatus.invalidate();
+        break;
+      }
+
+      case 'new_follower': {
+        utils.follow.getFollowCounts.invalidate();
+        utils.follow.getFollowers.invalidate();
+        break;
+      }
     }
   }, [lastEvent, utils]);
 };

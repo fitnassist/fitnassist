@@ -24,6 +24,8 @@ import { availabilityRouter } from './availability.router';
 import { bookingRouter } from './booking.router';
 import { notificationRouter } from './notification.router';
 import { analyticsRouter } from './analytics.router';
+import { followRouter } from './follow.router';
+import { friendshipRouter } from './friendship.router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -51,6 +53,8 @@ export const appRouter = router({
   booking: bookingRouter,
   notification: notificationRouter,
   analytics: analyticsRouter,
+  follow: followRouter,
+  friendship: friendshipRouter,
 });
 
 export type AppRouter = typeof appRouter;

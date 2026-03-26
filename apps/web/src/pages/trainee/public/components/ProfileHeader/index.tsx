@@ -24,7 +24,7 @@ export const ProfileHeader = ({
           alt=""
           className="h-full w-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#20415c] to-[#5a0c30] mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#20415c] to-[#5a0c30] mix-blend-multiply opacity-90" />
       </div>
 
       {/* Profile info */}

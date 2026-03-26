@@ -11,6 +11,7 @@ import {
   ProfileVideoIntro,
   ProfileNotFound,
   ProfileSkeleton,
+  FollowButton,
 } from './components';
 
 export function TrainerPublicProfilePage() {
@@ -30,6 +31,9 @@ export function TrainerPublicProfilePage() {
       <ProfileHero trainer={trainer} />
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-6">
+          <FollowButton trainerUserId={trainer.userId} />
+        </div>
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main content */}
           <div className="lg:col-span-2 space-y-8">

@@ -9,6 +9,7 @@ interface DashboardContext {
     messages: number;
     requests: number;
     onboarding: number;
+    friendRequests: number;
   };
 }
 

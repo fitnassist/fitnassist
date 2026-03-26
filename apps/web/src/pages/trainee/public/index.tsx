@@ -44,7 +44,7 @@ import { ActivityChart } from "@/pages/dashboard/diary/components/Trends/Activit
 import { StepsChart } from "@/pages/dashboard/diary/components/Trends/StepsChart";
 import { ChartTabBar } from "@/pages/dashboard/diary/components/Trends/ChartTabBar";
 import { TrendDateRange } from "@/pages/dashboard/diary/components/Trends/TrendDateRange";
-import { ProfileHeader } from "./components";
+import { ProfileHeader, AddFriendButton } from "./components";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -260,6 +260,9 @@ export const TraineePublicProfilePage = () => {
       />
 
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-6">
+          <AddFriendButton targetUserId={profile.userId} />
+        </div>
         <div className="grid gap-8 lg:grid-cols-3">
           {/* ── Main content ── */}
           <div className="lg:col-span-2 space-y-8">

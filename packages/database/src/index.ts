@@ -31,6 +31,7 @@ export {
   ActivitySource,
   PersonalBestCategory,
   Visibility,
+  FriendshipStatus,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -81,6 +82,8 @@ export type {
   PushSubscription,
   ActivityEntry,
   PersonalBest,
+  Follow,
+  Friendship,
 } from '@prisma/client';
 
 // Re-export generated Zod schemas from model schemas

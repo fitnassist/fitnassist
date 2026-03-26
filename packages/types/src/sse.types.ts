@@ -131,6 +131,30 @@ export interface SseNotificationEvent {
 }
 
 // =============================================================================
+// SOCIAL EVENTS
+// =============================================================================
+
+export interface SseFriendRequestEvent {
+  type: 'friend_request';
+  friendshipId: string;
+  requesterId: string;
+  requesterName: string;
+}
+
+export interface SseFriendAcceptedEvent {
+  type: 'friend_accepted';
+  friendshipId: string;
+  addresseeId: string;
+  addresseeName: string;
+}
+
+export interface SseNewFollowerEvent {
+  type: 'new_follower';
+  followerId: string;
+  followerName: string;
+}
+
+// =============================================================================
 // SYSTEM EVENTS
 // =============================================================================
 
@@ -156,4 +180,7 @@ export type SseEvent =
   | SseBookingCreatedEvent
   | SseBookingCancelledEvent
   | SseNotificationEvent
+  | SseFriendRequestEvent
+  | SseFriendAcceptedEvent
+  | SseNewFollowerEvent
   | SseHeartbeatEvent;

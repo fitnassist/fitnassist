@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Home, MessageCircle, Phone, User, UserCircle, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3 } from 'lucide-react';
+import { Home, MessageCircle, Phone, User, UserCircle, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3, Heart } from 'lucide-react';
 import { routes } from '@/config/routes';
 import {
   FEATURE_TIER_MAP,
@@ -92,6 +92,13 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     href: routes.dashboardContacts,
     icon: <User className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
+  },
+  {
+    label: 'Friends',
+    href: routes.dashboardFriends,
+    icon: <Heart className="h-5 w-5" />,
+    roles: ['TRAINEE'] as const,
+    badgeKey: 'friendRequests' as const,
   },
   {
     label: 'My Profile',

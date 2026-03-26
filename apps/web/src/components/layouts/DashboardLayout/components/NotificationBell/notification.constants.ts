@@ -41,4 +41,7 @@ export const NOTIFICATION_ICON_MAP: Record<string, LucideIcon> = {
   DIARY_COMMENT: MessageCircle,
   TRIAL_EXPIRING: AlertTriangle,
   PAYMENT_FAILED: CreditCard,
+  FRIEND_REQUEST: UserPlus,
+  FRIEND_ACCEPTED: UserCheck,
+  NEW_FOLLOWER: UserPlus,
 };

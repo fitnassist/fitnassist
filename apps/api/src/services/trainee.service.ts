@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { traineeRepository } from '../repositories/trainee.repository';
 import { contactRepository } from '../repositories/contact.repository';
 import { trainerRepository } from '../repositories/trainer.repository';
+import { friendshipRepository } from '../repositories/friendship.repository';
 import { goalRepository } from '../repositories/goal.repository';
 import { personalBestRepository } from '../repositories/personal-best.repository';
 import { diaryRepository } from '../repositories/diary.repository';
@@ -380,9 +381,9 @@ const determineViewerRelationship = async (
     if (connection?.status === 'ACCEPTED') return 'PT';
   }
 
-  // TODO: Phase 5.2 — check friendship status here
-  // const areFriends = await friendshipRepository.areFriends(viewerUserId, profileUserId);
-  // if (areFriends) return 'FRIEND';
+  // Check if viewer is a friend
+  const areFriends = await friendshipRepository.areFriends(viewerUserId, profileUserId);
+  if (areFriends) return 'FRIEND';
 
   return 'PUBLIC';
 };
