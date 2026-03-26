@@ -218,7 +218,7 @@ export function MainLayout() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
             <div>
-              <Logo />
+              <Logo size="small" />
               <p className="text-sm text-white/50 mt-2">
                 {new Date().getFullYear()} Fitnassist. All rights reserved.
               </p>
