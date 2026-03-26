@@ -1,5 +1,5 @@
-import { Outlet, Link } from 'react-router-dom';
-import { routes } from '@/config/routes';
+import { Outlet } from 'react-router-dom';
+import { Logo } from '@/components/Logo';
 
 export function AuthLayout() {
 
@@ -8,9 +8,7 @@ export function AuthLayout() {
       <header className="absolute top-0 left-0 right-0 z-10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center">
-            <Link to={routes.home} className="text-xl font-bold text-primary">
-              Fitnassist
-            </Link>
+            <Logo />
           </div>
         </div>
       </header>

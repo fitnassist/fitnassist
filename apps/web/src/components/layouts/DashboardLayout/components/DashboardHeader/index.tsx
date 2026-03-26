@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Logo } from '@/components/Logo';
 import { Sun, Moon, LogOut, Settings } from 'lucide-react';
 import { routes } from '@/config/routes';
 import {
@@ -40,9 +41,7 @@ export const DashboardHeader = ({ isDark, onToggleTheme, user, onSignOut }: Dash
     <header className="border-b border-white/10 bg-[hsl(230,25%,10%)] sticky top-0 z-50 flex-shrink-0">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
-          <Link to={routes.dashboard} className="text-xl font-bold text-primary">
-            Fitnassist
-          </Link>
+          <Logo />
           <nav className="flex items-center gap-2">
             <Button
               variant="ghost"

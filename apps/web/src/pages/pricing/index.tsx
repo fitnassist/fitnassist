@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks';
 import { Button } from '@/components/ui';
@@ -9,8 +9,34 @@ import type { BillingPeriod } from '@fitnassist/database';
 import { routes } from '@/config/routes';
 import { PricingCard, PricingToggle } from './components';
 
+const useSlider = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(0);
+
+  const onScroll = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    const children = Array.from(el.children) as HTMLElement[];
+    const center = el.scrollLeft + el.offsetWidth / 2;
+    let closest = 0;
+    let minDist = Infinity;
+    children.forEach((child, i) => {
+      const childCenter = child.offsetLeft + child.offsetWidth / 2;
+      const dist = Math.abs(center - childCenter);
+      if (dist < minDist) {
+        minDist = dist;
+        closest = i;
+      }
+    });
+    setActive(closest);
+  }, []);
+
+  return { ref, active, onScroll };
+};
+
 export const PricingPage = () => {
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('MONTHLY');
+  const pricingSlider = useSlider();
   const { isAuthenticated, isTrainer } = useAuth();
   const { data: subscriptionData } = useSubscription(isAuthenticated && isTrainer);
   const createCheckout = useCreateCheckoutSession();
@@ -62,29 +88,49 @@ export const PricingPage = () => {
           </div>
 
           {/* Pricing cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <PricingCard
-              tier="FREE"
-              info={FREE_TIER_INFO}
-              billingPeriod={billingPeriod}
-              isCurrentPlan={currentTier === 'FREE'}
-            />
-            <PricingCard
-              tier="PRO"
-              info={TIER_INFO.PRO}
-              billingPeriod={billingPeriod}
-              isCurrentPlan={currentTier === 'PRO'}
-              isPopular
-              onSelect={() => handleSelect('PRO')}
-              isLoading={createCheckout.isPending}
-            />
-            <PricingCard
-              tier="ELITE"
-              info={TIER_INFO.ELITE}
-              billingPeriod={billingPeriod}
-              isCurrentPlan={currentTier === 'ELITE'}
-              comingSoon
-            />
+          <div
+            ref={pricingSlider.ref}
+            onScroll={pricingSlider.onScroll}
+            className="-mx-4 px-[10vw] md:mx-0 md:px-0 flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 md:pb-0 md:grid md:grid-cols-3 md:overflow-visible max-w-5xl md:mx-auto scrollbar-none"
+          >
+            <div className="min-w-[80vw] snap-center md:min-w-0">
+              <PricingCard
+                tier="FREE"
+                info={FREE_TIER_INFO}
+                billingPeriod={billingPeriod}
+                isCurrentPlan={currentTier === 'FREE'}
+              />
+            </div>
+            <div className="min-w-[80vw] snap-center md:min-w-0">
+              <PricingCard
+                tier="PRO"
+                info={TIER_INFO.PRO}
+                billingPeriod={billingPeriod}
+                isCurrentPlan={currentTier === 'PRO'}
+                isPopular
+                onSelect={() => handleSelect('PRO')}
+                isLoading={createCheckout.isPending}
+              />
+            </div>
+            <div className="min-w-[80vw] snap-center md:min-w-0">
+              <PricingCard
+                tier="ELITE"
+                info={TIER_INFO.ELITE}
+                billingPeriod={billingPeriod}
+                isCurrentPlan={currentTier === 'ELITE'}
+                comingSoon
+              />
+            </div>
+          </div>
+          <div className="flex justify-center gap-2 mt-4 md:hidden">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className={`h-2 w-2 rounded-full transition-colors ${
+                  i === pricingSlider.active ? 'bg-white' : 'bg-white/30'
+                }`}
+              />
+            ))}
           </div>
 
           {/* Billing toggle */}
