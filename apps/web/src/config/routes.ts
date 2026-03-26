@@ -53,6 +53,7 @@ export const routes = {
   dashboardBookingsBook: (trainerId: string) => `/dashboard/bookings/book/${trainerId}`,
   dashboardFeed: '/dashboard/feed',
   dashboardFriends: '/dashboard/friends',
+  dashboardLeaderboards: '/dashboard/leaderboards',
   dashboardSettings: '/dashboard/settings',
 
   // Pricing

@@ -45,6 +45,7 @@ import { PricingPage } from '@/pages/pricing';
 import { AnalyticsPage } from '@/pages/dashboard/analytics';
 import { FeedPage } from '@/pages/dashboard/feed';
 import { FriendsPage } from '@/pages/dashboard/friends';
+import { LeaderboardsPage } from '@/pages/dashboard/leaderboards';
 import { NotFoundPage } from '@/pages/not-found';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from '@/providers';
@@ -121,6 +122,7 @@ function App() {
                       <Route path={routes.dashboardContacts} element={<ContactsPage />} />
                       <Route path="/dashboard/bookings/book/:trainerId" element={<BookSessionPage />} />
                       <Route path={routes.dashboardFriends} element={<FriendsPage />} />
+                      <Route path={routes.dashboardLeaderboards} element={<LeaderboardsPage />} />
                       <Route path={routes.traineeProfileEdit} element={<TraineeProfileEditPage />} />
                     </Route>
                   </Route>

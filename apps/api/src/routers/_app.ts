@@ -27,6 +27,7 @@ import { analyticsRouter } from './analytics.router';
 import { followRouter } from './follow.router';
 import { friendshipRouter } from './friendship.router';
 import { postRouter } from './post.router';
+import { leaderboardRouter } from './leaderboard.router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -57,6 +58,7 @@ export const appRouter = router({
   follow: followRouter,
   friendship: friendshipRouter,
   post: postRouter,
+  leaderboard: leaderboardRouter,
 });
 
 export type AppRouter = typeof appRouter;

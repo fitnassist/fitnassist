@@ -58,6 +58,7 @@ export const TraineeProfileSchema = z.object({
   longitude: z.number().nullable(),
   location: z.string().max(200).nullable(),
   lastFeedViewedAt: z.coerce.date().nullable(),
+  leaderboardOptIn: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -87,6 +88,7 @@ export const TraineeProfileOptionalDefaultsSchema = TraineeProfileSchema.merge(z
   privacyTrendSteps: VisibilitySchema.optional(),
   id: z.string().cuid().optional(),
   country: z.string().optional(),
+  leaderboardOptIn: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }))
