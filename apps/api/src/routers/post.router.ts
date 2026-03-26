@@ -65,4 +65,14 @@ export const postRouter = router({
     .mutation(async ({ input, ctx }) => {
       return postService.unlikeDiaryEntry(ctx.user.id, input.diaryEntryId);
     }),
+
+  getNewFeedCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      return postService.getNewFeedCount(ctx.user.id);
+    }),
+
+  markFeedViewed: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      return postService.markFeedViewed(ctx.user.id);
+    }),
 });

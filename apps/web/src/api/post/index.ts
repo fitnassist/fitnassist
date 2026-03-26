@@ -7,4 +7,6 @@ export {
   useUnlikeDiaryEntry,
   useFeed,
   useUserPosts,
+  useNewFeedCount,
+  useMarkFeedViewed,
 } from './usePost';

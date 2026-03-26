@@ -126,6 +126,7 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
       // --- Post events ---
       case 'new_post': {
         utils.post.getFeed.invalidate();
+        utils.post.getNewFeedCount.invalidate();
         break;
       }
 

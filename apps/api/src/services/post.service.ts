@@ -359,6 +359,89 @@ export const postService = {
     return { success: true };
   },
 
+  async getNewFeedCount(userId: string) {
+    // Get the user's last feed viewed timestamp
+    const profile = await prisma.traineeProfile.findUnique({
+      where: { userId },
+      select: { lastFeedViewedAt: true },
+    });
+
+    const since = profile?.lastFeedViewedAt ?? new Date(0);
+
+    const [friendIds, followingIds] = await Promise.all([
+      getFriendIds(userId),
+      getFollowingIds(userId),
+    ]);
+
+    // Count new posts since last view
+    const newPostCount = await prisma.post.count({
+      where: {
+        createdAt: { gt: since },
+        NOT: { userId }, // Don't count own posts
+        OR: [
+          {
+            userId: { in: followingIds },
+            visibility: 'EVERYONE',
+          },
+          {
+            userId: { in: friendIds },
+            visibility: { in: ['EVERYONE', 'PT_AND_FRIENDS'] },
+          },
+        ],
+      },
+    });
+
+    // Count new diary entries from friends since last view
+    let newDiaryCount = 0;
+    if (friendIds.length > 0) {
+      const friendProfiles = await prisma.traineeProfile.findMany({
+        where: { userId: { in: friendIds } },
+        select: {
+          userId: true,
+          privacyTrendWeight: true,
+          privacyTrendMeasurements: true,
+          privacyTrendNutrition: true,
+          privacyTrendWater: true,
+          privacyTrendMood: true,
+          privacyTrendSleep: true,
+          privacyTrendActivity: true,
+          privacyTrendSteps: true,
+          privacyProgressPhotos: true,
+        },
+      });
+
+      const visibleTypes = new Set<string>();
+      for (const fp of friendProfiles) {
+        for (const [diaryType, privacyField] of Object.entries(DIARY_TYPE_PRIVACY_FIELD)) {
+          const value = fp[privacyField as keyof typeof fp] as Visibility;
+          if (FRIEND_VISIBLE_LEVELS.includes(value)) {
+            visibleTypes.add(diaryType);
+          }
+        }
+      }
+
+      if (visibleTypes.size > 0) {
+        newDiaryCount = await prisma.diaryEntry.count({
+          where: {
+            createdAt: { gt: since },
+            userId: { in: friendIds },
+            type: { in: Array.from(visibleTypes) as DiaryEntryType[] },
+          },
+        });
+      }
+    }
+
+    return newPostCount + newDiaryCount;
+  },
+
+  async markFeedViewed(userId: string) {
+    await prisma.traineeProfile.update({
+      where: { userId },
+      data: { lastFeedViewedAt: new Date() },
+    });
+    return { success: true };
+  },
+
   async unlikeDiaryEntry(userId: string, diaryEntryId: string) {
     const diaryEntry = await prisma.diaryEntry.findUnique({
       where: { id: diaryEntryId },

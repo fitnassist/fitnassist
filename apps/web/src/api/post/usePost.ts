@@ -74,3 +74,16 @@ export const useUserPosts = (userId: string, limit = 20, enabled = true) => {
     }
   );
 };
+
+export const useNewFeedCount = (enabled = true) => {
+  return trpc.post.getNewFeedCount.useQuery(undefined, { enabled });
+};
+
+export const useMarkFeedViewed = () => {
+  const utils = trpc.useUtils();
+  return trpc.post.markFeedViewed.useMutation({
+    onSuccess: () => {
+      utils.post.getNewFeedCount.invalidate();
+    },
+  });
+};

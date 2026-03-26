@@ -26,6 +26,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     href: routes.dashboardFeed,
     icon: <Rss className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
+    badgeKey: 'newFeed' as const,
   },
   {
     label: 'Requests',

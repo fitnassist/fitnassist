@@ -1,12 +1,20 @@
+import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { PageLayout } from '@/components/layouts';
 import { Button } from '@/components/ui';
-import { useFeed } from '@/api/post';
+import { useFeed, useMarkFeedViewed } from '@/api/post';
 import { CreatePostForm, PostCard, DiaryFeedCard, FeedEmpty } from './components';
 
 export const FeedPage = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useFeed();
+  const markViewed = useMarkFeedViewed();
+
+  // Mark feed as viewed on mount
+  useEffect(() => {
+    markViewed.mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const items = data?.pages.flatMap((page) => page.items) ?? [];
 

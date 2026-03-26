@@ -28,10 +28,17 @@ export const useBadgeCounts = (isAuthenticated: boolean, isTrainer: boolean, sse
     refetchInterval: sseConnected ? false : BADGE_POLL_INTERVAL,
   });
 
+  // Fetch new feed item count for trainees
+  const { data: newFeedCount } = trpc.post.getNewFeedCount.useQuery(undefined, {
+    enabled: !isTrainer && isAuthenticated,
+    refetchInterval: sseConnected ? false : BADGE_POLL_INTERVAL,
+  });
+
   return {
     messages: unreadMessages?.count ?? 0,
     requests: pendingRequests?.count ?? 0,
     onboarding: pendingOnboarding ?? 0,
     friendRequests: pendingFriendRequests ?? 0,
+    newFeed: newFeedCount ?? 0,
   };
 };

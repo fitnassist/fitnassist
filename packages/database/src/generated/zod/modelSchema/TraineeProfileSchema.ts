@@ -57,6 +57,7 @@ export const TraineeProfileSchema = z.object({
   latitude: z.number().nullable(),
   longitude: z.number().nullable(),
   location: z.string().max(200).nullable(),
+  lastFeedViewedAt: z.coerce.date().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

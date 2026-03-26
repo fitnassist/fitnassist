@@ -10,6 +10,7 @@ interface DashboardContext {
     requests: number;
     onboarding: number;
     friendRequests: number;
+    newFeed: number;
   };
 }
 

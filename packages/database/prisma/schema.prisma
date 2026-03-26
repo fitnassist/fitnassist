@@ -765,6 +765,8 @@ model TraineeProfile {
   privacyTrendActivity      Visibility @default(EVERYONE)
   privacyTrendSteps         Visibility @default(EVERYONE)
 
+  lastFeedViewedAt DateTime?
+
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
