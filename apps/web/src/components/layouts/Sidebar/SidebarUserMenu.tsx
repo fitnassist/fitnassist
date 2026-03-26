@@ -76,39 +76,24 @@ export const SidebarUserMenu = ({
     </DropdownMenuContent>
   );
 
-  const trigger = (
-    <button className="flex items-center gap-3 w-full text-left hover:bg-muted/50 p-3 transition-colors outline-none overflow-hidden">
-      <span className="shrink-0">{avatarContent}</span>
-      <div className="flex-1 min-w-0 whitespace-nowrap overflow-hidden">
-        <p className="text-sm font-medium truncate">{user.name}</p>
-        <p className="text-xs text-muted-foreground">{user.role}</p>
-      </div>
-      <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
-    </button>
-  );
-
-  if (isCollapsed) {
-    return (
-      <div className="border-t overflow-hidden">
-        <DropdownMenu>
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="right">{user.name}</TooltipContent>
-          </Tooltip>
-          {menuContent}
-        </DropdownMenu>
-      </div>
-    );
-  }
-
   return (
     <div className="border-t overflow-hidden">
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          {trigger}
-        </DropdownMenuTrigger>
+        <Tooltip delayDuration={0} open={isCollapsed ? undefined : false}>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-3 w-full text-left hover:bg-muted/50 p-3 transition-colors outline-none overflow-hidden">
+                <span className="shrink-0">{avatarContent}</span>
+                <div className="flex-1 min-w-0 whitespace-nowrap overflow-hidden">
+                  <p className="text-sm font-medium truncate">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.role}</p>
+                </div>
+                <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
+              </button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="right">{user.name}</TooltipContent>
+        </Tooltip>
         {menuContent}
       </DropdownMenu>
     </div>
