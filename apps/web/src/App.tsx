@@ -43,6 +43,7 @@ import { TermsOfServicePage } from '@/pages/terms';
 import { SupportPage } from '@/pages/support';
 import { PricingPage } from '@/pages/pricing';
 import { AnalyticsPage } from '@/pages/dashboard/analytics';
+import { FeedPage } from '@/pages/dashboard/feed';
 import { FriendsPage } from '@/pages/dashboard/friends';
 import { NotFoundPage } from '@/pages/not-found';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -113,6 +114,7 @@ function App() {
 
                     {/* Trainee-only routes */}
                     <Route element={<RoleGuard allowedRoles={['TRAINEE']} />}>
+                      <Route path={routes.dashboardFeed} element={<FeedPage />} />
                       <Route path={routes.dashboardDiary} element={<DiaryPage />} />
                       <Route path={routes.dashboardGoals} element={<GoalsPage />} />
                       <Route path={routes.dashboardMyPlans} element={<MyPlansPage />} />

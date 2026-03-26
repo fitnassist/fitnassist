@@ -155,6 +155,28 @@ export interface SseNewFollowerEvent {
 }
 
 // =============================================================================
+// POST EVENTS
+// =============================================================================
+
+export interface SseNewPostEvent {
+  type: 'new_post';
+  postId: string;
+  authorName: string;
+}
+
+export interface SsePostLikedEvent {
+  type: 'post_liked';
+  postId: string;
+  userName: string;
+}
+
+export interface SseDiaryEntryLikedEvent {
+  type: 'diary_entry_liked';
+  diaryEntryId: string;
+  userName: string;
+}
+
+// =============================================================================
 // SYSTEM EVENTS
 // =============================================================================
 
@@ -183,4 +205,7 @@ export type SseEvent =
   | SseFriendRequestEvent
   | SseFriendAcceptedEvent
   | SseNewFollowerEvent
+  | SseNewPostEvent
+  | SsePostLikedEvent
+  | SseDiaryEntryLikedEvent
   | SseHeartbeatEvent;

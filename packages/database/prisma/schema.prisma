@@ -128,6 +128,8 @@ enum NotificationType {
   FRIEND_REQUEST
   FRIEND_ACCEPTED
   NEW_FOLLOWER
+  POST_LIKED
+  DIARY_ENTRY_LIKED
 }
 
 enum FriendshipStatus {
@@ -142,6 +144,12 @@ enum Visibility {
   MY_PT
   PT_AND_FRIENDS
   EVERYONE
+}
+
+enum PostType {
+  UPDATE
+  ACHIEVEMENT
+  MILESTONE
 }
 
 enum ContactRequestType {
@@ -215,6 +223,9 @@ model User {
   followers      Follow[]     @relation("followers")
   friendRequestsSent     Friendship[] @relation("friendRequestsSent")
   friendRequestsReceived Friendship[] @relation("friendRequestsReceived")
+  posts            Post[]
+  postLikes        PostLike[]
+  diaryEntryLikes  DiaryEntryLike[]
 
   @@map("users")
 }
@@ -969,6 +980,7 @@ model DiaryEntry {
   activityEntry    ActivityEntry?
   progressPhotos   ProgressPhoto[]
   comments         DiaryComment[]
+  likes            DiaryEntryLike[]
 
   @@index([userId, date])
   @@index([userId, type])
@@ -1497,4 +1509,55 @@ model Friendship {
   @@index([requesterId, status])
   @@index([addresseeId, status])
   @@map("friendships")
+}
+
+// =============================================================================
+// POSTS & LIKES
+// =============================================================================
+
+model Post {
+  id         String     @id @default(cuid())
+  userId     String
+  /// @zod.string.min(1, { message: "Post content is required" }).max(5000, { message: "Post content must be 5000 characters or less" })
+  content    String     @db.Text
+  imageUrl   String?
+  type       PostType   @default(UPDATE)
+  visibility Visibility @default(EVERYONE)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes PostLike[]
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@index([postId])
+  @@map("post_likes")
+}
+
+model DiaryEntryLike {
+  id           String   @id @default(cuid())
+  diaryEntryId String
+  userId       String
+  createdAt    DateTime @default(now())
+
+  diaryEntry DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([diaryEntryId, userId])
+  @@index([diaryEntryId])
+  @@map("diary_entry_likes")
 }

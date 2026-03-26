@@ -44,3 +44,8 @@ export * from './BookingSchema';
 export * from './TravelTimeCacheSchema';
 export * from './NotificationSchema';
 export * from './PushSubscriptionSchema';
+export * from './FollowSchema';
+export * from './FriendshipSchema';
+export * from './PostSchema';
+export * from './PostLikeSchema';
+export * from './DiaryEntryLikeSchema';

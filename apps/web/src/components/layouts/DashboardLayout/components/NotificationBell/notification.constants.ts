@@ -18,6 +18,7 @@ import {
   MessageCircle,
   AlertTriangle,
   CreditCard,
+  Heart,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -44,4 +45,6 @@ export const NOTIFICATION_ICON_MAP: Record<string, LucideIcon> = {
   FRIEND_REQUEST: UserPlus,
   FRIEND_ACCEPTED: UserCheck,
   NEW_FOLLOWER: UserPlus,
+  POST_LIKED: Heart,
+  DIARY_ENTRY_LIKED: Heart,
 };

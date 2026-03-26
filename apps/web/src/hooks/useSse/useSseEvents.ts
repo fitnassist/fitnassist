@@ -122,6 +122,23 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
         utils.follow.getFollowers.invalidate();
         break;
       }
+
+      // --- Post events ---
+      case 'new_post': {
+        utils.post.getFeed.invalidate();
+        break;
+      }
+
+      case 'post_liked': {
+        utils.post.getFeed.invalidate();
+        utils.post.getUserPosts.invalidate();
+        break;
+      }
+
+      case 'diary_entry_liked': {
+        utils.diary.getEntries.invalidate();
+        break;
+      }
     }
   }, [lastEvent, utils]);
 };

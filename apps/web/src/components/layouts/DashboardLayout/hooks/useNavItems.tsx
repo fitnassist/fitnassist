@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Home, MessageCircle, Phone, User, UserCircle, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3, Heart } from 'lucide-react';
+import { Home, MessageCircle, Phone, User, UserCircle, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3, Heart, Rss } from 'lucide-react';
 import { routes } from '@/config/routes';
 import {
   FEATURE_TIER_MAP,
@@ -20,6 +20,12 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     label: 'Dashboard',
     href: routes.dashboard,
     icon: <Home className="h-5 w-5" />,
+  },
+  {
+    label: 'Feed',
+    href: routes.dashboardFeed,
+    icon: <Rss className="h-5 w-5" />,
+    roles: ['TRAINEE'] as const,
   },
   {
     label: 'Requests',
