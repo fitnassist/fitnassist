@@ -106,7 +106,17 @@ export const DashboardLayout = () => {
         </main>
       </div>
 
-      <MobileBottomNav navItems={filteredNavItems} currentPath={location.pathname} />
+      <MobileBottomNav
+        navItems={filteredNavItems}
+        currentPath={location.pathname}
+        user={{
+          name: displayName || user.name,
+          image: profileImage ?? null,
+          role: isTrainer ? 'Trainer' : 'Trainee',
+        }}
+        onSignOut={handleSignOut}
+        isTrainee={isTrainee}
+      />
     </div>
   );
 };

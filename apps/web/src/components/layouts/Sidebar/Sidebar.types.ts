@@ -7,6 +7,7 @@ export interface NavItem {
   badge?: number;
   disabled?: boolean;
   disabledTooltip?: string;
+  mobileBottom?: boolean;
 }
 
 export interface SidebarUser {

@@ -51,6 +51,16 @@ export { ScrollArea, ScrollBar } from './scroll-area';
 export { Switch } from './switch';
 export { Select, type SelectOption } from './select';
 export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+} from './sheet';
+export {
   Skeleton,
   SkeletonAvatar,
   SkeletonText,

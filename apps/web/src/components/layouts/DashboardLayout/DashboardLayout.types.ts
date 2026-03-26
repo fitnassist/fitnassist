@@ -5,6 +5,7 @@ export interface DashboardNavItem extends NavItem {
   roles?: ('TRAINER' | 'TRAINEE')[];
   badgeKey?: 'messages' | 'requests' | 'onboarding' | 'friendRequests' | 'newFeed';
   requiredFeature?: Feature;
+  mobileBottom?: boolean;
 }
 
 export interface BadgeCounts {

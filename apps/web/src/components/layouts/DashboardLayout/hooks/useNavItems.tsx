@@ -20,6 +20,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     label: 'Dashboard',
     href: routes.dashboard,
     icon: <Home className="h-5 w-5" />,
+    mobileBottom: true,
   },
   {
     label: 'Feed',
@@ -40,6 +41,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     href: routes.dashboardMessages,
     icon: <MessageCircle className="h-5 w-5" />,
     badgeKey: 'messages' as const,
+    mobileBottom: true,
   },
   {
     label: 'Clients',
@@ -61,6 +63,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     href: routes.dashboardBookings,
     icon: <Calendar className="h-5 w-5" />,
     requiredFeature: 'booking',
+    mobileBottom: true,
   },
   {
     label: 'Analytics',
@@ -81,6 +84,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     href: routes.dashboardDiary,
     icon: <BookHeart className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
+    mobileBottom: true,
   },
   {
     label: 'Goals',
@@ -134,7 +138,7 @@ export const useNavItems = (
         if (!isTrainer && item.roles.includes('TRAINEE')) return true;
         return false;
       })
-      .map(({ roles: _roles, badgeKey, requiredFeature, ...item }) => {
+      .map(({ roles: _roles, badgeKey, requiredFeature, mobileBottom, ...item }) => {
         // Only gate trainer features — trainees see bookings as gated on their trainer's tier,
         // but we only show the gate for trainer-side nav
         const isGated = isTrainer && requiredFeature && !checkAccess(currentTier, requiredFeature);
@@ -147,6 +151,7 @@ export const useNavItems = (
           disabledTooltip: isGated && requiredTier
             ? `Upgrade to ${TIER_LABELS[requiredTier] ?? requiredTier} to unlock`
             : undefined,
+          mobileBottom,
         };
       });
   }, [isTrainer, badgeCounts, currentTier]);
