@@ -1,5 +1,3 @@
-import type { Visibility } from '@fitnassist/database';
-
 /** The privacy-filtered trainee profile shape returned by the API */
 export interface FilteredTraineeProfile {
   id: string;
@@ -25,17 +23,4 @@ export interface FilteredTraineeProfile {
   startWeightKg: number | null;
   goalWeightKg: number | null;
   medicalNotes: string | null;
-
-  // Privacy settings
-  privacyBio: Visibility;
-  privacyLocation: Visibility;
-  privacyFitnessGoals: Visibility;
-  privacyDiaryActivity: Visibility;
-  privacyProgressPhotos: Visibility;
-  privacyWeight: Visibility;
-  privacyMeasurements: Visibility;
-  privacyGoals: Visibility;
-  privacyPersonalBests: Visibility;
-  privacyStats: Visibility;
-  privacyNutrition: Visibility;
 }

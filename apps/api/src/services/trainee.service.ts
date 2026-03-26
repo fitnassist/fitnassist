@@ -114,6 +114,11 @@ export const traineeService = {
       viewerUserId,
     );
 
+    // Hide profile entirely if all settings are ONLY_ME for public viewers
+    if (isProfileFullyPrivate(profile) && viewerRelationship === 'PUBLIC') {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
+    }
+
     return {
       ...filterProfileByPrivacy(profile, viewerRelationship),
       viewerRelationship,
@@ -173,17 +178,23 @@ export const traineeService = {
     }
 
     return {
+      // Per-section
       privacyBio: profile.privacyBio,
       privacyLocation: profile.privacyLocation,
-      privacyFitnessGoals: profile.privacyFitnessGoals,
-      privacyDiaryActivity: profile.privacyDiaryActivity,
-      privacyProgressPhotos: profile.privacyProgressPhotos,
-      privacyWeight: profile.privacyWeight,
-      privacyMeasurements: profile.privacyMeasurements,
+      privacyBodyMetrics: profile.privacyBodyMetrics,
       privacyGoals: profile.privacyGoals,
       privacyPersonalBests: profile.privacyPersonalBests,
+      privacyProgressPhotos: profile.privacyProgressPhotos,
       privacyStats: profile.privacyStats,
-      privacyNutrition: profile.privacyNutrition,
+      // Granular trends
+      privacyTrendWeight: profile.privacyTrendWeight,
+      privacyTrendMeasurements: profile.privacyTrendMeasurements,
+      privacyTrendNutrition: profile.privacyTrendNutrition,
+      privacyTrendWater: profile.privacyTrendWater,
+      privacyTrendMood: profile.privacyTrendMood,
+      privacyTrendSleep: profile.privacyTrendSleep,
+      privacyTrendActivity: profile.privacyTrendActivity,
+      privacyTrendSteps: profile.privacyTrendSteps,
     };
   },
 
@@ -212,15 +223,28 @@ export const traineeService = {
     const viewerRelationship = await determineViewerRelationship(profile.userId, viewerUserId);
     const check = (setting: Visibility) => canView(viewerRelationship, setting);
 
+    // Hide profile entirely if all settings are ONLY_ME for public viewers
+    if (isProfileFullyPrivate(profile) && viewerRelationship === 'PUBLIC') {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
+    }
+
     // Date range for diary/trends (90 days to support 7d/30d/90d selector)
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 90);
 
-    // Fetch all data in parallel, then filter by privacy
-    const canSeeDiary = check(profile.privacyDiaryActivity);
-    const canSeeWeight = check(profile.privacyWeight);
-    const needsDiaryFetch = canSeeDiary || canSeeWeight;
+    // Determine which trend types the viewer can see
+    const trendVisibility = {
+      WEIGHT: check(profile.privacyTrendWeight),
+      MEASUREMENT: check(profile.privacyTrendMeasurements),
+      FOOD: check(profile.privacyTrendNutrition),
+      WATER: check(profile.privacyTrendWater),
+      MOOD: check(profile.privacyTrendMood),
+      SLEEP: check(profile.privacyTrendSleep),
+      ACTIVITY: check(profile.privacyTrendActivity),
+      STEPS: check(profile.privacyTrendSteps),
+    };
+    const needsDiaryFetch = Object.values(trendVisibility).some(Boolean);
 
     const [goals, personalBests, allDiaryEntries, progressPhotos] = await Promise.all([
       check(profile.privacyGoals)
@@ -237,10 +261,10 @@ export const traineeService = {
         : Promise.resolve([]),
     ]);
 
-    // Filter diary entries: include weight if privacyWeight allows, rest if privacyDiaryActivity allows
+    // Filter diary entries by per-type trend privacy
     const diaryEntries = allDiaryEntries.filter((e) => {
-      if (e.type === 'WEIGHT') return canSeeWeight;
-      return canSeeDiary;
+      const typeKey = e.type as keyof typeof trendVisibility;
+      return trendVisibility[typeKey] ?? false;
     });
 
     // Build stats summary if permitted
@@ -303,6 +327,7 @@ export const traineeService = {
         })),
       ) : null,
       stats,
+      trendVisibility,
       viewerRelationship,
     };
   },
@@ -366,11 +391,26 @@ const determineViewerRelationship = async (
  * Filter a trainee profile based on viewer relationship and privacy settings.
  * Returns the profile with restricted fields set to null.
  */
+/**
+ * Check if all privacy settings are ONLY_ME (profile should be hidden from public).
+ */
+const isProfileFullyPrivate = (profile: TraineeProfile): boolean => {
+  const settings: Visibility[] = [
+    profile.privacyBio, profile.privacyLocation, profile.privacyBodyMetrics,
+    profile.privacyGoals, profile.privacyPersonalBests, profile.privacyProgressPhotos,
+    profile.privacyStats, profile.privacyTrendWeight, profile.privacyTrendMeasurements,
+    profile.privacyTrendNutrition, profile.privacyTrendWater, profile.privacyTrendMood,
+    profile.privacyTrendSleep, profile.privacyTrendActivity, profile.privacyTrendSteps,
+  ];
+  return settings.every((s) => s === 'ONLY_ME');
+};
+
 const filterProfileByPrivacy = (
   profile: TraineeProfileWithUser,
   viewerRelationship: ViewerRelationship,
 ) => {
   const check = (setting: Visibility) => canView(viewerRelationship, setting);
+  const isPTOrSelf = viewerRelationship === 'PT' || viewerRelationship === 'SELF';
 
   return {
     // Always visible
@@ -382,41 +422,26 @@ const filterProfileByPrivacy = (
     unitPreference: profile.unitPreference,
     createdAt: profile.createdAt,
 
-    // Privacy-gated fields — bio level
+    // Bio & About (includes fitness goals, experience, activity level)
     bio: check(profile.privacyBio) ? profile.bio : null,
     experienceLevel: check(profile.privacyBio) ? profile.experienceLevel : null,
     activityLevel: check(profile.privacyBio) ? profile.activityLevel : null,
     gender: check(profile.privacyBio) ? profile.gender : null,
     dateOfBirth: check(profile.privacyBio) ? profile.dateOfBirth : null,
+    fitnessGoals: check(profile.privacyBio) ? profile.fitnessGoals : [],
+    fitnessGoalNotes: check(profile.privacyBio) ? profile.fitnessGoalNotes : null,
 
     // Location
     city: check(profile.privacyLocation) ? profile.city : null,
     postcode: check(profile.privacyLocation) ? profile.postcode : null,
     location: check(profile.privacyLocation) ? profile.location : null,
 
-    // Fitness goals
-    fitnessGoals: check(profile.privacyFitnessGoals) ? profile.fitnessGoals : [],
-    fitnessGoalNotes: check(profile.privacyFitnessGoals) ? profile.fitnessGoalNotes : null,
+    // Body metrics
+    heightCm: check(profile.privacyBodyMetrics) ? profile.heightCm : null,
+    startWeightKg: check(profile.privacyBodyMetrics) ? profile.startWeightKg : null,
+    goalWeightKg: check(profile.privacyBodyMetrics) ? profile.goalWeightKg : null,
 
-    // Weight / body metrics
-    heightCm: check(profile.privacyWeight) ? profile.heightCm : null,
-    startWeightKg: check(profile.privacyWeight) ? profile.startWeightKg : null,
-    goalWeightKg: check(profile.privacyWeight) ? profile.goalWeightKg : null,
-
-    // Medical notes (gated at weight level — sensitive data)
-    medicalNotes: check(profile.privacyWeight) ? profile.medicalNotes : null,
-
-    // Privacy setting values (so the viewer knows what's hidden)
-    privacyBio: profile.privacyBio,
-    privacyLocation: profile.privacyLocation,
-    privacyFitnessGoals: profile.privacyFitnessGoals,
-    privacyDiaryActivity: profile.privacyDiaryActivity,
-    privacyProgressPhotos: profile.privacyProgressPhotos,
-    privacyWeight: profile.privacyWeight,
-    privacyMeasurements: profile.privacyMeasurements,
-    privacyGoals: profile.privacyGoals,
-    privacyPersonalBests: profile.privacyPersonalBests,
-    privacyStats: profile.privacyStats,
-    privacyNutrition: profile.privacyNutrition,
+    // Medical notes — only visible to connected PT or self (hardcoded, no user setting)
+    medicalNotes: isPTOrSelf ? profile.medicalNotes : null,
   };
 };

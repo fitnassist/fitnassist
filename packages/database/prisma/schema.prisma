@@ -721,17 +721,24 @@ model TraineeProfile {
   // Privacy settings — controls visibility of each data category
   // ONLY_ME = only the trainee, MY_PT = trainee + connected trainer,
   // PT_AND_FRIENDS = trainee + PT + friends, EVERYONE = public
-  privacyBio             Visibility @default(EVERYONE)
-  privacyLocation        Visibility @default(EVERYONE)
-  privacyFitnessGoals    Visibility @default(EVERYONE)
-  privacyDiaryActivity   Visibility @default(MY_PT)
-  privacyProgressPhotos  Visibility @default(ONLY_ME)
-  privacyWeight          Visibility @default(MY_PT)
-  privacyMeasurements    Visibility @default(ONLY_ME)
-  privacyGoals           Visibility @default(PT_AND_FRIENDS)
-  privacyPersonalBests   Visibility @default(PT_AND_FRIENDS)
-  privacyStats           Visibility @default(PT_AND_FRIENDS)
-  privacyNutrition       Visibility @default(MY_PT)
+  // Per-section privacy
+  privacyBio                Visibility @default(EVERYONE)
+  privacyLocation           Visibility @default(EVERYONE)
+  privacyBodyMetrics        Visibility @default(PT_AND_FRIENDS)
+  privacyGoals              Visibility @default(PT_AND_FRIENDS)
+  privacyPersonalBests      Visibility @default(PT_AND_FRIENDS)
+  privacyProgressPhotos     Visibility @default(ONLY_ME)
+  privacyStats              Visibility @default(PT_AND_FRIENDS)
+
+  // Granular trend privacy
+  privacyTrendWeight        Visibility @default(MY_PT)
+  privacyTrendMeasurements  Visibility @default(ONLY_ME)
+  privacyTrendNutrition     Visibility @default(MY_PT)
+  privacyTrendWater         Visibility @default(MY_PT)
+  privacyTrendMood          Visibility @default(ONLY_ME)
+  privacyTrendSleep         Visibility @default(ONLY_ME)
+  privacyTrendActivity      Visibility @default(PT_AND_FRIENDS)
+  privacyTrendSteps         Visibility @default(PT_AND_FRIENDS)
 
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt

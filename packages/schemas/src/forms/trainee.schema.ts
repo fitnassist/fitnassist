@@ -64,18 +64,24 @@ export const createTraineeProfileSchema = z.object({
   // Other
   location: z.string().max(200).optional().or(z.literal('')),
 
-  // Privacy settings
+  // Per-section privacy settings
   privacyBio: visibilityEnum.optional(),
   privacyLocation: visibilityEnum.optional(),
-  privacyFitnessGoals: visibilityEnum.optional(),
-  privacyDiaryActivity: visibilityEnum.optional(),
-  privacyProgressPhotos: visibilityEnum.optional(),
-  privacyWeight: visibilityEnum.optional(),
-  privacyMeasurements: visibilityEnum.optional(),
+  privacyBodyMetrics: visibilityEnum.optional(),
   privacyGoals: visibilityEnum.optional(),
   privacyPersonalBests: visibilityEnum.optional(),
+  privacyProgressPhotos: visibilityEnum.optional(),
   privacyStats: visibilityEnum.optional(),
-  privacyNutrition: visibilityEnum.optional(),
+
+  // Granular trend privacy settings
+  privacyTrendWeight: visibilityEnum.optional(),
+  privacyTrendMeasurements: visibilityEnum.optional(),
+  privacyTrendNutrition: visibilityEnum.optional(),
+  privacyTrendWater: visibilityEnum.optional(),
+  privacyTrendMood: visibilityEnum.optional(),
+  privacyTrendSleep: visibilityEnum.optional(),
+  privacyTrendActivity: visibilityEnum.optional(),
+  privacyTrendSteps: visibilityEnum.optional(),
 });
 
 export type CreateTraineeProfileInput = z.infer<typeof createTraineeProfileSchema>;
@@ -89,17 +95,24 @@ export type UpdateTraineeProfileInput = z.infer<typeof updateTraineeProfileSchem
 // =============================================================================
 
 export const updatePrivacySettingsSchema = z.object({
+  // Per-section
   privacyBio: visibilityEnum,
   privacyLocation: visibilityEnum,
-  privacyFitnessGoals: visibilityEnum,
-  privacyDiaryActivity: visibilityEnum,
-  privacyProgressPhotos: visibilityEnum,
-  privacyWeight: visibilityEnum,
-  privacyMeasurements: visibilityEnum,
+  privacyBodyMetrics: visibilityEnum,
   privacyGoals: visibilityEnum,
   privacyPersonalBests: visibilityEnum,
+  privacyProgressPhotos: visibilityEnum,
   privacyStats: visibilityEnum,
-  privacyNutrition: visibilityEnum,
+
+  // Granular trends
+  privacyTrendWeight: visibilityEnum,
+  privacyTrendMeasurements: visibilityEnum,
+  privacyTrendNutrition: visibilityEnum,
+  privacyTrendWater: visibilityEnum,
+  privacyTrendMood: visibilityEnum,
+  privacyTrendSleep: visibilityEnum,
+  privacyTrendActivity: visibilityEnum,
+  privacyTrendSteps: visibilityEnum,
 });
 
 export type UpdatePrivacySettingsInput = z.infer<typeof updatePrivacySettingsSchema>;

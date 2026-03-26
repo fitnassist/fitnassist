@@ -1,4 +1,4 @@
-import { MapPin } from 'lucide-react';
+import { MapPin } from "lucide-react";
 
 interface ProfileHeaderProps {
   userName: string;
@@ -6,7 +6,6 @@ interface ProfileHeaderProps {
   avatarUrl: string | null;
   bio: string | null;
   city: string | null;
-  experienceLevel: string | null;
 }
 
 export const ProfileHeader = ({
@@ -15,12 +14,7 @@ export const ProfileHeader = ({
   avatarUrl,
   bio,
   city,
-  experienceLevel,
 }: ProfileHeaderProps) => {
-  const experienceLabel = experienceLevel
-    ? experienceLevel.charAt(0) + experienceLevel.slice(1).toLowerCase()
-    : null;
-
   return (
     <div className="relative">
       {/* Cover */}
@@ -68,18 +62,15 @@ export const ProfileHeader = ({
                   {city}
                 </span>
               )}
-              {experienceLabel && (
-                <span className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                  {experienceLabel}
-                </span>
-              )}
             </div>
           </div>
         </div>
 
         {/* Bio */}
         {bio && (
-          <p className="text-muted-foreground whitespace-pre-wrap pb-6">{bio}</p>
+          <p className="text-muted-foreground whitespace-pre-wrap pb-6">
+            {bio}
+          </p>
         )}
       </div>
     </div>
