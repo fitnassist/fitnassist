@@ -11,6 +11,7 @@ interface DashboardContext {
     onboarding: number;
     friendRequests: number;
     newFeed: number;
+    pendingBookings: number;
   };
 }
 

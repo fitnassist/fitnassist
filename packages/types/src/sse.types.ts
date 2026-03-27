@@ -112,6 +112,36 @@ export interface SseBookingCancelledEvent {
   reason?: string;
 }
 
+export interface SseBookingPendingEvent {
+  type: 'booking_pending';
+  bookingId: string;
+}
+
+export interface SseBookingConfirmedEvent {
+  type: 'booking_confirmed';
+  bookingId: string;
+}
+
+export interface SseBookingDeclinedEvent {
+  type: 'booking_declined';
+  bookingId: string;
+}
+
+export interface SseBookingRescheduledEvent {
+  type: 'booking_rescheduled';
+  bookingId: string;
+}
+
+export interface SseBookingHoldExpiredEvent {
+  type: 'booking_hold_expired';
+  bookingId: string;
+}
+
+export interface SseBookingSuggestionEvent {
+  type: 'booking_suggestion';
+  bookingId: string;
+}
+
 // =============================================================================
 // NOTIFICATION EVENTS
 // =============================================================================
@@ -211,6 +241,12 @@ export type SseEvent =
   | SseGoalCompletedEvent
   | SseBookingCreatedEvent
   | SseBookingCancelledEvent
+  | SseBookingPendingEvent
+  | SseBookingConfirmedEvent
+  | SseBookingDeclinedEvent
+  | SseBookingRescheduledEvent
+  | SseBookingHoldExpiredEvent
+  | SseBookingSuggestionEvent
   | SseNotificationEvent
   | SseFriendRequestEvent
   | SseFriendAcceptedEvent

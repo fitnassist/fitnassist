@@ -38,6 +38,7 @@ import { OnboardingCompletePage } from '@/pages/dashboard/onboarding/[responseId
 import { SettingsPage } from '@/pages/dashboard/settings';
 import { BookingsPage } from '@/pages/dashboard/bookings';
 import { BookSessionPage } from '@/pages/dashboard/bookings/book';
+import { BookingDetailPage } from '@/pages/dashboard/bookings/[id]';
 import { PrivacyPolicyPage } from '@/pages/privacy';
 import { TermsOfServicePage } from '@/pages/terms';
 import { SupportPage } from '@/pages/support';
@@ -90,6 +91,7 @@ function App() {
                     <Route path={routes.dashboardMessages} element={<MessagesPage />} />
                     <Route path="/dashboard/messages/:connectionId" element={<MessagesPage />} />
                     <Route path={routes.dashboardBookings} element={<BookingsPage />} />
+                    <Route path="/dashboard/bookings/:id" element={<BookingDetailPage />} />
                     <Route path={routes.dashboardSettings} element={<SettingsPage />} />
 
                     {/* Trainer-only routes */}

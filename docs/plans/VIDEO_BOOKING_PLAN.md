@@ -211,4 +211,4 @@ Hooks: useConfirmBooking, useDeclineBooking, useRescheduleBooking, useSuggestAlt
 - **Reschedule = RESCHEDULED original + new PENDING** — full audit trail via rescheduledFromId
 - **Suggestions from real availability** — slot picker, not free text
 - **Daily.co rooms created on CONFIRM only** — no wasted resources on pending/declined bookings
-- **Per-trainer video setting** — `offersVideoSessions` on TrainerProfile
+- **Per-trainer video setting** — `offersVideoSessions` on TrainerProfile, gated to ELITE tier

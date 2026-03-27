@@ -18,6 +18,12 @@ import {
 import { prisma } from '../lib/prisma';
 
 export const bookingRouter = router({
+  // Count pending bookings awaiting current user's confirmation
+  getPendingCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      return bookingService.getPendingCountForUser(ctx.user.id);
+    }),
+
   // Get a single booking (trainer or client)
   get: protectedProcedure
     .input(getBookingSchema)

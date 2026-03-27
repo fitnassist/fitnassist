@@ -97,6 +97,7 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
         utils.booking.listByClientRoster.invalidate();
         utils.booking.get.invalidate();
         utils.booking.getSuggestions.invalidate();
+        utils.booking.getPendingCount.invalidate();
         utils.availability.getSlots.invalidate();
         utils.trainer.getDashboardStats.invalidate();
         utils.analytics.bookingAnalytics.invalidate();

@@ -3,7 +3,7 @@ import type { Feature } from '@fitnassist/schemas';
 
 export interface DashboardNavItem extends NavItem {
   roles?: ('TRAINER' | 'TRAINEE')[];
-  badgeKey?: 'messages' | 'requests' | 'onboarding' | 'friendRequests' | 'newFeed';
+  badgeKey?: 'messages' | 'requests' | 'onboarding' | 'friendRequests' | 'newFeed' | 'pendingBookings';
   requiredFeature?: Feature;
   mobileBottom?: boolean;
 }
@@ -14,6 +14,7 @@ export interface BadgeCounts {
   onboarding: number;
   friendRequests: number;
   newFeed: number;
+  pendingBookings: number;
 }
 
 export interface DashboardContext {

@@ -723,4 +723,12 @@ export const bookingService = {
     console.log(`[BookingHoldExpiry] Expired ${count} pending bookings`);
     return { expired: count };
   },
+
+  /**
+   * Count PENDING bookings awaiting confirmation by this user.
+   */
+  getPendingCountForUser: async (userId: string) => {
+    const count = await bookingRepository.countPendingForUser(userId);
+    return { count };
+  },
 };

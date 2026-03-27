@@ -66,7 +66,7 @@ export const bookingRepository = {
       where: {
         trainerId,
         date: { gte: startDate, lte: endDate },
-        ...(status ? { status } : {}),
+        ...(status ? { status } : { status: { notIn: ['DECLINED'] } }),
       },
       include: bookingInclude,
       orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
@@ -196,6 +196,22 @@ export const bookingRepository = {
     return prisma.booking.update({
       where: { id },
       data: { reminderSentAt: new Date() },
+    });
+  },
+
+  /**
+   * Count PENDING bookings where the given user is the confirming party (not the initiator).
+   */
+  countPendingForUser: (userId: string) => {
+    return prisma.booking.count({
+      where: {
+        status: 'PENDING',
+        initiatedBy: { not: userId },
+        OR: [
+          { trainer: { userId } },
+          { clientRoster: { connection: { senderId: userId } } },
+        ],
+      },
     });
   },
 

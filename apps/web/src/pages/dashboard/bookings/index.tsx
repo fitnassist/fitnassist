@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import {
   Button,
@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks';
 import { useTrainerBookings, useUpcomingBookings } from '@/api/booking';
 import { trpc } from '@/lib/trpc';
 import { routes } from '@/config/routes';
-import { BookingCard } from './components';
+import { BookingCard, SuggestAlternativeDialog } from './components';
 
 const getDateRange = (view: 'week' | 'month') => {
   const now = new Date();
@@ -35,7 +35,9 @@ const getDateRange = (view: 'week' | 'month') => {
 
 export const BookingsPage = () => {
   const { isTrainer, user } = useAuth();
+  const navigate = useNavigate();
   const [view, setView] = useState<'week' | 'month'>('week');
+  const [suggestBookingId, setSuggestBookingId] = useState<string | null>(null);
 
   const { startDate, endDate } = useMemo(() => getDateRange(view), [view]);
 
@@ -50,6 +52,11 @@ export const BookingsPage = () => {
 
   const bookings = isTrainer ? trainerBookings : upcomingBookings;
   const isLoading = isTrainer ? trainerLoading : upcomingLoading;
+
+  // Find the booking being suggested for (to get trainerId and durationMin)
+  const suggestBooking = suggestBookingId
+    ? bookings?.find((b) => b.id === suggestBookingId)
+    : null;
 
   // Group by date
   const groupedBookings = useMemo(() => {
@@ -182,12 +189,26 @@ export const BookingsPage = () => {
                     booking={booking}
                     isTrainer={isTrainer}
                     currentUserId={user?.id ?? ''}
+                    onSuggestAlternative={setSuggestBookingId}
+                    onViewSuggestions={(id) => navigate(routes.dashboardBookingDetail(id))}
+                    onReschedule={(id) => navigate(routes.dashboardBookingDetail(id))}
                   />
                 ))}
               </div>
             </div>
           ))}
         </div>
+
+        {/* Suggest Alternative Dialog */}
+        {suggestBooking && suggestBooking.trainer && (
+          <SuggestAlternativeDialog
+            open={!!suggestBookingId}
+            onOpenChange={(open) => { if (!open) setSuggestBookingId(null); }}
+            bookingId={suggestBooking.id}
+            trainerId={suggestBooking.trainer.id}
+            durationMin={suggestBooking.durationMin}
+          />
+        )}
       </PageLayout.Content>
     </PageLayout>
   );

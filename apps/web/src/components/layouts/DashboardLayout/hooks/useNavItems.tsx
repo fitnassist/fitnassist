@@ -62,6 +62,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     label: 'Bookings',
     href: routes.dashboardBookings,
     icon: <Calendar className="h-5 w-5" />,
+    badgeKey: 'pendingBookings' as const,
     requiredFeature: 'booking',
     mobileBottom: true,
   },

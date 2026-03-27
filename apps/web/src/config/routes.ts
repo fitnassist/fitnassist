@@ -50,6 +50,7 @@ export const routes = {
   dashboardOnboardingComplete: (responseId: string) => `/dashboard/onboarding/${responseId}`,
   dashboardAnalytics: '/dashboard/analytics',
   dashboardBookings: '/dashboard/bookings',
+  dashboardBookingDetail: (id: string) => `/dashboard/bookings/${id}`,
   dashboardBookingsBook: (trainerId: string) => `/dashboard/bookings/book/${trainerId}`,
   dashboardFeed: '/dashboard/feed',
   dashboardFriends: '/dashboard/friends',

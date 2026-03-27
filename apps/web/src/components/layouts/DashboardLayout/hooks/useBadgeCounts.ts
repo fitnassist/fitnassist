@@ -34,11 +34,18 @@ export const useBadgeCounts = (isAuthenticated: boolean, isTrainer: boolean, sse
     refetchInterval: sseConnected ? false : BADGE_POLL_INTERVAL,
   });
 
+  // Fetch pending booking count (bookings awaiting current user's confirmation)
+  const { data: pendingBookingCount } = trpc.booking.getPendingCount.useQuery(undefined, {
+    enabled: isAuthenticated,
+    refetchInterval: sseConnected ? false : BADGE_POLL_INTERVAL,
+  });
+
   return {
     messages: unreadMessages?.count ?? 0,
     requests: pendingRequests?.count ?? 0,
     onboarding: pendingOnboarding ?? 0,
     friendRequests: pendingFriendRequests ?? 0,
     newFeed: newFeedCount ?? 0,
+    pendingBookings: pendingBookingCount?.count ?? 0,
   };
 };
