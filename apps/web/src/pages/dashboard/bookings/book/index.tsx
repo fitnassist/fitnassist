@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import type { AddressDetails } from '@/components/ui';
+import { Skeleton } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { useAvailableDates, useAvailableSlots } from '@/api/availability';
 import { useCreateBooking } from '@/api/booking';
@@ -20,7 +21,7 @@ export const BookSessionPage = () => {
   const createBooking = useCreateBooking();
 
   // Get trainer info
-  const { data: trainer } = trpc.trainer.getById.useQuery(
+  const { data: trainer, isLoading: trainerLoading } = trpc.trainer.getById.useQuery(
     { id: trainerId! },
     { enabled: !!trainerId }
   );
@@ -116,6 +117,36 @@ export const BookSessionPage = () => {
         backLink={{ label: 'Back to bookings', to: routes.dashboardBookings }}
       />
       <PageLayout.Content>
+        {trainerLoading ? (
+          <div className="space-y-6">
+            {/* Step indicator skeleton */}
+            <div className="flex items-center gap-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Skeleton className="h-8 w-8 rounded-full" />
+                  {i < 3 && <Skeleton className="w-8 h-px" />}
+                </div>
+              ))}
+            </div>
+            {/* Calendar skeleton */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <Skeleton className="h-8 w-8 rounded" />
+                <Skeleton className="h-5 w-36" />
+                <Skeleton className="h-8 w-8 rounded" />
+              </div>
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <Skeleton key={`h-${i}`} className="h-4 w-full mx-auto" />
+                ))}
+                {Array.from({ length: 35 }).map((_, i) => (
+                  <Skeleton key={i} className="h-9 w-9 rounded-full mx-auto" />
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+        <>
         {/* Step indicators */}
         <div className="flex items-center gap-2 mb-6">
           {(['date', 'time', 'location', 'confirm'] as Step[]).map((s, i) => (
@@ -217,6 +248,8 @@ export const BookSessionPage = () => {
             onBack={() => setStep('location')}
             isSubmitting={createBooking.isPending}
           />
+        )}
+        </>
         )}
       </PageLayout.Content>
     </PageLayout>

@@ -66,7 +66,7 @@ export const bookingRepository = {
       where: {
         trainerId,
         date: { gte: startDate, lte: endDate },
-        ...(status ? { status } : { status: { notIn: ['DECLINED'] } }),
+        ...(status ? { status } : { status: { notIn: ['DECLINED', 'CANCELLED_BY_TRAINER', 'CANCELLED_BY_CLIENT', 'RESCHEDULED'] } }),
       },
       include: bookingInclude,
       orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
