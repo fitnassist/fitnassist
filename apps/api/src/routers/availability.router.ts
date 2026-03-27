@@ -7,6 +7,7 @@ import {
   getAvailableSlotsSchema,
   getAvailableDatesSchema,
   updateTravelSettingsSchema,
+  updateVideoSettingsSchema,
 } from '@fitnassist/schemas';
 import { prisma } from '../lib/prisma';
 
@@ -99,6 +100,27 @@ export const availabilityRouter = router({
       select: { travelBufferMin: true, smartTravelEnabled: true },
     });
     return trainer ?? { travelBufferMin: 15, smartTravelEnabled: false };
+  }),
+
+  // Trainer: update video session settings (ELITE only)
+  updateVideoSettings: trainerProcedure
+    .use(requireTier('ELITE'))
+    .input(updateVideoSettingsSchema)
+    .mutation(async ({ input, ctx }) => {
+      return prisma.trainerProfile.update({
+        where: { userId: ctx.user.id },
+        data: input,
+        select: { offersVideoSessions: true },
+      });
+    }),
+
+  // Trainer: get video session settings
+  getVideoSettings: trainerProcedure.query(async ({ ctx }) => {
+    const trainer = await prisma.trainerProfile.findUnique({
+      where: { userId: ctx.user.id },
+      select: { offersVideoSessions: true },
+    });
+    return trainer ?? { offersVideoSessions: false };
   }),
 
   // Public: get available slots for a trainer on a date

@@ -34,6 +34,7 @@ export {
   FriendshipStatus,
   PostType,
   BookingSuggestionStatus,
+  SessionType,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -126,4 +127,5 @@ export {
   VisibilitySchema,
   PostTypeSchema,
   FriendshipStatusSchema,
+  SessionTypeSchema,
 } from './generated/zod/inputTypeSchemas';

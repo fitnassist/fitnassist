@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
-  Calendar, Clock, MapPin, User, Check, X, CalendarClock, ArrowRight, AlertTriangle, MoreVertical,
+  Calendar, Clock, MapPin, User, Check, X, CalendarClock, ArrowRight, AlertTriangle, MoreVertical, Video,
 } from 'lucide-react';
 import {
   Button, Badge, Card, CardContent, ConfirmDialog,
@@ -143,9 +143,17 @@ export const BookingDetailPage = () => {
                   <User className="h-5 w-5 text-muted-foreground" />
                   <span className="font-medium">{otherPartyName}</span>
                 </div>
-                <Badge variant={STATUS_VARIANTS[booking.status] ?? 'secondary'} className="text-sm">
-                  {STATUS_LABELS[booking.status] ?? booking.status}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant={STATUS_VARIANTS[booking.status] ?? 'secondary'} className="text-sm">
+                    {STATUS_LABELS[booking.status] ?? booking.status}
+                  </Badge>
+                  {booking.sessionType === 'VIDEO_CALL' && (
+                    <Badge variant="outline" className="gap-1">
+                      <Video className="h-3 w-3" />
+                      Video Call
+                    </Badge>
+                  )}
+                </div>
               </div>
 
               {isInitiator && (
@@ -172,6 +180,17 @@ export const BookingDetailPage = () => {
                   </div>
                 )}
               </div>
+
+              {/* Join Call button for confirmed video sessions */}
+              {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && (
+                <Button
+                  className="w-full"
+                  onClick={() => window.open(booking.dailyRoomUrl!, '_blank')}
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  Join Video Call
+                </Button>
+              )}
 
               {booking.notes && (
                 <div>

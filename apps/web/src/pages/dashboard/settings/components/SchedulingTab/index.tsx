@@ -1,6 +1,7 @@
 import { WeeklyScheduleBuilder } from './WeeklyScheduleBuilder';
 import { SessionLocationList } from './SessionLocationList';
 import { TravelSettings } from './TravelSettings';
+import { VideoSettings } from './VideoSettings';
 import { DateOverrides } from './DateOverrides';
 
 export const SchedulingTab = () => {
@@ -9,6 +10,7 @@ export const SchedulingTab = () => {
       <WeeklyScheduleBuilder />
       <SessionLocationList />
       <TravelSettings />
+      <VideoSettings />
       <DateOverrides />
     </div>
   );

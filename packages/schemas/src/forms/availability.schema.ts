@@ -49,3 +49,9 @@ export const updateTravelSettingsSchema = z.object({
 });
 
 export type UpdateTravelSettingsInput = z.infer<typeof updateTravelSettingsSchema>;
+
+export const updateVideoSettingsSchema = z.object({
+  offersVideoSessions: z.boolean(),
+});
+
+export type UpdateVideoSettingsInput = z.infer<typeof updateVideoSettingsSchema>;

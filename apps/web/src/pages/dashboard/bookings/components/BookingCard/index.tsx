@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, MapPin, User, MoreVertical, X, Check, AlertTriangle, CalendarClock, MessageSquare, ArrowRight } from 'lucide-react';
+import { Clock, MapPin, User, MoreVertical, X, Check, AlertTriangle, CalendarClock, MessageSquare, ArrowRight, Video } from 'lucide-react';
 import {
   Button, Badge, Card, CardContent,
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -21,6 +21,8 @@ interface BookingCardProps {
     durationMin: number;
     status: string;
     initiatedBy?: string | null;
+    sessionType?: string;
+    dailyRoomUrl?: string | null;
     notes?: string | null;
     cancellationReason?: string | null;
     declineReason?: string | null;
@@ -127,6 +129,12 @@ export const BookingCard = ({
                 <Badge variant={STATUS_VARIANTS[booking.status] ?? 'secondary'}>
                   {STATUS_LABELS[booking.status] ?? booking.status}
                 </Badge>
+                {booking.sessionType === 'VIDEO_CALL' && (
+                  <Badge variant="outline" className="gap-1">
+                    <Video className="h-3 w-3" />
+                    Video
+                  </Badge>
+                )}
                 {isInitiator && booking.status === 'PENDING' && (
                   <span className="text-xs text-muted-foreground">Awaiting confirmation</span>
                 )}
@@ -166,6 +174,17 @@ export const BookingCard = ({
 
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
+              {/* Join Call button for confirmed video calls */}
+              {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && (
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={() => window.open(booking.dailyRoomUrl!, '_blank')}
+                >
+                  <Video className="h-4 w-4 mr-1" />
+                  Join Call
+                </Button>
+              )}
               {/* Pending: confirm/decline buttons for the confirming party */}
               {isConfirmingParty && (
                 <>

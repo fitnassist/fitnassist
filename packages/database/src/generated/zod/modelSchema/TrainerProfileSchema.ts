@@ -41,6 +41,7 @@ export const TrainerProfileSchema = z.object({
   isPublished: z.boolean(),
   travelBufferMin: z.number().int().min(0).max(120),
   smartTravelEnabled: z.boolean(),
+  offersVideoSessions: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -60,6 +61,7 @@ export const TrainerProfileOptionalDefaultsSchema = TrainerProfileSchema.merge(z
   isPublished: z.boolean().optional(),
   travelBufferMin: z.number().int().min(0).max(120).optional(),
   smartTravelEnabled: z.boolean().optional(),
+  offersVideoSessions: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }))

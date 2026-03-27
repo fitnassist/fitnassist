@@ -55,6 +55,11 @@ enum BillingPeriod {
   ANNUAL
 }
 
+enum SessionType {
+  IN_PERSON
+  VIDEO_CALL
+}
+
 enum BookingStatus {
   PENDING
   CONFIRMED
@@ -360,6 +365,7 @@ model TrainerProfile {
   /// @zod.number.int().min(0).max(120)
   travelBufferMin      Int              @default(15)
   smartTravelEnabled   Boolean          @default(false)
+  offersVideoSessions  Boolean          @default(false)
 
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -1420,6 +1426,10 @@ model Booking {
   clientPostcode     String?
   clientLatitude     Float?
   clientLongitude    Float?
+  sessionType        SessionType     @default(IN_PERSON)
+  /// @zod.string.url()
+  dailyRoomUrl       String?
+  dailyRoomName      String?
   status             BookingStatus   @default(PENDING)
   initiatedBy        String?
   /// @zod.string.max(500)

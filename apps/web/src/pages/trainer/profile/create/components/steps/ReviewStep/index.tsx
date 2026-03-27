@@ -37,7 +37,6 @@ interface ReviewStepProps extends WizardStepProps {
 
 export const ReviewStep = ({
   data,
-  onUpdate,
   onBack,
   onGoToStep,
   isSubmitting,

@@ -1,10 +1,11 @@
-import { Calendar, Clock, MapPin } from 'lucide-react';
+import { Calendar, Clock, MapPin, Video } from 'lucide-react';
 import { Button, Card, CardContent } from '@/components/ui';
 
 interface BookingConfirmationProps {
   date: string;
   startTime: string;
   durationMin: number;
+  sessionType?: string;
   locationName?: string;
   clientAddress?: string;
   notes: string;
@@ -18,6 +19,7 @@ export const BookingConfirmation = ({
   date,
   startTime,
   durationMin,
+  sessionType,
   locationName,
   clientAddress,
   notes,
@@ -53,8 +55,17 @@ export const BookingConfirmation = ({
               <span>{startTime} - {endTime} ({durationMin} min)</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span>{locationName || clientAddress || 'No location specified'}</span>
+              {sessionType === 'VIDEO_CALL' ? (
+                <>
+                  <Video className="h-4 w-4 text-muted-foreground" />
+                  <span>Video Call</span>
+                </>
+              ) : (
+                <>
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>{locationName || clientAddress || 'No location specified'}</span>
+                </>
+              )}
             </div>
           </div>
         </CardContent>

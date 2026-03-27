@@ -273,6 +273,8 @@ export const emailTemplates = {
     locationName?: string;
     notes?: string;
     isTrainer: boolean;
+    sessionType?: string;
+    dailyRoomUrl?: string;
   }) =>
     layout(`
       <h2 style="margin: 0 0 16px;">Booking confirmed</h2>
@@ -287,6 +289,10 @@ export const emailTemplates = {
             <td style="padding: 4px 0; color: #888;">Time</td>
             <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime} (${data.durationMin} min)</td>
           </tr>
+          ${data.sessionType === 'VIDEO_CALL' ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Type</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">Video Call</td>
+          </tr>` : ''}
           ${data.locationName ? `<tr>
             <td style="padding: 4px 0; color: #888;">Location</td>
             <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.locationName}</td>
@@ -297,6 +303,11 @@ export const emailTemplates = {
           </tr>` : ''}
         </table>
       </div>
+      ${data.dailyRoomUrl ? `<p style="margin-top: 16px;">
+        <a href="${data.dailyRoomUrl}" style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          Join Video Call
+        </a>
+      </p>` : ''}
       <p style="margin-top: 24px;">
         <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
           View bookings
@@ -348,10 +359,12 @@ export const emailTemplates = {
     locationName?: string;
     notes?: string;
     isTrainer: boolean;
+    sessionType?: string;
+    dailyRoomUrl?: string;
   }) =>
     layout(`
       <h2 style="margin: 0 0 16px;">Session tomorrow</h2>
-      <p>Hi ${data.recipientName}, this is a reminder that you have a session ${data.isTrainer ? `with ${data.otherPartyName}` : `with ${data.otherPartyName}`} tomorrow.</p>
+      <p>Hi ${data.recipientName}, this is a reminder that you have a session with ${data.otherPartyName} tomorrow.</p>
       <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
         <table style="width: 100%; font-size: 14px;">
           <tr>
@@ -362,6 +375,10 @@ export const emailTemplates = {
             <td style="padding: 4px 0; color: #888;">Time</td>
             <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime} (${data.durationMin} min)</td>
           </tr>
+          ${data.sessionType === 'VIDEO_CALL' ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Type</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">Video Call</td>
+          </tr>` : ''}
           ${data.locationName ? `<tr>
             <td style="padding: 4px 0; color: #888;">Location</td>
             <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.locationName}</td>
@@ -372,6 +389,11 @@ export const emailTemplates = {
           </tr>` : ''}
         </table>
       </div>
+      ${data.dailyRoomUrl ? `<p style="margin-top: 16px;">
+        <a href="${data.dailyRoomUrl}" style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          Join Video Call
+        </a>
+      </p>` : ''}
       <p style="margin-top: 24px;">
         <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
           View bookings
@@ -388,6 +410,7 @@ export const emailTemplates = {
     durationMin: number;
     locationName?: string;
     notes?: string;
+    sessionType?: string;
   }) =>
     layout(`
       <h2 style="margin: 0 0 16px;">Session request</h2>
@@ -402,6 +425,10 @@ export const emailTemplates = {
             <td style="padding: 4px 0; color: #888;">Time</td>
             <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime} (${data.durationMin} min)</td>
           </tr>
+          ${data.sessionType === 'VIDEO_CALL' ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Type</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">Video Call</td>
+          </tr>` : ''}
           ${data.locationName ? `<tr>
             <td style="padding: 4px 0; color: #888;">Location</td>
             <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.locationName}</td>

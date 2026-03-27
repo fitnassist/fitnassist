@@ -41,6 +41,7 @@ export * from './SessionLocationSchema';
 export * from './AvailabilitySchema';
 export * from './AvailabilityOverrideSchema';
 export * from './BookingSchema';
+export * from './BookingSuggestionSchema';
 export * from './TravelTimeCacheSchema';
 export * from './NotificationSchema';
 export * from './PushSubscriptionSchema';

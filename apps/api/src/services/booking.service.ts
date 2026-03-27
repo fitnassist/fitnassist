@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server';
-import type { BookingStatus } from '@fitnassist/database';
+import type { BookingStatus, SessionType } from '@fitnassist/database';
 import { bookingRepository } from '../repositories/booking.repository';
 import { bookingSuggestionRepository } from '../repositories/booking-suggestion.repository';
 import { clientRosterRepository } from '../repositories/client-roster.repository';
@@ -7,6 +7,7 @@ import { availabilityService } from './availability.service';
 import { bookingNotificationService } from './booking-notification.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
+import { dailyService } from '../lib/daily';
 
 const HOLD_DURATION_MS = 48 * 60 * 60 * 1000; // 48 hours
 
@@ -83,6 +84,7 @@ export const bookingService = {
     clientLongitude?: number;
     notes?: string;
     initiatedBy: string;
+    sessionType?: SessionType;
   }) => {
     // Verify the client roster exists, belongs to this trainer, and is active
     const roster = await clientRosterRepository.findById(data.clientRosterId);
@@ -198,9 +200,26 @@ export const bookingService = {
       throw new TRPCError({ code: 'FORBIDDEN', message: 'You are not authorized to confirm this booking' });
     }
 
+    // Create Daily.co room for video calls
+    let dailyData: { dailyRoomUrl?: string; dailyRoomName?: string } = {};
+    if (booking.sessionType === 'VIDEO_CALL') {
+      try {
+        const dateStr = booking.date instanceof Date
+          ? booking.date.toISOString().split('T')[0]
+          : new Date(booking.date).toISOString().split('T')[0];
+        const sessionEnd = new Date(`${dateStr}T${booking.endTime}:00`);
+        const room = await dailyService.createRoom(id, sessionEnd);
+        dailyData = { dailyRoomUrl: room.url, dailyRoomName: room.name };
+      } catch (err) {
+        console.error('[Daily] Failed to create room for booking', id, err);
+        // Don't block confirmation if room creation fails
+      }
+    }
+
     const updated = await bookingRepository.update(id, {
       status: 'CONFIRMED',
       holdExpiresAt: null,
+      ...dailyData,
     });
 
     const dateLabel = formatDateLabel(booking.date);
@@ -305,11 +324,20 @@ export const bookingService = {
 
     const status: BookingStatus = isTrainer ? 'CANCELLED_BY_TRAINER' : 'CANCELLED_BY_CLIENT';
 
+    // Delete Daily.co room if this was a video call
+    if (booking.dailyRoomName) {
+      dailyService.deleteRoom(booking.dailyRoomName).catch((err) => {
+        console.error('[Daily] Failed to delete room on cancel:', err);
+      });
+    }
+
     const updated = await bookingRepository.update(id, {
       status,
       cancellationReason: reason,
       cancelledAt: new Date(),
       holdExpiresAt: null,
+      dailyRoomUrl: null,
+      dailyRoomName: null,
     });
 
     const trainerUserId = booking.trainer.userId;
@@ -391,6 +419,13 @@ export const bookingService = {
 
     const holdExpiresAt = new Date(Date.now() + HOLD_DURATION_MS);
 
+    // Delete old Daily room if video call
+    if (booking.dailyRoomName) {
+      dailyService.deleteRoom(booking.dailyRoomName).catch((err) => {
+        console.error('[Daily] Failed to delete room on reschedule:', err);
+      });
+    }
+
     // Create new booking as PENDING
     const newBooking = await bookingRepository.createWithLock(
       booking.trainerId,
@@ -405,6 +440,7 @@ export const bookingService = {
         startTime: newStartTime,
         endTime: newEndTime,
         durationMin: newDurationMin,
+        sessionType: booking.sessionType,
         clientAddress: booking.clientAddress,
         clientPostcode: booking.clientPostcode,
         clientLatitude: booking.clientLatitude,
@@ -552,6 +588,21 @@ export const bookingService = {
       const durationMin = ((durationParts[0] ?? 0) * 60 + (durationParts[1] ?? 0)) -
                           ((startParts[0] ?? 0) * 60 + (startParts[1] ?? 0));
 
+      // Create Daily.co room for video calls
+      let dailyData: { dailyRoomUrl?: string; dailyRoomName?: string } = {};
+      if (booking.sessionType === 'VIDEO_CALL') {
+        try {
+          const dateStr = suggestion.date instanceof Date
+            ? suggestion.date.toISOString().split('T')[0]
+            : new Date(suggestion.date).toISOString().split('T')[0];
+          const sessionEnd = new Date(`${dateStr}T${suggestion.endTime}:00`);
+          const room = await dailyService.createRoom(booking.id, sessionEnd);
+          dailyData = { dailyRoomUrl: room.url, dailyRoomName: room.name };
+        } catch (err) {
+          console.error('[Daily] Failed to create room for suggestion accept', booking.id, err);
+        }
+      }
+
       // Update the booking with the suggested time and confirm it
       await bookingRepository.update(booking.id, {
         date: suggestion.date,
@@ -560,6 +611,7 @@ export const bookingService = {
         durationMin: durationMin > 0 ? durationMin : undefined,
         status: 'CONFIRMED',
         holdExpiresAt: null,
+        ...dailyData,
       });
 
       // Accept this suggestion, decline all others

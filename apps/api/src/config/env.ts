@@ -41,6 +41,9 @@ const envSchema = z.object({
   VAPID_PRIVATE_KEY: z.string().optional(),
   VAPID_SUBJECT: z.string().optional(),
 
+  // Daily.co (Video Calls)
+  DAILY_API_KEY: z.string().optional(),
+
   // Cron job authentication
   CRON_SECRET: z.string().optional(),
 });

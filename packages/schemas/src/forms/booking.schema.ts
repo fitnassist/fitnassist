@@ -2,6 +2,10 @@ import { z } from 'zod';
 
 const timeRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+export const sessionTypeSchema = z.enum(['IN_PERSON', 'VIDEO_CALL']);
+
+export type SessionType = z.infer<typeof sessionTypeSchema>;
+
 export const createBookingSchema = z.object({
   trainerId: z.string().cuid(),
   clientRosterId: z.string().cuid(),
@@ -9,6 +13,7 @@ export const createBookingSchema = z.object({
   date: z.string(), // ISO date string
   startTime: z.string().regex(timeRegex),
   durationMin: z.number().int().min(15).max(180),
+  sessionType: sessionTypeSchema.optional().default('IN_PERSON'),
   clientAddress: z.string().max(200).optional(),
   clientPostcode: z.string().max(20).optional(),
   clientLatitude: z.number().min(-90).max(90).optional(),
@@ -89,6 +94,7 @@ export const createBookingForClientSchema = z.object({
   date: z.string(),
   startTime: z.string().regex(timeRegex),
   durationMin: z.number().int().min(15).max(180),
+  sessionType: sessionTypeSchema.optional().default('IN_PERSON'),
   clientAddress: z.string().max(200).optional(),
   clientPostcode: z.string().max(20).optional(),
   clientLatitude: z.number().min(-90).max(90).optional(),

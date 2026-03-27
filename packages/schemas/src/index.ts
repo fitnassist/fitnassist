@@ -49,6 +49,7 @@ export {
   SubscriptionStatusSchema,
   BillingPeriodSchema,
   BookingStatusSchema,
+  SessionTypeSchema,
   DayOfWeekSchema,
   GoalSchema,
   GoalOptionalDefaultsSchema,

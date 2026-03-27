@@ -86,6 +86,7 @@ export const bookingNotificationService = {
             durationMin: booking.durationMin,
             locationName,
             notes: booking.notes ?? undefined,
+            sessionType: booking.sessionType,
           }),
         });
       }
@@ -110,6 +111,8 @@ export const bookingNotificationService = {
       durationMin: booking.durationMin,
       locationName,
       notes: booking.notes ?? undefined,
+      sessionType: booking.sessionType,
+      dailyRoomUrl: booking.dailyRoomUrl ?? undefined,
     };
 
     if (trainerUser?.email) {
@@ -378,6 +381,8 @@ export const bookingNotificationService = {
         durationMin: booking.durationMin,
         locationName,
         notes: booking.notes ?? undefined,
+        sessionType: booking.sessionType,
+        dailyRoomUrl: booking.dailyRoomUrl ?? undefined,
       };
 
       if (trainerUser?.email) {

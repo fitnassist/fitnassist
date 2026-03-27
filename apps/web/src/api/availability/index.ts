@@ -51,6 +51,19 @@ export const useUpdateTravelSettings = () => {
   });
 };
 
+export const useVideoSettings = () => {
+  return trpc.availability.getVideoSettings.useQuery();
+};
+
+export const useUpdateVideoSettings = () => {
+  const utils = trpc.useUtils();
+  return trpc.availability.updateVideoSettings.useMutation({
+    onSuccess: () => {
+      utils.availability.getVideoSettings.invalidate();
+    },
+  });
+};
+
 export const useAvailableSlots = (trainerId: string, date: string, durationMin?: number) => {
   return trpc.availability.getSlots.useQuery(
     { trainerId, date, durationMin },

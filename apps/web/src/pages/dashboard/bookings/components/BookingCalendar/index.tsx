@@ -5,7 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import type { EventClickArg, EventContentArg, DatesSetArg } from '@fullcalendar/core';
-import { User } from 'lucide-react';
+import { User, Video } from 'lucide-react';
 import { useTrainerBookings } from '@/api/booking';
 import { routes } from '@/config/routes';
 import './booking-calendar.css';
@@ -30,17 +30,18 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const EventContent = ({ event }: EventContentArg) => {
-  const { name, status, isTimeGrid } = event.extendedProps as {
+  const { name, status, isTimeGrid, sessionType } = event.extendedProps as {
     name: string;
     status: string;
     isTimeGrid: boolean;
+    sessionType?: string;
   };
 
   if (isTimeGrid) {
     return (
       <div className="flex flex-col gap-0.5 overflow-hidden">
         <div className="flex items-center gap-1 font-medium truncate">
-          <User className="h-3 w-3 shrink-0" />
+          {sessionType === 'VIDEO_CALL' ? <Video className="h-3 w-3 shrink-0" /> : <User className="h-3 w-3 shrink-0" />}
           <span className="truncate">{name}</span>
         </div>
         <span className="text-[0.65rem] opacity-75">
@@ -111,6 +112,7 @@ export const BookingCalendar = ({ isTrainer, view }: BookingCalendarProps) => {
         extendedProps: {
           name,
           status: booking.status,
+          sessionType: booking.sessionType,
           isTimeGrid: view === 'week',
         },
       };
