@@ -22,29 +22,78 @@ export const useClientRosterBookings = (clientRosterId: string) => {
   );
 };
 
+const invalidateBookingQueries = (utils: ReturnType<typeof trpc.useUtils>) => {
+  utils.booking.upcoming.invalidate();
+  utils.booking.listByDateRange.invalidate();
+  utils.booking.get.invalidate();
+  utils.availability.getSlots.invalidate();
+  utils.trainer.getDashboardStats.invalidate();
+  utils.analytics.bookingAnalytics.invalidate();
+};
+
 export const useCreateBooking = () => {
   const utils = trpc.useUtils();
   return trpc.booking.create.useMutation({
+    onSuccess: () => invalidateBookingQueries(utils),
+  });
+};
+
+export const useCreateBookingForClient = () => {
+  const utils = trpc.useUtils();
+  return trpc.booking.createForClient.useMutation({
+    onSuccess: () => invalidateBookingQueries(utils),
+  });
+};
+
+export const useConfirmBooking = () => {
+  const utils = trpc.useUtils();
+  return trpc.booking.confirm.useMutation({
+    onSuccess: () => invalidateBookingQueries(utils),
+  });
+};
+
+export const useDeclineBooking = () => {
+  const utils = trpc.useUtils();
+  return trpc.booking.decline.useMutation({
+    onSuccess: () => invalidateBookingQueries(utils),
+  });
+};
+
+export const useRescheduleBooking = () => {
+  const utils = trpc.useUtils();
+  return trpc.booking.reschedule.useMutation({
+    onSuccess: () => invalidateBookingQueries(utils),
+  });
+};
+
+export const useSuggestAlternative = () => {
+  const utils = trpc.useUtils();
+  return trpc.booking.suggestAlternative.useMutation({
     onSuccess: () => {
-      utils.booking.upcoming.invalidate();
-      utils.booking.listByDateRange.invalidate();
-      utils.availability.getSlots.invalidate();
-      utils.trainer.getDashboardStats.invalidate();
-      utils.analytics.bookingAnalytics.invalidate();
+      utils.booking.getSuggestions.invalidate();
+      utils.booking.get.invalidate();
     },
   });
+};
+
+export const useRespondToSuggestion = () => {
+  const utils = trpc.useUtils();
+  return trpc.booking.respondToSuggestion.useMutation({
+    onSuccess: () => invalidateBookingQueries(utils),
+  });
+};
+
+export const useBookingSuggestions = (bookingId: string) => {
+  return trpc.booking.getSuggestions.useQuery(
+    { bookingId },
+    { enabled: !!bookingId }
+  );
 };
 
 export const useCancelBooking = () => {
   const utils = trpc.useUtils();
   return trpc.booking.cancel.useMutation({
-    onSuccess: () => {
-      utils.booking.upcoming.invalidate();
-      utils.booking.listByDateRange.invalidate();
-      utils.availability.getSlots.invalidate();
-      utils.trainer.getDashboardStats.invalidate();
-      utils.analytics.bookingAnalytics.invalidate();
-    },
+    onSuccess: () => invalidateBookingQueries(utils),
   });
 };
 

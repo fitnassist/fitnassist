@@ -56,7 +56,10 @@ enum BillingPeriod {
 }
 
 enum BookingStatus {
+  PENDING
   CONFIRMED
+  DECLINED
+  RESCHEDULED
   CANCELLED_BY_TRAINER
   CANCELLED_BY_CLIENT
   COMPLETED
@@ -131,6 +134,12 @@ enum NotificationType {
   POST_LIKED
   DIARY_ENTRY_LIKED
   BADGE_EARNED
+  BOOKING_PENDING
+  BOOKING_CONFIRMED
+  BOOKING_DECLINED
+  BOOKING_SUGGESTION
+  BOOKING_RESCHEDULED
+  BOOKING_EXPIRED
 }
 
 enum FriendshipStatus {
@@ -228,6 +237,8 @@ model User {
   postLikes        PostLike[]
   diaryEntryLikes  DiaryEntryLike[]
   badges           UserBadge[]
+  initiatedBookings Booking[]
+  bookingSuggestions BookingSuggestion[]
 
   @@map("users")
 }
@@ -1409,10 +1420,16 @@ model Booking {
   clientPostcode     String?
   clientLatitude     Float?
   clientLongitude    Float?
-  status             BookingStatus   @default(CONFIRMED)
+  status             BookingStatus   @default(PENDING)
+  initiatedBy        String?
   /// @zod.string.max(500)
   cancellationReason String?
   cancelledAt        DateTime?
+  /// @zod.string.max(500)
+  declineReason      String?
+  declinedAt         DateTime?
+  holdExpiresAt      DateTime?
+  rescheduledFromId  String?         @unique
   reminderSentAt     DateTime?
   /// @zod.string.max(500)
   notes              String?
@@ -1422,11 +1439,41 @@ model Booking {
   trainer            TrainerProfile  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
   clientRoster       ClientRoster    @relation(fields: [clientRosterId], references: [id], onDelete: Cascade)
   location           SessionLocation? @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  initiator          User?           @relation(fields: [initiatedBy], references: [id], onDelete: SetNull)
+  rescheduledFrom    Booking?        @relation("RescheduleChain", fields: [rescheduledFromId], references: [id], onDelete: SetNull)
+  rescheduledTo      Booking?        @relation("RescheduleChain")
+  suggestions        BookingSuggestion[]
 
   @@index([trainerId, date])
   @@index([clientRosterId])
   @@index([date, status])
+  @@index([holdExpiresAt])
   @@map("bookings")
+}
+
+enum BookingSuggestionStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model BookingSuggestion {
+  id          String                  @id @default(cuid())
+  bookingId   String
+  suggestedBy String
+  date        DateTime                @db.Date
+  /// @zod.string.regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+  startTime   String
+  /// @zod.string.regex(/^([01]\d|2[0-3]):[0-5]\d$/)
+  endTime     String
+  status      BookingSuggestionStatus @default(PENDING)
+  createdAt   DateTime                @default(now())
+
+  booking     Booking                 @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  suggestor   User                    @relation(fields: [suggestedBy], references: [id])
+
+  @@index([bookingId])
+  @@map("booking_suggestions")
 }
 
 model TravelTimeCache {

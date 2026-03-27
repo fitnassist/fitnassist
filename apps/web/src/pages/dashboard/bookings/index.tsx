@@ -34,7 +34,7 @@ const getDateRange = (view: 'week' | 'month') => {
 };
 
 export const BookingsPage = () => {
-  const { isTrainer } = useAuth();
+  const { isTrainer, user } = useAuth();
   const [view, setView] = useState<'week' | 'month'>('week');
 
   const { startDate, endDate } = useMemo(() => getDateRange(view), [view]);
@@ -177,7 +177,12 @@ export const BookingsPage = () => {
               </h3>
               <div className="space-y-2">
                 {groupedBookings[dateKey]?.map((booking) => (
-                  <BookingCard key={booking.id} booking={booking} isTrainer={isTrainer} />
+                  <BookingCard
+                    key={booking.id}
+                    booking={booking}
+                    isTrainer={isTrainer}
+                    currentUserId={user?.id ?? ''}
+                  />
                 ))}
               </div>
             </div>

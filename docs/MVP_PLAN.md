@@ -153,7 +153,7 @@ For reference, the following is live:
 - Badge showcase on profile
 - Achievement notifications
 
-### 5.5 Privacy Controls
+### 5.5 Privacy Controls ✅
 - Granular control over what data is visible
 - Public vs friends-only vs private settings
 - Opt out of leaderboards

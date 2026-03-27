@@ -85,10 +85,18 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
 
       // --- Booking events ---
       case 'booking_created':
-      case 'booking_cancelled': {
+      case 'booking_cancelled':
+      case 'booking_pending':
+      case 'booking_confirmed':
+      case 'booking_declined':
+      case 'booking_rescheduled':
+      case 'booking_hold_expired':
+      case 'booking_suggestion': {
         utils.booking.upcoming.invalidate();
         utils.booking.listByDateRange.invalidate();
         utils.booking.listByClientRoster.invalidate();
+        utils.booking.get.invalidate();
+        utils.booking.getSuggestions.invalidate();
         utils.availability.getSlots.invalidate();
         utils.trainer.getDashboardStats.invalidate();
         utils.analytics.bookingAnalytics.invalidate();

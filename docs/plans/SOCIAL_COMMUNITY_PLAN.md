@@ -693,7 +693,7 @@ pages/dashboard/achievements/
 
 ---
 
-## Phase 5.6: Privacy Controls (cross-cutting)
+## Phase 5.6: Privacy Controls (cross-cutting) ✅
 
 ### Goal
 Ensure all social features respect the privacy model and give trainees a single page to manage everything.
@@ -743,7 +743,7 @@ Build incrementally in this order:
 3. **5.3 Posts & Feed** — create posts, activity feed, likes
 4. **5.4 Leaderboards** — computed rankings with opt-in
 5. **5.5 Achievements & Badges** — badge definitions, awarding, showcase
-6. **5.6 Privacy hardening** — audit all endpoints, ensure enforcement
+6. **5.6 Privacy hardening** — audit all endpoints, ensure enforcement ✅
 
 Each sub-phase is independently deployable — the system works after each step.
 

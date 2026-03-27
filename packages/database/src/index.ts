@@ -33,6 +33,7 @@ export {
   Visibility,
   FriendshipStatus,
   PostType,
+  BookingSuggestionStatus,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -88,6 +89,8 @@ export type {
   Post,
   PostLike,
   DiaryEntryLike,
+  BookingSuggestion,
+  UserBadge,
 } from '@prisma/client';
 
 // Re-export generated Zod schemas from model schemas

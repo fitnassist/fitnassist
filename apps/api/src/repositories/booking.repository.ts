@@ -1,23 +1,38 @@
 import { prisma } from '../lib/prisma';
 import type { BookingStatus, Prisma } from '@fitnassist/database';
 
+const SLOT_BLOCKING_STATUSES: BookingStatus[] = ['CONFIRMED', 'PENDING'];
+
+const bookingInclude = {
+  location: true,
+  trainer: {
+    select: { id: true, displayName: true, userId: true },
+  },
+  clientRoster: {
+    include: {
+      connection: {
+        include: {
+          sender: { select: { id: true, name: true, email: true, image: true } },
+        },
+      },
+    },
+  },
+  suggestions: {
+    orderBy: { createdAt: 'desc' as const },
+  },
+} satisfies Prisma.BookingInclude;
+
 export const bookingRepository = {
   findById: (id: string) => {
     return prisma.booking.findUnique({
       where: { id },
       include: {
-        location: true,
-        clientRoster: {
-          include: {
-            connection: {
-              include: {
-                sender: { select: { id: true, name: true, email: true, image: true } },
-              },
-            },
-          },
+        ...bookingInclude,
+        rescheduledFrom: {
+          select: { id: true, date: true, startTime: true, endTime: true },
         },
-        trainer: {
-          select: { id: true, displayName: true, userId: true },
+        rescheduledTo: {
+          select: { id: true, date: true, startTime: true, endTime: true },
         },
       },
     });
@@ -28,7 +43,7 @@ export const bookingRepository = {
       where: {
         trainerId,
         date,
-        status: 'CONFIRMED',
+        status: { in: SLOT_BLOCKING_STATUSES },
       },
       include: {
         location: true,
@@ -53,18 +68,7 @@ export const bookingRepository = {
         date: { gte: startDate, lte: endDate },
         ...(status ? { status } : {}),
       },
-      include: {
-        location: true,
-        clientRoster: {
-          include: {
-            connection: {
-              include: {
-                sender: { select: { id: true, name: true, email: true, image: true } },
-              },
-            },
-          },
-        },
-      },
+      include: bookingInclude,
       orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
     });
   },
@@ -76,6 +80,9 @@ export const bookingRepository = {
         location: true,
         trainer: {
           select: { id: true, displayName: true, profileImageUrl: true, userId: true },
+        },
+        suggestions: {
+          orderBy: { createdAt: 'desc' as const },
         },
       },
       orderBy: [{ date: 'desc' }, { startTime: 'desc' }],
@@ -89,78 +96,40 @@ export const bookingRepository = {
     return prisma.booking.findMany({
       where: {
         date: { gte: today },
-        status: 'CONFIRMED',
+        status: { in: SLOT_BLOCKING_STATUSES },
         OR: [
           { trainer: { userId } },
           { clientRoster: { connection: { senderId: userId } } },
         ],
       },
       include: {
-        location: true,
-        trainer: {
-          select: { id: true, displayName: true, profileImageUrl: true, userId: true },
-        },
-        clientRoster: {
-          include: {
-            connection: {
-              include: {
-                sender: { select: { id: true, name: true, email: true, image: true } },
-              },
-            },
-          },
+        ...bookingInclude,
+        rescheduledFrom: {
+          select: { id: true, date: true, startTime: true, endTime: true },
         },
       },
       orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
     });
   },
 
-  create: (data: {
-    trainerId: string;
-    clientRosterId: string;
-    locationId?: string;
-    date: Date;
-    startTime: string;
-    endTime: string;
-    durationMin: number;
-    clientAddress?: string;
-    clientPostcode?: string;
-    clientLatitude?: number;
-    clientLongitude?: number;
-    notes?: string;
-  }) => {
+  create: (data: Prisma.BookingUncheckedCreateInput) => {
     return prisma.booking.create({
       data,
-      include: {
-        location: true,
-        trainer: {
-          select: { id: true, displayName: true, userId: true },
-        },
-        clientRoster: {
-          include: {
-            connection: {
-              include: {
-                sender: { select: { id: true, name: true, email: true } },
-              },
-            },
-          },
-        },
-      },
+      include: bookingInclude,
     });
   },
 
-  update: (id: string, data: {
-    status?: BookingStatus;
-    cancellationReason?: string;
-    cancelledAt?: Date;
-    reminderSentAt?: Date;
-    notes?: string;
-  }) => {
-    return prisma.booking.update({ where: { id }, data });
+  update: (id: string, data: Prisma.BookingUncheckedUpdateInput) => {
+    return prisma.booking.update({
+      where: { id },
+      data,
+      include: bookingInclude,
+    });
   },
 
   /**
    * Creates a booking inside a transaction, re-checking availability
-   * to prevent double-booking.
+   * to prevent double-booking. PENDING bookings also block slots.
    */
   createWithLock: async (
     trainerId: string,
@@ -175,7 +144,7 @@ export const bookingRepository = {
         where: {
           trainerId,
           date,
-          status: 'CONFIRMED',
+          status: { in: SLOT_BLOCKING_STATUSES },
           OR: [
             { startTime: { lt: endTime }, endTime: { gt: startTime } },
           ],
@@ -188,21 +157,7 @@ export const bookingRepository = {
 
       return tx.booking.create({
         data: createData,
-        include: {
-          location: true,
-          trainer: {
-            select: { id: true, displayName: true, userId: true },
-          },
-          clientRoster: {
-            include: {
-              connection: {
-                include: {
-                  sender: { select: { id: true, name: true, email: true } },
-                },
-              },
-            },
-          },
-        },
+        include: bookingInclude,
       });
     });
   },
@@ -241,6 +196,19 @@ export const bookingRepository = {
     return prisma.booking.update({
       where: { id },
       data: { reminderSentAt: new Date() },
+    });
+  },
+
+  /**
+   * Find PENDING bookings whose hold has expired.
+   */
+  findExpiredPending: () => {
+    return prisma.booking.findMany({
+      where: {
+        status: 'PENDING',
+        holdExpiresAt: { lt: new Date() },
+      },
+      include: bookingInclude,
     });
   },
 };

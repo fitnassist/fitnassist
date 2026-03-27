@@ -15,40 +15,91 @@ const formatDate = (date: Date | string) => {
   });
 };
 
-export const bookingNotificationService = {
-  /**
-   * Send confirmation emails to both trainer and client after a booking is created.
-   */
-  async sendBookingConfirmation(bookingId: string) {
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: {
-        trainer: {
-          select: {
-            displayName: true,
-            userId: true,
-            user: { select: { id: true, name: true, email: true } },
-          },
+const getBookingWithParties = async (bookingId: string) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      trainer: {
+        select: {
+          displayName: true,
+          userId: true,
+          user: { select: { id: true, name: true, email: true } },
         },
-        clientRoster: {
-          include: {
-            connection: {
-              include: {
-                sender: { select: { id: true, name: true, email: true } },
-              },
+      },
+      clientRoster: {
+        include: {
+          connection: {
+            include: {
+              sender: { select: { id: true, name: true, email: true } },
             },
           },
         },
-        location: true,
       },
-    });
+      location: true,
+      suggestions: {
+        where: { status: 'PENDING' },
+        orderBy: { createdAt: 'desc' },
+        include: { suggestor: { select: { name: true } } },
+      },
+    },
+  });
 
-    if (!booking) return;
+  if (!booking) return null;
 
-    const trainerUser = booking.trainer.user;
-    const clientUser = booking.clientRoster.connection.sender;
-    const trainerName = booking.trainer.displayName;
-    const clientName = clientUser?.name ?? 'Client';
+  const trainerUser = booking.trainer.user;
+  const clientUser = booking.clientRoster.connection.sender;
+  const trainerName = booking.trainer.displayName;
+  const clientName = clientUser?.name ?? 'Client';
+
+  return { booking, trainerUser, clientUser, trainerName, clientName };
+};
+
+export const bookingNotificationService = {
+  /**
+   * Send pending booking notification to the confirming party.
+   */
+  async sendBookingPending(bookingId: string) {
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, trainerUser, clientUser, trainerName, clientName } = result;
+
+    const dateStr = formatDate(booking.date);
+    const locationName = booking.location?.name ?? booking.clientAddress ?? undefined;
+    const isTrainerInitiated = booking.initiatedBy === trainerUser?.id;
+
+    // Send to the confirming party
+    const recipient = isTrainerInitiated ? clientUser : trainerUser;
+    const requesterName = isTrainerInitiated ? trainerName : clientName;
+
+    if (recipient?.email) {
+      const prefs = await userRepository.getNotificationPreferences(recipient.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: recipient.email,
+          subject: `Session request from ${requesterName} - Fitnassist`,
+          html: emailTemplates.bookingPending({
+            recipientName: recipient.name ?? 'there',
+            requesterName,
+            date: dateStr,
+            startTime: booking.startTime,
+            endTime: booking.endTime,
+            durationMin: booking.durationMin,
+            locationName,
+            notes: booking.notes ?? undefined,
+          }),
+        });
+      }
+    }
+  },
+
+  /**
+   * Send confirmation emails to both trainer and client after a booking is confirmed.
+   */
+  async sendBookingConfirmation(bookingId: string) {
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, trainerUser, clientUser, trainerName, clientName } = result;
+
     const dateStr = formatDate(booking.date);
     const locationName = booking.location?.name ?? booking.clientAddress ?? undefined;
 
@@ -61,13 +112,12 @@ export const bookingNotificationService = {
       notes: booking.notes ?? undefined,
     };
 
-    // Notify trainer
     if (trainerUser?.email) {
       const prefs = await userRepository.getNotificationPreferences(trainerUser.id);
       if (prefs?.emailNotifyBookings) {
         await sendEmail({
           to: trainerUser.email,
-          subject: `New booking with ${clientName} - Fitnassist`,
+          subject: `Booking confirmed with ${clientName} - Fitnassist`,
           html: emailTemplates.bookingConfirmation({
             ...baseData,
             recipientName: trainerUser.name ?? trainerName,
@@ -78,7 +128,6 @@ export const bookingNotificationService = {
       }
     }
 
-    // Notify client
     if (clientUser?.email) {
       const prefs = await userRepository.getNotificationPreferences(clientUser.id);
       if (prefs?.emailNotifyBookings) {
@@ -97,6 +146,40 @@ export const bookingNotificationService = {
   },
 
   /**
+   * Send decline notification to the initiator.
+   */
+  async sendBookingDeclined(bookingId: string) {
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, trainerUser, clientUser, trainerName, clientName } = result;
+
+    const dateStr = formatDate(booking.date);
+    const isTrainerInitiated = booking.initiatedBy === trainerUser?.id;
+
+    // Send to the initiator (who got declined)
+    const recipient = isTrainerInitiated ? trainerUser : clientUser;
+    const declinedByName = isTrainerInitiated ? clientName : trainerName;
+
+    if (recipient?.email) {
+      const prefs = await userRepository.getNotificationPreferences(recipient.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: recipient.email,
+          subject: `Session request declined - Fitnassist`,
+          html: emailTemplates.bookingDeclined({
+            recipientName: recipient.name ?? 'there',
+            declinedByName,
+            date: dateStr,
+            startTime: booking.startTime,
+            endTime: booking.endTime,
+            reason: booking.declineReason ?? undefined,
+          }),
+        });
+      }
+    }
+  },
+
+  /**
    * Send cancellation emails to the other party (not the one who cancelled).
    */
   async sendBookingCancellation(
@@ -104,36 +187,11 @@ export const bookingNotificationService = {
     cancelledByUserId: string,
     reason?: string
   ) {
-    const booking = await prisma.booking.findUnique({
-      where: { id: bookingId },
-      include: {
-        trainer: {
-          select: {
-            displayName: true,
-            userId: true,
-            user: { select: { id: true, name: true, email: true } },
-          },
-        },
-        clientRoster: {
-          include: {
-            connection: {
-              include: {
-                sender: { select: { id: true, name: true, email: true } },
-              },
-            },
-          },
-        },
-      },
-    });
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, trainerUser, clientUser, trainerName, clientName } = result;
 
-    if (!booking) return;
-
-    const trainerUser = booking.trainer.user;
-    const clientUser = booking.clientRoster.connection.sender;
-    const trainerName = booking.trainer.displayName;
-    const clientName = clientUser?.name ?? 'Client';
     const dateStr = formatDate(booking.date);
-
     const isTrainerCancelling = cancelledByUserId === trainerUser?.id;
 
     const baseData = {
@@ -143,7 +201,6 @@ export const bookingNotificationService = {
       reason,
     };
 
-    // Notify the other party
     if (isTrainerCancelling && clientUser?.email) {
       const prefs = await userRepository.getNotificationPreferences(clientUser.id);
       if (prefs?.emailNotifyBookings) {
@@ -174,6 +231,125 @@ export const bookingNotificationService = {
   },
 
   /**
+   * Send reschedule notification to the other party.
+   */
+  async sendBookingRescheduled(newBookingId: string, oldBookingId: string) {
+    const [newResult, oldResult] = await Promise.all([
+      getBookingWithParties(newBookingId),
+      getBookingWithParties(oldBookingId),
+    ]);
+    if (!newResult || !oldResult) return;
+
+    const { booking: newBooking, trainerUser, clientUser, trainerName, clientName } = newResult;
+    const { booking: oldBooking } = oldResult;
+
+    const isTrainerRescheduling = newBooking.initiatedBy === trainerUser?.id;
+    const recipient = isTrainerRescheduling ? clientUser : trainerUser;
+    const rescheduledByName = isTrainerRescheduling ? trainerName : clientName;
+
+    if (recipient?.email) {
+      const prefs = await userRepository.getNotificationPreferences(recipient.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: recipient.email,
+          subject: `Session rescheduled by ${rescheduledByName} - Fitnassist`,
+          html: emailTemplates.bookingRescheduled({
+            recipientName: recipient.name ?? 'there',
+            rescheduledByName,
+            oldDate: formatDate(oldBooking.date),
+            oldStartTime: oldBooking.startTime,
+            newDate: formatDate(newBooking.date),
+            newStartTime: newBooking.startTime,
+            newEndTime: newBooking.endTime,
+            durationMin: newBooking.durationMin,
+          }),
+        });
+      }
+    }
+  },
+
+  /**
+   * Send suggestion notification to the other party.
+   */
+  async sendBookingSuggestion(bookingId: string) {
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, trainerUser, clientUser, trainerName, clientName } = result;
+
+    if (!booking.suggestions.length) return;
+
+    const suggestorUserId = booking.suggestions[0]!.suggestedBy;
+    const isTrainerSuggesting = suggestorUserId === trainerUser?.id;
+    const recipient = isTrainerSuggesting ? clientUser : trainerUser;
+    const suggestorName = isTrainerSuggesting ? trainerName : clientName;
+
+    if (recipient?.email) {
+      const prefs = await userRepository.getNotificationPreferences(recipient.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: recipient.email,
+          subject: `Alternative times suggested - Fitnassist`,
+          html: emailTemplates.bookingSuggestion({
+            recipientName: recipient.name ?? 'there',
+            suggestorName,
+            originalDate: formatDate(booking.date),
+            originalStartTime: booking.startTime,
+            suggestions: booking.suggestions.map((s) => ({
+              date: formatDate(s.date),
+              startTime: s.startTime,
+              endTime: s.endTime,
+            })),
+          }),
+        });
+      }
+    }
+  },
+
+  /**
+   * Send hold expired notification to both parties.
+   */
+  async sendBookingHoldExpired(bookingId: string) {
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, trainerUser, clientUser, trainerName, clientName } = result;
+
+    const dateStr = formatDate(booking.date);
+    const baseData = {
+      date: dateStr,
+      startTime: booking.startTime,
+      endTime: booking.endTime,
+    };
+
+    if (trainerUser?.email) {
+      const prefs = await userRepository.getNotificationPreferences(trainerUser.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: trainerUser.email,
+          subject: `Session request expired - Fitnassist`,
+          html: emailTemplates.bookingHoldExpired({
+            ...baseData,
+            recipientName: trainerUser.name ?? trainerName,
+          }),
+        });
+      }
+    }
+
+    if (clientUser?.email) {
+      const prefs = await userRepository.getNotificationPreferences(clientUser.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: clientUser.email,
+          subject: `Session request expired - Fitnassist`,
+          html: emailTemplates.bookingHoldExpired({
+            ...baseData,
+            recipientName: clientName,
+          }),
+        });
+      }
+    }
+  },
+
+  /**
    * Send reminder emails for bookings happening tomorrow.
    * Idempotent — only sends to bookings where reminderSentAt is null.
    */
@@ -185,7 +361,7 @@ export const bookingNotificationService = {
     const bookings = await bookingRepository.findRemindable(tomorrow);
 
     let sent = 0;
-    let skipped = 0;
+    const skipped = 0;
 
     for (const booking of bookings) {
       const trainerUser = booking.trainer.user;
@@ -204,7 +380,6 @@ export const bookingNotificationService = {
         notes: booking.notes ?? undefined,
       };
 
-      // Notify trainer
       if (trainerUser?.email) {
         const prefs = await userRepository.getNotificationPreferences(trainerUser.id);
         if (prefs?.emailNotifyBookingReminders) {
@@ -221,7 +396,6 @@ export const bookingNotificationService = {
         }
       }
 
-      // Notify client
       if (clientUser?.email) {
         const prefs = await userRepository.getNotificationPreferences(clientUser.id);
         if (prefs?.emailNotifyBookingReminders) {
@@ -238,7 +412,6 @@ export const bookingNotificationService = {
         }
       }
 
-      // In-app reminder notifications
       if (trainerUser?.id) {
         inAppNotificationService.notify({
           userId: trainerUser.id,
@@ -256,7 +429,6 @@ export const bookingNotificationService = {
         }).catch(console.error);
       }
 
-      // Mark reminder as sent (idempotent)
       await bookingRepository.markReminderSent(booking.id);
       sent++;
     }

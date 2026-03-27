@@ -378,4 +378,168 @@ export const emailTemplates = {
         </a>
       </p>
     `),
+
+  bookingPending: (data: {
+    recipientName: string;
+    requesterName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    durationMin: number;
+    locationName?: string;
+    notes?: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Session request</h2>
+      <p>Hi ${data.recipientName}, ${data.requesterName} has requested a session with you. Please confirm or decline.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Date</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.date}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Time</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime} (${data.durationMin} min)</td>
+          </tr>
+          ${data.locationName ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Location</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.locationName}</td>
+          </tr>` : ''}
+          ${data.notes ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Notes</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.notes}</td>
+          </tr>` : ''}
+        </table>
+      </div>
+      <p style="font-size: 13px; color: #888;">This slot is held for 48 hours. If not confirmed, it will be automatically released.</p>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          Review request
+        </a>
+      </p>
+    `),
+
+  bookingDeclined: (data: {
+    recipientName: string;
+    declinedByName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    reason?: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Session request declined</h2>
+      <p>Hi ${data.recipientName}, ${data.declinedByName} has declined the session request.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Date</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.date}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Time</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime}</td>
+          </tr>
+          ${data.reason ? `<tr>
+            <td style="padding: 4px 0; color: #888;">Reason</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.reason}</td>
+          </tr>` : ''}
+        </table>
+      </div>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View bookings
+        </a>
+      </p>
+    `),
+
+  bookingRescheduled: (data: {
+    recipientName: string;
+    rescheduledByName: string;
+    oldDate: string;
+    oldStartTime: string;
+    newDate: string;
+    newStartTime: string;
+    newEndTime: string;
+    durationMin: number;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Session rescheduled</h2>
+      <p>Hi ${data.recipientName}, ${data.rescheduledByName} has rescheduled a session. Please confirm the new time.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Previously</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500; text-decoration: line-through; color: #888;">${data.oldDate} at ${data.oldStartTime}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">New date</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.newDate}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">New time</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.newStartTime} - ${data.newEndTime} (${data.durationMin} min)</td>
+          </tr>
+        </table>
+      </div>
+      <p style="font-size: 13px; color: #888;">This slot is held for 48 hours pending your confirmation.</p>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          Review reschedule
+        </a>
+      </p>
+    `),
+
+  bookingSuggestion: (data: {
+    recipientName: string;
+    suggestorName: string;
+    originalDate: string;
+    originalStartTime: string;
+    suggestions: { date: string; startTime: string; endTime: string }[];
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Alternative times suggested</h2>
+      <p>Hi ${data.recipientName}, ${data.suggestorName} has suggested alternative times for the session on ${data.originalDate} at ${data.originalStartTime}.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        ${data.suggestions.map((s, i) => `
+          <div style="padding: 8px 0;${i > 0 ? ' border-top: 1px solid #e5e5e5;' : ''}">
+            <strong>Option ${i + 1}:</strong> ${s.date} at ${s.startTime} - ${s.endTime}
+          </div>
+        `).join('')}
+      </div>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          Review suggestions
+        </a>
+      </p>
+    `),
+
+  bookingHoldExpired: (data: {
+    recipientName: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Session request expired</h2>
+      <p>Hi ${data.recipientName}, a session request has expired because it was not confirmed within 48 hours.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Date</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.date}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Time</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime}</td>
+          </tr>
+        </table>
+      </div>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View bookings
+        </a>
+      </p>
+    `),
 };
