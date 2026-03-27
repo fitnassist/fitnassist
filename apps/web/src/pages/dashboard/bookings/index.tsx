@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, List, LayoutGrid } from 'lucide-react';
 import {
@@ -43,20 +43,24 @@ export const BookingsPage = () => {
   const [period, setPeriod] = useState<Period>('week');
   const [suggestBookingId, setSuggestBookingId] = useState<string | null>(null);
 
-  // For list view and initial calendar load, use static date range
-  const staticRange = useMemo(() => getDateRange(period), [period]);
-
-  // For calendar view, FullCalendar drives the date range via datesSet
-  const [calendarRange, setCalendarRange] = useState<{ startDate: string; endDate: string } | null>(null);
-
-  const handleCalendarRangeChange = useCallback((start: string, end: string) => {
-    setCalendarRange({ startDate: start, endDate: end });
-  }, []);
-
-  // Use calendar-driven range when in calendar mode, otherwise static
-  const { startDate, endDate } = isTrainer
-    ? (viewMode === 'calendar' && calendarRange ? calendarRange : staticRange)
-    : staticRange;
+  // List view uses a narrow range; calendar view uses a wide range so
+  // the user can navigate freely without triggering refetches.
+  const { startDate, endDate } = useMemo(() => {
+    if (isTrainer && viewMode === 'calendar') {
+      const now = new Date();
+      const start = new Date(now);
+      start.setMonth(start.getMonth() - 3);
+      start.setDate(1);
+      const end = new Date(now);
+      end.setMonth(end.getMonth() + 6);
+      end.setDate(0);
+      return {
+        startDate: start.toISOString().split('T')[0]!,
+        endDate: end.toISOString().split('T')[0]!,
+      };
+    }
+    return getDateRange(period);
+  }, [isTrainer, viewMode, period]);
 
   // Trainer uses date-range query, trainee uses upcoming
   const { data: trainerBookings, isLoading: trainerLoading } = useTrainerBookings(startDate, endDate);
@@ -198,7 +202,6 @@ export const BookingsPage = () => {
             bookings={bookings ?? []}
             isTrainer={isTrainer}
             view={period}
-            onDateRangeChange={handleCalendarRangeChange}
           />
         )}
 

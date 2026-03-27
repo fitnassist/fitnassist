@@ -32,7 +32,6 @@ interface BookingCalendarProps {
   bookings: Booking[];
   isTrainer: boolean;
   view: 'week' | 'month';
-  onDateRangeChange: (start: string, end: string) => void;
 }
 
 const STATUS_CLASS: Record<string, string> = {
@@ -82,21 +81,14 @@ const EventContent = ({ event }: EventContentArg) => {
 };
 
 export const BookingCalendar = ({
-  bookings, isTrainer, view, onDateRangeChange,
+  bookings, isTrainer, view,
 }: BookingCalendarProps) => {
   const navigate = useNavigate();
   const calendarRef = useRef<FullCalendar>(null);
-  const onDateRangeChangeRef = useRef(onDateRangeChange);
-
-  // Keep ref in sync without causing re-renders
-  useEffect(() => {
-    onDateRangeChangeRef.current = onDateRangeChange;
-  }, [onDateRangeChange]);
 
   const calendarView = view === 'week' ? 'timeGridWeek' : 'dayGridMonth';
 
-  // When view (week/month) changes, tell the existing calendar to switch
-  // instead of remounting via key
+  // Switch view without remounting
   useEffect(() => {
     const api = calendarRef.current?.getApi();
     if (api) {
@@ -133,14 +125,6 @@ export const BookingCalendar = ({
     navigate(routes.dashboardBookingDetail(info.event.id));
   }, [navigate]);
 
-  // Use ref for callback to avoid re-render loop:
-  // datesSet → state update → re-render → new events prop → datesSet again
-  const handleDatesSet = useCallback((dateInfo: { start: Date; end: Date }) => {
-    const start = dateInfo.start.toISOString().split('T')[0]!;
-    const end = dateInfo.end.toISOString().split('T')[0]!;
-    onDateRangeChangeRef.current(start, end);
-  }, []);
-
   return (
     <FullCalendar
       ref={calendarRef}
@@ -148,7 +132,6 @@ export const BookingCalendar = ({
       initialView={calendarView}
       events={events}
       eventClick={handleEventClick}
-      datesSet={handleDatesSet}
       eventContent={EventContent}
       headerToolbar={{
         left: 'prev,next today',
