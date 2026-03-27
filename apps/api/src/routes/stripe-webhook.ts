@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { stripeService } from '../services/stripe.service';
 import { subscriptionService } from '../services/subscription.service';
 import { inAppNotificationService } from '../services/in-app-notification.service';
+import { sessionPaymentRepository } from '../repositories/session-payment.repository';
+import { bookingNotificationService } from '../services/booking-notification.service';
 import { prisma } from '../lib/prisma';
 import type Stripe from 'stripe';
 
@@ -115,6 +117,83 @@ stripeWebhookRouter.post(
               title: 'Your trial expires in 3 days — upgrade to keep your features',
               link: '/pricing',
             }).catch(console.error);
+          }
+          break;
+        }
+
+        // ── Session payment events ──
+
+        case 'payment_intent.succeeded': {
+          const pi = event.data.object as Stripe.PaymentIntent;
+          if (pi.metadata?.platform !== 'fitnassist') break;
+
+          const payment = await sessionPaymentRepository.findByPaymentIntentId(pi.id);
+          if (payment && payment.status === 'PENDING') {
+            await sessionPaymentRepository.update(payment.id, {
+              status: 'SUCCEEDED',
+              paidAt: new Date(),
+            });
+
+            // Notify client + trainer
+            bookingNotificationService.sendPaymentReceived(payment.bookingId).catch(console.error);
+          }
+          break;
+        }
+
+        case 'charge.refunded': {
+          const charge = event.data.object as Stripe.Charge;
+          const piId = typeof charge.payment_intent === 'string'
+            ? charge.payment_intent
+            : charge.payment_intent?.id;
+          if (!piId) break;
+
+          const payment = await sessionPaymentRepository.findByPaymentIntentId(piId);
+          if (!payment) break;
+
+          // Refund details are already written by our service methods,
+          // but sync status from Stripe in case of manual refunds via dashboard
+          const totalRefunded = charge.amount_refunded;
+          const isFullRefund = totalRefunded >= payment.amount;
+
+          await sessionPaymentRepository.update(payment.id, {
+            status: isFullRefund ? 'REFUNDED' : 'PARTIALLY_REFUNDED',
+            refundAmount: totalRefunded,
+            refundedAt: new Date(),
+          });
+
+          bookingNotificationService.sendRefundProcessed(payment.bookingId, totalRefunded, payment.currency).catch(console.error);
+          break;
+        }
+
+        case 'account.updated': {
+          const account = event.data.object as Stripe.Account;
+          // Sync Connect onboarding status
+          const trainer = await prisma.trainerProfile.findFirst({
+            where: { stripeConnectedAccountId: account.id },
+          });
+          if (trainer) {
+            const isComplete = account.charges_enabled && account.payouts_enabled;
+            if (trainer.stripeOnboardingComplete !== isComplete) {
+              await prisma.trainerProfile.update({
+                where: { id: trainer.id },
+                data: { stripeOnboardingComplete: isComplete },
+              });
+            }
+          }
+          break;
+        }
+
+        case 'payment_intent.payment_failed': {
+          const pi = event.data.object as Stripe.PaymentIntent;
+          if (pi.metadata?.platform !== 'fitnassist') break;
+
+          const payment = await sessionPaymentRepository.findByPaymentIntentId(pi.id);
+          if (payment && payment.status === 'PENDING') {
+            await sessionPaymentRepository.update(payment.id, {
+              status: 'FAILED',
+            });
+
+            bookingNotificationService.sendPaymentFailed(payment.bookingId).catch(console.error);
           }
           break;
         }

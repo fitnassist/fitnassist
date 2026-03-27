@@ -542,6 +542,79 @@ export const emailTemplates = {
       </p>
     `),
 
+  paymentReceived: (data: {
+    recipientName: string;
+    otherPartyName: string;
+    amount: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    bookingId: string;
+    isTrainer: boolean;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Payment received</h2>
+      <p>Hi ${data.recipientName}, payment of <strong>${data.amount}</strong> has been received for your session ${data.isTrainer ? `with ${data.otherPartyName}` : `with ${data.otherPartyName}`}.</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Amount</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.amount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Date</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.date}</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 0; color: #888;">Time</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">${data.startTime} - ${data.endTime}</td>
+          </tr>
+        </table>
+      </div>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}/${data.bookingId}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View booking
+        </a>
+      </p>
+    `),
+
+  refundProcessed: (data: {
+    recipientName: string;
+    amount: string;
+    date: string;
+    startTime: string;
+    reason?: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Refund processed</h2>
+      <p>Hi ${data.recipientName}, a refund of <strong>${data.amount}</strong> has been processed for your session on ${data.date} at ${data.startTime}.</p>
+      ${data.reason ? `<p style="font-size: 13px; color: #888;">Reason: ${data.reason}</p>` : ''}
+      <p style="font-size: 13px; color: #888;">The refund may take 5-10 business days to appear on your statement.</p>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View bookings
+        </a>
+      </p>
+    `),
+
+  paymentFailed: (data: {
+    recipientName: string;
+    otherPartyName: string;
+    date: string;
+    startTime: string;
+    bookingId: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Payment failed</h2>
+      <p>Hi ${data.recipientName}, the payment for your session with ${data.otherPartyName} on ${data.date} at ${data.startTime} was unsuccessful.</p>
+      <p>Please try again or use a different payment method.</p>
+      <p style="margin-top: 24px;">
+        <a href="${bookingsUrl}/${data.bookingId}" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          Retry payment
+        </a>
+      </p>
+    `),
+
   bookingHoldExpired: (data: {
     recipientName: string;
     date: string;

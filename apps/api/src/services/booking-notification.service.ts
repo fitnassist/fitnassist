@@ -353,6 +353,168 @@ export const bookingNotificationService = {
   },
 
   /**
+   * Send payment received notification to both parties.
+   */
+  async sendPaymentReceived(bookingId: string) {
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, trainerUser, clientUser, trainerName, clientName } = result;
+
+    const payment = await prisma.sessionPayment.findUnique({
+      where: { bookingId },
+      select: { amount: true, currency: true },
+    });
+    if (!payment) return;
+
+    const dateStr = formatDate(booking.date);
+    const amount = new Intl.NumberFormat('en-GB', {
+      style: 'currency',
+      currency: payment.currency.toUpperCase(),
+    }).format(payment.amount / 100);
+
+    const baseData = {
+      amount,
+      date: dateStr,
+      startTime: booking.startTime,
+      endTime: booking.endTime,
+      bookingId: booking.id,
+    };
+
+    if (clientUser?.email) {
+      const prefs = await userRepository.getNotificationPreferences(clientUser.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: clientUser.email,
+          subject: `Payment received — ${amount} - Fitnassist`,
+          html: emailTemplates.paymentReceived({
+            ...baseData,
+            recipientName: clientName,
+            otherPartyName: trainerName,
+            isTrainer: false,
+          }),
+        });
+      }
+    }
+
+    if (trainerUser?.email) {
+      const prefs = await userRepository.getNotificationPreferences(trainerUser.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: trainerUser.email,
+          subject: `Payment received from ${clientName} — ${amount} - Fitnassist`,
+          html: emailTemplates.paymentReceived({
+            ...baseData,
+            recipientName: trainerUser.name ?? trainerName,
+            otherPartyName: clientName,
+            isTrainer: true,
+          }),
+        });
+      }
+    }
+
+    // In-app notifications
+    if (trainerUser?.id) {
+      inAppNotificationService.notify({
+        userId: trainerUser.id,
+        type: 'PAYMENT_RECEIVED',
+        title: `Payment of ${amount} received from ${clientName}`,
+        link: `/dashboard/bookings/${booking.id}`,
+      }).catch(console.error);
+    }
+    if (clientUser?.id) {
+      inAppNotificationService.notify({
+        userId: clientUser.id,
+        type: 'PAYMENT_RECEIVED',
+        title: `Payment of ${amount} confirmed for session with ${trainerName}`,
+        link: `/dashboard/bookings/${booking.id}`,
+      }).catch(console.error);
+    }
+  },
+
+  /**
+   * Send refund processed notification to the client.
+   */
+  async sendRefundProcessed(bookingId: string, refundAmount: number, currency: string) {
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, clientUser, clientName, trainerName } = result;
+
+    const dateStr = formatDate(booking.date);
+    const amount = new Intl.NumberFormat('en-GB', {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+    }).format(refundAmount / 100);
+
+    const payment = await prisma.sessionPayment.findUnique({
+      where: { bookingId },
+      select: { refundReason: true },
+    });
+
+    if (clientUser?.email) {
+      const prefs = await userRepository.getNotificationPreferences(clientUser.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: clientUser.email,
+          subject: `Refund of ${amount} processed - Fitnassist`,
+          html: emailTemplates.refundProcessed({
+            recipientName: clientName,
+            amount,
+            date: dateStr,
+            startTime: booking.startTime,
+            reason: payment?.refundReason ?? undefined,
+          }),
+        });
+      }
+    }
+
+    if (clientUser?.id) {
+      inAppNotificationService.notify({
+        userId: clientUser.id,
+        type: 'REFUND_PROCESSED',
+        title: `Refund of ${amount} processed for session with ${trainerName}`,
+        link: `/dashboard/bookings/${booking.id}`,
+      }).catch(console.error);
+    }
+  },
+
+  /**
+   * Send payment failed notification to the client.
+   */
+  async sendPaymentFailed(bookingId: string) {
+    const result = await getBookingWithParties(bookingId);
+    if (!result) return;
+    const { booking, clientUser, clientName, trainerName } = result;
+
+    const dateStr = formatDate(booking.date);
+
+    if (clientUser?.email) {
+      const prefs = await userRepository.getNotificationPreferences(clientUser.id);
+      if (prefs?.emailNotifyBookings) {
+        await sendEmail({
+          to: clientUser.email,
+          subject: `Payment failed for session with ${trainerName} - Fitnassist`,
+          html: emailTemplates.paymentFailed({
+            recipientName: clientName,
+            otherPartyName: trainerName,
+            date: dateStr,
+            startTime: booking.startTime,
+            bookingId: booking.id,
+          }),
+        });
+      }
+    }
+
+    if (clientUser?.id) {
+      inAppNotificationService.notify({
+        userId: clientUser.id,
+        type: 'PAYMENT_FAILED',
+        title: `Payment failed for session with ${trainerName}`,
+        link: `/dashboard/bookings/${booking.id}`,
+      }).catch(console.error);
+    }
+  },
+
+  /**
    * Send reminder emails for bookings happening tomorrow.
    * Idempotent — only sends to bookings where reminderSentAt is null.
    */
