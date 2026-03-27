@@ -40,6 +40,7 @@ import { BookingsPage } from '@/pages/dashboard/bookings';
 import { BookSessionPage } from '@/pages/dashboard/bookings/book';
 import { BookingDetailPage } from '@/pages/dashboard/bookings/[id]';
 import { BookingCallPage } from '@/pages/dashboard/bookings/[id]/call';
+import { TrainerBookSessionPage } from '@/pages/dashboard/bookings/book-client';
 import { PrivacyPolicyPage } from '@/pages/privacy';
 import { TermsOfServicePage } from '@/pages/terms';
 import { SupportPage } from '@/pages/support';
@@ -114,6 +115,8 @@ function App() {
                       <Route path="/dashboard/onboarding/templates/:id/edit" element={<OnboardingTemplateFormPage />} />
                       <Route path="/dashboard/onboarding/:responseId" element={<OnboardingCompletePage />} />
                       <Route path={routes.dashboardAnalytics} element={<AnalyticsPage />} />
+                      <Route path="/dashboard/bookings/book-client" element={<TrainerBookSessionPage />} />
+                      <Route path="/dashboard/bookings/book-client/:clientRosterId" element={<TrainerBookSessionPage />} />
                       <Route path={routes.trainerProfileEdit} element={<ProfileEditPage />} />
                       <Route path="/trainee/profile/:userId" element={<TraineeProfileViewPage />} />
                     </Route>

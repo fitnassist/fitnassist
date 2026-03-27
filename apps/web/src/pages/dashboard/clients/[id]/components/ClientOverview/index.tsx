@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, User, Unlink } from 'lucide-react';
+import { MessageCircle, User, Unlink, Calendar } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -133,6 +133,12 @@ export const ClientOverview = ({ client, onStatusChange, isUpdating, onDisconnec
                 )}
                 {!isDisconnected && (
                   <>
+                    <Link to={routes.dashboardBookingsBookClientWithId(client.id)}>
+                      <Button variant="outline" size="sm">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Book Session
+                      </Button>
+                    </Link>
                     <Link to={routes.dashboardMessageThread(connection.id)}>
                       <Button variant="outline" size="sm">
                         <MessageCircle className="h-4 w-4 mr-2" />

@@ -80,6 +80,12 @@ export const BookingsPage = () => {
   // Trainer action buttons
   const trainerActions = isTrainer ? (
     <div className="flex items-center gap-2">
+      <Link to={routes.dashboardBookingsBookClient}>
+        <Button size="sm">
+          <Calendar className="h-4 w-4 mr-2" />
+          Book Session
+        </Button>
+      </Link>
       <div className="flex items-center rounded-md border border-border">
         <Button
           variant={viewMode === 'calendar' ? 'default' : 'ghost'}
