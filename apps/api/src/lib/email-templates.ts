@@ -274,7 +274,7 @@ export const emailTemplates = {
     notes?: string;
     isTrainer: boolean;
     sessionType?: string;
-    dailyRoomUrl?: string;
+    bookingId?: string;
   }) =>
     layout(`
       <h2 style="margin: 0 0 16px;">Booking confirmed</h2>
@@ -303,8 +303,8 @@ export const emailTemplates = {
           </tr>` : ''}
         </table>
       </div>
-      ${data.dailyRoomUrl ? `<p style="margin-top: 16px;">
-        <a href="${data.dailyRoomUrl}" style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+      ${data.sessionType === 'VIDEO_CALL' && data.bookingId ? `<p style="margin-top: 16px;">
+        <a href="${bookingsUrl}/${data.bookingId}/call" style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
           Join Video Call
         </a>
       </p>` : ''}
@@ -360,7 +360,7 @@ export const emailTemplates = {
     notes?: string;
     isTrainer: boolean;
     sessionType?: string;
-    dailyRoomUrl?: string;
+    bookingId?: string;
   }) =>
     layout(`
       <h2 style="margin: 0 0 16px;">Session tomorrow</h2>
@@ -389,8 +389,8 @@ export const emailTemplates = {
           </tr>` : ''}
         </table>
       </div>
-      ${data.dailyRoomUrl ? `<p style="margin-top: 16px;">
-        <a href="${data.dailyRoomUrl}" style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+      ${data.sessionType === 'VIDEO_CALL' && data.bookingId ? `<p style="margin-top: 16px;">
+        <a href="${bookingsUrl}/${data.bookingId}/call" style="display: inline-block; background: #2563eb; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
           Join Video Call
         </a>
       </p>` : ''}

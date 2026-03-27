@@ -112,7 +112,7 @@ export const bookingNotificationService = {
       locationName,
       notes: booking.notes ?? undefined,
       sessionType: booking.sessionType,
-      dailyRoomUrl: booking.dailyRoomUrl ?? undefined,
+      bookingId: booking.id,
     };
 
     if (trainerUser?.email) {
@@ -382,7 +382,7 @@ export const bookingNotificationService = {
         locationName,
         notes: booking.notes ?? undefined,
         sessionType: booking.sessionType,
-        dailyRoomUrl: booking.dailyRoomUrl ?? undefined,
+        bookingId: booking.id,
       };
 
       if (trainerUser?.email) {

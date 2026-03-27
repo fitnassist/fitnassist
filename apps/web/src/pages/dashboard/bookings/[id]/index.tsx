@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Calendar, Clock, MapPin, User, Check, X, CalendarClock, ArrowRight, AlertTriangle, MoreVertical, Video,
 } from 'lucide-react';
@@ -41,6 +41,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export const BookingDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user, isTrainer } = useAuth();
   const { data: booking, isLoading } = useBooking(id ?? '');
 
@@ -185,7 +186,7 @@ export const BookingDetailPage = () => {
               {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && (
                 <Button
                   className="w-full"
-                  onClick={() => window.open(booking.dailyRoomUrl!, '_blank')}
+                  onClick={() => navigate(routes.dashboardBookingCall(booking.id))}
                 >
                   <Video className="h-4 w-4 mr-2" />
                   Join Video Call

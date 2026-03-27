@@ -51,6 +51,7 @@ export const routes = {
   dashboardAnalytics: '/dashboard/analytics',
   dashboardBookings: '/dashboard/bookings',
   dashboardBookingDetail: (id: string) => `/dashboard/bookings/${id}`,
+  dashboardBookingCall: (id: string) => `/dashboard/bookings/${id}/call`,
   dashboardBookingsBook: (trainerId: string) => `/dashboard/bookings/book/${trainerId}`,
   dashboardFeed: '/dashboard/feed',
   dashboardFriends: '/dashboard/friends',

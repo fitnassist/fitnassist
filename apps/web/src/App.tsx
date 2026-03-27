@@ -39,6 +39,7 @@ import { SettingsPage } from '@/pages/dashboard/settings';
 import { BookingsPage } from '@/pages/dashboard/bookings';
 import { BookSessionPage } from '@/pages/dashboard/bookings/book';
 import { BookingDetailPage } from '@/pages/dashboard/bookings/[id]';
+import { BookingCallPage } from '@/pages/dashboard/bookings/[id]/call';
 import { PrivacyPolicyPage } from '@/pages/privacy';
 import { TermsOfServicePage } from '@/pages/terms';
 import { SupportPage } from '@/pages/support';
@@ -92,6 +93,7 @@ function App() {
                     <Route path="/dashboard/messages/:connectionId" element={<MessagesPage />} />
                     <Route path={routes.dashboardBookings} element={<BookingsPage />} />
                     <Route path="/dashboard/bookings/:id" element={<BookingDetailPage />} />
+                    <Route path="/dashboard/bookings/:id/call" element={<BookingCallPage />} />
                     <Route path={routes.dashboardSettings} element={<SettingsPage />} />
 
                     {/* Trainer-only routes */}

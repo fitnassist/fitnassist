@@ -179,7 +179,7 @@ export const BookingCard = ({
                 <Button
                   size="sm"
                   variant="default"
-                  onClick={() => window.open(booking.dailyRoomUrl!, '_blank')}
+                  onClick={() => navigate(routes.dashboardBookingCall(booking.id))}
                 >
                   <Video className="h-4 w-4 mr-1" />
                   Join Call
