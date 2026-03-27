@@ -145,7 +145,7 @@ export const BookingCalendar = ({
       slotLabelInterval="01:00:00"
       nowIndicator
       dayMaxEvents={3}
-      height={view === 'week' ? 'calc(100vh - 220px)' : 'auto'}
+      height="calc(100vh - 220px)"
       expandRows
       eventDisplay="block"
       stickyHeaderDates
