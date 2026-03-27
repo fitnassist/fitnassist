@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Calendar, Clock, MapPin, User, Check, X, CalendarClock, ArrowRight, AlertTriangle, MoreVertical, Video,
+  CreditCard, RotateCcw,
 } from 'lucide-react';
 import {
   Button, Badge, Card, CardContent, ConfirmDialog,
@@ -13,9 +14,11 @@ import {
   useBooking, useConfirmBooking, useDeclineBooking, useCancelBooking,
   useCompleteBooking, useNoShowBooking,
 } from '@/api/booking';
+import { useCreatePaymentIntent } from '@/api/payment';
 import { routes } from '@/config/routes';
 import { SuggestionsList } from '../components/SuggestionsList';
 import { SuggestAlternativeDialog } from '../components/SuggestAlternativeDialog';
+import { PaymentStep } from '../book/components/PaymentStep';
 
 const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline'> = {
   PENDING: 'warning',
@@ -39,11 +42,15 @@ const STATUS_LABELS: Record<string, string> = {
   NO_SHOW: 'No Show',
 };
 
+const formatPrice = (amount: number, currency: string = 'gbp') =>
+  new Intl.NumberFormat('en-GB', { style: 'currency', currency: currency.toUpperCase() }).format(amount / 100);
+
 export const BookingDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isTrainer } = useAuth();
   const { data: booking, isLoading } = useBooking(id ?? '');
+  const createPaymentIntent = useCreatePaymentIntent();
 
   const confirmMutation = useConfirmBooking();
   const declineMutation = useDeclineBooking();
@@ -54,6 +61,8 @@ export const BookingDetailPage = () => {
   const [showCancel, setShowCancel] = useState(false);
   const [showDecline, setShowDecline] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -100,6 +109,31 @@ export const BookingDetailPage = () => {
 
   const bookingDateIso = new Date(booking.date).toISOString().split('T')[0];
   const isSessionExpired = new Date(`${bookingDateIso}T${booking.endTime}:00`).getTime() < Date.now();
+
+  const payment = (booking as { payment?: { id: string; status: string; amount: number; currency: string; refundAmount?: number | null; refundReason?: string | null; paidAt?: string | null; refundedAt?: string | null } | null }).payment;
+
+  // Client needs to pay: trainer initiated the booking, payment exists but is PENDING, and user is the client
+  const isClient = booking.clientRoster?.connection?.sender?.id === currentUserId;
+  const needsPayment = isClient && payment?.status === 'PENDING' && !showPayment;
+
+  const handlePayNow = () => {
+    createPaymentIntent.mutate(
+      { bookingId: booking.id },
+      {
+        onSuccess: (result) => {
+          setClientSecret(result.clientSecret);
+          setShowPayment(true);
+        },
+      }
+    );
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPayment(false);
+    // Refetch booking data
+    navigate(routes.dashboardBookingDetail(booking.id));
+    window.location.reload();
+  };
 
   return (
     <PageLayout>
@@ -211,6 +245,86 @@ export const BookingDetailPage = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Payment info card */}
+          {payment && (
+            <Card>
+              <CardContent className="p-4 space-y-2">
+                <h4 className="text-sm font-medium flex items-center gap-2">
+                  <CreditCard className="h-4 w-4" />
+                  Payment
+                </h4>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{formatPrice(payment.amount, payment.currency)}</span>
+                  {payment.status === 'SUCCEEDED' && (
+                    <Badge variant="success" className="gap-1">
+                      <Check className="h-3 w-3" />
+                      Paid
+                    </Badge>
+                  )}
+                  {payment.status === 'PENDING' && (
+                    <Badge variant="warning" className="gap-1">
+                      <CreditCard className="h-3 w-3" />
+                      Awaiting payment
+                    </Badge>
+                  )}
+                  {payment.status === 'REFUNDED' && (
+                    <Badge variant="outline" className="gap-1 text-orange-700 border-orange-300">
+                      <RotateCcw className="h-3 w-3" />
+                      Refunded
+                    </Badge>
+                  )}
+                  {payment.status === 'PARTIALLY_REFUNDED' && (
+                    <Badge variant="outline" className="gap-1 text-orange-700 border-orange-300">
+                      <RotateCcw className="h-3 w-3" />
+                      Partially refunded
+                    </Badge>
+                  )}
+                  {payment.status === 'FAILED' && (
+                    <Badge variant="destructive" className="gap-1">
+                      <X className="h-3 w-3" />
+                      Failed
+                    </Badge>
+                  )}
+                </div>
+                {payment.refundAmount != null && payment.refundAmount > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    {formatPrice(payment.refundAmount, payment.currency)} refunded
+                    {payment.refundReason && ` — ${payment.refundReason}`}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Pay Now card for trainer-initiated bookings awaiting client payment */}
+          {needsPayment && (
+            <Card>
+              <CardContent className="p-4 space-y-3">
+                <p className="text-sm">
+                  {trainerName} has booked this session. Please pay to confirm.
+                </p>
+                <Button onClick={handlePayNow} disabled={createPaymentIntent.isPending} className="w-full">
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Pay {formatPrice(payment!.amount, payment!.currency)}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Inline payment form */}
+          {showPayment && clientSecret && payment && (
+            <PaymentStep
+              clientSecret={clientSecret}
+              paymentInfo={{
+                amount: payment.amount,
+                currency: payment.currency,
+                cancellationPolicy: null,
+              }}
+              onSuccess={handlePaymentSuccess}
+              onBack={() => setShowPayment(false)}
+            />
+          )}
 
           {/* Confirm/Decline actions for confirming party */}
           {isConfirmingParty && (

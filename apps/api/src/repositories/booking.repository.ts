@@ -20,6 +20,9 @@ const bookingInclude = {
   suggestions: {
     orderBy: { createdAt: 'desc' as const },
   },
+  payment: {
+    select: { id: true, status: true, amount: true, currency: true, refundAmount: true, refundReason: true, paidAt: true, refundedAt: true },
+  },
 } satisfies Prisma.BookingInclude;
 
 export const bookingRepository = {

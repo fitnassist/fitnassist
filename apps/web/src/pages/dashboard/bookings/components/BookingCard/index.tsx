@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, MapPin, User, MoreVertical, X, Check, AlertTriangle, CalendarClock, MessageSquare, ArrowRight, Video } from 'lucide-react';
+import { Clock, MapPin, User, MoreVertical, X, Check, AlertTriangle, CalendarClock, MessageSquare, ArrowRight, Video, CreditCard, RotateCcw } from 'lucide-react';
 import {
   Button, Badge, Card, CardContent,
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -41,6 +41,14 @@ interface BookingCardProps {
       profileImageUrl?: string | null;
       userId?: string;
     } | null;
+    payment?: {
+      id: string;
+      status: string;
+      amount: number;
+      currency: string;
+      refundAmount?: number | null;
+      refundReason?: string | null;
+    } | null;
   };
   isTrainer: boolean;
   currentUserId: string;
@@ -69,6 +77,51 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED_BY_TRAINER: 'Cancelled',
   CANCELLED_BY_CLIENT: 'Cancelled',
   NO_SHOW: 'No Show',
+};
+
+const formatPrice = (amount: number, currency: string = 'gbp') =>
+  new Intl.NumberFormat('en-GB', { style: 'currency', currency: currency.toUpperCase() }).format(amount / 100);
+
+const PaymentBadge = ({ payment }: { payment: { status: string; amount: number; currency: string; refundAmount?: number | null } }) => {
+  switch (payment.status) {
+    case 'SUCCEEDED':
+      return (
+        <Badge variant="outline" className="gap-1 text-green-700 border-green-300">
+          <CreditCard className="h-3 w-3" />
+          {formatPrice(payment.amount, payment.currency)}
+        </Badge>
+      );
+    case 'REFUNDED':
+      return (
+        <Badge variant="outline" className="gap-1 text-orange-700 border-orange-300">
+          <RotateCcw className="h-3 w-3" />
+          Refunded
+        </Badge>
+      );
+    case 'PARTIALLY_REFUNDED':
+      return (
+        <Badge variant="outline" className="gap-1 text-orange-700 border-orange-300">
+          <RotateCcw className="h-3 w-3" />
+          {formatPrice(payment.refundAmount ?? 0, payment.currency)} refunded
+        </Badge>
+      );
+    case 'PENDING':
+      return (
+        <Badge variant="outline" className="gap-1 text-yellow-700 border-yellow-300">
+          <CreditCard className="h-3 w-3" />
+          Payment pending
+        </Badge>
+      );
+    case 'FAILED':
+      return (
+        <Badge variant="destructive" className="gap-1">
+          <CreditCard className="h-3 w-3" />
+          Payment failed
+        </Badge>
+      );
+    default:
+      return null;
+  }
 };
 
 export const BookingCard = ({
@@ -139,6 +192,9 @@ export const BookingCard = ({
                     <Video className="h-3 w-3" />
                     Video
                   </Badge>
+                )}
+                {booking.payment && (
+                  <PaymentBadge payment={booking.payment} />
                 )}
                 {isInitiator && booking.status === 'PENDING' && (
                   <span className="text-xs text-muted-foreground">Awaiting confirmation</span>
