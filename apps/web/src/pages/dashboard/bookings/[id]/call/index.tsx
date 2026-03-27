@@ -1,12 +1,27 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import DailyIframe from '@daily-co/daily-js';
-import { DailyProvider, DailyVideo, useLocalSessionId, useParticipantIds, useDailyEvent, useDaily } from '@daily-co/daily-react';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Loader2 } from 'lucide-react';
+import DailyIframe, { DailyCall } from '@daily-co/daily-js';
+import { DailyProvider, DailyVideo, DailyAudio, useLocalSessionId, useParticipantIds, useDailyEvent, useDaily } from '@daily-co/daily-react';
+import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { useBooking } from '@/api/booking';
 import { useAuth } from '@/hooks';
 import { routes } from '@/config/routes';
+
+/** Check if an error is a config/billing issue that shouldn't be shown to users */
+const isConfigError = (err: unknown): boolean => {
+  const msg = err instanceof Error ? err.message.toLowerCase() : String(err).toLowerCase();
+  return (
+    msg.includes('payment') ||
+    msg.includes('billing') ||
+    msg.includes('api key') ||
+    msg.includes('not configured') ||
+    msg.includes('unauthorized') ||
+    msg.includes('401') ||
+    msg.includes('402') ||
+    msg.includes('403')
+  );
+};
 
 const CallUI = ({ bookingId, otherPartyName }: { bookingId: string; otherPartyName: string }) => {
   const navigate = useNavigate();
@@ -16,10 +31,18 @@ const CallUI = ({ bookingId, otherPartyName }: { bookingId: string; otherPartyNa
 
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [isMicOn, setIsMicOn] = useState(true);
+  const [callError, setCallError] = useState<string | null>(null);
 
   useDailyEvent('left-meeting', useCallback(() => {
     navigate(routes.dashboardBookingDetail(bookingId));
   }, [navigate, bookingId]));
+
+  useDailyEvent('error', useCallback((ev?: { errorMsg?: string }) => {
+    console.error('[VideoCall] Daily error event:', ev);
+    if (ev?.errorMsg && !isConfigError(ev.errorMsg)) {
+      setCallError(ev.errorMsg);
+    }
+  }, []));
 
   const toggleCamera = useCallback(() => {
     daily?.setLocalVideo(!isCameraOn);
@@ -37,7 +60,13 @@ const CallUI = ({ bookingId, otherPartyName }: { bookingId: string; otherPartyNa
   }, [daily, navigate, bookingId]);
 
   return (
-    <div className="fixed inset-0 bg-black flex flex-col z-50">
+    <div className="fixed inset-0 bg-black flex flex-col z-[60]">
+      {/* Mid-call error banner */}
+      {callError && (
+        <div className="bg-destructive/90 text-white text-center py-2 px-4 text-sm">
+          Connection issue: {callError}
+        </div>
+      )}
       {/* Video grid */}
       <div className="flex-1 flex items-center justify-center gap-4 p-4">
         {/* Remote participant (large) */}
@@ -73,6 +102,9 @@ const CallUI = ({ bookingId, otherPartyName }: { bookingId: string; otherPartyNa
         )}
       </div>
 
+      {/* DailyAudio handles all audio tracks automatically */}
+      <DailyAudio />
+
       {/* Controls bar */}
       <div className="flex items-center justify-center gap-4 py-6 bg-black/80">
         <Button
@@ -104,15 +136,43 @@ const CallUI = ({ bookingId, otherPartyName }: { bookingId: string; otherPartyNa
   );
 };
 
+/** Hook to create a single DailyCall instance and clean it up on unmount */
+const useCallObject = (url: string) => {
+  const [callObject, setCallObject] = useState<DailyCall | null>(null);
+  const createdRef = useRef(false);
+
+  useEffect(() => {
+    if (createdRef.current) return;
+    createdRef.current = true;
+
+    const co = DailyIframe.createCallObject({
+      url,
+      startVideoOff: false,
+      startAudioOff: false,
+    });
+    setCallObject(co);
+
+    return () => {
+      co.destroy().catch(console.error);
+      createdRef.current = false;
+    };
+  }, [url]);
+
+  return callObject;
+};
+
 export const BookingCallPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isTrainer } = useAuth();
   const { data: booking, isLoading } = useBooking(id ?? '');
 
+  const roomUrl = booking?.dailyRoomUrl ?? '';
+  const callObject = useCallObject(roomUrl);
+
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-[60]">
         <Loader2 className="h-8 w-8 animate-spin text-white" />
       </div>
     );
@@ -120,11 +180,19 @@ export const BookingCallPage = () => {
 
   if (!booking || booking.sessionType !== 'VIDEO_CALL' || !booking.dailyRoomUrl) {
     return (
-      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4 z-50">
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4 z-[60]">
         <p className="text-white text-lg">Video call not available for this booking.</p>
         <Button variant="secondary" onClick={() => navigate(routes.dashboardBookings)}>
           Back to Bookings
         </Button>
+      </div>
+    );
+  }
+
+  if (!callObject) {
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-[60]">
+        <Loader2 className="h-8 w-8 animate-spin text-white" />
       </div>
     );
   }
@@ -134,13 +202,7 @@ export const BookingCallPage = () => {
   const otherPartyName = isTrainer ? clientName : trainerName;
 
   return (
-    <DailyProvider
-      callObject={DailyIframe.createCallObject({
-        url: booking.dailyRoomUrl,
-        startVideoOff: false,
-        startAudioOff: false,
-      })}
-    >
+    <DailyProvider callObject={callObject}>
       <CallRoom bookingId={booking.id} otherPartyName={otherPartyName} roomUrl={booking.dailyRoomUrl} />
     </DailyProvider>
   );
@@ -150,16 +212,30 @@ const CallRoom = ({ bookingId, otherPartyName, roomUrl }: { bookingId: string; o
   const daily = useDaily();
   const [joined, setJoined] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const joinCall = useCallback(async () => {
     if (!daily) return;
     setJoining(true);
+    setError(null);
     try {
       await daily.join({ url: roomUrl });
       setJoined(true);
     } catch (err) {
       console.error('[VideoCall] Failed to join:', err);
+      if (isConfigError(err)) {
+        setError('Video calls are temporarily unavailable. Please try again later.');
+      } else {
+        const msg = err instanceof Error ? err.message : 'Unknown error';
+        if (msg.includes('expired') || msg.includes('not found')) {
+          setError('This video call room has expired or is no longer available.');
+        } else if (msg.includes('network') || msg.includes('fetch')) {
+          setError('Could not connect to the video call. Please check your internet connection and try again.');
+        } else {
+          setError('Something went wrong joining the call. Please try again.');
+        }
+      }
     } finally {
       setJoining(false);
     }
@@ -167,11 +243,21 @@ const CallRoom = ({ bookingId, otherPartyName, roomUrl }: { bookingId: string; o
 
   if (!joined) {
     return (
-      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-6 z-50">
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-6 z-[60]">
         <div className="text-center text-white">
-          <Video className="h-12 w-12 mx-auto mb-4 text-primary" />
-          <h2 className="text-xl font-semibold mb-1">Ready to join?</h2>
-          <p className="text-white/60">Session with {otherPartyName}</p>
+          {error ? (
+            <>
+              <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+              <h2 className="text-xl font-semibold mb-1">Unable to join call</h2>
+              <p className="text-white/60 max-w-sm">{error}</p>
+            </>
+          ) : (
+            <>
+              <Video className="h-12 w-12 mx-auto mb-4 text-primary" />
+              <h2 className="text-xl font-semibold mb-1">Ready to join?</h2>
+              <p className="text-white/60">Session with {otherPartyName}</p>
+            </>
+          )}
         </div>
         <div className="flex gap-3">
           <Button
@@ -186,6 +272,8 @@ const CallRoom = ({ bookingId, otherPartyName, roomUrl }: { bookingId: string; o
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                 Joining...
               </>
+            ) : error ? (
+              'Try Again'
             ) : (
               <>
                 <Phone className="h-4 w-4 mr-2" />

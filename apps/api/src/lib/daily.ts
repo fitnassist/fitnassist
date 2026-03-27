@@ -10,9 +10,36 @@ interface DailyRoom {
   config: Record<string, unknown>;
 }
 
+/** Config/billing errors that should not be shown to end users */
+const isConfigError = (status: number, body: string): boolean => {
+  const lowerBody = body.toLowerCase();
+  return (
+    status === 401 ||
+    status === 403 ||
+    (status === 402 || lowerBody.includes('payment') || lowerBody.includes('billing')) ||
+    lowerBody.includes('api key') ||
+    lowerBody.includes('not configured') ||
+    lowerBody.includes('unauthorized')
+  );
+};
+
+export class DailyConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DailyConfigError';
+  }
+}
+
+export class DailyRoomError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DailyRoomError';
+  }
+}
+
 const dailyFetch = async (path: string, options: RequestInit = {}): Promise<Response> => {
   if (!env.DAILY_API_KEY) {
-    throw new Error('DAILY_API_KEY is not configured');
+    throw new DailyConfigError('DAILY_API_KEY is not configured');
   }
 
   return fetch(`${DAILY_API_BASE}${path}`, {
@@ -29,6 +56,7 @@ export const dailyService = {
   /**
    * Create a video call room for a booking.
    * Room auto-expires 24 hours after the session end time.
+   * Throws DailyConfigError for billing/auth issues, DailyRoomError for other failures.
    */
   createRoom: async (bookingId: string, sessionEndTime: Date): Promise<{ url: string; name: string }> => {
     const roomName = `fitnassist-${bookingId}`;
@@ -49,9 +77,13 @@ export const dailyService = {
     });
 
     if (!res.ok) {
-      const error = await res.text();
-      console.error('[Daily] Failed to create room:', error);
-      throw new Error(`Failed to create video call room: ${res.status}`);
+      const errorBody = await res.text();
+      console.error('[Daily] Failed to create room:', res.status, errorBody);
+
+      if (isConfigError(res.status, errorBody)) {
+        throw new DailyConfigError(`Video call service configuration error: ${res.status}`);
+      }
+      throw new DailyRoomError(`Failed to create video call room: ${res.status}`);
     }
 
     const room = (await res.json()) as DailyRoom;

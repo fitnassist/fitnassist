@@ -7,7 +7,7 @@ import { availabilityService } from './availability.service';
 import { bookingNotificationService } from './booking-notification.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
-import { dailyService } from '../lib/daily';
+import { dailyService, DailyConfigError } from '../lib/daily';
 
 const HOLD_DURATION_MS = 48 * 60 * 60 * 1000; // 48 hours
 
@@ -212,7 +212,14 @@ export const bookingService = {
         dailyData = { dailyRoomUrl: room.url, dailyRoomName: room.name };
       } catch (err) {
         console.error('[Daily] Failed to create room for booking', id, err);
-        // Don't block confirmation if room creation fails
+        // Config/billing errors are silently swallowed — the booking still confirms
+        // but the video call won't be available. Real errors surface to the user.
+        if (!(err instanceof DailyConfigError)) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Video call setup failed. The booking has not been confirmed. Please try again.',
+          });
+        }
       }
     }
 
@@ -600,6 +607,12 @@ export const bookingService = {
           dailyData = { dailyRoomUrl: room.url, dailyRoomName: room.name };
         } catch (err) {
           console.error('[Daily] Failed to create room for suggestion accept', booking.id, err);
+          if (!(err instanceof DailyConfigError)) {
+            throw new TRPCError({
+              code: 'INTERNAL_SERVER_ERROR',
+              message: 'Video call setup failed. Please try again.',
+            });
+          }
         }
       }
 
