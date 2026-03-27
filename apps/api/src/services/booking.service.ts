@@ -8,6 +8,7 @@ import { bookingNotificationService } from './booking-notification.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { dailyService, DailyConfigError } from '../lib/daily';
+import { sessionPaymentService } from './session-payment.service';
 
 const HOLD_DURATION_MS = 48 * 60 * 60 * 1000; // 48 hours
 
@@ -282,6 +283,11 @@ export const bookingService = {
       holdExpiresAt: null,
     });
 
+    // Process full refund if there was a payment
+    sessionPaymentService.processDeclineRefund(id).catch((err) => {
+      console.error('[SessionPayment] Failed to process decline refund:', err);
+    });
+
     const dateLabel = formatDateLabel(booking.date);
 
     // SSE to both
@@ -345,6 +351,11 @@ export const bookingService = {
       holdExpiresAt: null,
       dailyRoomUrl: null,
       dailyRoomName: null,
+    });
+
+    // Process refund based on cancellation policy
+    sessionPaymentService.processCancellationRefund(id, isTrainer ? 'trainer' : 'client').catch((err) => {
+      console.error('[SessionPayment] Failed to process cancellation refund:', err);
     });
 
     const trainerUserId = booking.trainer.userId;

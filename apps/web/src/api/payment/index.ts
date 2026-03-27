@@ -54,3 +54,21 @@ export const useTrainerPricing = (trainerId: string) => {
     { enabled: !!trainerId }
   );
 };
+
+export const useCreatePaymentIntent = () => {
+  return trpc.payment.createPaymentIntent.useMutation();
+};
+
+export const usePaymentStatus = (bookingId: string) => {
+  return trpc.payment.getPaymentStatus.useQuery(
+    { bookingId },
+    { enabled: !!bookingId }
+  );
+};
+
+export const usePaymentRequirement = (trainerId: string, clientRosterId: string) => {
+  return trpc.payment.getPaymentRequirement.useQuery(
+    { trainerId, clientRosterId },
+    { enabled: !!trainerId && !!clientRosterId }
+  );
+};

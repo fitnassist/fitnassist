@@ -87,6 +87,10 @@ export {
   ProgressPhotoOptionalDefaultsSchema,
   DiaryCommentSchema,
   DiaryCommentOptionalDefaultsSchema,
+  PaymentStatusSchema,
+  SessionPaymentSchema,
+  SessionPriceSchema,
+  CancellationPolicySchema,
 } from '@fitnassist/database';
 
 // =============================================================================

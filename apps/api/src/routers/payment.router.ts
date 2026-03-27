@@ -2,6 +2,7 @@ import { router, trainerProcedure, protectedProcedure, requireTier } from '../li
 import { prisma } from '../lib/prisma';
 import { TRPCError } from '@trpc/server';
 import { stripeConnectService } from '../services/stripe-connect.service';
+import { sessionPaymentService } from '../services/session-payment.service';
 import { sessionPriceRepository } from '../repositories/session-price.repository';
 import { cancellationPolicyRepository } from '../repositories/cancellation-policy.repository';
 import {
@@ -196,5 +197,43 @@ export const paymentRouter = router({
           partialRefundPercent: cancellationPolicy.partialRefundPercent,
         } : null,
       };
+    }),
+
+  // Create PaymentIntent for a booking
+  createPaymentIntent: protectedProcedure
+    .input(z.object({ bookingId: z.string().cuid() }))
+    .mutation(async ({ input, ctx }) => {
+      const booking = await prisma.booking.findUnique({
+        where: { id: input.bookingId },
+        select: {
+          id: true,
+          trainerId: true,
+          status: true,
+          clientRoster: {
+            select: { connection: { select: { senderId: true } } },
+          },
+        },
+      });
+      if (!booking) throw new TRPCError({ code: 'NOT_FOUND', message: 'Booking not found' });
+
+      // Only the client (trainee) can pay
+      const isClient = booking.clientRoster.connection.senderId === ctx.user.id;
+      if (!isClient) throw new TRPCError({ code: 'FORBIDDEN', message: 'Only the client can pay' });
+
+      return sessionPaymentService.createPaymentIntent(booking.id, booking.trainerId);
+    }),
+
+  // Get payment status for a booking
+  getPaymentStatus: protectedProcedure
+    .input(z.object({ bookingId: z.string().cuid() }))
+    .query(async ({ input }) => {
+      return sessionPaymentService.getPaymentStatus(input.bookingId);
+    }),
+
+  // Check if payment is required for a booking (used before creating booking)
+  getPaymentRequirement: protectedProcedure
+    .input(z.object({ trainerId: z.string().cuid(), clientRosterId: z.string().cuid() }))
+    .query(async ({ input }) => {
+      return sessionPaymentService.getPaymentRequirement(input.trainerId, input.clientRosterId);
     }),
 });
