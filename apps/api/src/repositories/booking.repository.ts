@@ -241,4 +241,22 @@ export const bookingRepository = {
       include: bookingInclude,
     });
   },
+
+  /**
+   * Find bookings with Daily rooms whose session time has passed.
+   */
+  findExpiredVideoRooms: () => {
+    return prisma.booking.findMany({
+      where: {
+        dailyRoomName: { not: null },
+        date: { lt: new Date() },
+      },
+      select: {
+        id: true,
+        dailyRoomName: true,
+        date: true,
+        endTime: true,
+      },
+    });
+  },
 };

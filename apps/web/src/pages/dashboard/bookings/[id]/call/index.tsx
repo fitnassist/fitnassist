@@ -189,6 +189,24 @@ export const BookingCallPage = () => {
     );
   }
 
+  // Check if the session time has passed
+  const bookingDateStr = new Date(booking.date).toISOString().split('T')[0];
+  const sessionEnd = new Date(`${bookingDateStr}T${booking.endTime}:00`);
+  const isExpired = sessionEnd.getTime() < Date.now();
+
+  if (isExpired) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4 z-[60]">
+        <AlertCircle className="h-12 w-12 text-white/60" />
+        <p className="text-white text-lg">This session has ended.</p>
+        <p className="text-white/60 text-sm">The video call is no longer available.</p>
+        <Button variant="secondary" onClick={() => navigate(routes.dashboardBookingDetail(booking.id))}>
+          Back to Booking
+        </Button>
+      </div>
+    );
+  }
+
   if (!callObject) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-[60]">

@@ -97,6 +97,11 @@ export const BookingCard = ({
   const isInitiator = booking.status === 'PENDING' && booking.initiatedBy === currentUserId;
   const pendingSuggestionCount = booking.suggestions?.filter((s) => s.status === 'PENDING').length ?? 0;
 
+  const bookingDateIso = typeof booking.date === 'string'
+    ? booking.date.split('T')[0]
+    : new Date(booking.date).toISOString().split('T')[0];
+  const isSessionExpired = new Date(`${bookingDateIso}T${booking.endTime}:00`).getTime() < Date.now();
+
   const handleCancel = () => {
     cancelMutation.mutate(
       { id: booking.id },
@@ -174,8 +179,8 @@ export const BookingCard = ({
 
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
-              {/* Join Call button for confirmed video calls */}
-              {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && (
+              {/* Join Call button for confirmed video calls (hide if session ended) */}
+              {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && !isSessionExpired && (
                 <Button
                   size="sm"
                   variant="default"

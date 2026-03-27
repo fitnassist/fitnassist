@@ -71,6 +71,22 @@ cronRouter.post('/booking-hold-expiry', async (req, res) => {
   }
 });
 
+cronRouter.post('/cleanup-video-rooms', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!env.CRON_SECRET || authHeader !== `Bearer ${env.CRON_SECRET}`) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const result = await bookingService.cleanupExpiredVideoRooms();
+    res.json({ ok: true, ...result });
+  } catch (error) {
+    console.error('[Cron] Video room cleanup failed:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 cronRouter.post('/cleanup-notifications', async (req, res) => {
   const authHeader = req.headers.authorization;
   if (!env.CRON_SECRET || authHeader !== `Bearer ${env.CRON_SECRET}`) {

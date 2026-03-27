@@ -98,6 +98,9 @@ export const BookingDetailPage = () => {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
 
+  const bookingDateIso = new Date(booking.date).toISOString().split('T')[0];
+  const isSessionExpired = new Date(`${bookingDateIso}T${booking.endTime}:00`).getTime() < Date.now();
+
   return (
     <PageLayout>
       <PageLayout.Header
@@ -182,8 +185,8 @@ export const BookingDetailPage = () => {
                 )}
               </div>
 
-              {/* Join Call button for confirmed video sessions */}
-              {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && (
+              {/* Join Call button for confirmed video sessions (hide if session ended) */}
+              {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && !isSessionExpired && (
                 <Button
                   className="w-full"
                   onClick={() => navigate(routes.dashboardBookingCall(booking.id))}

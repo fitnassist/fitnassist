@@ -796,4 +796,40 @@ export const bookingService = {
     const count = await bookingRepository.countPendingForUser(userId);
     return { count };
   },
+
+  /**
+   * Clean up expired Daily.co video rooms. Called by cron.
+   * Deletes the room from Daily and clears the DB fields.
+   */
+  cleanupExpiredVideoRooms: async () => {
+    const bookings = await bookingRepository.findExpiredVideoRooms();
+    let cleaned = 0;
+
+    for (const booking of bookings) {
+      // Double-check the session has actually ended (date < today catches most,
+      // but same-day bookings need the endTime check)
+      const dateStr = booking.date instanceof Date
+        ? booking.date.toISOString().split('T')[0]
+        : new Date(booking.date).toISOString().split('T')[0];
+      const sessionEnd = new Date(`${dateStr}T${booking.endTime}:00`);
+
+      if (sessionEnd.getTime() >= Date.now()) continue;
+
+      if (booking.dailyRoomName) {
+        await dailyService.deleteRoom(booking.dailyRoomName).catch((err) => {
+          console.error('[Daily] Failed to delete expired room:', booking.dailyRoomName, err);
+        });
+      }
+
+      await bookingRepository.update(booking.id, {
+        dailyRoomUrl: null,
+        dailyRoomName: null,
+      });
+
+      cleaned++;
+    }
+
+    console.log(`[VideoRoomCleanup] Cleaned ${cleaned} expired video rooms`);
+    return { cleaned };
+  },
 };

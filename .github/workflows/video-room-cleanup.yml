@@ -1,0 +1,17 @@
+name: Video Room Cleanup
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Every day at 2:00 UTC
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  cleanup-rooms:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean up expired Daily.co video rooms
+        run: |
+          curl -f -X POST \
+            "${{ secrets.API_URL }}/api/cron/cleanup-video-rooms" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

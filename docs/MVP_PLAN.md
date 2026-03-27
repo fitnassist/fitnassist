@@ -129,26 +129,26 @@ For reference, the following is live:
 
 ---
 
-## Phase 5: Social & Community
+## Phase 5: Social & Community ✅
 
 **Goal**: Add social features to increase engagement, retention, and organic growth.
 
-### 5.1 Follow System
+### 5.1 Follow System ✅
 - Follow PTs and other users
 - Follow back / mutual friend connections
 - Activity feed of followed users
 
-### 5.2 Posts & Updates
+### 5.2 Posts & Updates ✅
 - PTs and users can post updates (text, photos)
 - Feed of updates from followed accounts
 - Like/react to posts
 
-### 5.3 Leaderboards
+### 5.3 Leaderboards ✅
 - Public leaderboards (steps, workouts, streaks)
 - Private/friend-group leaderboards
 - Weekly/monthly competitions
 
-### 5.4 Achievements & Badges
+### 5.4 Achievements & Badges ✅
 - Earn badges for milestones (personal bests, streaks, goals hit)
 - Badge showcase on profile
 - Achievement notifications
@@ -252,10 +252,10 @@ For reference, the following is live:
 
 **Goal**: Premium tools for PTs to grow their business beyond the platform.
 
-### 9.1 Live Video Sessions
-- 1-on-1 video training sessions
-- Group session support
-- In-app video with no external tools needed
+### 9.1 Live Video Sessions ✅
+- 1-on-1 video training sessions (Daily.co integration, ELITE tier)
+- In-app video with lobby, controls, error handling
+- Trainer and trainee initiated video bookings
 
 ### 9.2 Product Storefront
 - PTs can sell fitness products, programs, and digital content
