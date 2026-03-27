@@ -1,4 +1,4 @@
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -85,8 +85,24 @@ export const BookingCalendar = ({
   bookings, isTrainer, view, onDateRangeChange,
 }: BookingCalendarProps) => {
   const navigate = useNavigate();
+  const calendarRef = useRef<FullCalendar>(null);
+  const onDateRangeChangeRef = useRef(onDateRangeChange);
+
+  // Keep ref in sync without causing re-renders
+  useEffect(() => {
+    onDateRangeChangeRef.current = onDateRangeChange;
+  }, [onDateRangeChange]);
 
   const calendarView = view === 'week' ? 'timeGridWeek' : 'dayGridMonth';
+
+  // When view (week/month) changes, tell the existing calendar to switch
+  // instead of remounting via key
+  useEffect(() => {
+    const api = calendarRef.current?.getApi();
+    if (api) {
+      api.changeView(calendarView);
+    }
+  }, [calendarView]);
 
   const events = useMemo(() => {
     return bookings.map((booking) => {
@@ -117,17 +133,19 @@ export const BookingCalendar = ({
     navigate(routes.dashboardBookingDetail(info.event.id));
   }, [navigate]);
 
+  // Use ref for callback to avoid re-render loop:
+  // datesSet → state update → re-render → new events prop → datesSet again
   const handleDatesSet = useCallback((dateInfo: { start: Date; end: Date }) => {
     const start = dateInfo.start.toISOString().split('T')[0]!;
     const end = dateInfo.end.toISOString().split('T')[0]!;
-    onDateRangeChange(start, end);
-  }, [onDateRangeChange]);
+    onDateRangeChangeRef.current(start, end);
+  }, []);
 
   return (
     <FullCalendar
+      ref={calendarRef}
       plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
       initialView={calendarView}
-      key={calendarView}
       events={events}
       eventClick={handleEventClick}
       datesSet={handleDatesSet}
