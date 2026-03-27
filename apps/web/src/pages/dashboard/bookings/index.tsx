@@ -43,24 +43,8 @@ export const BookingsPage = () => {
   const [period, setPeriod] = useState<Period>('week');
   const [suggestBookingId, setSuggestBookingId] = useState<string | null>(null);
 
-  // List view uses a narrow range; calendar view uses a wide range so
-  // the user can navigate freely without triggering refetches.
-  const { startDate, endDate } = useMemo(() => {
-    if (isTrainer && viewMode === 'calendar') {
-      const now = new Date();
-      const start = new Date(now);
-      start.setMonth(start.getMonth() - 3);
-      start.setDate(1);
-      const end = new Date(now);
-      end.setMonth(end.getMonth() + 6);
-      end.setDate(0);
-      return {
-        startDate: start.toISOString().split('T')[0]!,
-        endDate: end.toISOString().split('T')[0]!,
-      };
-    }
-    return getDateRange(period);
-  }, [isTrainer, viewMode, period]);
+  // List view date range
+  const { startDate, endDate } = useMemo(() => getDateRange(period), [period]);
 
   // Trainer uses date-range query, trainee uses upcoming
   const { data: trainerBookings, isLoading: trainerLoading } = useTrainerBookings(startDate, endDate);
@@ -199,7 +183,6 @@ export const BookingsPage = () => {
         {/* Calendar view (trainer only) */}
         {isTrainer && viewMode === 'calendar' && !isLoading && (
           <BookingCalendar
-            bookings={bookings ?? []}
             isTrainer={isTrainer}
             view={period}
           />

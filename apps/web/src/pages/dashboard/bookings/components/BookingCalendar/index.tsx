@@ -1,35 +1,16 @@
-import { useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import type { EventClickArg, EventContentArg } from '@fullcalendar/core';
+import type { EventClickArg, EventContentArg, DatesSetArg } from '@fullcalendar/core';
 import { User } from 'lucide-react';
+import { useTrainerBookings } from '@/api/booking';
 import { routes } from '@/config/routes';
 import './booking-calendar.css';
 
-interface Booking {
-  id: string;
-  date: string | Date;
-  startTime: string;
-  endTime: string;
-  durationMin: number;
-  status: string;
-  clientRoster?: {
-    connection?: {
-      sender?: { id: string; name: string; image?: string | null } | null;
-      senderId?: string | null;
-    } | null;
-  } | null;
-  trainer?: {
-    displayName: string;
-    profileImageUrl?: string | null;
-  } | null;
-}
-
 interface BookingCalendarProps {
-  bookings: Booking[];
   isTrainer: boolean;
   view: 'week' | 'month';
 }
@@ -72,7 +53,6 @@ const EventContent = ({ event }: EventContentArg) => {
     );
   }
 
-  // Month/daygrid: compact
   return (
     <div className="flex items-center gap-1 truncate">
       <span className="font-medium truncate">{name}</span>
@@ -80,15 +60,29 @@ const EventContent = ({ event }: EventContentArg) => {
   );
 };
 
-export const BookingCalendar = ({
-  bookings, isTrainer, view,
-}: BookingCalendarProps) => {
+export const BookingCalendar = ({ isTrainer, view }: BookingCalendarProps) => {
   const navigate = useNavigate();
   const calendarRef = useRef<FullCalendar>(null);
 
+  // Track the visible date range — updated by datesSet but only used
+  // for the query, never fed back into FullCalendar props.
+  const [dateRange, setDateRange] = useState(() => {
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(start.getDate() - start.getDay() + 1); // Monday of current week
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+    return {
+      startDate: start.toISOString().split('T')[0]!,
+      endDate: end.toISOString().split('T')[0]!,
+    };
+  });
+
+  // Fetch bookings for the visible range — this is the ONLY query
+  const { data: bookings } = useTrainerBookings(dateRange.startDate, dateRange.endDate);
+
   const calendarView = view === 'week' ? 'timeGridWeek' : 'dayGridMonth';
 
-  // Switch view without remounting
   useEffect(() => {
     const api = calendarRef.current?.getApi();
     if (api) {
@@ -96,11 +90,13 @@ export const BookingCalendar = ({
     }
   }, [calendarView]);
 
+  // Convert bookings to FullCalendar events. This is derived from query
+  // data which updates independently of the calendar's internal state.
   const events = useMemo(() => {
+    if (!bookings) return [];
     return bookings.map((booking) => {
-      const dateStr = typeof booking.date === 'string'
-        ? booking.date.split('T')[0]
-        : booking.date.toISOString().split('T')[0];
+      const d = booking.date instanceof Date ? booking.date : new Date(booking.date);
+      const dateStr = d.toISOString().split('T')[0];
 
       const name = isTrainer
         ? (booking.clientRoster?.connection?.sender?.name ?? 'Client')
@@ -125,6 +121,19 @@ export const BookingCalendar = ({
     navigate(routes.dashboardBookingDetail(info.event.id));
   }, [navigate]);
 
+  // When FullCalendar navigates (prev/next/today), update the query range.
+  // This does NOT cause FullCalendar to remount or reset — the calendar
+  // manages its own position internally. We just update the data query.
+  const handleDatesSet = useCallback((dateInfo: DatesSetArg) => {
+    const start = dateInfo.start.toISOString().split('T')[0]!;
+    const end = dateInfo.end.toISOString().split('T')[0]!;
+    setDateRange((prev) => {
+      // Only update if actually changed to avoid unnecessary re-renders
+      if (prev.startDate === start && prev.endDate === end) return prev;
+      return { startDate: start, endDate: end };
+    });
+  }, []);
+
   return (
     <FullCalendar
       ref={calendarRef}
@@ -132,6 +141,7 @@ export const BookingCalendar = ({
       initialView={calendarView}
       events={events}
       eventClick={handleEventClick}
+      datesSet={handleDatesSet}
       eventContent={EventContent}
       headerToolbar={{
         left: 'prev,next today',
