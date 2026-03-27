@@ -42,6 +42,10 @@ export const TrainerProfileSchema = z.object({
   travelBufferMin: z.number().int().min(0).max(120),
   smartTravelEnabled: z.boolean(),
   offersVideoSessions: z.boolean(),
+  paymentsEnabled: z.boolean(),
+  stripeConnectedAccountId: z.string().nullable(),
+  stripeOnboardingComplete: z.boolean(),
+  firstSessionFree: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -62,6 +66,9 @@ export const TrainerProfileOptionalDefaultsSchema = TrainerProfileSchema.merge(z
   travelBufferMin: z.number().int().min(0).max(120).optional(),
   smartTravelEnabled: z.boolean().optional(),
   offersVideoSessions: z.boolean().optional(),
+  paymentsEnabled: z.boolean().optional(),
+  stripeOnboardingComplete: z.boolean().optional(),
+  firstSessionFree: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }))

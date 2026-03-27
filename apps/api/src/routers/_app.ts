@@ -29,6 +29,7 @@ import { friendshipRouter } from './friendship.router';
 import { postRouter } from './post.router';
 import { leaderboardRouter } from './leaderboard.router';
 import { badgeRouter } from './badge.router';
+import { paymentRouter } from './payment.router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -61,6 +62,7 @@ export const appRouter = router({
   post: postRouter,
   leaderboard: leaderboardRouter,
   badge: badgeRouter,
+  payment: paymentRouter,
 });
 
 export type AppRouter = typeof appRouter;

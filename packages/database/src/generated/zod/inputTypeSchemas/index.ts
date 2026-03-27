@@ -43,6 +43,9 @@ export { AvailabilityScalarFieldEnumSchema } from './AvailabilityScalarFieldEnum
 export { AvailabilityOverrideScalarFieldEnumSchema } from './AvailabilityOverrideScalarFieldEnumSchema';
 export { BookingScalarFieldEnumSchema } from './BookingScalarFieldEnumSchema';
 export { BookingSuggestionScalarFieldEnumSchema } from './BookingSuggestionScalarFieldEnumSchema';
+export { SessionPriceScalarFieldEnumSchema } from './SessionPriceScalarFieldEnumSchema';
+export { CancellationPolicyScalarFieldEnumSchema } from './CancellationPolicyScalarFieldEnumSchema';
+export { SessionPaymentScalarFieldEnumSchema } from './SessionPaymentScalarFieldEnumSchema';
 export { TravelTimeCacheScalarFieldEnumSchema } from './TravelTimeCacheScalarFieldEnumSchema';
 export { NotificationScalarFieldEnumSchema } from './NotificationScalarFieldEnumSchema';
 export { PushSubscriptionScalarFieldEnumSchema } from './PushSubscriptionScalarFieldEnumSchema';
@@ -63,6 +66,7 @@ export { SubscriptionTierSchema } from './SubscriptionTierSchema';
 export { SubscriptionStatusSchema } from './SubscriptionStatusSchema';
 export { BillingPeriodSchema } from './BillingPeriodSchema';
 export { SessionTypeSchema } from './SessionTypeSchema';
+export { PaymentStatusSchema } from './PaymentStatusSchema';
 export { BookingStatusSchema } from './BookingStatusSchema';
 export { DayOfWeekSchema } from './DayOfWeekSchema';
 export { TravelOptionSchema } from './TravelOptionSchema';

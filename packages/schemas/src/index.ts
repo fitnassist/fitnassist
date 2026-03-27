@@ -116,6 +116,7 @@ export * from './forms/subscription.schema';
 export * from './forms/session-location.schema';
 export * from './forms/availability.schema';
 export * from './forms/booking.schema';
+export * from './forms/payment.schema';
 
 // =============================================================================
 // CONSTANTS

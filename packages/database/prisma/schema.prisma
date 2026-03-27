@@ -60,6 +60,14 @@ enum SessionType {
   VIDEO_CALL
 }
 
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
 enum BookingStatus {
   PENDING
   CONFIRMED
@@ -367,6 +375,12 @@ model TrainerProfile {
   smartTravelEnabled   Boolean          @default(false)
   offersVideoSessions  Boolean          @default(false)
 
+  // Payment settings
+  paymentsEnabled            Boolean  @default(false)
+  stripeConnectedAccountId   String?
+  stripeOnboardingComplete   Boolean  @default(false)
+  firstSessionFree           Boolean  @default(false)
+
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -386,6 +400,8 @@ model TrainerProfile {
   availabilities         Availability[]
   availabilityOverrides  AvailabilityOverride[]
   bookings               Booking[]
+  sessionPrice           SessionPrice?
+  cancellationPolicy     CancellationPolicy?
 
   @@index([latitude, longitude])
   @@index([city])
@@ -1453,6 +1469,7 @@ model Booking {
   rescheduledFrom    Booking?        @relation("RescheduleChain", fields: [rescheduledFromId], references: [id], onDelete: SetNull)
   rescheduledTo      Booking?        @relation("RescheduleChain")
   suggestions        BookingSuggestion[]
+  payment            SessionPayment?
 
   @@index([trainerId, date])
   @@index([clientRosterId])
@@ -1484,6 +1501,59 @@ model BookingSuggestion {
 
   @@index([bookingId])
   @@map("booking_suggestions")
+}
+
+model SessionPrice {
+  id         String         @id @default(cuid())
+  trainerId  String         @unique
+  /// @zod.number.int().min(100).max(100000)
+  amount     Int            // Price in pence (e.g. 5000 = £50.00)
+  currency   String         @default("gbp")
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  trainer    TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@map("session_prices")
+}
+
+model CancellationPolicy {
+  id                    String         @id @default(cuid())
+  trainerId             String         @unique
+  /// @zod.number.int().min(1).max(168)
+  fullRefundHours       Int            @default(48)
+  /// @zod.number.int().min(1).max(168)
+  partialRefundHours    Int            @default(24)
+  /// @zod.number.int().min(0).max(100)
+  partialRefundPercent  Int            @default(50)
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  trainer               TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@map("cancellation_policies")
+}
+
+model SessionPayment {
+  id                    String         @id @default(cuid())
+  bookingId             String         @unique
+  stripePaymentIntentId String         @unique
+  stripeChargeId        String?
+  amount                Int            // Amount charged in pence
+  platformFee           Int            @default(50)  // £0.50 = 50 pence
+  currency              String         @default("gbp")
+  status                PaymentStatus  @default(PENDING)
+  refundAmount          Int?
+  /// @zod.string.max(500)
+  refundReason          String?
+  refundedAt            DateTime?
+  paidAt                DateTime?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  booking               Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@map("session_payments")
 }
 
 model TravelTimeCache {
