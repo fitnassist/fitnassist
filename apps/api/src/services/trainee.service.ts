@@ -116,13 +116,18 @@ export const traineeService = {
       viewerUserId,
     );
 
+    // Blocked users see nothing
+    if (viewerRelationship === 'BLOCKED') {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
+    }
+
     // Hide profile entirely if all settings are ONLY_ME for public viewers
     if (isProfileFullyPrivate(profile) && viewerRelationship === 'PUBLIC') {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
     }
 
     return {
-      ...filterProfileByPrivacy(profile, viewerRelationship),
+      ...filterProfileByPrivacy(profile, viewerRelationship as ViewerRelationship),
       viewerRelationship,
     };
   },
@@ -188,6 +193,8 @@ export const traineeService = {
       privacyPersonalBests: profile.privacyPersonalBests,
       privacyProgressPhotos: profile.privacyProgressPhotos,
       privacyStats: profile.privacyStats,
+      privacyBadges: profile.privacyBadges,
+      privacyFriendCount: profile.privacyFriendCount,
       // Granular trends
       privacyTrendWeight: profile.privacyTrendWeight,
       privacyTrendMeasurements: profile.privacyTrendMeasurements,
@@ -223,7 +230,13 @@ export const traineeService = {
     }
 
     const viewerRelationship = await determineViewerRelationship(profile.userId, viewerUserId);
-    const check = (setting: Visibility) => canView(viewerRelationship, setting);
+
+    // Blocked users see nothing
+    if (viewerRelationship === 'BLOCKED') {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Profile not found' });
+    }
+
+    const check = (setting: Visibility) => canView(viewerRelationship as ViewerRelationship, setting);
 
     // Hide profile entirely if all settings are ONLY_ME for public viewers
     if (isProfileFullyPrivate(profile) && viewerRelationship === 'PUBLIC') {
@@ -330,7 +343,7 @@ export const traineeService = {
         })),
       ) : null,
       stats,
-      showcaseBadges,
+      showcaseBadges: check(profile.privacyBadges) ? showcaseBadges : [],
       trendVisibility,
       viewerRelationship,
     };
@@ -370,9 +383,13 @@ export const traineeService = {
 const determineViewerRelationship = async (
   profileUserId: string,
   viewerUserId?: string,
-): Promise<ViewerRelationship> => {
+): Promise<ViewerRelationship | 'BLOCKED'> => {
   if (!viewerUserId) return 'PUBLIC';
   if (viewerUserId === profileUserId) return 'SELF';
+
+  // Check if either user has blocked the other
+  const isBlocked = await friendshipRepository.isBlocked(viewerUserId, profileUserId);
+  if (isBlocked) return 'BLOCKED';
 
   // Check if viewer is a connected trainer
   const trainerProfile = await trainerRepository.findByUserId(viewerUserId);
@@ -402,7 +419,8 @@ const isProfileFullyPrivate = (profile: TraineeProfile): boolean => {
   const settings: Visibility[] = [
     profile.privacyBio, profile.privacyLocation, profile.privacyBodyMetrics,
     profile.privacyGoals, profile.privacyPersonalBests, profile.privacyProgressPhotos,
-    profile.privacyStats, profile.privacyTrendWeight, profile.privacyTrendMeasurements,
+    profile.privacyStats, profile.privacyBadges, profile.privacyFriendCount,
+    profile.privacyTrendWeight, profile.privacyTrendMeasurements,
     profile.privacyTrendNutrition, profile.privacyTrendWater, profile.privacyTrendMood,
     profile.privacyTrendSleep, profile.privacyTrendActivity, profile.privacyTrendSteps,
   ];

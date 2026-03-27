@@ -58,6 +58,8 @@ export const SECTION_PRIVACY_SETTINGS: PrivacySettingDef[] = [
   { key: 'privacyPersonalBests', label: 'Personal Bests', description: 'Your personal best achievements' },
   { key: 'privacyProgressPhotos', label: 'Progress Photos', description: 'Your progress photos' },
   { key: 'privacyStats', label: 'Stats', description: 'Your goal and personal best counts' },
+  { key: 'privacyBadges', label: 'Badges', description: 'Your showcase badges on your profile' },
+  { key: 'privacyFriendCount', label: 'Friend Count', description: 'Whether others can see your friend count' },
 ];
 
 /** Granular trend chart privacy settings */

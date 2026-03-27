@@ -46,6 +46,21 @@ const getFollowingIds = async (userId: string): Promise<string[]> => {
   return follows.map((f) => f.followingId);
 };
 
+const getBlockedUserIds = async (userId: string): Promise<Set<string>> => {
+  const blocked = await prisma.friendship.findMany({
+    where: {
+      status: 'BLOCKED',
+      OR: [{ requesterId: userId }, { addresseeId: userId }],
+    },
+    select: { requesterId: true, addresseeId: true },
+  });
+  const ids = new Set<string>();
+  for (const b of blocked) {
+    ids.add(b.requesterId === userId ? b.addresseeId : b.requesterId);
+  }
+  return ids;
+};
+
 const getFollowerIds = async (userId: string): Promise<string[]> => {
   const follows = await prisma.follow.findMany({
     where: { followingId: userId },
@@ -127,10 +142,15 @@ export const postService = {
   },
 
   async getFeed(userId: string, cursor?: string, limit = 20) {
-    const [friendIds, followingIds] = await Promise.all([
+    const [friendIds, followingIds, blockedIds] = await Promise.all([
       getFriendIds(userId),
       getFollowingIds(userId),
+      getBlockedUserIds(userId),
     ]);
+
+    // Filter out blocked users from friends and following
+    const safeFriendIds = friendIds.filter((id) => !blockedIds.has(id));
+    const safeFollowingIds = followingIds.filter((id) => !blockedIds.has(id));
 
     // Parse cursor — format: "timestamp|type|id" or just a post ID for backwards compat
     let postCursor: string | undefined;
@@ -149,16 +169,16 @@ export const postService = {
 
     // Get posts
     const postsResult = await postRepository.getFeed(
-      userId, friendIds, followingIds, postCursor, limit
+      userId, safeFriendIds, safeFollowingIds, postCursor, limit
     );
 
     // Get diary entries from friends based on their privacy settings
     let allowedDiaryTypes: DiaryEntryType[] = [];
 
-    if (friendIds.length > 0) {
+    if (safeFriendIds.length > 0) {
       // Get friends' privacy settings to determine which diary types are visible
       const friendProfiles = await prisma.traineeProfile.findMany({
-        where: { userId: { in: friendIds } },
+        where: { userId: { in: safeFriendIds } },
         select: {
           userId: true,
           privacyTrendWeight: true,
@@ -187,7 +207,7 @@ export const postService = {
     }
 
     const diaryEntries = await postRepository.getFeedDiaryEntries(
-      friendIds, userId, allowedDiaryTypes, diaryCursorDate, limit
+      safeFriendIds, userId, allowedDiaryTypes, diaryCursorDate, limit
     );
 
     // Merge posts and diary entries, sorted by createdAt desc

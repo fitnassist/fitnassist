@@ -767,6 +767,10 @@ model TraineeProfile {
   privacyTrendActivity      Visibility @default(EVERYONE)
   privacyTrendSteps         Visibility @default(EVERYONE)
 
+  // Social privacy
+  privacyBadges             Visibility @default(EVERYONE)
+  privacyFriendCount        Visibility @default(PT_AND_FRIENDS)
+
   lastFeedViewedAt DateTime?
   leaderboardOptIn Boolean          @default(false)
   showcaseBadgeIds String[]         @default([])

@@ -72,6 +72,8 @@ export const createTraineeProfileSchema = z.object({
   privacyPersonalBests: visibilityEnum.optional(),
   privacyProgressPhotos: visibilityEnum.optional(),
   privacyStats: visibilityEnum.optional(),
+  privacyBadges: visibilityEnum.optional(),
+  privacyFriendCount: visibilityEnum.optional(),
 
   // Granular trend privacy settings
   privacyTrendWeight: visibilityEnum.optional(),
@@ -103,6 +105,8 @@ export const updatePrivacySettingsSchema = z.object({
   privacyPersonalBests: visibilityEnum,
   privacyProgressPhotos: visibilityEnum,
   privacyStats: visibilityEnum,
+  privacyBadges: visibilityEnum,
+  privacyFriendCount: visibilityEnum,
 
   // Granular trends
   privacyTrendWeight: visibilityEnum,

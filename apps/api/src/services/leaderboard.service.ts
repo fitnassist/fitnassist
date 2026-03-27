@@ -48,16 +48,34 @@ const getFriendIds = async (userId: string): Promise<string[]> => {
   );
 };
 
+const getBlockedUserIds = async (userId: string): Promise<Set<string>> => {
+  const blocked = await prisma.friendship.findMany({
+    where: {
+      status: 'BLOCKED',
+      OR: [{ requesterId: userId }, { addresseeId: userId }],
+    },
+    select: { requesterId: true, addresseeId: true },
+  });
+  const ids = new Set<string>();
+  for (const b of blocked) {
+    ids.add(b.requesterId === userId ? b.addresseeId : b.requesterId);
+  }
+  return ids;
+};
+
 const getEligibleUserIds = async (
   scope: LeaderboardScope,
   userId: string
 ): Promise<string[] | null> => {
+  const blockedIds = await getBlockedUserIds(userId);
+
   if (scope === 'FRIENDS') {
     const friendIds = await getFriendIds(userId);
+    const safeFriendIds = friendIds.filter((id) => !blockedIds.has(id));
     // Include friends with stats visible to friends + the current user
     const friendProfiles = await prisma.traineeProfile.findMany({
       where: {
-        userId: { in: friendIds },
+        userId: { in: safeFriendIds },
         privacyStats: { in: FRIEND_VISIBLE_LEVELS },
       },
       select: { userId: true },
@@ -70,7 +88,7 @@ const getEligibleUserIds = async (
     where: { leaderboardOptIn: true },
     select: { userId: true },
   });
-  const ids = optedIn.map((p) => p.userId);
+  const ids = optedIn.map((p) => p.userId).filter((id) => !blockedIds.has(id));
   // Always include the requesting user if they're opted in
   if (!ids.includes(userId)) {
     const userProfile = await prisma.traineeProfile.findUnique({
