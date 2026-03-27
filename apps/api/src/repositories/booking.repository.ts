@@ -61,6 +61,20 @@ export const bookingRepository = {
     });
   },
 
+  /**
+   * Lightweight query for slot conflict checking — only returns date/time fields.
+   */
+  findSlotsByTrainerDateRange: (trainerId: string, startDate: Date, endDate: Date) => {
+    return prisma.booking.findMany({
+      where: {
+        trainerId,
+        date: { gte: startDate, lte: endDate },
+        status: { in: SLOT_BLOCKING_STATUSES },
+      },
+      select: { date: true, startTime: true, endTime: true },
+    });
+  },
+
   findByTrainerDateRange: (trainerId: string, startDate: Date, endDate: Date, status?: BookingStatus) => {
     return prisma.booking.findMany({
       where: {

@@ -149,6 +149,7 @@ export const availabilityService = {
 
   /**
    * Get dates in a range that have any availability.
+   * Batches all DB queries upfront (4 total) instead of per-day.
    */
   getAvailableDates: async (
     trainerId: string,
@@ -156,15 +157,105 @@ export const availabilityService = {
     endDate: Date,
     durationMin?: number
   ): Promise<string[]> => {
+    // Batch: fetch all data in parallel (4 queries total)
+    const [allAvailability, overrides, trainer, bookings] = await Promise.all([
+      availabilityRepository.findByTrainerId(trainerId),
+      availabilityRepository.findOverridesByTrainerAndDateRange(trainerId, startDate, endDate),
+      prisma.trainerProfile.findUnique({
+        where: { id: trainerId },
+        select: { travelBufferMin: true },
+      }),
+      bookingRepository.findSlotsByTrainerDateRange(trainerId, startDate, endDate),
+    ]);
+
+    const travelBufferMin = trainer?.travelBufferMin ?? 15;
+
+    // Index overrides by date string
+    const overrideMap = new Map<string, typeof overrides[number]>();
+    for (const o of overrides) {
+      const key = o.date.toISOString().split('T')[0]!;
+      overrideMap.set(key, o);
+    }
+
+    // Index availability windows by day of week
+    const availabilityByDay = new Map<string, typeof allAvailability>();
+    for (const a of allAvailability) {
+      const existing = availabilityByDay.get(a.dayOfWeek) ?? [];
+      existing.push(a);
+      availabilityByDay.set(a.dayOfWeek, existing);
+    }
+
+    // Index bookings by date string
+    const bookingsByDate = new Map<string, { start: number; end: number }[]>();
+    for (const b of bookings) {
+      const key = b.date.toISOString().split('T')[0]!;
+      const existing = bookingsByDate.get(key) ?? [];
+      existing.push({ start: timeToMinutes(b.startTime), end: timeToMinutes(b.endTime) });
+      bookingsByDate.set(key, existing);
+    }
+
+    // Iterate days in-memory
     const dates: string[] = [];
     const current = new Date(startDate);
 
     while (current <= endDate) {
-      const slots = await availabilityService.getAvailableSlots(trainerId, new Date(current), durationMin);
-      if (slots.length > 0) {
-        const dateStr = current.toISOString().split('T')[0];
-        if (dateStr) dates.push(dateStr);
+      const dateStr = current.toISOString().split('T')[0]!;
+      const dayOfWeek = DAY_MAP[current.getDay()];
+
+      if (dayOfWeek) {
+        const override = overrideMap.get(dateStr);
+
+        if (!override?.isBlocked) {
+          // Determine windows for this day
+          let windows: { startTime: string; endTime: string; sessionDurationMin: number }[];
+
+          if (override && !override.isBlocked && override.startTime && override.endTime) {
+            windows = [{
+              startTime: override.startTime,
+              endTime: override.endTime,
+              sessionDurationMin: durationMin ?? 60,
+            }];
+          } else {
+            const dayAvailability = availabilityByDay.get(dayOfWeek);
+            windows = dayAvailability ?? [];
+          }
+
+          if (windows.length > 0) {
+            const bookedSlots = bookingsByDate.get(dateStr) ?? [];
+            bookedSlots.sort((a, b) => a.start - b.start);
+
+            let hasSlot = false;
+            for (const window of windows) {
+              const windowStart = timeToMinutes(window.startTime);
+              const windowEnd = timeToMinutes(window.endTime);
+              const duration = durationMin ?? window.sessionDurationMin;
+
+              for (let slotStart = windowStart; slotStart + duration <= windowEnd; slotStart += duration) {
+                const slotEnd = slotStart + duration;
+                let isAvailable = true;
+
+                for (const booked of bookedSlots) {
+                  if (slotStart < booked.end + travelBufferMin && slotEnd > booked.start - travelBufferMin) {
+                    isAvailable = false;
+                    break;
+                  }
+                }
+
+                if (isAvailable) {
+                  hasSlot = true;
+                  break;
+                }
+              }
+              if (hasSlot) break;
+            }
+
+            if (hasSlot) {
+              dates.push(dateStr);
+            }
+          }
+        }
       }
+
       current.setDate(current.getDate() + 1);
     }
 
