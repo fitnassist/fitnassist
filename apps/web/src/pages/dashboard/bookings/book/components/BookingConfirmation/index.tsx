@@ -1,5 +1,5 @@
-import { Calendar, Clock, MapPin, Video } from 'lucide-react';
-import { Button, Card, CardContent } from '@/components/ui';
+import { Calendar, Clock, MapPin, Video, CreditCard, Gift } from 'lucide-react';
+import { Button, Card, CardContent, Badge } from '@/components/ui';
 
 interface BookingConfirmationProps {
   date: string;
@@ -13,7 +13,19 @@ interface BookingConfirmationProps {
   onConfirm: () => void;
   onBack: () => void;
   isSubmitting: boolean;
+  paymentInfo?: {
+    amount: number;
+    currency: string;
+  } | null;
+  isFirstFree?: boolean;
 }
+
+const formatPrice = (amount: number, currency: string = 'gbp') => {
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+  }).format(amount / 100);
+};
 
 export const BookingConfirmation = ({
   date,
@@ -27,6 +39,8 @@ export const BookingConfirmation = ({
   onConfirm,
   onBack,
   isSubmitting,
+  paymentInfo,
+  isFirstFree,
 }: BookingConfirmationProps) => {
   const dateStr = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', {
     weekday: 'long',
@@ -39,6 +53,8 @@ export const BookingConfirmation = ({
   const parts = startTime.split(':').map(Number);
   const endMinutes = (parts[0] ?? 0) * 60 + (parts[1] ?? 0) + durationMin;
   const endTime = `${String(Math.floor(endMinutes / 60)).padStart(2, '0')}:${String(endMinutes % 60).padStart(2, '0')}`;
+
+  const showPayment = paymentInfo || isFirstFree;
 
   return (
     <div className="space-y-4">
@@ -67,6 +83,21 @@ export const BookingConfirmation = ({
                 </>
               )}
             </div>
+            {showPayment && (
+              <div className="flex items-center gap-2">
+                {isFirstFree ? (
+                  <>
+                    <Gift className="h-4 w-4 text-green-600" />
+                    <Badge variant="success" className="text-xs">First Session Free</Badge>
+                  </>
+                ) : paymentInfo ? (
+                  <>
+                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <span>{formatPrice(paymentInfo.amount, paymentInfo.currency)}</span>
+                  </>
+                ) : null}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -87,7 +118,11 @@ export const BookingConfirmation = ({
           Back
         </Button>
         <Button onClick={onConfirm} disabled={isSubmitting} className="flex-1">
-          {isSubmitting ? 'Booking...' : 'Confirm Booking'}
+          {isSubmitting ? 'Booking...' : (
+            paymentInfo && !isFirstFree
+              ? `Confirm & Pay ${formatPrice(paymentInfo.amount, paymentInfo.currency)}`
+              : 'Confirm Booking'
+          )}
         </Button>
       </div>
     </div>

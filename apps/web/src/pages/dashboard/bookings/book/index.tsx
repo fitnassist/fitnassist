@@ -6,6 +6,7 @@ import { Skeleton, Card, CardContent } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { useAvailableDates, useAvailableSlots } from '@/api/availability';
 import { useCreateBooking } from '@/api/booking';
+import { usePaymentRequirement, useCreatePaymentIntent } from '@/api/payment';
 import { trpc } from '@/lib/trpc';
 import { routes } from '@/config/routes';
 import type { SessionType } from '@fitnassist/schemas';
@@ -13,13 +14,15 @@ import { DatePicker } from './components/DatePicker';
 import { SlotPicker } from './components/SlotPicker';
 import { LocationPicker } from './components/LocationPicker';
 import { BookingConfirmation } from './components/BookingConfirmation';
+import { PaymentStep } from './components/PaymentStep';
 
-type Step = 'date' | 'time' | 'session-type' | 'location' | 'confirm';
+type Step = 'date' | 'time' | 'session-type' | 'location' | 'confirm' | 'payment';
 
 export const BookSessionPage = () => {
   const { trainerId } = useParams<{ trainerId: string }>();
   const navigate = useNavigate();
   const createBooking = useCreateBooking();
+  const createPaymentIntent = useCreatePaymentIntent();
 
   // Get trainer info
   const { data: trainer, isLoading: trainerLoading } = trpc.trainer.getById.useQuery(
@@ -35,6 +38,7 @@ export const BookSessionPage = () => {
   const [clientAddressDetails, setClientAddressDetails] = useState<AddressDetails | null>(null);
   const [sessionType, setSessionType] = useState<SessionType>('IN_PERSON');
   const [notes, setNotes] = useState('');
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   // Get trainee profile for "Use my address" feature
   const { data: traineeProfile } = trpc.trainee.getMyProfile.useQuery();
@@ -64,13 +68,17 @@ export const BookSessionPage = () => {
 
   const selectedSlotObj = slots?.find((s) => s.startTime === selectedSlot);
 
-  // We need clientRosterId to create booking. Get it via the client-roster.
-  // The trainee needs to have a connection with this trainer.
+  // Get clientRosterId
   const { data: clientRoster } = trpc.clientRoster.myTrainers.useQuery(undefined, {
     enabled: !!trainerId,
   });
-
   const myRoster = clientRoster?.find((r: { trainer?: { id: string } }) => r.trainer?.id === trainerId);
+
+  // Check if payment is required
+  const { data: paymentReq } = usePaymentRequirement(
+    trainerId ?? '',
+    myRoster?.id ?? ''
+  );
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
@@ -80,7 +88,6 @@ export const BookSessionPage = () => {
 
   const handleSlotSelect = (startTime: string) => {
     setSelectedSlot(startTime);
-    // Show session type picker if trainer offers video, otherwise skip to location
     if (trainer?.offersVideoSessions) {
       setStep('session-type');
     } else {
@@ -91,7 +98,6 @@ export const BookSessionPage = () => {
   const handleSessionTypeSelect = (type: SessionType) => {
     setSessionType(type);
     if (type === 'VIDEO_CALL') {
-      // Skip location step for video calls
       setStep('confirm');
     } else {
       setStep('location');
@@ -101,37 +107,70 @@ export const BookSessionPage = () => {
   const handleConfirm = () => {
     if (!trainerId || !selectedDate || !selectedSlot || !selectedSlotObj || !myRoster) return;
 
-    createBooking.mutate(
-      {
-        trainerId,
-        clientRosterId: myRoster.id,
-        date: selectedDate,
-        startTime: selectedSlot,
-        durationMin: selectedSlotObj.durationMin,
-        sessionType,
-        locationId: sessionType === 'VIDEO_CALL' ? undefined : (selectedLocationId ?? undefined),
-        clientAddress: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.addressLine1 || undefined),
-        clientPostcode: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.postcode || undefined),
-        clientLatitude: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.latitude || undefined),
-        clientLongitude: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.longitude || undefined),
-        notes: notes || undefined,
-      },
-      {
-        onSuccess: () => {
-          navigate(routes.dashboardBookings);
+    const bookingData = {
+      trainerId,
+      clientRosterId: myRoster.id,
+      date: selectedDate,
+      startTime: selectedSlot,
+      durationMin: selectedSlotObj.durationMin,
+      sessionType,
+      locationId: sessionType === 'VIDEO_CALL' ? undefined : (selectedLocationId ?? undefined),
+      clientAddress: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.addressLine1 || undefined),
+      clientPostcode: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.postcode || undefined),
+      clientLatitude: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.latitude || undefined),
+      clientLongitude: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.longitude || undefined),
+      notes: notes || undefined,
+    };
+
+    // If payment required (and not first free), create booking then go to payment step
+    if (paymentReq?.paymentRequired) {
+      createBooking.mutate(bookingData, {
+        onSuccess: (booking) => {
+          // Create PaymentIntent for this booking
+          createPaymentIntent.mutate(
+            { bookingId: booking.id },
+            {
+              onSuccess: (result) => {
+                setClientSecret(result.clientSecret);
+                setStep('payment');
+              },
+            }
+          );
         },
-      }
-    );
+      });
+      return;
+    }
+
+    // No payment — create booking and navigate
+    createBooking.mutate(bookingData, {
+      onSuccess: () => {
+        navigate(routes.dashboardBookings);
+      },
+    });
+  };
+
+  const handlePaymentSuccess = () => {
+    navigate(routes.dashboardBookings);
   };
 
   const trainerName = trainer?.displayName ?? 'Trainer';
 
-  // Build step list — include session-type only if trainer offers video
-  const steps: Step[] = trainer?.offersVideoSessions
+  // Payment info for display
+  const paymentInfo = paymentReq?.paymentRequired
+    ? { amount: paymentReq.amount, currency: paymentReq.currency }
+    : null;
+  const isFirstFree = paymentReq && !paymentReq.paymentRequired && 'reason' in paymentReq && paymentReq.reason === 'first_session_free';
+
+  // Build step list
+  const baseSteps: Step[] = trainer?.offersVideoSessions
     ? (sessionType === 'VIDEO_CALL'
       ? ['date', 'time', 'session-type', 'confirm']
       : ['date', 'time', 'session-type', 'location', 'confirm'])
     : ['date', 'time', 'location', 'confirm'];
+
+  const steps: Step[] = paymentInfo
+    ? [...baseSteps, 'payment']
+    : baseSteps;
 
   return (
     <PageLayout>
@@ -144,7 +183,6 @@ export const BookSessionPage = () => {
       <PageLayout.Content>
         {trainerLoading ? (
           <div className="space-y-6">
-            {/* Step indicator skeleton */}
             <div className="flex items-center gap-2">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-2">
@@ -153,7 +191,6 @@ export const BookSessionPage = () => {
                 </div>
               ))}
             </div>
-            {/* Calendar skeleton */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <Skeleton className="h-8 w-8 rounded" />
@@ -174,7 +211,7 @@ export const BookSessionPage = () => {
         <>
         {/* Step indicators */}
         <div className="flex items-center gap-2 mb-6">
-          {(steps).map((s, i) => (
+          {steps.map((s, i) => (
             <div key={s} className="flex items-center gap-2">
               <div
                 className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -306,7 +343,22 @@ export const BookSessionPage = () => {
             onNotesChange={setNotes}
             onConfirm={handleConfirm}
             onBack={() => setStep(sessionType === 'VIDEO_CALL' ? 'session-type' : 'location')}
-            isSubmitting={createBooking.isPending}
+            isSubmitting={createBooking.isPending || createPaymentIntent.isPending}
+            paymentInfo={paymentInfo}
+            isFirstFree={!!isFirstFree}
+          />
+        )}
+
+        {step === 'payment' && clientSecret && paymentReq?.paymentRequired && (
+          <PaymentStep
+            clientSecret={clientSecret}
+            paymentInfo={{
+              amount: paymentReq.amount,
+              currency: paymentReq.currency,
+              cancellationPolicy: paymentReq.cancellationPolicy,
+            }}
+            onSuccess={handlePaymentSuccess}
+            onBack={() => setStep('confirm')}
           />
         )}
         </>
