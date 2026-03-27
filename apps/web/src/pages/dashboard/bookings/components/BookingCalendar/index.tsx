@@ -145,9 +145,10 @@ export const BookingCalendar = ({
       slotLabelInterval="01:00:00"
       nowIndicator
       dayMaxEvents={3}
-      height="auto"
+      height={view === 'week' ? 'calc(100vh - 220px)' : 'auto'}
       expandRows
       eventDisplay="block"
+      stickyHeaderDates
     />
   );
 };

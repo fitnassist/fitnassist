@@ -180,7 +180,7 @@ export const BookingsPage = () => {
   ) : null;
 
   return (
-    <PageLayout>
+    <PageLayout maxWidth={isTrainer && viewMode === 'calendar' ? 'full' : '4xl'}>
       <PageLayout.Header
         title="Bookings"
         description={isTrainer ? 'Manage your upcoming sessions' : 'Your upcoming sessions'}
