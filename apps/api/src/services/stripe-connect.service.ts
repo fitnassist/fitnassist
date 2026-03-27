@@ -22,8 +22,8 @@ export const stripeConnectService = {
     const stripe = getStripe();
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: `${env.FRONTEND_URL}/dashboard/settings?tab=scheduling&stripe=refresh`,
-      return_url: `${env.FRONTEND_URL}/dashboard/settings?tab=scheduling&stripe=complete`,
+      refresh_url: `${env.FRONTEND_URL}/dashboard/settings?tab=payments&stripe=refresh`,
+      return_url: `${env.FRONTEND_URL}/dashboard/settings?tab=payments&stripe=complete`,
       type: 'account_onboarding',
     });
     return accountLink.url;

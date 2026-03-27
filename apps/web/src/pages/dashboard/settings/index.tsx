@@ -2,7 +2,7 @@ import { Settings } from 'lucide-react';
 import { ResponsiveTabs, TabsContent } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { useTabParam, useAuth } from '@/hooks';
-import { AccountTab, NotificationsTab, DangerZoneTab, SubscriptionTab, SchedulingTab } from './components';
+import { AccountTab, NotificationsTab, DangerZoneTab, SubscriptionTab, SchedulingTab, PaymentsTab } from './components';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 
@@ -11,12 +11,14 @@ export const SettingsPage = () => {
   const { isTrainer } = useAuth();
 
   const { hasAccess: hasBookingAccess } = useFeatureAccess('booking');
+  const { hasAccess: hasPaymentsAccess } = useFeatureAccess('sessionPayments');
 
   const tabOptions = [
     { value: 'account', label: 'Account' },
     { value: 'notifications', label: 'Notifications' },
     ...(isTrainer ? [{ value: 'subscription', label: 'Subscription' }] : []),
     ...(isTrainer ? [{ value: 'scheduling', label: 'Scheduling' }] : []),
+    ...(isTrainer ? [{ value: 'payments', label: 'Payments' }] : []),
     { value: 'danger', label: 'Danger Zone' },
   ];
 
@@ -50,6 +52,15 @@ export const SettingsPage = () => {
               <SchedulingTab />
             ) : (
               <UpgradePrompt requiredTier="PRO" featureName="Booking & Scheduling" />
+            )}
+          </TabsContent>
+        )}
+        {isTrainer && (
+          <TabsContent value="payments">
+            {hasPaymentsAccess ? (
+              <PaymentsTab />
+            ) : (
+              <UpgradePrompt requiredTier="ELITE" featureName="Session Payments" />
             )}
           </TabsContent>
         )}
