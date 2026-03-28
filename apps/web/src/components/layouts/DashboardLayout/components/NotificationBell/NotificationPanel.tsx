@@ -43,7 +43,7 @@ export const NotificationPanel = ({
         )}
       </div>
 
-      <ScrollArea className="max-h-[400px]">
+      <ScrollArea className="max-h-[60vh] overflow-y-auto">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />

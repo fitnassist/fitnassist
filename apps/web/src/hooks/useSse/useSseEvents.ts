@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
+import { toast } from '@/lib/toast';
 import type { SseEvent } from '@fitnassist/types';
 
 export const useSseEvents = (lastEvent: SseEvent | null) => {
@@ -108,6 +109,8 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
       case 'notification': {
         utils.notification.getUnreadCount.invalidate();
         utils.notification.list.invalidate();
+        const { notification } = lastEvent;
+        toast.info(notification.body || notification.title);
         break;
       }
 
