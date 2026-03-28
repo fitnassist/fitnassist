@@ -207,6 +207,25 @@ export const BookingCallPage = () => {
     );
   }
 
+  // Only allow joining 5 minutes before start time
+  const sessionStart = new Date(`${bookingDateStr}T${booking.startTime}:00`);
+  const isTooEarly = sessionStart.getTime() - 5 * 60_000 > Date.now();
+
+  if (isTooEarly) {
+    return (
+      <div className="fixed inset-0 bg-black flex flex-col items-center justify-center gap-4 z-[60]">
+        <Video className="h-12 w-12 text-white/60" />
+        <p className="text-white text-lg">Call not available yet</p>
+        <p className="text-white/60 text-sm">
+          You can join 5 minutes before the session starts at {booking.startTime}.
+        </p>
+        <Button variant="secondary" onClick={() => navigate(routes.dashboardBookingDetail(booking.id))}>
+          Back to Booking
+        </Button>
+      </div>
+    );
+  }
+
   if (!callObject) {
     return (
       <div className="fixed inset-0 bg-black flex items-center justify-center z-[60]">

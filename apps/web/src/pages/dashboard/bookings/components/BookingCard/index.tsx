@@ -155,6 +155,7 @@ export const BookingCard = ({
     ? booking.date.split('T')[0]
     : new Date(booking.date).toISOString().split('T')[0];
   const isSessionExpired = new Date(`${bookingDateIso}T${booking.endTime}:00`).getTime() < Date.now();
+  const isCallJoinable = new Date(`${bookingDateIso}T${booking.startTime}:00`).getTime() - 5 * 60_000 <= Date.now();
 
   const handleCancel = () => {
     cancelMutation.mutate(
@@ -244,14 +245,18 @@ export const BookingCard = ({
             <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
               {/* Join Call button for confirmed video calls (hide if session ended) */}
               {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && !isSessionExpired && (
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={() => navigate(routes.dashboardBookingCall(booking.id))}
-                >
-                  <Video className="h-4 w-4 mr-1" />
-                  Join Call
-                </Button>
+                isCallJoinable ? (
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => navigate(routes.dashboardBookingCall(booking.id))}
+                  >
+                    <Video className="h-4 w-4 mr-1" />
+                    Join Call
+                  </Button>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Opens 5 min before</span>
+                )
               )}
               {/* Pending: confirm/decline buttons for the confirming party */}
               {isConfirmingParty && (

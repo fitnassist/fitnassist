@@ -111,6 +111,7 @@ export const BookingDetailPage = () => {
 
   const bookingDateIso = new Date(booking.date).toISOString().split('T')[0];
   const isSessionExpired = new Date(`${bookingDateIso}T${booking.endTime}:00`).getTime() < Date.now();
+  const isCallJoinable = new Date(`${bookingDateIso}T${booking.startTime}:00`).getTime() - 5 * 60_000 <= Date.now();
 
   const payment = (booking as { payment?: { id: string; status: string; amount: number; currency: string; refundAmount?: number | null; refundReason?: string | null; paidAt?: string | null; refundedAt?: string | null } | null }).payment;
   const isFreeSession = (booking as { isFreeSession?: boolean }).isFreeSession ?? false;
@@ -230,13 +231,19 @@ export const BookingDetailPage = () => {
 
               {/* Join Call button for confirmed video sessions (hide if session ended) */}
               {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && !isSessionExpired && (
-                <Button
-                  className="w-full"
-                  onClick={() => navigate(routes.dashboardBookingCall(booking.id))}
-                >
-                  <Video className="h-4 w-4 mr-2" />
-                  Join Video Call
-                </Button>
+                isCallJoinable ? (
+                  <Button
+                    className="w-full"
+                    onClick={() => navigate(routes.dashboardBookingCall(booking.id))}
+                  >
+                    <Video className="h-4 w-4 mr-2" />
+                    Join Video Call
+                  </Button>
+                ) : (
+                  <div className="w-full text-center py-2 text-sm text-muted-foreground">
+                    Video call opens 5 minutes before the session
+                  </div>
+                )
               )}
 
               {booking.notes && (
