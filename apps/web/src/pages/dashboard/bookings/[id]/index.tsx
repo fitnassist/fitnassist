@@ -18,6 +18,7 @@ import { useCreatePaymentIntent } from '@/api/payment';
 import { routes } from '@/config/routes';
 import { SuggestionsList } from '../components/SuggestionsList';
 import { SuggestAlternativeDialog } from '../components/SuggestAlternativeDialog';
+import { RescheduleDialog } from '../components/RescheduleDialog';
 import { PaymentStep } from '../book/components/PaymentStep';
 
 const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline'> = {
@@ -61,6 +62,7 @@ export const BookingDetailPage = () => {
   const [showCancel, setShowCancel] = useState(false);
   const [showDecline, setShowDecline] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
+  const [showReschedule, setShowReschedule] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
@@ -162,6 +164,12 @@ export const BookingDetailPage = () => {
                       No Show
                     </DropdownMenuItem>
                   </>
+                )}
+                {booking.status === 'CONFIRMED' && (
+                  <DropdownMenuItem onClick={() => setShowReschedule(true)}>
+                    <CalendarClock className="h-4 w-4 mr-2" />
+                    Reschedule
+                  </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={() => setShowCancel(true)} className="text-destructive">
                   <X className="h-4 w-4 mr-2" />
@@ -444,6 +452,16 @@ export const BookingDetailPage = () => {
           <SuggestAlternativeDialog
             open={showSuggest}
             onOpenChange={setShowSuggest}
+            bookingId={booking.id}
+            trainerId={trainerId}
+            durationMin={booking.durationMin}
+          />
+        )}
+
+        {showReschedule && trainerId && (
+          <RescheduleDialog
+            open={showReschedule}
+            onOpenChange={setShowReschedule}
             bookingId={booking.id}
             trainerId={trainerId}
             durationMin={booking.durationMin}

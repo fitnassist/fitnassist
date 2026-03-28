@@ -1,18 +1,18 @@
 import { trpc } from '@/lib/trpc';
 
 export const useBooking = (id: string) => {
-  return trpc.booking.get.useQuery({ id }, { enabled: !!id });
+  return trpc.booking.get.useQuery({ id }, { enabled: !!id, refetchInterval: 10_000 });
 };
 
 export const useTrainerBookings = (startDate: string, endDate: string) => {
   return trpc.booking.listByDateRange.useQuery(
     { startDate, endDate },
-    { enabled: !!startDate && !!endDate }
+    { enabled: !!startDate && !!endDate, refetchInterval: 10_000 }
   );
 };
 
 export const useUpcomingBookings = () => {
-  return trpc.booking.upcoming.useQuery();
+  return trpc.booking.upcoming.useQuery(undefined, { refetchInterval: 10_000 });
 };
 
 export const useClientRosterBookings = (clientRosterId: string) => {

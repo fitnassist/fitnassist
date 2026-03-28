@@ -13,7 +13,7 @@ import { useAuth } from '@/hooks';
 import { useTrainerBookings, useUpcomingBookings } from '@/api/booking';
 import { trpc } from '@/lib/trpc';
 import { routes } from '@/config/routes';
-import { BookingCard, BookingCalendar, SuggestAlternativeDialog } from './components';
+import { BookingCard, BookingCalendar, SuggestAlternativeDialog, RescheduleDialog } from './components';
 
 type ViewMode = 'calendar' | 'list';
 type Period = 'week' | 'month';
@@ -42,6 +42,7 @@ export const BookingsPage = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('calendar');
   const [period, setPeriod] = useState<Period>('week');
   const [suggestBookingId, setSuggestBookingId] = useState<string | null>(null);
+  const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
 
   // List view date range
   const { startDate, endDate } = useMemo(() => getDateRange(period), [period]);
@@ -58,9 +59,12 @@ export const BookingsPage = () => {
   const bookings = isTrainer ? trainerBookings : upcomingBookings;
   const isLoading = isTrainer ? trainerLoading : upcomingLoading;
 
-  // Find the booking being suggested for
+  // Find the booking being suggested/rescheduled
   const suggestBooking = suggestBookingId
     ? bookings?.find((b) => b.id === suggestBookingId)
+    : null;
+  const rescheduleBooking = rescheduleBookingId
+    ? bookings?.find((b) => b.id === rescheduleBookingId)
     : null;
 
   // Group by date (for list view)
@@ -259,7 +263,7 @@ export const BookingsPage = () => {
                         currentUserId={user?.id ?? ''}
                         onSuggestAlternative={setSuggestBookingId}
                         onViewSuggestions={(id) => navigate(routes.dashboardBookingDetail(id))}
-                        onReschedule={(id) => navigate(routes.dashboardBookingDetail(id))}
+                        onReschedule={setRescheduleBookingId}
                       />
                     ))}
                   </div>
@@ -277,6 +281,17 @@ export const BookingsPage = () => {
             bookingId={suggestBooking.id}
             trainerId={suggestBooking.trainer.id}
             durationMin={suggestBooking.durationMin}
+          />
+        )}
+
+        {/* Reschedule Dialog */}
+        {rescheduleBooking && rescheduleBooking.trainer && (
+          <RescheduleDialog
+            open={!!rescheduleBookingId}
+            onOpenChange={(open) => { if (!open) setRescheduleBookingId(null); }}
+            bookingId={rescheduleBooking.id}
+            trainerId={rescheduleBooking.trainer.id}
+            durationMin={rescheduleBooking.durationMin}
           />
         )}
       </PageLayout.Content>
