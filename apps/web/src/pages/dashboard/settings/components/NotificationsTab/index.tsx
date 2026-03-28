@@ -24,6 +24,7 @@ import {
 } from '@fitnassist/schemas';
 import { useAuth } from '@/hooks';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { toast } from '@/lib/toast';
 
 export const NotificationsTab = () => {
   const { isTrainer } = useAuth();
@@ -62,6 +63,7 @@ export const NotificationsTab = () => {
 
   const onSubmit = async (data: NotificationPreferencesInput) => {
     await updateMutation.mutateAsync(data);
+    toast.success('Notification preferences updated');
   };
 
   if (isLoading) {
@@ -86,12 +88,6 @@ export const NotificationsTab = () => {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      {updateMutation.isSuccess && (
-        <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
-          Notification preferences updated successfully!
-        </div>
-      )}
-
       {updateMutation.isError && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
           Failed to update preferences. Please try again.

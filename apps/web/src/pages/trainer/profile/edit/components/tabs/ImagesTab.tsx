@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { wizardImagesSchema, type WizardImagesInput } from '@fitnassist/schemas';
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, ImageUpload, GalleryUpload, VideoUpload } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
+import { toast } from '@/lib/toast';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 import type { GalleryImage } from '@/components/ui';
@@ -19,15 +20,13 @@ interface ImagesTabProps {
 
 export function ImagesTab({ profile }: ImagesTabProps) {
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const { hasAccess: hasGalleryAccess, requiredTier: galleryTier } = useFeatureAccess('gallery');
 
   const utils = trpc.useUtils();
   const updateMutation = trpc.trainer.update.useMutation({
     onSuccess: () => {
       utils.trainer.getMyProfile.invalidate();
-      setSuccessMessage('Images updated successfully');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      toast.success('Images updated');
     },
   });
 
@@ -188,10 +187,6 @@ export function ImagesTab({ profile }: ImagesTabProps) {
 
             {updateMutation.error && (
               <p className="text-sm text-destructive">{updateMutation.error.message}</p>
-            )}
-
-            {successMessage && (
-              <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
             )}
 
             <div className="flex justify-end">

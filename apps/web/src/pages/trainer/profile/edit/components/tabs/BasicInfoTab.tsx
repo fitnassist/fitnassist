@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { wizardBasicInfoSchema, type WizardBasicInfoInput } from '@fitnassist/schemas';
 import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
+import { toast } from '@/lib/toast';
 import { useState } from 'react';
 
 interface BasicInfoTabProps {
@@ -15,14 +16,12 @@ interface BasicInfoTabProps {
 
 export function BasicInfoTab({ profile }: BasicInfoTabProps) {
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const utils = trpc.useUtils();
   const updateMutation = trpc.trainer.update.useMutation({
     onSuccess: () => {
       utils.trainer.getMyProfile.invalidate();
-      setSuccessMessage('Profile updated successfully');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      toast.success('Profile updated');
     },
   });
 
@@ -105,10 +104,6 @@ export function BasicInfoTab({ profile }: BasicInfoTabProps) {
 
           {updateMutation.error && (
             <p className="text-sm text-destructive">{updateMutation.error.message}</p>
-          )}
-
-          {successMessage && (
-            <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
           )}
 
           <div className="flex justify-end">

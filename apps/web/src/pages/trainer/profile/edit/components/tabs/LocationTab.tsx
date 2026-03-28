@@ -4,6 +4,7 @@ import { Phone } from 'lucide-react';
 import { wizardLocationSchema, type WizardLocationInput } from '@fitnassist/schemas';
 import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, AddressAutocomplete, type AddressDetails } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
+import { toast } from '@/lib/toast';
 import { env } from '@/config/env';
 import { useState } from 'react';
 
@@ -43,14 +44,12 @@ interface LocationTabProps {
 
 export function LocationTab({ profile }: LocationTabProps) {
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const utils = trpc.useUtils();
   const updateMutation = trpc.trainer.update.useMutation({
     onSuccess: () => {
       utils.trainer.getMyProfile.invalidate();
-      setSuccessMessage('Location updated successfully');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      toast.success('Location updated');
     },
   });
 
@@ -223,10 +222,6 @@ export function LocationTab({ profile }: LocationTabProps) {
 
           {updateMutation.error && (
             <p className="text-sm text-destructive">{updateMutation.error.message}</p>
-          )}
-
-          {successMessage && (
-            <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
           )}
 
           <div className="flex justify-end">

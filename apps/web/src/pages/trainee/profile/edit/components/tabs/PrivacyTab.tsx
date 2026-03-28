@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Shield, TrendingUp, Check, Loader2, AlertCircle } from 'lucide-react';
+import { Shield, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
 import {
   Button,
   Card,
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui';
 import { Select } from '@/components/ui';
 import { usePrivacySettings, useUpdatePrivacySettings } from '@/api/trainee';
+import { toast } from '@/lib/toast';
 import {
   SECTION_PRIVACY_SETTINGS,
   TREND_PRIVACY_SETTINGS,
@@ -81,6 +82,7 @@ export const PrivacyTab = () => {
     if (!localSettings) return;
     await updateMutation.mutateAsync(localSettings as Parameters<typeof updateMutation.mutateAsync>[0]);
     setHasChanges(false);
+    toast.success('Privacy settings saved');
   };
 
   if (isLoading) {
@@ -171,12 +173,6 @@ export const PrivacyTab = () => {
       <div className="flex items-center justify-end gap-3">
         {updateMutation.error && (
           <p className="text-sm text-destructive">{updateMutation.error.message}</p>
-        )}
-        {updateMutation.isSuccess && !hasChanges && (
-          <p className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
-            <Check className="h-4 w-4" />
-            Saved
-          </p>
         )}
         <Button
           onClick={handleSave}

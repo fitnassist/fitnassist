@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Clock, Plus, Trash2 } from 'lucide-react';
 import { Button, Card, CardHeader, CardTitle, CardContent, Input } from '@/components/ui';
 import { useWeeklyAvailability, useSetWeeklyAvailability } from '@/api/availability';
+import { toast } from '@/lib/toast';
 import type { DayOfWeek } from '@fitnassist/database';
 
 const DAYS: { value: DayOfWeek; label: string; short: string }[] = [
@@ -26,7 +27,6 @@ export const WeeklyScheduleBuilder = () => {
   const setWeekly = useSetWeeklyAvailability();
   const [slots, setSlots] = useState<SlotEntry[]>([]);
   const [initialized, setInitialized] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   // Initialize from server data
   if (existing && !initialized) {
@@ -43,25 +43,22 @@ export const WeeklyScheduleBuilder = () => {
 
   const addSlot = (day: DayOfWeek) => {
     setSlots([...slots, { dayOfWeek: day, startTime: '09:00', endTime: '17:00', sessionDurationMin: 60 }]);
-    setSaved(false);
   };
 
   const removeSlot = (index: number) => {
     setSlots(slots.filter((_, i) => i !== index));
-    setSaved(false);
   };
 
   const updateSlot = (index: number, field: keyof SlotEntry, value: string | number) => {
     const updated = [...slots];
     updated[index] = { ...updated[index]!, [field]: value };
     setSlots(updated);
-    setSaved(false);
   };
 
   const handleSave = () => {
     setWeekly.mutate(
       { slots },
-      { onSuccess: () => setSaved(true) }
+      { onSuccess: () => toast.success('Schedule saved') }
     );
   };
 
@@ -144,7 +141,6 @@ export const WeeklyScheduleBuilder = () => {
           <Button onClick={handleSave} disabled={setWeekly.isPending}>
             {setWeekly.isPending ? 'Saving...' : 'Save Schedule'}
           </Button>
-          {saved && <span className="text-sm text-green-600 dark:text-green-400">Saved!</span>}
         </div>
       </CardContent>
     </Card>

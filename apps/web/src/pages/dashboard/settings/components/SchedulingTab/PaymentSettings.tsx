@@ -15,6 +15,7 @@ import {
   useRefreshConnectStatus,
   useGetDashboardLink,
 } from '@/api/payment';
+import { toast } from '@/lib/toast';
 
 const FULL_REFUND_OPTIONS: SelectOption[] = [
   { value: '24', label: '24 hours' },
@@ -47,7 +48,7 @@ export const PaymentSettings = () => {
 
   const [priceInput, setPriceInput] = useState('');
   const [priceDirty, setPriceDirty] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Initialize price input from server data
   useEffect(() => {
@@ -56,12 +57,12 @@ export const PaymentSettings = () => {
     }
   }, [data?.sessionPrice, priceDirty]);
 
-  // Auto-clear messages
+  // Auto-clear error messages
   useEffect(() => {
-    if (!message) return;
-    const timer = setTimeout(() => setMessage(null), 4000);
+    if (!errorMessage) return;
+    const timer = setTimeout(() => setErrorMessage(null), 4000);
     return () => clearTimeout(timer);
-  }, [message]);
+  }, [errorMessage]);
 
   // Auto-refresh Stripe status when returning from onboarding
   useEffect(() => {
@@ -69,9 +70,9 @@ export const PaymentSettings = () => {
       refreshStatusMutation.mutate(undefined, {
         onSuccess: (result) => {
           if (result.onboardingComplete) {
-            setMessage({ type: 'success', text: 'Stripe onboarding complete! You can now accept payments.' });
+            toast.success('Stripe onboarding complete! You can now accept payments.');
           } else {
-            setMessage({ type: 'error', text: 'Stripe onboarding not yet complete. Please finish all required steps.' });
+            setErrorMessage('Stripe onboarding not yet complete. Please finish all required steps.');
           }
         },
       });
@@ -83,11 +84,11 @@ export const PaymentSettings = () => {
 
   const handleTogglePayments = (checked: boolean) => {
     if (checked && !data.stripeOnboardingComplete) {
-      setMessage({ type: 'error', text: 'Complete Stripe onboarding first' });
+      setErrorMessage('Complete Stripe onboarding first');
       return;
     }
     if (checked && !data.sessionPrice) {
-      setMessage({ type: 'error', text: 'Set a session price first' });
+      setErrorMessage('Set a session price first');
       return;
     }
     updateSettingsMutation.mutate({ paymentsEnabled: checked });
@@ -100,7 +101,7 @@ export const PaymentSettings = () => {
   const handleSavePrice = () => {
     const pounds = parseFloat(priceInput);
     if (isNaN(pounds) || pounds < 1 || pounds > 1000) {
-      setMessage({ type: 'error', text: 'Price must be between £1.00 and £1,000.00' });
+      setErrorMessage('Price must be between £1.00 and £1,000.00');
       return;
     }
     const pence = Math.round(pounds * 100);
@@ -109,7 +110,7 @@ export const PaymentSettings = () => {
       {
         onSuccess: () => {
           setPriceDirty(false);
-          setMessage({ type: 'success', text: 'Session price updated' });
+          toast.success('Session price updated');
         },
       }
     );
@@ -124,12 +125,12 @@ export const PaymentSettings = () => {
     const updated = { ...current, [field]: parseInt(value, 10) };
 
     if (updated.partialRefundHours >= updated.fullRefundHours && updated.partialRefundHours > 0) {
-      setMessage({ type: 'error', text: 'Partial refund window must be less than full refund window' });
+      setErrorMessage('Partial refund window must be less than full refund window');
       return;
     }
 
     updatePolicyMutation.mutate(updated, {
-      onSuccess: () => setMessage({ type: 'success', text: 'Cancellation policy updated' }),
+      onSuccess: () => toast.success('Cancellation policy updated'),
     });
   };
 
@@ -139,7 +140,7 @@ export const PaymentSettings = () => {
         window.open(result.url, '_blank');
       },
       onError: () => {
-        setMessage({ type: 'error', text: 'Failed to start Stripe onboarding' });
+        setErrorMessage('Failed to start Stripe onboarding');
       },
     });
   };
@@ -168,14 +169,10 @@ export const PaymentSettings = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Status message */}
-        {message && (
-          <div className={`text-sm px-3 py-2 rounded-md ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-300'
-              : 'bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300'
-          }`}>
-            {message.text}
+        {/* Error message */}
+        {errorMessage && (
+          <div className="text-sm px-3 py-2 rounded-md bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300">
+            {errorMessage}
           </div>
         )}
 

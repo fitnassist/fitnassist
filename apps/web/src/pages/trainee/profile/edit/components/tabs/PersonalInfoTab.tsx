@@ -21,6 +21,7 @@ import {
   type SelectOption,
 } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
+import { toast } from '@/lib/toast';
 import { env } from '@/config/env';
 import { useCheckHandleAvailability } from '@/api/trainee';
 import { useDebounce } from '@/hooks';
@@ -67,7 +68,6 @@ const genderOptions = GENDER_OPTIONS.map((o) => ({ value: o.value, label: o.labe
 
 export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const getUploadParamsMutation = trpc.upload.getUploadParams.useMutation();
 
@@ -92,15 +92,13 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
     onSuccess: () => {
       utils.trainee.getMyProfile.invalidate();
       utils.trainee.hasProfile.invalidate();
-      setSuccessMessage('Profile created successfully');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      toast.success('Profile created');
     },
   });
   const updateMutation = trpc.trainee.update.useMutation({
     onSuccess: () => {
       utils.trainee.getMyProfile.invalidate();
-      setSuccessMessage('Profile updated successfully');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      toast.success('Profile updated');
     },
   });
 
@@ -299,10 +297,6 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
 
           {mutation.error && (
             <p className="text-sm text-destructive">{mutation.error.message}</p>
-          )}
-
-          {successMessage && (
-            <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
           )}
 
           <div className="flex justify-end">

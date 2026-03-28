@@ -3,6 +3,7 @@ import { Car } from 'lucide-react';
 import { Button, Card, CardHeader, CardTitle, CardContent, Label, Switch } from '@/components/ui';
 import { Select } from '@/components/ui';
 import { useTravelSettings, useUpdateTravelSettings } from '@/api/availability';
+import { toast } from '@/lib/toast';
 
 const BUFFER_OPTIONS = [
   { value: '0', label: 'No buffer' },
@@ -22,7 +23,6 @@ export const TravelSettings = () => {
   const updateMutation = useUpdateTravelSettings();
   const [bufferMin, setBufferMin] = useState('15');
   const [smartTravel, setSmartTravel] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (data) {
@@ -34,7 +34,7 @@ export const TravelSettings = () => {
   const handleSave = () => {
     updateMutation.mutate(
       { travelBufferMin: Number(bufferMin), smartTravelEnabled: smartTravel },
-      { onSuccess: () => setSaved(true) }
+      { onSuccess: () => toast.success('Travel settings saved') }
     );
   };
 
@@ -59,7 +59,6 @@ export const TravelSettings = () => {
             onChange={(option) => {
               if (option) {
                 setBufferMin((option as { value: string }).value);
-                setSaved(false);
               }
             }}
             options={BUFFER_OPTIONS}
@@ -77,7 +76,6 @@ export const TravelSettings = () => {
             checked={smartTravel}
             onCheckedChange={(checked) => {
               setSmartTravel(checked);
-              setSaved(false);
             }}
           />
         </div>
@@ -86,7 +84,6 @@ export const TravelSettings = () => {
           <Button onClick={handleSave} disabled={updateMutation.isPending}>
             {updateMutation.isPending ? 'Saving...' : 'Save'}
           </Button>
-          {saved && <span className="text-sm text-green-600 dark:text-green-400">Saved!</span>}
         </div>
       </CardContent>
     </Card>

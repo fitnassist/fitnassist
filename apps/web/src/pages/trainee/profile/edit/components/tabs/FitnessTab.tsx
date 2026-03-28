@@ -21,6 +21,7 @@ import {
   type SelectOption,
 } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
+import { toast } from '@/lib/toast';
 
 const experienceOptions = EXPERIENCE_LEVEL_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
 const activityOptions = ACTIVITY_LEVEL_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
@@ -47,22 +48,19 @@ interface FitnessTabProps {
 
 export const FitnessTab = ({ profile }: FitnessTabProps) => {
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
 
   const utils = trpc.useUtils();
   const createMutation = trpc.trainee.create.useMutation({
     onSuccess: () => {
       utils.trainee.getMyProfile.invalidate();
       utils.trainee.hasProfile.invalidate();
-      setSuccessMessage('Profile created successfully');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      toast.success('Profile created');
     },
   });
   const updateMutation = trpc.trainee.update.useMutation({
     onSuccess: () => {
       utils.trainee.getMyProfile.invalidate();
-      setSuccessMessage('Fitness info updated successfully');
-      setTimeout(() => setSuccessMessage(''), 3000);
+      toast.success('Fitness info updated');
     },
   });
 
@@ -202,10 +200,6 @@ export const FitnessTab = ({ profile }: FitnessTabProps) => {
 
           {mutation.error && (
             <p className="text-sm text-destructive">{mutation.error.message}</p>
-          )}
-
-          {successMessage && (
-            <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
           )}
 
           <div className="flex justify-end">

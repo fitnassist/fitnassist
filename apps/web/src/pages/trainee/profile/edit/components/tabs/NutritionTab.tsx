@@ -19,6 +19,7 @@ import {
   Switch,
 } from "@/components/ui";
 import { trpc } from "@/lib/trpc";
+import { toast } from "@/lib/toast";
 
 const nutritionSchema = updateTraineeProfileSchema.pick({
   weeklyWeightGoalKg: true,
@@ -49,7 +50,6 @@ interface NutritionTabProps {
 
 export const NutritionTab = ({ profile }: NutritionTabProps) => {
   const [isSaving, setIsSaving] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
   const [useManualOverride, setUseManualOverride] = useState(
     profile?.dailyCalorieTarget != null,
   );
@@ -59,8 +59,7 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
     onSuccess: () => {
       utils.trainee.getMyProfile.invalidate();
       utils.trainee.getNutritionTargets.invalidate();
-      setSuccessMessage("Nutrition targets updated");
-      setTimeout(() => setSuccessMessage(""), 3000);
+      toast.success("Nutrition targets updated");
     },
   });
 
@@ -307,10 +306,6 @@ export const NutritionTab = ({ profile }: NutritionTabProps) => {
             <p className="text-sm text-destructive">
               {updateMutation.error.message}
             </p>
-          )}
-
-          {successMessage && (
-            <p className="text-sm text-green-600 dark:text-green-400">{successMessage}</p>
           )}
 
           <div className="flex justify-end">

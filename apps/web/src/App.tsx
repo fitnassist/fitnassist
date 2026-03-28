@@ -52,6 +52,7 @@ import { LeaderboardsPage } from '@/pages/dashboard/leaderboards';
 import { AchievementsPage } from '@/pages/dashboard/achievements';
 import { NotFoundPage } from '@/pages/not-found';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Toaster } from '@/components/ui';
 import { ThemeProvider } from '@/providers';
 
 function App() {
@@ -145,6 +146,7 @@ function App() {
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </BrowserRouter>
+            <Toaster />
           </QueryClientProvider>
         </trpc.Provider>
       </ThemeProvider>
