@@ -108,6 +108,120 @@ export const analyticsRepository = {
     return adherenceData.sort((a, b) => a.entriesThisWeek - b.entriesThisWeek);
   },
 
+  async getRevenueAnalytics(trainerId: string) {
+    const twelveWeeksAgo = new Date(Date.now() - 12 * 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    // Weekly revenue trend (12 weeks)
+    const weeklyRevenue = await prisma.$queryRaw<Array<{
+      week: Date;
+      revenue: number;
+      sessions: number;
+      refunds: number;
+    }>>`
+      SELECT
+        DATE_TRUNC('week', sp."paidAt") as week,
+        COALESCE(SUM(sp."amount" - sp."platformFee"), 0)::int as revenue,
+        COUNT(*)::int as sessions,
+        COALESCE(SUM(sp."refundAmount"), 0)::int as refunds
+      FROM "session_payments" sp
+      JOIN "bookings" b ON sp."bookingId" = b."id"
+      WHERE b."trainerId" = ${trainerId}
+        AND sp."paidAt" IS NOT NULL
+        AND sp."paidAt" >= ${twelveWeeksAgo}
+        AND sp."status" IN ('SUCCEEDED', 'REFUNDED', 'PARTIALLY_REFUNDED')
+      GROUP BY DATE_TRUNC('week', sp."paidAt")
+      ORDER BY week ASC
+    `;
+
+    // 30-day summary
+    const summary = await prisma.$queryRaw<Array<{
+      total_revenue: number;
+      total_sessions: number;
+      total_refunds: number;
+      avg_session_price: number;
+    }>>`
+      SELECT
+        COALESCE(SUM(sp."amount" - sp."platformFee"), 0)::int as total_revenue,
+        COUNT(*)::int as total_sessions,
+        COALESCE(SUM(sp."refundAmount"), 0)::int as total_refunds,
+        COALESCE(AVG(sp."amount" - sp."platformFee"), 0)::int as avg_session_price
+      FROM "session_payments" sp
+      JOIN "bookings" b ON sp."bookingId" = b."id"
+      WHERE b."trainerId" = ${trainerId}
+        AND sp."paidAt" IS NOT NULL
+        AND sp."paidAt" >= ${thirtyDaysAgo}
+        AND sp."status" IN ('SUCCEEDED', 'REFUNDED', 'PARTIALLY_REFUNDED')
+    `;
+
+    const summaryRow = summary[0] ?? { total_revenue: 0, total_sessions: 0, total_refunds: 0, avg_session_price: 0 };
+
+    return {
+      weeklyRevenue: weeklyRevenue.map(r => ({
+        week: r.week.toISOString().split('T')[0]!,
+        revenue: r.revenue,
+        sessions: r.sessions,
+        refunds: r.refunds,
+      })),
+      summary: {
+        totalRevenue30d: summaryRow.total_revenue,
+        totalSessions30d: summaryRow.total_sessions,
+        totalRefunds30d: summaryRow.total_refunds,
+        avgSessionPrice: summaryRow.avg_session_price,
+      },
+    };
+  },
+
+  async getRevenueTransactions(trainerId: string, cursor?: string, limit: number = 20) {
+    const transactions = await prisma.sessionPayment.findMany({
+      where: {
+        booking: { trainerId },
+        paidAt: { not: null },
+      },
+      include: {
+        booking: {
+          include: {
+            clientRoster: {
+              include: {
+                connection: {
+                  include: {
+                    sender: { select: { id: true, name: true, image: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: { paidAt: 'desc' },
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    });
+
+    const hasMore = transactions.length > limit;
+    const items = hasMore ? transactions.slice(0, limit) : transactions;
+
+    return {
+      items: items.map(t => ({
+        id: t.id,
+        amount: t.amount,
+        platformFee: t.platformFee,
+        netAmount: t.amount - t.platformFee,
+        currency: t.currency,
+        status: t.status,
+        refundAmount: t.refundAmount,
+        refundReason: t.refundReason,
+        refundedAt: t.refundedAt,
+        paidAt: t.paidAt!,
+        clientName: t.booking.clientRoster.connection.sender?.name ?? 'Unknown',
+        clientImage: t.booking.clientRoster.connection.sender?.image,
+        bookingDate: t.booking.date,
+        startTime: t.booking.startTime,
+      })),
+      nextCursor: hasMore ? items[items.length - 1]?.id : undefined,
+    };
+  },
+
   async getGoalAnalytics(trainerId: string) {
     // Get active clients with connected sender
     const activeClients = await prisma.clientRoster.findMany({

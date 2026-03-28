@@ -15,3 +15,14 @@ export const useClientAdherence = () => {
 export const useGoalAnalytics = () => {
   return trpc.analytics.goalAnalytics.useQuery();
 };
+
+export const useRevenueAnalytics = () => {
+  return trpc.analytics.revenueAnalytics.useQuery();
+};
+
+export const useRevenueTransactions = () => {
+  return trpc.analytics.revenueTransactions.useInfiniteQuery(
+    { limit: 20 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  );
+};

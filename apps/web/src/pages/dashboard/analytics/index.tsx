@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, Calendar, Users, Target } from 'lucide-react';
+import { Eye, Calendar, Users, Target, PoundSterling } from 'lucide-react';
 import { Card, CardContent, ResponsiveTabs, TabsContent } from '@/components/ui';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 import { useTierAccess } from '@/hooks/useFeatureAccess';
@@ -9,6 +9,7 @@ import {
   BookingAnalytics,
   ClientAdherence,
   GoalAnalytics,
+  RevenueAnalytics,
 } from './components';
 
 const TAB_OPTIONS = [
@@ -16,6 +17,7 @@ const TAB_OPTIONS = [
   { value: 'bookings', label: 'Bookings', icon: <Calendar className="h-4 w-4" /> },
   { value: 'adherence', label: 'Client Adherence', icon: <Users className="h-4 w-4" /> },
   { value: 'goals', label: 'Goals', icon: <Target className="h-4 w-4" /> },
+  { value: 'revenue', label: 'Revenue', icon: <PoundSterling className="h-4 w-4" /> },
 ];
 
 export const AnalyticsPage = () => {
@@ -61,6 +63,9 @@ export const AnalyticsPage = () => {
         </TabsContent>
         <TabsContent value="goals">
           <GoalAnalytics />
+        </TabsContent>
+        <TabsContent value="revenue">
+          <RevenueAnalytics />
         </TabsContent>
       </ResponsiveTabs>
     </div>
