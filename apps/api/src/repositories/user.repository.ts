@@ -37,6 +37,7 @@ export const userRepository = {
     return prisma.user.findUnique({
       where: { id: userId },
       select: {
+        phoneNumber: true,
         emailNotifyConnectionRequests: true,
         emailNotifyMessages: true,
         emailNotifyMarketing: true,
@@ -45,6 +46,8 @@ export const userRepository = {
         emailNotifyBookingReminders: true,
         smsNotifyConnectionRequests: true,
         smsNotifyMessages: true,
+        smsNotifyBookings: true,
+        smsNotifyBookingReminders: true,
         pushNotifyConnectionRequests: true,
         pushNotifyMessages: true,
         pushNotifyBookings: true,
@@ -68,6 +71,8 @@ export const userRepository = {
       emailNotifyBookingReminders?: boolean;
       smsNotifyConnectionRequests?: boolean;
       smsNotifyMessages?: boolean;
+      smsNotifyBookings?: boolean;
+      smsNotifyBookingReminders?: boolean;
       pushNotifyConnectionRequests?: boolean;
       pushNotifyMessages?: boolean;
       pushNotifyBookings?: boolean;
@@ -82,6 +87,7 @@ export const userRepository = {
       where: { id: userId },
       data: preferences,
       select: {
+        phoneNumber: true,
         emailNotifyConnectionRequests: true,
         emailNotifyMessages: true,
         emailNotifyMarketing: true,
@@ -90,6 +96,8 @@ export const userRepository = {
         emailNotifyBookingReminders: true,
         smsNotifyConnectionRequests: true,
         smsNotifyMessages: true,
+        smsNotifyBookings: true,
+        smsNotifyBookingReminders: true,
         pushNotifyConnectionRequests: true,
         pushNotifyMessages: true,
         pushNotifyBookings: true,

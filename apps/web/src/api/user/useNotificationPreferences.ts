@@ -13,3 +13,13 @@ export const useUpdateNotificationPreferences = () => {
     },
   });
 };
+
+export const useUpdatePhoneNumber = () => {
+  const utils = trpc.useUtils();
+
+  return trpc.user.updatePhoneNumber.useMutation({
+    onSuccess: () => {
+      utils.user.getNotificationPreferences.invalidate();
+    },
+  });
+};

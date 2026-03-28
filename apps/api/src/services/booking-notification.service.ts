@@ -1,4 +1,5 @@
 import { sendEmail } from '../lib/email';
+import { sendSms } from '../lib/sms';
 import { emailTemplates } from '../lib/email-templates';
 import { userRepository } from '../repositories/user.repository';
 import { bookingRepository } from '../repositories/booking.repository';
@@ -90,6 +91,13 @@ export const bookingNotificationService = {
           }),
         });
       }
+
+      if (prefs?.smsNotifyBookings && prefs.phoneNumber) {
+        await sendSms({
+          to: prefs.phoneNumber,
+          body: `Fitnassist: ${requesterName} has requested a session on ${dateStr} at ${booking.startTime}. Check your dashboard to respond.`,
+        });
+      }
     }
   },
 
@@ -116,8 +124,8 @@ export const bookingNotificationService = {
     };
 
     if (trainerUser?.email) {
-      const prefs = await userRepository.getNotificationPreferences(trainerUser.id);
-      if (prefs?.emailNotifyBookings) {
+      const trainerPrefs = await userRepository.getNotificationPreferences(trainerUser.id);
+      if (trainerPrefs?.emailNotifyBookings) {
         await sendEmail({
           to: trainerUser.email,
           subject: `Booking confirmed with ${clientName} - Fitnassist`,
@@ -129,11 +137,18 @@ export const bookingNotificationService = {
           }),
         });
       }
+
+      if (trainerPrefs?.smsNotifyBookings && trainerPrefs.phoneNumber) {
+        await sendSms({
+          to: trainerPrefs.phoneNumber,
+          body: `Fitnassist: Session confirmed with ${clientName} on ${dateStr} at ${booking.startTime}.`,
+        });
+      }
     }
 
     if (clientUser?.email) {
-      const prefs = await userRepository.getNotificationPreferences(clientUser.id);
-      if (prefs?.emailNotifyBookings) {
+      const clientPrefs = await userRepository.getNotificationPreferences(clientUser.id);
+      if (clientPrefs?.emailNotifyBookings) {
         await sendEmail({
           to: clientUser.email,
           subject: `Booking confirmed with ${trainerName} - Fitnassist`,
@@ -143,6 +158,13 @@ export const bookingNotificationService = {
             otherPartyName: trainerName,
             isTrainer: false,
           }),
+        });
+      }
+
+      if (clientPrefs?.smsNotifyBookings && clientPrefs.phoneNumber) {
+        await sendSms({
+          to: clientPrefs.phoneNumber,
+          body: `Fitnassist: Session confirmed with ${trainerName} on ${dateStr} at ${booking.startTime}.`,
         });
       }
     }
@@ -177,6 +199,13 @@ export const bookingNotificationService = {
             endTime: booking.endTime,
             reason: booking.declineReason ?? undefined,
           }),
+        });
+      }
+
+      if (prefs?.smsNotifyBookings && prefs.phoneNumber) {
+        await sendSms({
+          to: prefs.phoneNumber,
+          body: `Fitnassist: Your session request for ${dateStr} at ${booking.startTime} was declined by ${declinedByName}.`,
         });
       }
     }
@@ -217,6 +246,13 @@ export const bookingNotificationService = {
           }),
         });
       }
+
+      if (prefs?.smsNotifyBookings && prefs.phoneNumber) {
+        await sendSms({
+          to: prefs.phoneNumber,
+          body: `Fitnassist: Your session on ${dateStr} at ${booking.startTime} has been cancelled by ${trainerName}.`,
+        });
+      }
     } else if (!isTrainerCancelling && trainerUser?.email) {
       const prefs = await userRepository.getNotificationPreferences(trainerUser.id);
       if (prefs?.emailNotifyBookings) {
@@ -228,6 +264,13 @@ export const bookingNotificationService = {
             recipientName: trainerUser.name ?? trainerName,
             cancelledByName: clientName,
           }),
+        });
+      }
+
+      if (prefs?.smsNotifyBookings && prefs.phoneNumber) {
+        await sendSms({
+          to: prefs.phoneNumber,
+          body: `Fitnassist: Your session on ${dateStr} at ${booking.startTime} has been cancelled by ${clientName}.`,
         });
       }
     }
@@ -268,6 +311,13 @@ export const bookingNotificationService = {
           }),
         });
       }
+
+      if (prefs?.smsNotifyBookings && prefs.phoneNumber) {
+        await sendSms({
+          to: prefs.phoneNumber,
+          body: `Fitnassist: ${rescheduledByName} rescheduled your session to ${formatDate(newBooking.date)} at ${newBooking.startTime}. Check your dashboard for details.`,
+        });
+      }
     }
   },
 
@@ -303,6 +353,13 @@ export const bookingNotificationService = {
               endTime: s.endTime,
             })),
           }),
+        });
+      }
+
+      if (prefs?.smsNotifyBookings && prefs.phoneNumber) {
+        await sendSms({
+          to: prefs.phoneNumber,
+          body: `Fitnassist: ${suggestorName} suggested alternative times for your session. Check your dashboard to review.`,
         });
       }
     }
@@ -548,8 +605,8 @@ export const bookingNotificationService = {
       };
 
       if (trainerUser?.email) {
-        const prefs = await userRepository.getNotificationPreferences(trainerUser.id);
-        if (prefs?.emailNotifyBookingReminders) {
+        const trainerPrefs = await userRepository.getNotificationPreferences(trainerUser.id);
+        if (trainerPrefs?.emailNotifyBookingReminders) {
           await sendEmail({
             to: trainerUser.email,
             subject: `Reminder: Session with ${clientName} tomorrow - Fitnassist`,
@@ -561,11 +618,18 @@ export const bookingNotificationService = {
             }),
           });
         }
+
+        if (trainerPrefs?.smsNotifyBookingReminders && trainerPrefs.phoneNumber) {
+          await sendSms({
+            to: trainerPrefs.phoneNumber,
+            body: `Fitnassist: Reminder — session with ${clientName} tomorrow at ${booking.startTime}.`,
+          });
+        }
       }
 
       if (clientUser?.email) {
-        const prefs = await userRepository.getNotificationPreferences(clientUser.id);
-        if (prefs?.emailNotifyBookingReminders) {
+        const clientPrefs = await userRepository.getNotificationPreferences(clientUser.id);
+        if (clientPrefs?.emailNotifyBookingReminders) {
           await sendEmail({
             to: clientUser.email,
             subject: `Reminder: Session with ${trainerName} tomorrow - Fitnassist`,
@@ -575,6 +639,13 @@ export const bookingNotificationService = {
               otherPartyName: trainerName,
               isTrainer: false,
             }),
+          });
+        }
+
+        if (clientPrefs?.smsNotifyBookingReminders && clientPrefs.phoneNumber) {
+          await sendSms({
+            to: clientPrefs.phoneNumber,
+            body: `Fitnassist: Reminder — session with ${trainerName} tomorrow at ${booking.startTime}.`,
           });
         }
       }

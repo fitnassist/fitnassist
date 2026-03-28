@@ -7,6 +7,10 @@ export const userService = {
     return userRepository.update(userId, { name });
   },
 
+  async updatePhoneNumber(userId: string, phoneNumber: string | null) {
+    return userRepository.update(userId, { phoneNumber });
+  },
+
   async getNotificationPreferences(userId: string) {
     const preferences = await userRepository.getNotificationPreferences(userId);
 

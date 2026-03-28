@@ -203,6 +203,8 @@ model User {
   emailVerified Boolean   @default(false)
   image         String?
   role          UserRole  @default(TRAINEE)
+  /// @zod.string.regex(/^\+[1-9]\d{6,14}$/, { message: "Phone must be in E.164 format (e.g. +447123456789)" })
+  phoneNumber   String?
   lastActiveAt  DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -218,6 +220,8 @@ model User {
   // Notification Preferences - SMS (default OFF - costs money)
   smsNotifyConnectionRequests   Boolean @default(false)
   smsNotifyMessages             Boolean @default(false)
+  smsNotifyBookings             Boolean @default(false)
+  smsNotifyBookingReminders     Boolean @default(false)
 
   // Notification Preferences - Push
   pushNotifyConnectionRequests  Boolean @default(true)

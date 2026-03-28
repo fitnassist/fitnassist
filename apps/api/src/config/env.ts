@@ -36,6 +36,11 @@ const envSchema = z.object({
   STRIPE_PRICE_ID_ELITE_MONTHLY: z.string().optional(),
   STRIPE_PRICE_ID_ELITE_ANNUAL: z.string().optional(),
 
+  // Twilio (SMS)
+  TWILIO_ACCOUNT_SID: z.string().optional(),
+  TWILIO_AUTH_TOKEN: z.string().optional(),
+  TWILIO_FROM_NUMBER: z.string().optional(),
+
   // Web Push (VAPID keys)
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),

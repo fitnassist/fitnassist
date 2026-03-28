@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, Mail, MessageSquare, Bell } from 'lucide-react';
+import { Loader2, Mail, MessageSquare, Bell, Phone } from 'lucide-react';
 import {
   Button,
   Card,
@@ -9,6 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Input,
   Label,
   SkeletonText,
   Switch,
@@ -17,6 +18,7 @@ import {
 import {
   useNotificationPreferences,
   useUpdateNotificationPreferences,
+  useUpdatePhoneNumber,
 } from '@/api/user';
 import {
   notificationPreferencesSchema,
@@ -30,8 +32,11 @@ export const NotificationsTab = () => {
   const { isTrainer } = useAuth();
   const { data: preferences, isLoading } = useNotificationPreferences();
   const updateMutation = useUpdateNotificationPreferences();
+  const updatePhoneMutation = useUpdatePhoneNumber();
   const { isSupported, permission, requestPermission, isEnabled, isConfigured } = usePushNotifications();
   const [isEnabling, setIsEnabling] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneSaved, setPhoneSaved] = useState(false);
 
   const form = useForm<NotificationPreferencesInput>({
     resolver: zodResolver(notificationPreferencesSchema),
@@ -44,6 +49,8 @@ export const NotificationsTab = () => {
       emailNotifyBookingReminders: true,
       smsNotifyConnectionRequests: false,
       smsNotifyMessages: false,
+      smsNotifyBookings: false,
+      smsNotifyBookingReminders: false,
       pushNotifyConnectionRequests: true,
       pushNotifyMessages: true,
       pushNotifyBookings: true,
@@ -57,7 +64,10 @@ export const NotificationsTab = () => {
 
   useEffect(() => {
     if (preferences) {
-      form.reset(preferences);
+      const { phoneNumber: phone, ...prefs } = preferences;
+      form.reset(prefs);
+      setPhoneNumber(phone ?? '');
+      setPhoneSaved(!!phone);
     }
   }, [preferences, form]);
 
@@ -220,6 +230,50 @@ export const NotificationsTab = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Phone Number */}
+          <div className="space-y-2">
+            <Label htmlFor="phoneNumber" className="flex items-center gap-2">
+              <Phone className="h-4 w-4" />
+              Phone Number
+            </Label>
+            <p className="text-sm text-muted-foreground">
+              Enter your phone number in international format (e.g. +44 7700 900000).
+            </p>
+            <div className="flex gap-2">
+              <Input
+                id="phoneNumber"
+                type="tel"
+                placeholder="+44 7700 900000"
+                value={phoneNumber}
+                onChange={(e) => {
+                  setPhoneNumber(e.target.value);
+                  setPhoneSaved(false);
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={updatePhoneMutation.isPending || phoneSaved}
+                onClick={async () => {
+                  const cleaned = phoneNumber.replace(/\s/g, '');
+                  if (cleaned && !/^\+[1-9]\d{1,14}$/.test(cleaned)) {
+                    toast.error('Please enter a valid phone number in international format (e.g. +44...)');
+                    return;
+                  }
+                  await updatePhoneMutation.mutateAsync({ phoneNumber: cleaned || null });
+                  setPhoneSaved(true);
+                  toast.success(cleaned ? 'Phone number saved' : 'Phone number removed');
+                }}
+              >
+                {updatePhoneMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {phoneSaved ? 'Saved' : 'Save'}
+              </Button>
+            </div>
+          </div>
+
+          <Separator />
+
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="smsNotifyConnectionRequests">Connection Requests</Label>
@@ -249,6 +303,38 @@ export const NotificationsTab = () => {
               id="smsNotifyMessages"
               checked={form.watch('smsNotifyMessages')}
               onCheckedChange={(checked) => form.setValue('smsNotifyMessages', checked)}
+            />
+          </div>
+
+          <Separator />
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="smsNotifyBookings">Booking Confirmations</Label>
+              <p className="text-sm text-muted-foreground">
+                Get a text when a session is booked, cancelled, or rescheduled.
+              </p>
+            </div>
+            <Switch
+              id="smsNotifyBookings"
+              checked={form.watch('smsNotifyBookings')}
+              onCheckedChange={(checked) => form.setValue('smsNotifyBookings', checked)}
+            />
+          </div>
+
+          <Separator />
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="smsNotifyBookingReminders">Booking Reminders</Label>
+              <p className="text-sm text-muted-foreground">
+                Get a text reminder 24 hours before your session.
+              </p>
+            </div>
+            <Switch
+              id="smsNotifyBookingReminders"
+              checked={form.watch('smsNotifyBookingReminders')}
+              onCheckedChange={(checked) => form.setValue('smsNotifyBookingReminders', checked)}
             />
           </div>
         </CardContent>

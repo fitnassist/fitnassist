@@ -19,4 +19,10 @@ export const userRouter = router({
     .mutation(async ({ ctx, input }) => {
       return userService.updateNotificationPreferences(ctx.user.id, input);
     }),
+
+  updatePhoneNumber: protectedProcedure
+    .input(z.object({ phoneNumber: z.string().regex(/^\+[1-9]\d{1,14}$/, 'Must be E.164 format (e.g. +44...)').nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      return userService.updatePhoneNumber(ctx.user.id, input.phoneNumber);
+    }),
 });
