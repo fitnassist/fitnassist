@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, MapPin, User, MoreVertical, X, Check, AlertTriangle, CalendarClock, MessageSquare, ArrowRight, Video, CreditCard, RotateCcw } from 'lucide-react';
+import { Clock, MapPin, User, MoreVertical, X, Check, AlertTriangle, CalendarClock, MessageSquare, ArrowRight, Video, CreditCard, RotateCcw, Gift } from 'lucide-react';
 import {
   Button, Badge, Card, CardContent,
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -49,6 +49,7 @@ interface BookingCardProps {
       refundAmount?: number | null;
       refundReason?: string | null;
     } | null;
+    isFreeSession?: boolean;
   };
   isTrainer: boolean;
   currentUserId: string;
@@ -195,6 +196,12 @@ export const BookingCard = ({
                 )}
                 {booking.payment && (
                   <PaymentBadge payment={booking.payment} />
+                )}
+                {booking.isFreeSession && !booking.payment && (
+                  <Badge variant="outline" className="gap-1 text-green-700 border-green-300">
+                    <Gift className="h-3 w-3" />
+                    Free
+                  </Badge>
                 )}
                 {isInitiator && booking.status === 'PENDING' && (
                   <span className="text-xs text-muted-foreground">Awaiting confirmation</span>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Calendar, Clock, MapPin, User, Check, X, CalendarClock, ArrowRight, AlertTriangle, MoreVertical, Video,
-  CreditCard, RotateCcw,
+  CreditCard, RotateCcw, Gift,
 } from 'lucide-react';
 import {
   Button, Badge, Card, CardContent, ConfirmDialog,
@@ -111,6 +111,7 @@ export const BookingDetailPage = () => {
   const isSessionExpired = new Date(`${bookingDateIso}T${booking.endTime}:00`).getTime() < Date.now();
 
   const payment = (booking as { payment?: { id: string; status: string; amount: number; currency: string; refundAmount?: number | null; refundReason?: string | null; paidAt?: string | null; refundedAt?: string | null } | null }).payment;
+  const isFreeSession = (booking as { isFreeSession?: boolean }).isFreeSession ?? false;
 
   // Client needs to pay: trainer initiated the booking, payment exists but is PENDING, and user is the client
   const isClient = booking.clientRoster?.connection?.sender?.id === currentUserId;
@@ -293,6 +294,19 @@ export const BookingDetailPage = () => {
                     {payment.refundReason && ` — ${payment.refundReason}`}
                   </p>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Free session badge */}
+          {isFreeSession && !payment && (
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Gift className="h-4 w-4 text-green-600" />
+                  <Badge variant="success" className="text-xs">Free Session</Badge>
+                  <span className="text-sm text-muted-foreground">No payment required</span>
+                </div>
               </CardContent>
             </Card>
           )}

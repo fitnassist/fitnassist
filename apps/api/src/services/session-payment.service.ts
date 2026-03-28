@@ -13,6 +13,15 @@ export const sessionPaymentService = {
    * Returns the client secret for Stripe Elements on the frontend.
    */
   createPaymentIntent: async (bookingId: string, trainerId: string) => {
+    // Check if this is a free session (trainer marked it free at booking time)
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      select: { isFreeSession: true },
+    });
+    if (booking?.isFreeSession) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'This is a free session — no payment required' });
+    }
+
     const stripe = getStripe();
 
     // Get trainer's Stripe account and pricing

@@ -86,6 +86,7 @@ export const bookingService = {
     notes?: string;
     initiatedBy: string;
     sessionType?: SessionType;
+    isFreeSession?: boolean;
   }) => {
     // Verify the client roster exists, belongs to this trainer, and is active
     const roster = await clientRosterRepository.findById(data.clientRosterId);

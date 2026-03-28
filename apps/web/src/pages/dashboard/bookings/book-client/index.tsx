@@ -6,6 +6,7 @@ import { Skeleton, Card, CardContent, Avatar, AvatarFallback, AvatarImage } from
 import { PageLayout } from '@/components/layouts';
 import { useAvailableDates, useAvailableSlots } from '@/api/availability';
 import { useCreateBookingForClient } from '@/api/booking';
+import { usePaymentRequirement } from '@/api/payment';
 import { useClients } from '@/api/client-roster';
 import { trpc } from '@/lib/trpc';
 import { routes } from '@/config/routes';
@@ -38,6 +39,7 @@ export const TrainerBookSessionPage = () => {
   const [clientAddressDetails, setClientAddressDetails] = useState<AddressDetails | null>(null);
   const [sessionType, setSessionType] = useState<SessionType>('IN_PERSON');
   const [notes, setNotes] = useState('');
+  const [isFreeSession, setIsFreeSession] = useState(false);
 
   // Get own trainer profile for trainerId and video settings
   const { data: trainerProfile, isLoading: trainerLoading } = trpc.trainer.getMyProfile.useQuery();
@@ -66,6 +68,13 @@ export const TrainerBookSessionPage = () => {
     { trainerId },
     { enabled: !!trainerId && step === 'location' }
   );
+
+  // Check if trainer has payments enabled (to show free session toggle)
+  const { data: paymentReq } = usePaymentRequirement(
+    trainerId,
+    selectedClientRosterId ?? ''
+  );
+  const trainerHasPayments = paymentReq?.paymentRequired === true;
 
   const selectedSlotObj = slots?.find((s) => s.startTime === selectedSlot);
   const selectedClient = clients.find((c) => c.id === selectedClientRosterId);
@@ -116,6 +125,7 @@ export const TrainerBookSessionPage = () => {
         clientLatitude: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.latitude || undefined),
         clientLongitude: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.longitude || undefined),
         notes: notes || undefined,
+        isFreeSession: trainerHasPayments ? isFreeSession : undefined,
       },
       {
         onSuccess: () => {
@@ -345,6 +355,9 @@ export const TrainerBookSessionPage = () => {
             onConfirm={handleConfirm}
             onBack={() => setStep(sessionType === 'VIDEO_CALL' ? 'session-type' : 'location')}
             isSubmitting={createBooking.isPending}
+            paymentInfo={trainerHasPayments ? { amount: paymentReq!.amount, currency: paymentReq!.currency } : null}
+            isFreeSession={isFreeSession}
+            onFreeSessionChange={trainerHasPayments ? setIsFreeSession : undefined}
           />
         )}
         </>

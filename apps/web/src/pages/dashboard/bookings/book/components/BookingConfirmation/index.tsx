@@ -1,5 +1,5 @@
 import { Calendar, Clock, MapPin, Video, CreditCard, Gift } from 'lucide-react';
-import { Button, Card, CardContent, Badge } from '@/components/ui';
+import { Button, Card, CardContent, Badge, Switch, Label } from '@/components/ui';
 
 interface BookingConfirmationProps {
   date: string;
@@ -18,6 +18,8 @@ interface BookingConfirmationProps {
     currency: string;
   } | null;
   isFirstFree?: boolean;
+  isFreeSession?: boolean;
+  onFreeSessionChange?: (free: boolean) => void;
 }
 
 const formatPrice = (amount: number, currency: string = 'gbp') => {
@@ -41,6 +43,8 @@ export const BookingConfirmation = ({
   isSubmitting,
   paymentInfo,
   isFirstFree,
+  isFreeSession,
+  onFreeSessionChange,
 }: BookingConfirmationProps) => {
   const dateStr = new Date(date + 'T00:00:00').toLocaleDateString('en-GB', {
     weekday: 'long',
@@ -83,7 +87,7 @@ export const BookingConfirmation = ({
                 </>
               )}
             </div>
-            {showPayment && (
+            {showPayment && !isFreeSession && (
               <div className="flex items-center gap-2">
                 {isFirstFree ? (
                   <>
@@ -98,9 +102,29 @@ export const BookingConfirmation = ({
                 ) : null}
               </div>
             )}
+            {isFreeSession && (
+              <div className="flex items-center gap-2">
+                <Gift className="h-4 w-4 text-green-600" />
+                <Badge variant="success" className="text-xs">Free Session</Badge>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {onFreeSessionChange && paymentInfo && !isFirstFree && (
+        <div className="flex items-center justify-between rounded-lg border p-3">
+          <div className="space-y-0.5">
+            <Label htmlFor="free-session">Free session</Label>
+            <p className="text-xs text-muted-foreground">No payment will be required for this session</p>
+          </div>
+          <Switch
+            id="free-session"
+            checked={isFreeSession ?? false}
+            onCheckedChange={onFreeSessionChange}
+          />
+        </div>
+      )}
 
       <div>
         <label className="text-sm font-medium mb-1 block">Notes (optional)</label>
@@ -119,7 +143,7 @@ export const BookingConfirmation = ({
         </Button>
         <Button onClick={onConfirm} disabled={isSubmitting} className="flex-1">
           {isSubmitting ? 'Booking...' : (
-            paymentInfo && !isFirstFree
+            paymentInfo && !isFirstFree && !isFreeSession
               ? `Confirm & Pay ${formatPrice(paymentInfo.amount, paymentInfo.currency)}`
               : 'Confirm Booking'
           )}

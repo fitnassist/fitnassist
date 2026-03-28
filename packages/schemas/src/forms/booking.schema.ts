@@ -100,6 +100,7 @@ export const createBookingForClientSchema = z.object({
   clientLatitude: z.number().min(-90).max(90).optional(),
   clientLongitude: z.number().min(-180).max(180).optional(),
   notes: z.string().max(500).optional(),
+  isFreeSession: z.boolean().optional(),
 });
 
 export type CreateBookingForClientInput = z.infer<typeof createBookingForClientSchema>;
