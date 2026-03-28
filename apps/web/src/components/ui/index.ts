@@ -71,3 +71,4 @@ export {
   SkeletonCardList,
   SkeletonConversationRow,
 } from './skeleton';
+export { StarRating, InteractiveStarRating } from './star-rating';

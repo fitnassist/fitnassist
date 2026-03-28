@@ -32,6 +32,7 @@ export const BookingSchema = z.object({
   rescheduledFromId: z.string().nullable(),
   reminderSentAt: z.coerce.date().nullable(),
   notes: z.string().max(500).nullable(),
+  isFreeSession: z.boolean(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -46,6 +47,7 @@ export const BookingOptionalDefaultsSchema = BookingSchema.merge(z.object({
   sessionType: SessionTypeSchema.optional(),
   status: BookingStatusSchema.optional(),
   id: z.string().cuid().optional(),
+  isFreeSession: z.boolean().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }))

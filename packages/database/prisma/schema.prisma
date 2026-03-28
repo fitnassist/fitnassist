@@ -155,6 +155,15 @@ enum NotificationType {
   BOOKING_SUGGESTION
   BOOKING_RESCHEDULED
   BOOKING_EXPIRED
+  REVIEW_RECEIVED
+  REVIEW_REPLY
+}
+
+enum ReportReason {
+  INAPPROPRIATE
+  FAKE
+  SPAM
+  HARASSMENT
 }
 
 enum FriendshipStatus {
@@ -258,6 +267,8 @@ model User {
   badges           UserBadge[]
   initiatedBookings Booking[]
   bookingSuggestions BookingSuggestion[]
+  reviews          Review[]
+  reviewReports    ReviewReport[]
 
   @@map("users")
 }
@@ -387,6 +398,10 @@ model TrainerProfile {
   stripeOnboardingComplete   Boolean  @default(false)
   firstSessionFree           Boolean  @default(false)
 
+  // Rating cache
+  ratingAverage    Float            @default(0)
+  ratingCount      Int              @default(0)
+
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 
@@ -396,6 +411,7 @@ model TrainerProfile {
   profileViews     ProfileView[]
   galleryImages    GalleryImage[]
   clientRoster     ClientRoster[]
+  reviews          Review[]
   onboardingTemplates OnboardingTemplate[]
   exercises        Exercise[]
   recipes          Recipe[]
@@ -1721,4 +1737,52 @@ model UserBadge {
   @@unique([userId, badgeId])
   @@index([userId])
   @@map("user_badges")
+}
+
+// =============================================================================
+// REVIEWS & RATINGS
+// =============================================================================
+
+model Review {
+  id          String    @id @default(cuid())
+  trainerId   String
+  reviewerId  String
+
+  /// @zod.number.int().min(1).max(5)
+  rating      Int
+  /// @zod.string.min(10, { message: "Review must be at least 10 characters" }).max(2000, { message: "Review must be at most 2000 characters" })
+  text        String    @db.Text
+
+  /// @zod.string.max(2000, { message: "Reply must be at most 2000 characters" })
+  replyText   String?   @db.Text
+  repliedAt   DateTime?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  trainer     TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  reviewer    User           @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+  reports     ReviewReport[]
+
+  @@unique([trainerId, reviewerId])
+  @@index([trainerId])
+  @@index([reviewerId])
+  @@map("reviews")
+}
+
+model ReviewReport {
+  id         String       @id @default(cuid())
+  reviewId   String
+  reporterId String
+  reason     ReportReason
+  /// @zod.string.max(500, { message: "Details must be at most 500 characters" })
+  details    String?      @db.Text
+  createdAt  DateTime     @default(now())
+
+  review     Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reporter   User   @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@unique([reviewId, reporterId])
+  @@index([reviewId])
+  @@map("review_reports")
 }

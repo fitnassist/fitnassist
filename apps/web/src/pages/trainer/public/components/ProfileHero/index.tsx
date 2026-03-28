@@ -1,4 +1,5 @@
 import { MapPin, PoundSterling, UserCheck, UserX } from 'lucide-react';
+import { StarRating } from '@/components/ui';
 import type { PublicTrainerProfile } from '../../public.types';
 import { getPostcodeArea, formatRate } from '../../public.utils';
 
@@ -59,7 +60,14 @@ export function ProfileHero({ trainer }: ProfileHeroProps) {
                 {locationText}
               </p>
             )}
-            <div className="flex items-center gap-3 mt-1.5">
+            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+              {trainer.ratingCount > 0 && (
+                <StarRating
+                  rating={trainer.ratingAverage ?? 0}
+                  count={trainer.ratingCount}
+                  size="sm"
+                />
+              )}
               {rateDisplay && (
                 <span className="flex items-center gap-1 text-sm font-medium text-foreground">
                   <PoundSterling className="h-3.5 w-3.5" />

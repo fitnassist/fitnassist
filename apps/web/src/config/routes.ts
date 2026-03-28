@@ -49,6 +49,7 @@ export const routes = {
   dashboardOnboardingTemplateEdit: (id: string) => `/dashboard/onboarding/templates/${id}/edit`,
   dashboardOnboardingComplete: (responseId: string) => `/dashboard/onboarding/${responseId}`,
   dashboardAnalytics: '/dashboard/analytics',
+  dashboardReviews: '/dashboard/reviews',
   dashboardBookings: '/dashboard/bookings',
   dashboardBookingDetail: (id: string) => `/dashboard/bookings/${id}`,
   dashboardBookingCall: (id: string) => `/dashboard/bookings/${id}/call`,

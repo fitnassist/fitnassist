@@ -36,6 +36,7 @@ export {
   BookingSuggestionStatus,
   SessionType,
   PaymentStatus,
+  ReportReason,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -96,6 +97,8 @@ export type {
   SessionPrice,
   CancellationPolicy,
   SessionPayment,
+  Review,
+  ReviewReport,
 } from '@prisma/client';
 
 // Re-export generated Zod schemas from model schemas
@@ -133,4 +136,5 @@ export {
   FriendshipStatusSchema,
   SessionTypeSchema,
   PaymentStatusSchema,
+  ReportReasonSchema,
 } from './generated/zod/inputTypeSchemas';

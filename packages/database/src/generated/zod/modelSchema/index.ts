@@ -54,3 +54,5 @@ export * from './PostSchema';
 export * from './PostLikeSchema';
 export * from './DiaryEntryLikeSchema';
 export * from './UserBadgeSchema';
+export * from './ReviewSchema';
+export * from './ReviewReportSchema';

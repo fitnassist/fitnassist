@@ -9,3 +9,4 @@ export { ProfileVideoIntro } from './ProfileVideoIntro';
 export { ProfileNotFound } from './ProfileNotFound';
 export { ProfileSkeleton } from './ProfileSkeleton';
 export { FollowButton } from './FollowButton';
+export { ReviewsSection } from './ReviewsSection';

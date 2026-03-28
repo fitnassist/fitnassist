@@ -46,6 +46,7 @@ import { TermsOfServicePage } from '@/pages/terms';
 import { SupportPage } from '@/pages/support';
 import { PricingPage } from '@/pages/pricing';
 import { AnalyticsPage } from '@/pages/dashboard/analytics';
+import { ReviewsPage } from '@/pages/dashboard/reviews';
 import { FeedPage } from '@/pages/dashboard/feed';
 import { FriendsPage } from '@/pages/dashboard/friends';
 import { LeaderboardsPage } from '@/pages/dashboard/leaderboards';
@@ -116,6 +117,7 @@ function App() {
                       <Route path="/dashboard/onboarding/templates/:id/edit" element={<OnboardingTemplateFormPage />} />
                       <Route path="/dashboard/onboarding/:responseId" element={<OnboardingCompletePage />} />
                       <Route path={routes.dashboardAnalytics} element={<AnalyticsPage />} />
+                      <Route path={routes.dashboardReviews} element={<ReviewsPage />} />
                       <Route path="/dashboard/bookings/book-client" element={<TrainerBookSessionPage />} />
                       <Route path="/dashboard/bookings/book-client/:clientRosterId" element={<TrainerBookSessionPage />} />
                       <Route path={routes.trainerProfileEdit} element={<ProfileEditPage />} />

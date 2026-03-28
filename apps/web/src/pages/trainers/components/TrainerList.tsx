@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MapPin, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback, Badge, Select, type SelectOption } from '@/components/ui';
+import { Avatar, AvatarImage, AvatarFallback, Badge, Select, StarRating, type SelectOption } from '@/components/ui';
 import { routes } from '@/config/routes';
 import { getServiceLabel } from '@/pages/trainer/public/public.utils';
 
@@ -26,6 +26,8 @@ interface Trainer {
   hourlyRateMin: number | null;
   hourlyRateMax: number | null;
   acceptingClients: boolean;
+  ratingAverage: number;
+  ratingCount: number;
   distance?: number;
 }
 
@@ -199,9 +201,12 @@ const TrainerCard = ({ trainer, isSelected, onSelect }: TrainerCardProps) => {
             <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           </div>
 
-          {/* Rate + availability */}
-          {(rateDisplay || !trainer.acceptingClients) && (
-            <div className="flex items-center gap-2 mt-1">
+          {/* Rating + Rate + availability */}
+          {(rateDisplay || !trainer.acceptingClients || trainer.ratingCount > 0) && (
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              {trainer.ratingCount > 0 && (
+                <StarRating rating={trainer.ratingAverage} count={trainer.ratingCount} size="sm" />
+              )}
               {rateDisplay && (
                 <span className="text-sm font-medium text-foreground">{rateDisplay}</span>
               )}

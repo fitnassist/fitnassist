@@ -46,6 +46,8 @@ export const TrainerProfileSchema = z.object({
   stripeConnectedAccountId: z.string().nullable(),
   stripeOnboardingComplete: z.boolean(),
   firstSessionFree: z.boolean(),
+  ratingAverage: z.number(),
+  ratingCount: z.number().int(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -69,6 +71,8 @@ export const TrainerProfileOptionalDefaultsSchema = TrainerProfileSchema.merge(z
   paymentsEnabled: z.boolean().optional(),
   stripeOnboardingComplete: z.boolean().optional(),
   firstSessionFree: z.boolean().optional(),
+  ratingAverage: z.number().optional(),
+  ratingCount: z.number().int().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }))

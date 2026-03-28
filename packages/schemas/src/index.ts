@@ -91,6 +91,11 @@ export {
   SessionPaymentSchema,
   SessionPriceSchema,
   CancellationPolicySchema,
+  ReviewSchema,
+  ReviewOptionalDefaultsSchema,
+  ReviewReportSchema,
+  ReviewReportOptionalDefaultsSchema,
+  ReportReasonSchema,
 } from '@fitnassist/database';
 
 // =============================================================================
@@ -121,6 +126,7 @@ export * from './forms/session-location.schema';
 export * from './forms/availability.schema';
 export * from './forms/booking.schema';
 export * from './forms/payment.schema';
+export * from './forms/review.schema';
 
 // =============================================================================
 // CONSTANTS

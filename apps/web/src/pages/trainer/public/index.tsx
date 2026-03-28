@@ -12,6 +12,7 @@ import {
   ProfileNotFound,
   ProfileSkeleton,
   FollowButton,
+  ReviewsSection,
 } from './components';
 
 export function TrainerPublicProfilePage() {
@@ -46,6 +47,11 @@ export function TrainerPublicProfilePage() {
             )}
             <ProfileServices services={trainer.services} />
             <ProfileQualifications qualifications={trainer.qualifications} />
+            <ReviewsSection
+              trainerId={trainer.id}
+              ratingAverage={trainer.ratingAverage ?? 0}
+              ratingCount={trainer.ratingCount ?? 0}
+            />
           </div>
 
           {/* Sidebar */}
