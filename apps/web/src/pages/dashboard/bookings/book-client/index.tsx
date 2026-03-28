@@ -7,7 +7,7 @@ import { PageLayout } from '@/components/layouts';
 import { useAvailableDates, useAvailableSlots } from '@/api/availability';
 import { useCreateBookingForClient } from '@/api/booking';
 import { usePaymentRequirement } from '@/api/payment';
-import { useClients } from '@/api/client-roster';
+import { useClients, useClient } from '@/api/client-roster';
 import { trpc } from '@/lib/trpc';
 import { routes } from '@/config/routes';
 import type { SessionType } from '@fitnassist/schemas';
@@ -26,7 +26,7 @@ export const TrainerBookSessionPage = () => {
   // Fetch active clients for the picker
   const { data: clientsData, isLoading: clientsLoading } = useClients({
     status: 'ACTIVE',
-    limit: 100,
+    limit: 50,
   });
   const clients = clientsData?.clients ?? [];
 
@@ -76,9 +76,16 @@ export const TrainerBookSessionPage = () => {
   );
   const trainerHasPayments = paymentReq?.paymentRequired === true;
 
+  // Fetch individual client when preselected (so name shows immediately)
+  const { data: preselectedClient } = useClient(preselectedClientId ?? '');
+
   const selectedSlotObj = slots?.find((s) => s.startTime === selectedSlot);
   const selectedClient = clients.find((c) => c.id === selectedClientRosterId);
-  const clientName = selectedClient?.connection?.sender?.name ?? selectedClient?.connection?.name ?? 'Client';
+  const clientName = selectedClient?.connection?.sender?.name
+    ?? selectedClient?.connection?.name
+    ?? preselectedClient?.connection?.sender?.name
+    ?? preselectedClient?.connection?.name
+    ?? 'Client';
 
   const handleClientSelect = (clientId: string) => {
     setSelectedClientRosterId(clientId);
