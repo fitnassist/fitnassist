@@ -164,7 +164,7 @@ export const paymentRouter = router({
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Stripe onboarding not complete' });
       }
 
-      const url = await stripeConnectService.createDashboardLink(trainer.stripeConnectedAccountId);
+      const url = await stripeConnectService.getDashboardUrl();
       return { url };
     }),
 

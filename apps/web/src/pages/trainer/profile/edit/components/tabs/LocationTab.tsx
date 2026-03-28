@@ -1,8 +1,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Phone } from 'lucide-react';
 import { wizardLocationSchema, type WizardLocationInput } from '@fitnassist/schemas';
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, AddressAutocomplete, type AddressDetails } from '@/components/ui';
+import { Button, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, AddressAutocomplete, type AddressDetails } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { toast } from '@/lib/toast';
 import { env } from '@/config/env';
@@ -37,7 +36,6 @@ interface LocationTabProps {
     placeId: string | null;
     latitude: number | null;
     longitude: number | null;
-    phoneNumber: string | null;
     travelOption: 'CLIENT_TRAVELS' | 'TRAINER_TRAVELS' | 'BOTH' | null;
   };
 }
@@ -54,7 +52,6 @@ export function LocationTab({ profile }: LocationTabProps) {
   });
 
   const {
-    register,
     handleSubmit,
     control,
     setValue,
@@ -72,7 +69,6 @@ export function LocationTab({ profile }: LocationTabProps) {
       placeId: profile.placeId || '',
       latitude: profile.latitude || undefined,
       longitude: profile.longitude || undefined,
-      phoneNumber: profile.phoneNumber || '',
       travelOption: profile.travelOption || 'CLIENT_TRAVELS',
     },
   });
@@ -116,7 +112,6 @@ export function LocationTab({ profile }: LocationTabProps) {
         placeId: data.placeId || undefined,
         latitude: data.latitude,
         longitude: data.longitude,
-        phoneNumber: data.phoneNumber || undefined,
         travelOption: data.travelOption,
       });
     } finally {
@@ -158,26 +153,6 @@ export function LocationTab({ profile }: LocationTabProps) {
               />
             )}
           />
-
-          {/* Phone Number */}
-          <div>
-            <Label htmlFor="phoneNumber" className="flex items-center gap-2">
-              <Phone className="h-4 w-4" />
-              Phone Number
-            </Label>
-            <Input
-              id="phoneNumber"
-              type="tel"
-              placeholder="+44 7123 456789"
-              {...register('phoneNumber')}
-            />
-            {errors.phoneNumber && (
-              <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Used for SMS appointment reminders. Never shared publicly.
-            </p>
-          </div>
 
           {/* Travel Options */}
           <div className="space-y-3">

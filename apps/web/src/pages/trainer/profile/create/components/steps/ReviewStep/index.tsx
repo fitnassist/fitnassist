@@ -122,12 +122,6 @@ export const ReviewStep = ({
                 {data.location.postcode}
               </p>
             )}
-            {data.location.phoneNumber && (
-              <p>
-                <span className="font-medium">Phone:</span>{' '}
-                {data.location.phoneNumber}
-              </p>
-            )}
             <p>
               <span className="font-medium">Training Location:</span>{' '}
               {getTravelOptionLabel(data.location.travelOption)}

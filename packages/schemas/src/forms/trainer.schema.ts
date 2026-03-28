@@ -122,12 +122,6 @@ export const wizardLocationSchema = z.object({
   longitude: z.number().min(-180).max(180).optional(),
   // Training location preference
   travelOption: z.enum(['CLIENT_TRAVELS', 'TRAINER_TRAVELS', 'BOTH']),
-  // Phone number for SMS reminders
-  phoneNumber: z
-    .string()
-    .regex(/^\+?[0-9\s\-\(\)]{10,20}$/, 'Please enter a valid phone number')
-    .optional()
-    .or(z.literal('')),
 });
 
 export type WizardLocationInput = z.infer<typeof wizardLocationSchema>;

@@ -35,7 +35,6 @@ const initialFormData: WizardFormData = {
     latitude: undefined,
     longitude: undefined,
     travelOption: 'CLIENT_TRAVELS',
-    phoneNumber: '',
   },
   services: {
     services: [],
@@ -106,7 +105,6 @@ export function ProfileWizard() {
         latitude: formData.location.latitude,
         longitude: formData.location.longitude,
         travelOption: formData.location.travelOption,
-        phoneNumber: formData.location.phoneNumber || undefined,
         services: formData.services.services,
         qualifications: formData.services.qualifications,
         profileImageUrl: formData.images.profileImageUrl || undefined,

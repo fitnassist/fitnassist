@@ -1,8 +1,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Phone } from 'lucide-react';
 import { wizardLocationSchema, type WizardLocationInput } from '@fitnassist/schemas';
-import { Button, Input, Label, AddressAutocomplete, type AddressDetails } from '@/components/ui';
+import { Button, Label, AddressAutocomplete, type AddressDetails } from '@/components/ui';
 import { env } from '@/config/env';
 import type { WizardStepProps } from '../../ProfileWizard/ProfileWizard.types';
 
@@ -31,7 +30,6 @@ export function LocationStep({
   onBack,
 }: WizardStepProps) {
   const {
-    register,
     handleSubmit,
     control,
     setValue,
@@ -97,26 +95,6 @@ export function LocationStep({
             />
           )}
         />
-
-        {/* Phone Number */}
-        <div>
-          <Label htmlFor="phoneNumber" className="flex items-center gap-2">
-            <Phone className="h-4 w-4" />
-            Phone Number
-          </Label>
-          <Input
-            id="phoneNumber"
-            type="tel"
-            placeholder="+44 7123 456789"
-            {...register('phoneNumber')}
-          />
-          {errors.phoneNumber && (
-            <p className="text-sm text-destructive">{errors.phoneNumber.message}</p>
-          )}
-          <p className="mt-1.5 text-xs text-muted-foreground">
-            Used for SMS appointment reminders. Never shared publicly.
-          </p>
-        </div>
 
         {/* Travel Options */}
         <div className="space-y-3">

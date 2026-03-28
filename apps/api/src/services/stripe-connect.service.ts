@@ -30,12 +30,11 @@ export const stripeConnectService = {
   },
 
   /**
-   * Generate a Stripe Express dashboard link for a connected account.
+   * Get the Stripe dashboard URL for a Standard connected account.
+   * Standard accounts manage their own Stripe dashboard directly.
    */
-  createDashboardLink: async (accountId: string) => {
-    const stripe = getStripe();
-    const loginLink = await stripe.accounts.createLoginLink(accountId);
-    return loginLink.url;
+  getDashboardUrl: async () => {
+    return 'https://dashboard.stripe.com';
   },
 
   /**
