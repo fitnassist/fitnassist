@@ -182,7 +182,7 @@ For reference, the following is live:
 
 ---
 
-## Phase 7: Subscription & Payments ✅
+## Phase 7: Subscription & Payments
 
 **Goal**: Monetise the platform. Gate premium features behind paid tiers and enable session payments.
 
@@ -197,10 +197,10 @@ For reference, the following is live:
 - **Basic**: Enhanced profile, featured/boosted in search results, gallery, video intro
 - **Pro**: All Basic + booking, payments, client management
 
-### 7.3 Session Payments
+### 7.3 Session Payments ✅
 - Pay for sessions at booking time via Stripe
 - PT payouts / Stripe Connect for direct transfers
-- Payment history for both parties
+- Payment history for both parties (revenue analytics tab)
 - Automatic refunds for policy-eligible cancellations
 
 ### 7.4 Additional Auth Providers
@@ -226,6 +226,7 @@ For reference, the following is live:
 - Goal analytics (horizontal bar chart with completion rates per client)
 - Upgrade prompt for non-ELITE trainers
 - Analytics nav item in sidebar (feature-gated)
+- Revenue analytics tab (30-day summary, 12-week revenue trend chart, paginated transaction history)
 
 ---
 
