@@ -62,9 +62,9 @@ export const BookingAnalytics = () => {
                 <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />
                 <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
                 <Legend />
-                <Bar dataKey="completed" name="Completed" stackId="a" fill="hsl(142, 71%, 45%)" />
-                <Bar dataKey="cancelled" name="Cancelled" stackId="a" fill="hsl(0, 84%, 60%)" />
-                <Bar dataKey="upcoming" name="Upcoming" stackId="a" fill="hsl(217, 91%, 60%)" />
+                <Bar dataKey="completed" name="Completed" stackId="a" fill="hsl(170, 58%, 50%)" />
+                <Bar dataKey="cancelled" name="Cancelled" stackId="a" fill="hsl(0, 50%, 65%)" />
+                <Bar dataKey="upcoming" name="Upcoming" stackId="a" fill="hsl(220, 45%, 65%)" />
               </BarChart>
             </ResponsiveContainer>
           </>

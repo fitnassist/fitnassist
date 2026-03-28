@@ -66,9 +66,9 @@ export const GoalAnalytics = () => {
                 />
                 <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
                 <Legend />
-                <Bar dataKey="completed" name="Completed" stackId="a" fill="hsl(142, 71%, 45%)" />
-                <Bar dataKey="active" name="Active" stackId="a" fill="hsl(217, 91%, 60%)" />
-                <Bar dataKey="abandoned" name="Abandoned" stackId="a" fill="hsl(0, 84%, 60%)" />
+                <Bar dataKey="completed" name="Completed" stackId="a" fill="hsl(170, 58%, 50%)" />
+                <Bar dataKey="active" name="Active" stackId="a" fill="hsl(220, 45%, 65%)" />
+                <Bar dataKey="abandoned" name="Abandoned" stackId="a" fill="hsl(0, 50%, 65%)" />
               </BarChart>
             </ResponsiveContainer>
           </>

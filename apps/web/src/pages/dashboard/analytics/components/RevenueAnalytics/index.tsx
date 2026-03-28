@@ -104,8 +104,8 @@ export const RevenueAnalytics = () => {
                       contentStyle={{ fontSize: 12, borderRadius: 8 }}
                       formatter={(value) => [`£${Number(value).toFixed(2)}`]}
                     />
-                    <Bar dataKey="revenue" name="Revenue" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="refunds" name="Refunds" fill="hsl(0, 84%, 60%)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="revenue" name="Revenue" fill="hsl(170, 58%, 50%)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="refunds" name="Refunds" fill="hsl(0, 50%, 65%)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
