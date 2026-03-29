@@ -43,7 +43,7 @@ export const PricingPage = () => {
 
   const currentTier = subscriptionData?.effectiveTier ?? 'FREE';
 
-  const handleSelect = (tier: 'PRO') => {
+  const handleSelect = (tier: 'PRO' | 'ELITE') => {
     if (!isAuthenticated) {
       window.location.href = routes.register;
       return;
@@ -118,7 +118,8 @@ export const PricingPage = () => {
                 info={TIER_INFO.ELITE}
                 billingPeriod={billingPeriod}
                 isCurrentPlan={currentTier === 'ELITE'}
-                comingSoon
+                onSelect={() => handleSelect('ELITE')}
+                isLoading={createCheckout.isPending}
               />
             </div>
           </div>

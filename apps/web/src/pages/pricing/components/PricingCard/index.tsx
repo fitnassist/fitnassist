@@ -18,7 +18,6 @@ interface PricingCardProps {
   isCurrentPlan?: boolean;
   isPopular?: boolean;
   isLoading?: boolean;
-  comingSoon?: boolean;
   onSelect?: () => void;
 }
 
@@ -29,7 +28,6 @@ export const PricingCard = ({
   isCurrentPlan,
   isPopular,
   isLoading,
-  comingSoon,
   onSelect,
 }: PricingCardProps) => {
   const price =
@@ -78,16 +76,14 @@ export const PricingCard = ({
         <Button
           className="w-full uppercase tracking-wider font-semibold"
           variant={isPopular ? "default" : "outline"}
-          disabled={isCurrentPlan || isLoading || tier === "FREE" || comingSoon}
+          disabled={isCurrentPlan || isLoading || tier === "FREE"}
           onClick={onSelect}
         >
-          {comingSoon
-            ? "Coming Soon"
-            : isCurrentPlan
-              ? "Current Plan"
-              : tier === "FREE"
-                ? "Free Forever"
-                : "Get Started"}
+          {isCurrentPlan
+            ? "Current Plan"
+            : tier === "FREE"
+              ? "Free Forever"
+              : "Get Started"}
         </Button>
       </div>
     </div>
