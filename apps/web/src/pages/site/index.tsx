@@ -25,6 +25,14 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
   const { data: website, isLoading, isError, error } = usePublicWebsite(handle);
   const [view, setView] = useState<SiteView>(parsePathToView);
 
+  // Check if blog posts exist for dynamic nav item (must be before early returns)
+  const subdomain = website?.subdomain ?? '';
+  const { data: blogData } = trpc.blog.getPublicPosts.useQuery(
+    { subdomain, limit: 1 },
+    { enabled: !!subdomain }
+  );
+  const hasBlogPosts = (blogData?.posts?.length ?? 0) > 0;
+
   // Handle browser back/forward
   useEffect(() => {
     const onPopState = () => setView(parsePathToView());
@@ -124,13 +132,6 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
       </div>
     );
   }
-
-  // Check if blog posts exist for dynamic nav item
-  const { data: blogData } = trpc.blog.getPublicPosts.useQuery(
-    { subdomain: website.subdomain, limit: 1 },
-    { enabled: !!website.subdomain }
-  );
-  const hasBlogPosts = (blogData?.posts?.length ?? 0) > 0;
 
   const sortedSections = [...website.sections]
     .filter((s) => s.isVisible)
