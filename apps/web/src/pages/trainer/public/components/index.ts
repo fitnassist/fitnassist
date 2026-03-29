@@ -10,3 +10,4 @@ export { ProfileNotFound } from './ProfileNotFound';
 export { ProfileSkeleton } from './ProfileSkeleton';
 export { FollowButton } from './FollowButton';
 export { ReviewsSection } from './ReviewsSection';
+export { ProfileBlogPosts } from './ProfileBlogPosts';

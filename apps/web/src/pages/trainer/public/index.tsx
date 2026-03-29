@@ -13,6 +13,7 @@ import {
   ProfileSkeleton,
   FollowButton,
   ReviewsSection,
+  ProfileBlogPosts,
 } from './components';
 
 export function TrainerPublicProfilePage() {
@@ -52,6 +53,9 @@ export function TrainerPublicProfilePage() {
               ratingAverage={trainer.ratingAverage ?? 0}
               ratingCount={trainer.ratingCount ?? 0}
             />
+            {trainer.website?.subdomain && trainer.website.status === 'PUBLISHED' && (
+              <ProfileBlogPosts subdomain={trainer.website.subdomain} />
+            )}
           </div>
 
           {/* Sidebar */}

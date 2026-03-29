@@ -41,6 +41,7 @@ export const trainerRepository = {
       include: {
         user: true,
         galleryImages: { orderBy: { sortOrder: 'asc' } },
+        website: { select: { subdomain: true, status: true } },
       },
     });
   },

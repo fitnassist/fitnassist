@@ -8,12 +8,13 @@ interface SiteLayoutProps {
   children: ReactNode;
   onNavigateBlog?: () => void;
   onNavigateHome?: () => void;
+  hasBlogPosts?: boolean;
 }
 
-export const SiteLayout = ({ website, children, onNavigateBlog, onNavigateHome }: SiteLayoutProps) => {
+export const SiteLayout = ({ website, children, onNavigateBlog, onNavigateHome, hasBlogPosts }: SiteLayoutProps) => {
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader website={website} onNavigateBlog={onNavigateBlog} onNavigateHome={onNavigateHome} />
+      <SiteHeader website={website} onNavigateBlog={onNavigateBlog} onNavigateHome={onNavigateHome} hasBlogPosts={hasBlogPosts} />
       <main className="flex-1">{children}</main>
       <SiteFooter trainer={website.trainer} />
     </div>

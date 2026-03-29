@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Skeleton } from '@/components/ui';
 import { usePublicWebsite } from '@/api/website';
+import { trpc } from '@/lib/trpc';
 import { SiteThemeProvider } from './components/ThemeProvider';
 import { SiteLayout } from './components/SiteLayout';
 import { SectionRenderer } from './components/sections';
@@ -8,33 +9,46 @@ import { BlogListPage, BlogPostPage } from './components/blog';
 
 type SiteView = { page: 'home' } | { page: 'blog' } | { page: 'blog-post'; slug: string };
 
+const parsePathToView = (): SiteView => {
+  const path = window.location.pathname;
+  if (path === '/blog' || path === '/blog/') return { page: 'blog' };
+  const postMatch = path.match(/^\/blog\/(.+)$/);
+  if (postMatch?.[1]) return { page: 'blog-post', slug: postMatch[1] };
+  return { page: 'home' };
+};
+
 interface SiteRendererProps {
   handle: string;
 }
 
 export const SiteRenderer = ({ handle }: SiteRendererProps) => {
   const { data: website, isLoading, isError, error } = usePublicWebsite(handle);
-  const [view, setView] = useState<SiteView>({ page: 'home' });
+  const [view, setView] = useState<SiteView>(parsePathToView);
+
+  // Handle browser back/forward
+  useEffect(() => {
+    const onPopState = () => setView(parsePathToView());
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
+  const navigate = useCallback((newView: SiteView, path: string) => {
+    window.history.pushState(null, '', path);
+    setView(newView);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleNavigateBlog = useCallback(() => {
-    setView({ page: 'blog' });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    navigate({ page: 'blog' }, '/blog');
+  }, [navigate]);
 
   const handleNavigatePost = useCallback((slug: string) => {
-    setView({ page: 'blog-post', slug });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    navigate({ page: 'blog-post', slug }, `/blog/${slug}`);
+  }, [navigate]);
 
   const handleNavigateHome = useCallback(() => {
-    setView({ page: 'home' });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  const handleNavigateBlogList = useCallback(() => {
-    setView({ page: 'blog' });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+    navigate({ page: 'home' }, '/');
+  }, [navigate]);
 
   // Update document title based on site SEO
   if (website?.seoTitle) {
@@ -74,11 +88,7 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
         <div className="border-b bg-white px-4 py-4">
           <div className="mx-auto flex max-w-7xl items-center justify-between">
             <Skeleton className="h-8 w-32" />
-            <div className="hidden gap-4 md:flex">
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-4 w-16" />
-            </div>
+            <Skeleton className="h-8 w-8 rounded" />
           </div>
         </div>
         {/* Hero skeleton */}
@@ -115,13 +125,20 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
     );
   }
 
+  // Check if blog posts exist for dynamic nav item
+  const { data: blogData } = trpc.blog.getPublicPosts.useQuery(
+    { subdomain: website.subdomain, limit: 1 },
+    { enabled: !!website.subdomain }
+  );
+  const hasBlogPosts = (blogData?.posts?.length ?? 0) > 0;
+
   const sortedSections = [...website.sections]
     .filter((s) => s.isVisible)
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <SiteThemeProvider website={website}>
-      <SiteLayout website={website} onNavigateBlog={handleNavigateBlog} onNavigateHome={handleNavigateHome}>
+      <SiteLayout website={website} onNavigateBlog={handleNavigateBlog} onNavigateHome={handleNavigateHome} hasBlogPosts={hasBlogPosts}>
         {view.page === 'home' && (
           <>
             {sortedSections.map((section) => (
@@ -149,7 +166,7 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
           <BlogPostPage
             subdomain={website.subdomain}
             slug={view.slug}
-            onNavigateBack={handleNavigateBlogList}
+            onNavigateBack={handleNavigateBlog}
           />
         )}
       </SiteLayout>

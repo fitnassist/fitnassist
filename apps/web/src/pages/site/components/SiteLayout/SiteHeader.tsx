@@ -7,6 +7,7 @@ interface SiteHeaderProps {
   website: PublicWebsite;
   onNavigateBlog?: () => void;
   onNavigateHome?: () => void;
+  hasBlogPosts?: boolean;
 }
 
 const getSectionLabel = (section: PublicSection): string => {
@@ -30,19 +31,18 @@ const getSectionLabel = (section: PublicSection): string => {
   return labels[section.type] ?? section.type;
 };
 
-export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome }: SiteHeaderProps) => {
+export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome, hasBlogPosts }: SiteHeaderProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navSections = website.sections.filter(
-    (s) => s.isVisible && s.type !== 'HERO'
+    (s) => s.isVisible && s.type !== 'HERO' && s.type !== 'BLOG'
   );
+
+  // Show blog nav item if there are published posts (regardless of BLOG section)
+  const showBlogNav = hasBlogPosts && onNavigateBlog;
 
   const handleNav = (section: PublicSection) => {
     setMenuOpen(false);
-    if (section.type === 'BLOG' && onNavigateBlog) {
-      onNavigateBlog();
-      return;
-    }
     const el = document.getElementById(`section-${section.id}`);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -99,6 +99,17 @@ export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome }: SiteHead
                 {getSectionLabel(section)}
               </button>
             ))}
+            {showBlogNav && (
+              <button
+                onClick={() => {
+                  setMenuOpen(false);
+                  onNavigateBlog();
+                }}
+                className="rounded-md px-3 py-2 text-left text-sm font-medium text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--foreground))]"
+              >
+                Blog
+              </button>
+            )}
           </div>
         </nav>
       )}
