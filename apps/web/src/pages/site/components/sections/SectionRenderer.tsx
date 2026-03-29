@@ -17,10 +17,12 @@ interface SectionRendererProps {
   section: PublicSection;
   trainer: PublicTrainer;
   onNavigateBlog?: () => void;
+  onNavigatePost?: (slug: string) => void;
+  subdomain?: string;
   preview?: boolean;
 }
 
-export const SectionRenderer = ({ section, trainer, onNavigateBlog, preview }: SectionRendererProps) => {
+export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePost, subdomain, preview }: SectionRendererProps) => {
   if (!section.isVisible) return null;
 
   const renderSection = () => {
@@ -36,7 +38,7 @@ export const SectionRenderer = ({ section, trainer, onNavigateBlog, preview }: S
       case 'TESTIMONIALS':
         return <TestimonialsSection section={section} trainer={trainer} />;
       case 'BLOG':
-        return <BlogSection section={section} onNavigateBlog={onNavigateBlog} />;
+        return preview ? null : <BlogSection section={section} subdomain={subdomain} onNavigateBlog={onNavigateBlog} onNavigatePost={onNavigatePost} />;
       case 'CONTACT':
         return <ContactSection section={section} trainer={trainer} preview={preview} />;
       case 'CUSTOM_TEXT':

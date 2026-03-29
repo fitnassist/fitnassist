@@ -136,6 +136,7 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
                 content={field.value}
                 onChange={field.onChange}
                 placeholder="Write your blog post content..."
+                onUploadImage={uploadImage}
               />
             )}
           />
