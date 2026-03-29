@@ -1,4 +1,5 @@
 export {
+  useAvailableProviders,
   useIntegrations,
   useIntegrationStatus,
   useDisconnectIntegration,

@@ -1,18 +1,34 @@
 import { Link2 } from 'lucide-react';
-import { useIntegrations } from '@/api/integration';
+import { useIntegrations, useAvailableProviders } from '@/api/integration';
 import { IntegrationCard } from './IntegrationCard';
 import { PROVIDERS } from './integrations.constants';
 import { Skeleton } from '@/components/ui';
 
 export const IntegrationsTab = () => {
-  const { data: connections, isLoading } = useIntegrations();
+  const { data: connections, isLoading: connectionsLoading } = useIntegrations();
+  const { data: availableProviders, isLoading: providersLoading } = useAvailableProviders();
+
+  const isLoading = connectionsLoading || providersLoading;
+
+  const visibleProviders = PROVIDERS.filter(
+    (meta) => availableProviders?.includes(meta.provider)
+  );
 
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3].map((i) => (
           <Skeleton key={i} className="h-32 w-full rounded-xl" />
         ))}
+      </div>
+    );
+  }
+
+  if (visibleProviders.length === 0) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        <Link2 className="h-8 w-8 mx-auto mb-3 opacity-50" />
+        <p>No integrations available yet.</p>
       </div>
     );
   }
@@ -30,7 +46,7 @@ export const IntegrationsTab = () => {
       </div>
 
       <div className="grid gap-4">
-        {PROVIDERS.map((meta) => {
+        {visibleProviders.map((meta) => {
           const connection = connections?.find((c) => c.provider === meta.provider);
           return (
             <IntegrationCard

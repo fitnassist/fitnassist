@@ -1,6 +1,10 @@
 import { trpc } from '@/lib/trpc';
 import type { IntegrationProvider } from '@fitnassist/database';
 
+export const useAvailableProviders = () => {
+  return trpc.integration.availableProviders.useQuery();
+};
+
 export const useIntegrations = () => {
   return trpc.integration.list.useQuery();
 };
