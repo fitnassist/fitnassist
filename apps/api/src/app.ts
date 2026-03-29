@@ -19,9 +19,24 @@ const app = express();
 // Security middleware
 app.use(helmet());
 
-// CORS
+// CORS — allow the frontend URL plus any *.SITE_DOMAIN subdomains
 app.use(cors({
-  origin: env.FRONTEND_URL,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (server-to-server, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    const allowed = [env.FRONTEND_URL];
+    const siteDomain = env.SITE_DOMAIN; // e.g. 'fitnassist.co'
+
+    if (
+      allowed.includes(origin) ||
+      origin.match(new RegExp(`^https?://[a-z0-9-]+\\.${siteDomain.replace(/\./g, '\\.')}$`))
+    ) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 

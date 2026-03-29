@@ -47,6 +47,7 @@ import { SupportPage } from '@/pages/support';
 import { PricingPage } from '@/pages/pricing';
 import { AnalyticsPage } from '@/pages/dashboard/analytics';
 import { ReviewsPage } from '@/pages/dashboard/reviews';
+import { WebsitePage } from '@/pages/dashboard/website';
 import { FeedPage } from '@/pages/dashboard/feed';
 import { FriendsPage } from '@/pages/dashboard/friends';
 import { LeaderboardsPage } from '@/pages/dashboard/leaderboards';
@@ -120,6 +121,7 @@ function App() {
                       <Route path={routes.dashboardReviews} element={<ReviewsPage />} />
                       <Route path="/dashboard/bookings/book-client" element={<TrainerBookSessionPage />} />
                       <Route path="/dashboard/bookings/book-client/:clientRosterId" element={<TrainerBookSessionPage />} />
+                      <Route path={routes.dashboardWebsite} element={<WebsitePage />} />
                       <Route path={routes.trainerProfileEdit} element={<ProfileEditPage />} />
                       <Route path="/trainee/profile/:userId" element={<TraineeProfileViewPage />} />
                     </Route>

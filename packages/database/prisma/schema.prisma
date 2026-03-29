@@ -425,6 +425,7 @@ model TrainerProfile {
   bookings               Booking[]
   sessionPrice           SessionPrice?
   cancellationPolicy     CancellationPolicy?
+  website                Website?
 
   @@index([latitude, longitude])
   @@index([city])
@@ -1021,6 +1022,35 @@ enum IntegrationStatus {
   DISCONNECTED
   ERROR
   SYNCING
+}
+
+enum WebsiteStatus {
+  DRAFT
+  PUBLISHED
+  MAINTENANCE
+}
+
+enum SectionType {
+  HERO
+  ABOUT
+  SERVICES
+  GALLERY
+  TESTIMONIALS
+  BLOG
+  CONTACT
+  CUSTOM_TEXT
+  VIDEO
+  PRICING
+  FAQ
+  CTA
+  SOCIAL_LINKS
+  SHOP
+}
+
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }
 
 enum PersonalBestCategory {
@@ -1835,4 +1865,89 @@ model IntegrationConnection {
   @@index([provider, status])
   @@index([externalUserId])
   @@map("integration_connections")
+}
+
+// =============================================================================
+// WEBSITE BUILDER
+// =============================================================================
+
+model Website {
+  id                String         @id @default(cuid())
+  trainerId         String         @unique
+  /// @zod.string.min(3, { message: "Subdomain must be at least 3 characters" }).max(30, { message: "Subdomain must be at most 30 characters" }).regex(/^[a-z0-9-]+$/, { message: "Subdomain can only contain lowercase letters, numbers, and hyphens" })
+  subdomain         String         @unique
+  status            WebsiteStatus  @default(DRAFT)
+  themeId           String         @default("default")
+  customColors      Json?
+  customFonts       Json?
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  logoUrl           String?
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  faviconUrl        String?
+  /// @zod.string.max(60, { message: "SEO title must be at most 60 characters" })
+  seoTitle          String?
+  /// @zod.string.max(160, { message: "SEO description must be at most 160 characters" })
+  seoDescription    String?
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  ogImageUrl        String?
+  googleAnalyticsId String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  trainer           TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  sections          WebsiteSection[]
+  blogPosts         BlogPost[]
+
+  @@index([subdomain])
+  @@map("websites")
+}
+
+model WebsiteSection {
+  id          String      @id @default(cuid())
+  websiteId   String
+  type        SectionType
+  /// @zod.string.max(100, { message: "Title must be at most 100 characters" })
+  title       String?
+  /// @zod.string.max(500, { message: "Subtitle must be at most 500 characters" })
+  subtitle    String?
+  content     Json?
+  settings    Json?
+  sortOrder   Int         @default(0)
+  isVisible   Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  website     Website     @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId, sortOrder])
+  @@map("website_sections")
+}
+
+model BlogPost {
+  id             String         @id @default(cuid())
+  websiteId      String
+  /// @zod.string.min(1, { message: "Title is required" }).max(200, { message: "Title must be at most 200 characters" })
+  title          String
+  /// @zod.string.min(1, { message: "Slug is required" }).max(200, { message: "Slug must be at most 200 characters" })
+  slug           String
+  /// @zod.string.max(300, { message: "Excerpt must be at most 300 characters" })
+  excerpt        String?
+  content        String         @db.Text
+  /// @zod.string.url({ message: "Must be a valid URL" })
+  coverImageUrl  String?
+  status         BlogPostStatus @default(DRAFT)
+  publishedAt    DateTime?
+  /// @zod.string.max(60, { message: "SEO title must be at most 60 characters" })
+  seoTitle       String?
+  /// @zod.string.max(160, { message: "SEO description must be at most 160 characters" })
+  seoDescription String?
+  tags           String[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  website        Website        @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, slug])
+  @@index([websiteId, status, publishedAt])
+  @@map("blog_posts")
 }

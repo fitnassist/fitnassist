@@ -73,3 +73,4 @@ export {
 } from './skeleton';
 export { StarRating, InteractiveStarRating } from './star-rating';
 export { SourceBadge } from './source-badge';
+export { RichTextEditor } from './rich-text-editor';

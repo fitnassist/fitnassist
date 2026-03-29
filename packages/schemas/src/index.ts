@@ -100,6 +100,15 @@ export {
   IntegrationStatusSchema,
   IntegrationConnectionSchema,
   IntegrationConnectionOptionalDefaultsSchema,
+  WebsiteStatusSchema,
+  SectionTypeSchema,
+  BlogPostStatusSchema,
+  WebsiteSchema,
+  WebsiteOptionalDefaultsSchema,
+  WebsiteSectionSchema,
+  WebsiteSectionOptionalDefaultsSchema,
+  BlogPostSchema,
+  BlogPostOptionalDefaultsSchema,
 } from '@fitnassist/database';
 
 // =============================================================================
@@ -132,6 +141,7 @@ export * from './forms/booking.schema';
 export * from './forms/payment.schema';
 export * from './forms/review.schema';
 export * from './forms/integration.schema';
+export * from './forms/website.schema';
 
 // =============================================================================
 // CONSTANTS

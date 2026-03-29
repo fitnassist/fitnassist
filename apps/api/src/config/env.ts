@@ -72,6 +72,9 @@ const envSchema = z.object({
   // Garmin
   GARMIN_CONSUMER_KEY: z.string().optional(),
   GARMIN_CONSUMER_SECRET: z.string().optional(),
+
+  // Website builder
+  SITE_DOMAIN: z.string().default('fitnassist.co'),
 });
 
 export type Env = z.infer<typeof envSchema>;

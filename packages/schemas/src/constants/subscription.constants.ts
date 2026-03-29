@@ -26,7 +26,8 @@ export type Feature =
   | "customBranding"
   | "prioritySupport"
   | "sessionPayments"
-  | "customSubdomain";
+  | "customSubdomain"
+  | "websiteBuilder";
 
 export const FEATURE_TIER_MAP: Record<Feature, SubscriptionTier> = {
   gallery: "PRO",
@@ -40,6 +41,7 @@ export const FEATURE_TIER_MAP: Record<Feature, SubscriptionTier> = {
   customBranding: "ELITE",
   prioritySupport: "ELITE",
   customSubdomain: "ELITE",
+  websiteBuilder: "ELITE",
 } as const;
 
 // =============================================================================
@@ -77,10 +79,9 @@ export const TIER_INFO: Record<"PRO" | "ELITE", TierInfo> = {
     features: [
       "Session payment handling",
       "Advanced analytics",
-      "Product storefront",
-      "Custom branding",
       "Priority support",
       "Website builder",
+      "Product storefront",
       "Everything in Pro",
     ],
   },

@@ -61,6 +61,7 @@ export const routes = {
   dashboardLeaderboards: '/dashboard/leaderboards',
   dashboardAchievements: '/dashboard/achievements',
   dashboardSettings: '/dashboard/settings',
+  dashboardWebsite: '/dashboard/website',
 
   // Pricing
   pricing: '/pricing',

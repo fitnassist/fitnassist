@@ -39,6 +39,9 @@ export {
   ReportReason,
   IntegrationProvider,
   IntegrationStatus,
+  WebsiteStatus,
+  SectionType,
+  BlogPostStatus,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -102,6 +105,9 @@ export type {
   Review,
   ReviewReport,
   IntegrationConnection,
+  Website,
+  WebsiteSection,
+  BlogPost,
 } from '@prisma/client';
 
 // Re-export generated Zod schemas from model schemas
@@ -142,4 +148,7 @@ export {
   ReportReasonSchema,
   IntegrationProviderSchema,
   IntegrationStatusSchema,
+  WebsiteStatusSchema,
+  SectionTypeSchema,
+  BlogPostStatusSchema,
 } from './generated/zod/inputTypeSchemas';

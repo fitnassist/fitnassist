@@ -57,3 +57,6 @@ export * from './UserBadgeSchema';
 export * from './ReviewSchema';
 export * from './ReviewReportSchema';
 export * from './IntegrationConnectionSchema';
+export * from './WebsiteSchema';
+export * from './WebsiteSectionSchema';
+export * from './BlogPostSchema';

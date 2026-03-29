@@ -1,0 +1,13 @@
+export { HeroForm } from './HeroForm';
+export { AboutForm } from './AboutForm';
+export { ServicesForm } from './ServicesForm';
+export { GalleryForm } from './GalleryForm';
+export { TestimonialsForm } from './TestimonialsForm';
+export { BlogForm } from './BlogForm';
+export { ContactForm } from './ContactForm';
+export { CustomTextForm } from './CustomTextForm';
+export { VideoForm } from './VideoForm';
+export { PricingForm } from './PricingForm';
+export { FaqForm } from './FaqForm';
+export { CtaForm } from './CtaForm';
+export { SocialLinksForm } from './SocialLinksForm';
