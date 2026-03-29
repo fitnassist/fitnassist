@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Phone, ExternalLink, UserPlus, Loader2, CheckCircle } from 'lucide-react';
+import { Mail, Phone, ExternalLink, UserPlus, Loader2, CheckCircle, MapPin } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -29,9 +29,11 @@ interface ContactContent {
   showForm?: boolean;
   showEmail?: boolean;
   showPhone?: boolean;
+  showAddress?: boolean;
   showBookingLink?: boolean;
   bookingUrl?: string;
   bookingLabel?: string;
+  address?: string;
 }
 
 interface ContactSectionProps {
@@ -268,11 +270,26 @@ const ConnectCard = ({ trainer }: { trainer: PublicTrainer }) => {
   );
 };
 
+const formatAddress = (trainer: PublicTrainer, customAddress?: string): string | null => {
+  if (customAddress) return customAddress;
+
+  const parts = [
+    trainer.addressLine1,
+    trainer.addressLine2,
+    trainer.city,
+    trainer.postcode,
+  ].filter(Boolean);
+
+  return parts.length > 0 ? parts.join(', ') : null;
+};
+
 export const ContactSection = ({ section, trainer }: ContactSectionProps) => {
   const content = parseContent(section.content);
 
   const showEmail = content.showEmail !== false && trainer.contactEmail;
   const showPhone = content.showPhone !== false && trainer.phoneNumber;
+  const showForm = content.showForm !== false;
+  const address = content.showAddress ? formatAddress(trainer, content.address) : null;
 
   return (
     <section id={`section-${section.id}`} className="py-16 sm:py-20">
@@ -309,6 +326,12 @@ export const ContactSection = ({ section, trainer }: ContactSectionProps) => {
                 <span>{trainer.phoneNumber}</span>
               </a>
             )}
+            {address && (
+              <div className="flex items-start gap-3 text-[hsl(var(--foreground))]">
+                <MapPin className="h-5 w-5 mt-0.5 text-[hsl(var(--primary))]" />
+                <span>{address}</span>
+              </div>
+            )}
             {content.bookingUrl && (
               <a
                 href={content.bookingUrl}
@@ -323,7 +346,7 @@ export const ContactSection = ({ section, trainer }: ContactSectionProps) => {
           </div>
 
           {/* Callback / Connect request card */}
-          <ConnectCard trainer={trainer} />
+          {showForm && <ConnectCard trainer={trainer} />}
         </div>
       </div>
     </section>
