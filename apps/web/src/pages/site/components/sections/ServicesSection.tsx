@@ -1,4 +1,5 @@
 import { Card, CardContent } from '@/components/ui';
+import { ICON_MAP } from '@/pages/dashboard/website/components/SectionForms/IconPicker';
 import type { PublicSection, PublicTrainer } from '../../site.types';
 
 interface ServiceItem {
@@ -54,6 +55,10 @@ export const ServicesSection = ({ section, trainer }: ServicesSectionProps) => {
           {services.map((service, idx) => (
             <Card key={idx} className="border-[hsl(var(--border))] bg-[hsl(var(--card))]">
               <CardContent className="p-6">
+                {(() => {
+                  const Icon = service.icon ? ICON_MAP[service.icon] : undefined;
+                  return Icon ? <Icon className="mb-3 h-8 w-8 text-[hsl(var(--primary))]" /> : null;
+                })()}
                 <h3 className="site-heading mb-2 text-lg font-semibold text-[hsl(var(--card-foreground))]">
                   {service.title}
                 </h3>

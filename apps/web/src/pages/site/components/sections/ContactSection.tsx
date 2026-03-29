@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Phone, ExternalLink, UserPlus, Loader2, CheckCircle, MapPin } from 'lucide-react';
+import { Mail, Phone, UserPlus, Loader2, CheckCircle, MapPin } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -30,15 +30,13 @@ interface ContactContent {
   showEmail?: boolean;
   showPhone?: boolean;
   showAddress?: boolean;
-  showBookingLink?: boolean;
-  bookingUrl?: string;
-  bookingLabel?: string;
   address?: string;
 }
 
 interface ContactSectionProps {
   section: PublicSection;
   trainer: PublicTrainer;
+  preview?: boolean;
 }
 
 const parseContent = (raw: unknown): ContactContent => {
@@ -283,10 +281,38 @@ const formatAddress = (trainer: PublicTrainer, customAddress?: string): string |
   return parts.length > 0 ? parts.join(', ') : null;
 };
 
-export const ContactSection = ({ section, trainer }: ContactSectionProps) => {
+const ConnectCardPlaceholder = ({ trainer }: { trainer: PublicTrainer }) => (
+  <Card className="border-[hsl(var(--border))] bg-[hsl(var(--card))]">
+    <CardContent className="p-6 space-y-4">
+      <p className="text-sm text-[hsl(var(--card-foreground))]">
+        Interested in training with {trainer.displayName}? Choose how you'd like to connect.
+      </p>
+      <div className="space-y-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start border-[hsl(var(--border))] text-[hsl(var(--card-foreground))]"
+          disabled
+        >
+          <Phone className="h-4 w-4 mr-2" />
+          Request a Callback
+        </Button>
+        <Button
+          className="w-full justify-start bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
+          disabled
+        >
+          <UserPlus className="h-4 w-4 mr-2" />
+          Request to Connect
+        </Button>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+export const ContactSection = ({ section, trainer, preview }: ContactSectionProps) => {
   const content = parseContent(section.content);
 
-  const showEmail = content.showEmail !== false && trainer.contactEmail;
+  const email = trainer.contactEmail || (trainer as any).user?.email;
+  const showEmail = content.showEmail !== false && email;
   const showPhone = content.showPhone !== false && trainer.phoneNumber;
   const showForm = content.showForm !== false;
   const address = content.showAddress ? formatAddress(trainer, content.address) : null;
@@ -310,11 +336,11 @@ export const ContactSection = ({ section, trainer }: ContactSectionProps) => {
           <div className="flex flex-col gap-4">
             {showEmail && (
               <a
-                href={`mailto:${trainer.contactEmail}`}
+                href={`mailto:${email}`}
                 className="flex items-center gap-3 text-[hsl(var(--foreground))] transition-colors hover:text-[hsl(var(--primary))]"
               >
                 <Mail className="h-5 w-5 text-[hsl(var(--primary))]" />
-                <span>{trainer.contactEmail}</span>
+                <span>{email}</span>
               </a>
             )}
             {showPhone && (
@@ -332,21 +358,10 @@ export const ContactSection = ({ section, trainer }: ContactSectionProps) => {
                 <span>{address}</span>
               </div>
             )}
-            {content.bookingUrl && (
-              <a
-                href={content.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 text-[hsl(var(--foreground))] transition-colors hover:text-[hsl(var(--primary))]"
-              >
-                <ExternalLink className="h-5 w-5 text-[hsl(var(--primary))]" />
-                <span>{content.bookingLabel ?? 'Book a session'}</span>
-              </a>
-            )}
           </div>
 
           {/* Callback / Connect request card */}
-          {showForm && <ConnectCard trainer={trainer} />}
+          {showForm && (preview ? <ConnectCardPlaceholder trainer={trainer} /> : <ConnectCard trainer={trainer} />)}
         </div>
       </div>
     </section>

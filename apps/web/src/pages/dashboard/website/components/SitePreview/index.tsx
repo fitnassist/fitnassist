@@ -24,6 +24,7 @@ const PreviewContent = ({ preview }: { preview: NonNullable<ReturnType<typeof us
               key={section.id}
               section={section}
               trainer={preview.trainer}
+              preview
             />
           ))}
       </SiteLayout>

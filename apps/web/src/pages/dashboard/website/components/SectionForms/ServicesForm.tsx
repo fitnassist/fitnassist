@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button, Input, Label, Textarea } from '@/components/ui';
 import { useUpdateSection } from '@/api/website';
+import { IconPicker } from './IconPicker';
 
 interface ServiceItem {
   title: string;
@@ -87,14 +88,10 @@ export const ServicesForm = ({ sectionId, content }: ServicesFormProps) => {
             </div>
           </div>
 
-          <div className="space-y-1">
-            <Label className="text-xs">Icon</Label>
-            <Input
-              value={item.icon}
-              onChange={(e) => handleUpdate(index, 'icon', e.target.value)}
-              placeholder="e.g. dumbbell"
-            />
-          </div>
+          <IconPicker
+            value={item.icon}
+            onChange={(v) => handleUpdate(index, 'icon', v)}
+          />
 
           <div className="space-y-1">
             <Label className="text-xs">Description</Label>

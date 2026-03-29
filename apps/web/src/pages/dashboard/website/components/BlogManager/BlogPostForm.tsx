@@ -163,23 +163,17 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
 
         <div className="space-y-2">
           <Label htmlFor="tags">Tags</Label>
-          <Controller
-            name="tags"
-            control={control}
-            render={({ field }) => (
-              <Input
-                id="tags"
-                value={(field.value ?? []).join(', ')}
-                onChange={(e) => {
-                  const tags = e.target.value
-                    .split(',')
-                    .map((t) => t.trim())
-                    .filter(Boolean);
-                  field.onChange(tags);
-                }}
-                placeholder="fitness, nutrition, tips"
-              />
-            )}
+          <Input
+            id="tags"
+            defaultValue={(watch('tags') ?? []).join(', ')}
+            onBlur={(e) => {
+              const tags = e.target.value
+                .split(',')
+                .map((t) => t.trim())
+                .filter(Boolean);
+              setValue('tags', tags);
+            }}
+            placeholder="fitness, nutrition, tips (comma separated)"
           />
         </div>
 
