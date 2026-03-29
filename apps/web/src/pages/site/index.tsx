@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui';
 import { usePublicWebsite } from '@/api/website';
 import { SiteThemeProvider } from './components/ThemeProvider';
@@ -9,9 +8,12 @@ import { BlogListPage, BlogPostPage } from './components/blog';
 
 type SiteView = { page: 'home' } | { page: 'blog' } | { page: 'blog-post'; slug: string };
 
-export const SiteRenderer = () => {
-  const { handle } = useParams<{ handle: string }>();
-  const { data: website, isLoading, isError, error } = usePublicWebsite(handle ?? '');
+interface SiteRendererProps {
+  handle: string;
+}
+
+export const SiteRenderer = ({ handle }: SiteRendererProps) => {
+  const { data: website, isLoading, isError, error } = usePublicWebsite(handle);
   const [view, setView] = useState<SiteView>({ page: 'home' });
 
   const handleNavigateBlog = useCallback(() => {

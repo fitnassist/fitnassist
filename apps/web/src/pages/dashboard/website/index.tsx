@@ -57,7 +57,7 @@ export const WebsitePage = () => {
           <h2 className="text-lg font-semibold mb-2">Create Your Website</h2>
           <p className="text-sm text-muted-foreground max-w-md mb-6">
             Build a branded micro-site for your personal training business.
-            Your site will be available at <strong>fitnassist.co/site/{profile?.handle ?? 'yourhandle'}</strong>.
+            Your site will be available at <strong>{profile?.handle ?? 'yourhandle'}.sites.fitnassist.co</strong>.
           </p>
           <Button
             onClick={() => createWebsite.mutate()}
@@ -71,7 +71,7 @@ export const WebsitePage = () => {
     );
   }
 
-  const siteUrl = `${window.location.origin}/site/${website.subdomain}`;
+  const siteUrl = `https://${website.subdomain}.sites.fitnassist.co`;
   const ws = website as unknown as WebsiteData;
 
   if (showPreview) {

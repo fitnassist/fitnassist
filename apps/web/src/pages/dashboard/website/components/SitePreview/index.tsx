@@ -34,7 +34,7 @@ const PreviewContent = ({ preview }: { preview: NonNullable<ReturnType<typeof us
 export const SitePreview = ({ website, onClose }: SitePreviewProps) => {
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
   const { data: preview, isLoading } = useWebsitePreview();
-  const siteUrl = `${window.location.origin}/site/${website.subdomain}`;
+  const siteUrl = `https://${website.subdomain}.sites.fitnassist.co`;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [, setIframeReady] = useState(false);
 
@@ -87,7 +87,7 @@ export const SitePreview = ({ website, onClose }: SitePreviewProps) => {
             Back to Editor
           </Button>
           <span className="text-sm text-muted-foreground">
-            Preview — fitnassist.co/site/{website.subdomain}
+            Preview — {website.subdomain}.sites.fitnassist.co
           </span>
         </div>
         <div className="flex items-center gap-2">

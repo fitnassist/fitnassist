@@ -48,7 +48,7 @@ import { PricingPage } from '@/pages/pricing';
 import { AnalyticsPage } from '@/pages/dashboard/analytics';
 import { ReviewsPage } from '@/pages/dashboard/reviews';
 import { WebsitePage } from '@/pages/dashboard/website';
-import { SiteRenderer } from '@/pages/site';
+import { SiteRoutePage } from '@/pages/site/route';
 import { FeedPage } from '@/pages/dashboard/feed';
 import { FriendsPage } from '@/pages/dashboard/friends';
 import { LeaderboardsPage } from '@/pages/dashboard/leaderboards';
@@ -148,7 +148,7 @@ function App() {
                   <Route path="/users/:handle" element={<TraineePublicProfilePage />} />
                 </Route>
                 {/* Public PT websites */}
-                <Route path="/site/:handle" element={<SiteRenderer />} />
+                <Route path="/site/:handle" element={<SiteRoutePage />} />
                 {/* 404 catch-all */}
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>

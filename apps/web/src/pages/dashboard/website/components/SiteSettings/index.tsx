@@ -70,7 +70,7 @@ const SubdomainSettings = ({ website }: SiteSettingsProps) => {
                 {...register('subdomain')}
                 className="max-w-[200px]"
               />
-              <span className="text-sm text-muted-foreground ml-1">— fitnassist.co/site/{'{handle}'}</span>
+              <span className="text-sm text-muted-foreground">.sites.fitnassist.co</span>
             </div>
             {errors.subdomain && (
               <p className="text-sm text-destructive mt-1">{errors.subdomain.message}</p>
@@ -92,7 +92,7 @@ const PublishSettings = ({ website }: SiteSettingsProps) => {
   const [showUnpublish, setShowUnpublish] = useState(false);
 
   const isPublished = website.status === 'PUBLISHED';
-  const siteUrl = `${window.location.origin}/site/${website.subdomain}`;
+  const siteUrl = `https://${website.subdomain}.sites.fitnassist.co`;
 
   return (
     <Card>
