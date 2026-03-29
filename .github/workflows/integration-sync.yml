@@ -1,0 +1,17 @@
+name: Integration Sync
+
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Every 15 minutes
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  sync-integrations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Poll Google Fit for connected users
+        run: |
+          curl -f -X POST \
+            "${{ secrets.API_URL }}/api/cron/integration-sync" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

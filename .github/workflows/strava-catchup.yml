@@ -1,0 +1,17 @@
+name: Strava Catchup
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Every 6 hours
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  strava-catchup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Re-sync last 24h of Strava activities
+        run: |
+          curl -f -X POST \
+            "${{ secrets.API_URL }}/api/cron/strava-catchup" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"

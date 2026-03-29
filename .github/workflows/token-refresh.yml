@@ -1,0 +1,17 @@
+name: Token Refresh
+
+on:
+  schedule:
+    - cron: '*/30 * * * *' # Every 30 minutes
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  refresh-tokens:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh expiring integration tokens
+        run: |
+          curl -f -X POST \
+            "${{ secrets.API_URL }}/api/cron/token-refresh" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json"
