@@ -6,13 +6,13 @@ import { subscriptionService } from '../services/subscription.service';
 import { trainerRepository } from '../repositories/trainer.repository';
 import { hasTierAccess } from '../config/features.js';
 
-const uploadTypeSchema = z.enum(['profile', 'cover', 'gallery', 'video-intro', 'exercise-video', 'exercise-thumbnail', 'recipe-image', 'progress-photo', 'website-image', 'website-video']);
+const uploadTypeSchema = z.enum(['profile', 'cover', 'gallery', 'video-intro', 'exercise-video', 'exercise-thumbnail', 'recipe-image', 'progress-photo', 'website-image', 'website-video', 'product-image', 'product-file']);
 
 // Upload types that require PRO tier
 const PRO_UPLOAD_TYPES = new Set(['gallery', 'video-intro', 'exercise-video', 'exercise-thumbnail', 'recipe-image']);
 
 // Upload types that require ELITE tier
-const ELITE_UPLOAD_TYPES = new Set(['website-image', 'website-video']);
+const ELITE_UPLOAD_TYPES = new Set(['website-image', 'website-video', 'product-image', 'product-file']);
 
 export const uploadRouter = router({
   /**
@@ -71,7 +71,7 @@ export const uploadRouter = router({
     .input(
       z.object({
         url: z.string().url(),
-        resourceType: z.enum(['image', 'video']).default('image'),
+        resourceType: z.enum(['image', 'video', 'raw']).default('image'),
       })
     )
     .mutation(async ({ input }) => {

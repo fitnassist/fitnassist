@@ -110,6 +110,13 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
         utils.notification.getUnreadCount.invalidate();
         utils.notification.list.invalidate();
         const { notification } = lastEvent;
+
+        // Invalidate order queries when order-related notifications arrive
+        if (['NEW_ORDER', 'ORDER_CONFIRMED', 'ORDER_SHIPPED', 'ORDER_DELIVERED', 'ORDER_REFUNDED'].includes(notification.type)) {
+          utils.order.myOrders.invalidate();
+          utils.order.trainerOrders.invalidate();
+        }
+
         toast.info(notification.body || notification.title);
         break;
       }

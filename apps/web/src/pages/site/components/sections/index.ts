@@ -12,3 +12,4 @@ export { PricingSection } from './PricingSection';
 export { FaqSection } from './FaqSection';
 export { CtaSection } from './CtaSection';
 export { SocialLinksSection } from './SocialLinksSection';
+export { ShopSection } from '../shop/ShopSection';

@@ -60,8 +60,10 @@ export const routes = {
   dashboardFriends: '/dashboard/friends',
   dashboardLeaderboards: '/dashboard/leaderboards',
   dashboardAchievements: '/dashboard/achievements',
+  dashboardPurchases: '/dashboard/purchases',
   dashboardSettings: '/dashboard/settings',
   dashboardWebsite: '/dashboard/website',
+  dashboardStorefront: '/dashboard/storefront',
 
   // Pricing
   pricing: '/pricing',

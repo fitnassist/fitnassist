@@ -5,6 +5,7 @@ import { ServicesSection } from './ServicesSection';
 import { GallerySection } from './GallerySection';
 import { TestimonialsSection } from './TestimonialsSection';
 import { BlogSection } from './BlogSection';
+import { ShopSection } from '../shop/ShopSection';
 import { ContactSection } from './ContactSection';
 import { CustomTextSection } from './CustomTextSection';
 import { VideoSection } from './VideoSection';
@@ -18,11 +19,13 @@ interface SectionRendererProps {
   trainer: PublicTrainer;
   onNavigateBlog?: () => void;
   onNavigatePost?: (slug: string) => void;
+  onNavigateShop?: () => void;
+  onNavigateProduct?: (slug: string) => void;
   subdomain?: string;
   preview?: boolean;
 }
 
-export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePost, subdomain, preview }: SectionRendererProps) => {
+export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePost, onNavigateShop, onNavigateProduct, subdomain, preview }: SectionRendererProps) => {
   if (!section.isVisible) return null;
 
   const renderSection = () => {
@@ -39,6 +42,8 @@ export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePo
         return <TestimonialsSection section={section} trainer={trainer} />;
       case 'BLOG':
         return preview ? null : <BlogSection section={section} subdomain={subdomain} onNavigateBlog={onNavigateBlog} onNavigatePost={onNavigatePost} />;
+      case 'SHOP':
+        return preview ? null : <ShopSection section={section} trainerId={trainer.id} onNavigateShop={onNavigateShop} onNavigateProduct={onNavigateProduct} />;
       case 'CONTACT':
         return <ContactSection section={section} trainer={trainer} preview={preview} />;
       case 'CUSTOM_TEXT':

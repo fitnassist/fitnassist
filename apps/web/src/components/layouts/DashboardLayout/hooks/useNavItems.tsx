@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Home, MessageCircle, Phone, User, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3, Heart, Rss, Trophy, Award, Star, Globe } from 'lucide-react';
+import { Home, MessageCircle, Phone, User, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3, Heart, Rss, Trophy, Award, Star, Globe, ShoppingBag, Package } from 'lucide-react';
 import { routes } from '@/config/routes';
 import {
   FEATURE_TIER_MAP,
@@ -87,6 +87,13 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     requiredFeature: 'websiteBuilder',
   },
   {
+    label: 'Storefront',
+    href: routes.dashboardStorefront,
+    icon: <ShoppingBag className="h-5 w-5" />,
+    roles: ['TRAINER'] as const,
+    requiredFeature: 'productStorefront',
+  },
+  {
     label: 'Resources',
     href: routes.dashboardResources,
     icon: <BookOpen className="h-5 w-5" />,
@@ -110,6 +117,12 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     label: 'My Plans',
     href: routes.dashboardMyPlans,
     icon: <ClipboardList className="h-5 w-5" />,
+    roles: ['TRAINEE'] as const,
+  },
+  {
+    label: 'Purchases',
+    href: routes.dashboardPurchases,
+    icon: <Package className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
   },
   {

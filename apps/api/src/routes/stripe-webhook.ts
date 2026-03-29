@@ -4,6 +4,7 @@ import { subscriptionService } from '../services/subscription.service';
 import { inAppNotificationService } from '../services/in-app-notification.service';
 import { sessionPaymentRepository } from '../repositories/session-payment.repository';
 import { bookingNotificationService } from '../services/booking-notification.service';
+import { productPaymentService } from '../services/product-payment.service';
 import { prisma } from '../lib/prisma';
 import type Stripe from 'stripe';
 
@@ -127,6 +128,13 @@ stripeWebhookRouter.post(
           const pi = event.data.object as Stripe.PaymentIntent;
           if (pi.metadata?.platform !== 'fitnassist') break;
 
+          // Product order payment
+          if (pi.metadata?.type === 'product_order') {
+            await productPaymentService.confirmOrder(pi.id);
+            break;
+          }
+
+          // Session payment
           const payment = await sessionPaymentRepository.findByPaymentIntentId(pi.id);
           if (payment && payment.status === 'PENDING') {
             await sessionPaymentRepository.update(payment.id, {

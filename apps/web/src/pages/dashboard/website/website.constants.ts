@@ -214,4 +214,10 @@ export const SECTION_TYPES: SectionTypeConfig[] = [
     description: 'Links to your social media profiles',
     icon: 'share-2',
   },
+  {
+    type: 'SHOP',
+    label: 'Shop',
+    description: 'Display your products for sale',
+    icon: 'shopping-bag',
+  },
 ];

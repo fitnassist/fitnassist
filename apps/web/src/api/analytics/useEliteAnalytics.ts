@@ -26,3 +26,10 @@ export const useRevenueTransactions = () => {
     { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
 };
+
+export const useProductOrderTransactions = () => {
+  return trpc.analytics.productOrderTransactions.useInfiniteQuery(
+    { limit: 20 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
+  );
+};

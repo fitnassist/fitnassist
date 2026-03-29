@@ -1,6 +1,6 @@
 import {
   Layout, User, Briefcase, Image, Quote, FileText, Mail,
-  Type, Play, PoundSterling, HelpCircle, Megaphone, Share2,
+  Type, Play, PoundSterling, HelpCircle, Megaphone, Share2, ShoppingBag,
 } from 'lucide-react';
 import {
   Dialog,
@@ -32,6 +32,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   'help-circle': <HelpCircle className="h-5 w-5" />,
   megaphone: <Megaphone className="h-5 w-5" />,
   'share-2': <Share2 className="h-5 w-5" />,
+  'shopping-bag': <ShoppingBag className="h-5 w-5" />,
 };
 
 export const AddSectionDialog = ({ open, onOpenChange }: AddSectionDialogProps) => {
@@ -52,7 +53,7 @@ export const AddSectionDialog = ({ open, onOpenChange }: AddSectionDialogProps) 
           <DialogTitle>Add Section</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 gap-2 mt-2">
-          {SECTION_TYPES.filter((s) => s.type !== 'SHOP').map((section) => (
+          {SECTION_TYPES.map((section) => (
             <Button
               key={section.type}
               variant="ghost"

@@ -34,6 +34,9 @@ import { reviewRouter } from './review.router';
 import { integrationRouter } from './integration.router';
 import { websiteRouter } from './website.router';
 import { blogRouter } from './blog.router';
+import { productRouter } from './product.router';
+import { couponRouter } from './coupon.router';
+import { orderRouter } from './order.router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -71,6 +74,9 @@ export const appRouter = router({
   integration: integrationRouter,
   website: websiteRouter,
   blog: blogRouter,
+  product: productRouter,
+  coupon: couponRouter,
+  order: orderRouter,
 });
 
 export type AppRouter = typeof appRouter;

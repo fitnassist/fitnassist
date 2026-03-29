@@ -615,6 +615,153 @@ export const emailTemplates = {
       </p>
     `),
 
+  // =========================================================================
+  // Product Orders
+  // =========================================================================
+
+  orderConfirmationBuyer: (data: {
+    buyerName: string;
+    orderId: string;
+    trainerName: string;
+    items: Array<{ name: string; quantity: number; pricePence: number }>;
+    subtotalPence: number;
+    discountPence: number;
+    totalPence: number;
+    isAllDigital: boolean;
+  }) => {
+    const itemRows = data.items
+      .map(
+        (item) => `
+          <tr>
+            <td style="padding: 4px 0;">${item.name}${item.quantity > 1 ? ` x${item.quantity}` : ''}</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">£${((item.pricePence * item.quantity) / 100).toFixed(2)}</td>
+          </tr>
+        `,
+      )
+      .join('');
+
+    const discountRow =
+      data.discountPence > 0
+        ? `<tr>
+            <td style="padding: 4px 0; color: #16a34a;">Discount</td>
+            <td style="padding: 4px 0; text-align: right; color: #16a34a;">-£${(data.discountPence / 100).toFixed(2)}</td>
+          </tr>`
+        : '';
+
+    return layout(`
+      <h2 style="margin: 0 0 16px;">Order confirmed</h2>
+      <p>Hi ${data.buyerName}, your order has been confirmed.</p>
+      <p style="font-size: 13px; color: #888;">Order #${data.orderId.slice(-8).toUpperCase()} from ${data.trainerName}</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <table style="width: 100%; font-size: 14px;">
+          ${itemRows}
+          ${discountRow}
+          <tr style="border-top: 1px solid #e5e5e5;">
+            <td style="padding: 8px 0 0; font-weight: 600;">Total</td>
+            <td style="padding: 8px 0 0; text-align: right; font-weight: 600;">£${(data.totalPence / 100).toFixed(2)}</td>
+          </tr>
+        </table>
+      </div>
+      ${data.isAllDigital ? '<p style="font-size: 13px; color: #888;">Your digital downloads are available now in your purchases.</p>' : '<p style="font-size: 13px; color: #888;">The trainer will process your order shortly.</p>'}
+      <p style="margin-top: 24px;">
+        <a href="${dashboardUrl}/purchases" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View purchases
+        </a>
+      </p>
+    `);
+  },
+
+  newOrderTrainer: (data: {
+    trainerName: string;
+    orderId: string;
+    buyerName: string;
+    buyerEmail: string;
+    items: Array<{ name: string; quantity: number; pricePence: number }>;
+    totalPence: number;
+    hasPhysical: boolean;
+  }) => {
+    const itemRows = data.items
+      .map(
+        (item) => `
+          <tr>
+            <td style="padding: 4px 0;">${item.name}${item.quantity > 1 ? ` x${item.quantity}` : ''}</td>
+            <td style="padding: 4px 0; text-align: right; font-weight: 500;">£${((item.pricePence * item.quantity) / 100).toFixed(2)}</td>
+          </tr>
+        `,
+      )
+      .join('');
+
+    return layout(`
+      <h2 style="margin: 0 0 16px;">New order received</h2>
+      <p>Hi ${data.trainerName}, you have a new order!</p>
+      <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <p style="margin: 0 0 8px; font-size: 13px; color: #888;">Order #${data.orderId.slice(-8).toUpperCase()}</p>
+        <p style="margin: 0 0 12px;"><strong>${data.buyerName}</strong> (${data.buyerEmail})</p>
+        <table style="width: 100%; font-size: 14px;">
+          ${itemRows}
+          <tr style="border-top: 1px solid #e5e5e5;">
+            <td style="padding: 8px 0 0; font-weight: 600;">Total</td>
+            <td style="padding: 8px 0 0; text-align: right; font-weight: 600;">£${(data.totalPence / 100).toFixed(2)}</td>
+          </tr>
+        </table>
+      </div>
+      ${data.hasPhysical ? '<p style="font-size: 13px; color: #888;">This order contains physical items that need to be shipped.</p>' : ''}
+      <p style="margin-top: 24px;">
+        <a href="${dashboardUrl}/storefront?tab=orders" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View orders
+        </a>
+      </p>
+    `);
+  },
+
+  orderShipped: (data: {
+    buyerName: string;
+    orderId: string;
+    trainerName: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Order shipped</h2>
+      <p>Hi ${data.buyerName}, your order #${data.orderId.slice(-8).toUpperCase()} from ${data.trainerName} has been shipped.</p>
+      <p style="margin-top: 24px;">
+        <a href="${dashboardUrl}/purchases" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View purchases
+        </a>
+      </p>
+    `),
+
+  orderDelivered: (data: {
+    buyerName: string;
+    orderId: string;
+    trainerName: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Order delivered</h2>
+      <p>Hi ${data.buyerName}, your order #${data.orderId.slice(-8).toUpperCase()} from ${data.trainerName} has been marked as delivered.</p>
+      <p style="margin-top: 24px;">
+        <a href="${dashboardUrl}/purchases" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View purchases
+        </a>
+      </p>
+    `),
+
+  orderRefunded: (data: {
+    buyerName: string;
+    orderId: string;
+    amount: string;
+    reason?: string;
+  }) =>
+    layout(`
+      <h2 style="margin: 0 0 16px;">Order refunded</h2>
+      <p>Hi ${data.buyerName}, your order #${data.orderId.slice(-8).toUpperCase()} of ${data.amount} has been refunded.</p>
+      ${data.reason ? `<p style="font-size: 13px; color: #888;">Reason: ${data.reason}</p>` : ''}
+      <p style="font-size: 13px; color: #888;">The refund may take 5-10 business days to appear on your statement.</p>
+      <p style="margin-top: 24px;">
+        <a href="${dashboardUrl}/purchases" style="display: inline-block; background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none;">
+          View purchases
+        </a>
+      </p>
+    `),
+
   bookingHoldExpired: (data: {
     recipientName: string;
     date: string;

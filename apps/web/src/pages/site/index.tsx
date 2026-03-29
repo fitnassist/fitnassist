@@ -6,14 +6,23 @@ import { SiteThemeProvider } from './components/ThemeProvider';
 import { SiteLayout } from './components/SiteLayout';
 import { SectionRenderer } from './components/sections';
 import { BlogListPage, BlogPostPage } from './components/blog';
+import { ShopPage, ProductDetailPage, CheckoutDialog } from './components/shop';
 
-type SiteView = { page: 'home' } | { page: 'blog' } | { page: 'blog-post'; slug: string };
+type SiteView =
+  | { page: 'home' }
+  | { page: 'blog' }
+  | { page: 'blog-post'; slug: string }
+  | { page: 'shop' }
+  | { page: 'shop-product'; slug: string };
 
 const parsePathToView = (): SiteView => {
   const path = window.location.pathname;
   if (path === '/blog' || path === '/blog/') return { page: 'blog' };
   const postMatch = path.match(/^\/blog\/(.+)$/);
   if (postMatch?.[1]) return { page: 'blog-post', slug: postMatch[1] };
+  if (path === '/shop' || path === '/shop/') return { page: 'shop' };
+  const productMatch = path.match(/^\/shop\/(.+)$/);
+  if (productMatch?.[1]) return { page: 'shop-product', slug: productMatch[1] };
   return { page: 'home' };
 };
 
@@ -27,11 +36,41 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
 
   // Check if blog posts exist for dynamic nav item (must be before early returns)
   const subdomain = website?.subdomain ?? '';
+  const trainerId = website?.trainer?.id ?? '';
   const { data: blogData } = trpc.blog.getPublicPosts.useQuery(
     { subdomain, limit: 1 },
     { enabled: !!subdomain }
   );
   const hasBlogPosts = (blogData?.posts?.length ?? 0) > 0;
+
+  // Check if products exist for dynamic nav item
+  const { data: productsData } = trpc.product.getPublicProducts.useQuery(
+    { trainerId },
+    { enabled: !!trainerId }
+  );
+  const hasProducts = (productsData?.length ?? 0) > 0;
+
+  // Checkout state
+  const [checkoutProduct, setCheckoutProduct] = useState<{
+    id: string;
+    name: string;
+    pricePence: number;
+    type: 'DIGITAL' | 'PHYSICAL';
+    imageUrl: string | null;
+  } | null>(null);
+
+  const handleBuyNow = useCallback((productId: string) => {
+    const product = productsData?.find((p) => p.id === productId);
+    if (product) {
+      setCheckoutProduct({
+        id: product.id,
+        name: product.name,
+        pricePence: product.pricePence,
+        type: product.type as 'DIGITAL' | 'PHYSICAL',
+        imageUrl: product.imageUrl,
+      });
+    }
+  }, [productsData]);
 
   // Handle browser back/forward
   useEffect(() => {
@@ -52,6 +91,14 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
 
   const handleNavigatePost = useCallback((slug: string) => {
     navigate({ page: 'blog-post', slug }, `/blog/${slug}`);
+  }, [navigate]);
+
+  const handleNavigateShop = useCallback(() => {
+    navigate({ page: 'shop' }, '/shop');
+  }, [navigate]);
+
+  const handleNavigateProduct = useCallback((slug: string) => {
+    navigate({ page: 'shop-product', slug }, `/shop/${slug}`);
   }, [navigate]);
 
   const handleNavigateHome = useCallback(() => {
@@ -139,7 +186,7 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
 
   return (
     <SiteThemeProvider website={website}>
-      <SiteLayout website={website} onNavigateBlog={handleNavigateBlog} onNavigateHome={handleNavigateHome} hasBlogPosts={hasBlogPosts} isHomePage={view.page === 'home'}>
+      <SiteLayout website={website} onNavigateBlog={handleNavigateBlog} onNavigateHome={handleNavigateHome} onNavigateShop={handleNavigateShop} hasBlogPosts={hasBlogPosts} hasProducts={hasProducts} isHomePage={view.page === 'home'}>
         {view.page === 'home' && (
           <>
             {sortedSections.map((section) => (
@@ -150,6 +197,8 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
                 subdomain={website.subdomain}
                 onNavigateBlog={handleNavigateBlog}
                 onNavigatePost={handleNavigatePost}
+                onNavigateShop={handleNavigateShop}
+                onNavigateProduct={handleNavigateProduct}
               />
             ))}
           </>
@@ -168,6 +217,32 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
             subdomain={website.subdomain}
             slug={view.slug}
             onNavigateBack={handleNavigateBlog}
+          />
+        )}
+
+        {view.page === 'shop' && (
+          <ShopPage
+            trainerId={trainerId}
+            onNavigateProduct={handleNavigateProduct}
+            onNavigateHome={handleNavigateHome}
+          />
+        )}
+
+        {view.page === 'shop-product' && (
+          <ProductDetailPage
+            trainerId={trainerId}
+            slug={view.slug}
+            onNavigateBack={handleNavigateShop}
+            onBuyNow={handleBuyNow}
+          />
+        )}
+
+        {checkoutProduct && (
+          <CheckoutDialog
+            open={!!checkoutProduct}
+            onOpenChange={(open) => { if (!open) setCheckoutProduct(null); }}
+            product={checkoutProduct}
+            trainerId={trainerId}
           />
         )}
       </SiteLayout>

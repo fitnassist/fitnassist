@@ -42,4 +42,14 @@ export const analyticsRouter = router({
     .query(async ({ ctx, input }) => {
       return analyticsService.getRevenueTransactions(ctx.user.id, input.cursor, input.limit);
     }),
+
+  productOrderTransactions: trainerProcedure
+    .use(requireTier('ELITE'))
+    .input(z.object({
+      cursor: z.string().optional(),
+      limit: z.number().int().min(1).max(50).default(20),
+    }))
+    .query(async ({ ctx, input }) => {
+      return analyticsService.getProductOrderTransactions(ctx.user.id, input.cursor, input.limit);
+    }),
 });

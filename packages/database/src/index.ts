@@ -42,6 +42,9 @@ export {
   WebsiteStatus,
   SectionType,
   BlogPostStatus,
+  ProductType,
+  ProductStatus,
+  OrderStatus,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -108,6 +111,10 @@ export type {
   Website,
   WebsiteSection,
   BlogPost,
+  Product,
+  Coupon,
+  ProductOrder,
+  OrderItem,
 } from '@prisma/client';
 
 // Re-export generated Zod schemas from model schemas
@@ -151,4 +158,7 @@ export {
   WebsiteStatusSchema,
   SectionTypeSchema,
   BlogPostStatusSchema,
+  ProductTypeSchema,
+  ProductStatusSchema,
+  OrderStatusSchema,
 } from './generated/zod/inputTypeSchemas';

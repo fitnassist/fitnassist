@@ -157,6 +157,11 @@ enum NotificationType {
   BOOKING_EXPIRED
   REVIEW_RECEIVED
   REVIEW_REPLY
+  NEW_ORDER
+  ORDER_CONFIRMED
+  ORDER_SHIPPED
+  ORDER_DELIVERED
+  ORDER_REFUNDED
 }
 
 enum ReportReason {
@@ -197,6 +202,27 @@ enum ContactRequestStatus {
   DECLINED
   RESPONDED
   CLOSED
+}
+
+enum ProductType {
+  DIGITAL
+  PHYSICAL
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  REFUNDED
+  CANCELLED
 }
 
 // =============================================================================
@@ -270,6 +296,7 @@ model User {
   reviews          Review[]
   reviewReports    ReviewReport[]
   integrations     IntegrationConnection[]
+  productOrders    ProductOrder[]
 
   @@map("users")
 }
@@ -426,6 +453,9 @@ model TrainerProfile {
   sessionPrice           SessionPrice?
   cancellationPolicy     CancellationPolicy?
   website                Website?
+  products               Product[]
+  coupons                Coupon[]
+  productOrders          ProductOrder[]
 
   @@index([latitude, longitude])
   @@index([city])
@@ -1950,4 +1980,120 @@ model BlogPost {
   @@unique([websiteId, slug])
   @@index([websiteId, status, publishedAt])
   @@map("blog_posts")
+}
+
+// =============================================================================
+// PRODUCT STOREFRONT
+// =============================================================================
+
+model Product {
+  id                  String        @id @default(cuid())
+  trainerId           String
+  type                ProductType
+  status              ProductStatus @default(DRAFT)
+  /// @zod.string.min(1, { message: "Product name is required" }).max(200, { message: "Product name must be at most 200 characters" })
+  name                String
+  /// @zod.string.min(1, { message: "Slug is required" }).max(200, { message: "Slug must be at most 200 characters" })
+  slug                String
+  description         String?       @db.Text
+  /// @zod.string.max(300, { message: "Short description must be at most 300 characters" })
+  shortDescription    String?
+  /// @zod.number.int().min(1, { message: "Price must be at least 1p" })
+  pricePence          Int
+  currency            String        @default("gbp")
+  compareAtPricePence Int?
+  imageUrl            String?
+  galleryUrls         String[]
+  digitalFileUrl      String?
+  digitalFileName     String?
+  stockCount          Int?
+  /// @zod.string.max(60, { message: "SEO title must be at most 60 characters" })
+  seoTitle            String?
+  /// @zod.string.max(160, { message: "SEO description must be at most 160 characters" })
+  seoDescription      String?
+  sortOrder           Int           @default(0)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  trainer             TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  orderItems          OrderItem[]
+
+  @@unique([trainerId, slug])
+  @@index([trainerId, status])
+  @@map("products")
+}
+
+model Coupon {
+  id                    String    @id @default(cuid())
+  trainerId             String
+  /// @zod.string.min(1, { message: "Coupon code is required" }).max(50, { message: "Coupon code must be at most 50 characters" })
+  code                  String
+  stripeCouponId        String
+  stripePromotionCodeId String?
+  description           String?
+  percentOff            Float?
+  amountOffPence        Int?
+  minOrderPence         Int?
+  maxRedemptions        Int?
+  currentRedemptions    Int       @default(0)
+  isActive              Boolean   @default(true)
+  expiresAt             DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  trainer               TrainerProfile @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  orders                ProductOrder[]
+
+  @@unique([trainerId, code])
+  @@index([trainerId, isActive])
+  @@map("coupons")
+}
+
+model ProductOrder {
+  id                    String      @id @default(cuid())
+  buyerUserId           String
+  trainerId             String
+  stripePaymentIntentId String?     @unique
+  stripeChargeId        String?
+  status                OrderStatus @default(PENDING_PAYMENT)
+  subtotalPence         Int
+  discountPence         Int         @default(0)
+  totalPence            Int
+  platformFeePence      Int
+  currency              String      @default("gbp")
+  couponId              String?
+  couponCode            String?
+  shippingName          String?
+  shippingAddress       String?     @db.Text
+  refundAmount          Int?
+  refundReason          String?
+  refundedAt            DateTime?
+  paidAt                DateTime?
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  buyer                 User           @relation(fields: [buyerUserId], references: [id])
+  trainer               TrainerProfile @relation(fields: [trainerId], references: [id])
+  coupon                Coupon?        @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  items                 OrderItem[]
+
+  @@index([buyerUserId])
+  @@index([trainerId])
+  @@map("product_orders")
+}
+
+model OrderItem {
+  id          String  @id @default(cuid())
+  orderId     String
+  productId   String
+  productName String
+  /// @zod.number.int().min(1, { message: "Price must be at least 1p" })
+  pricePence  Int
+  quantity    Int     @default(1)
+
+  order       ProductOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product      @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@map("order_items")
 }

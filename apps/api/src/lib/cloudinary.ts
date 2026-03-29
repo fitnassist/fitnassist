@@ -20,11 +20,11 @@ if (isConfigured) {
   });
 }
 
-export type UploadType = 'profile' | 'cover' | 'gallery' | 'video-intro' | 'exercise-video' | 'exercise-thumbnail' | 'recipe-image' | 'progress-photo' | 'website-image' | 'website-video';
+export type UploadType = 'profile' | 'cover' | 'gallery' | 'video-intro' | 'exercise-video' | 'exercise-thumbnail' | 'recipe-image' | 'progress-photo' | 'website-image' | 'website-video' | 'product-image' | 'product-file';
 
 interface UploadConfig {
   folder: string;
-  resourceType: 'image' | 'video';
+  resourceType: 'image' | 'video' | 'raw';
   transformation?: object[];
   maxFileSize?: number; // in bytes
 }
@@ -108,6 +108,20 @@ const UPLOAD_CONFIGS: Record<UploadType, UploadConfig> = {
     resourceType: 'video',
     maxFileSize: 100 * 1024 * 1024, // 100MB
   },
+  'product-image': {
+    folder: 'fitnassist/products/images',
+    resourceType: 'image',
+    transformation: [
+      { width: 1200, crop: 'limit' },
+      { quality: 'auto', fetch_format: 'auto' },
+    ],
+    maxFileSize: 10 * 1024 * 1024, // 10MB
+  },
+  'product-file': {
+    folder: 'fitnassist/products/files',
+    resourceType: 'raw',
+    maxFileSize: 100 * 1024 * 1024, // 100MB
+  },
 };
 
 export interface SignedUploadParams {
@@ -159,7 +173,7 @@ export function getUploadConfig(type: UploadType): UploadConfig {
 /**
  * Delete a file from Cloudinary by public ID
  */
-export async function deleteFile(publicId: string, resourceType: 'image' | 'video' = 'image'): Promise<boolean> {
+export async function deleteFile(publicId: string, resourceType: 'image' | 'video' | 'raw' = 'image'): Promise<boolean> {
   if (!isConfigured) {
     console.log('[Cloudinary] Not configured, mock deleting:', publicId);
     return true;

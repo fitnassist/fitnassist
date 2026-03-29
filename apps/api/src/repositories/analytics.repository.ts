@@ -112,8 +112,8 @@ export const analyticsRepository = {
     const twelveWeeksAgo = new Date(Date.now() - 12 * 7 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    // Weekly revenue trend (12 weeks)
-    const weeklyRevenue = await prisma.$queryRaw<Array<{
+    // Weekly session revenue (12 weeks)
+    const weeklySessionRevenue = await prisma.$queryRaw<Array<{
       week: Date;
       revenue: number;
       sessions: number;
@@ -134,8 +134,29 @@ export const analyticsRepository = {
       ORDER BY week ASC
     `;
 
-    // 30-day summary
-    const summary = await prisma.$queryRaw<Array<{
+    // Weekly product order revenue (12 weeks)
+    const weeklyProductRevenue = await prisma.$queryRaw<Array<{
+      week: Date;
+      revenue: number;
+      orders: number;
+      refunds: number;
+    }>>`
+      SELECT
+        DATE_TRUNC('week', po."paidAt") as week,
+        COALESCE(SUM(po."totalPence" - po."platformFeePence"), 0)::int as revenue,
+        COUNT(*)::int as orders,
+        COALESCE(SUM(po."refundAmount"), 0)::int as refunds
+      FROM "product_orders" po
+      WHERE po."trainerId" = ${trainerId}
+        AND po."paidAt" IS NOT NULL
+        AND po."paidAt" >= ${twelveWeeksAgo}
+        AND po."status" IN ('PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'REFUNDED')
+      GROUP BY DATE_TRUNC('week', po."paidAt")
+      ORDER BY week ASC
+    `;
+
+    // 30-day session summary
+    const sessionSummary = await prisma.$queryRaw<Array<{
       total_revenue: number;
       total_sessions: number;
       total_refunds: number;
@@ -154,20 +175,80 @@ export const analyticsRepository = {
         AND sp."status" IN ('SUCCEEDED', 'REFUNDED', 'PARTIALLY_REFUNDED')
     `;
 
-    const summaryRow = summary[0] ?? { total_revenue: 0, total_sessions: 0, total_refunds: 0, avg_session_price: 0 };
+    // 30-day product order summary
+    const productSummary = await prisma.$queryRaw<Array<{
+      total_revenue: number;
+      total_orders: number;
+      total_refunds: number;
+      avg_order_value: number;
+    }>>`
+      SELECT
+        COALESCE(SUM(po."totalPence" - po."platformFeePence"), 0)::int as total_revenue,
+        COUNT(*)::int as total_orders,
+        COALESCE(SUM(po."refundAmount"), 0)::int as total_refunds,
+        COALESCE(AVG(po."totalPence" - po."platformFeePence"), 0)::int as avg_order_value
+      FROM "product_orders" po
+      WHERE po."trainerId" = ${trainerId}
+        AND po."paidAt" IS NOT NULL
+        AND po."paidAt" >= ${thirtyDaysAgo}
+        AND po."status" IN ('PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'REFUNDED')
+    `;
+
+    const sessionRow = sessionSummary[0] ?? { total_revenue: 0, total_sessions: 0, total_refunds: 0, avg_session_price: 0 };
+    const productRow = productSummary[0] ?? { total_revenue: 0, total_orders: 0, total_refunds: 0, avg_order_value: 0 };
+
+    // Merge weekly data by week key
+    const weeklyMap = new Map<string, { sessionRevenue: number; productRevenue: number; sessions: number; orders: number; refunds: number }>();
+    for (const r of weeklySessionRevenue) {
+      const key = r.week.toISOString().split('T')[0]!;
+      weeklyMap.set(key, {
+        sessionRevenue: r.revenue,
+        productRevenue: 0,
+        sessions: r.sessions,
+        orders: 0,
+        refunds: r.refunds,
+      });
+    }
+    for (const r of weeklyProductRevenue) {
+      const key = r.week.toISOString().split('T')[0]!;
+      const existing = weeklyMap.get(key);
+      if (existing) {
+        existing.productRevenue = r.revenue;
+        existing.orders = r.orders;
+        existing.refunds += r.refunds;
+      } else {
+        weeklyMap.set(key, {
+          sessionRevenue: 0,
+          productRevenue: r.revenue,
+          sessions: 0,
+          orders: r.orders,
+          refunds: r.refunds,
+        });
+      }
+    }
+    const weeklyRevenue = Array.from(weeklyMap.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([week, data]) => ({
+        week,
+        sessionRevenue: data.sessionRevenue,
+        productRevenue: data.productRevenue,
+        revenue: data.sessionRevenue + data.productRevenue,
+        sessions: data.sessions,
+        orders: data.orders,
+        refunds: data.refunds,
+      }));
 
     return {
-      weeklyRevenue: weeklyRevenue.map(r => ({
-        week: r.week.toISOString().split('T')[0]!,
-        revenue: r.revenue,
-        sessions: r.sessions,
-        refunds: r.refunds,
-      })),
+      weeklyRevenue,
       summary: {
-        totalRevenue30d: summaryRow.total_revenue,
-        totalSessions30d: summaryRow.total_sessions,
-        totalRefunds30d: summaryRow.total_refunds,
-        avgSessionPrice: summaryRow.avg_session_price,
+        totalRevenue30d: sessionRow.total_revenue + productRow.total_revenue,
+        totalSessions30d: sessionRow.total_sessions,
+        totalRefunds30d: sessionRow.total_refunds + productRow.total_refunds,
+        avgSessionPrice: sessionRow.avg_session_price,
+        totalProductRevenue30d: productRow.total_revenue,
+        totalOrders30d: productRow.total_orders,
+        totalProductRefunds30d: productRow.total_refunds,
+        avgOrderValue: productRow.avg_order_value,
       },
     };
   },
@@ -217,6 +298,48 @@ export const analyticsRepository = {
         clientImage: t.booking.clientRoster.connection.sender?.image,
         bookingDate: t.booking.date,
         startTime: t.booking.startTime,
+      })),
+      nextCursor: hasMore ? items[items.length - 1]?.id : undefined,
+    };
+  },
+
+  async getProductOrderTransactions(trainerId: string, cursor?: string, limit: number = 20) {
+    const orders = await prisma.productOrder.findMany({
+      where: {
+        trainerId,
+        paidAt: { not: null },
+      },
+      include: {
+        buyer: { select: { id: true, name: true, image: true } },
+        items: {
+          select: { productName: true, quantity: true, pricePence: true },
+        },
+      },
+      orderBy: { paidAt: 'desc' },
+      take: limit + 1,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+    });
+
+    const hasMore = orders.length > limit;
+    const items = hasMore ? orders.slice(0, limit) : orders;
+
+    return {
+      items: items.map(o => ({
+        id: o.id,
+        totalPence: o.totalPence,
+        platformFeePence: o.platformFeePence,
+        netAmount: o.totalPence - o.platformFeePence,
+        discountPence: o.discountPence,
+        currency: o.currency,
+        status: o.status,
+        refundAmount: o.refundAmount,
+        refundReason: o.refundReason,
+        refundedAt: o.refundedAt,
+        paidAt: o.paidAt!,
+        buyerName: o.buyer.name ?? 'Customer',
+        buyerImage: o.buyer.image,
+        items: o.items,
+        couponCode: o.couponCode,
       })),
       nextCursor: hasMore ? items[items.length - 1]?.id : undefined,
     };

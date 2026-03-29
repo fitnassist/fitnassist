@@ -109,6 +109,18 @@ export {
   WebsiteSectionOptionalDefaultsSchema,
   BlogPostSchema,
   BlogPostOptionalDefaultsSchema,
+  // Product storefront
+  ProductTypeSchema,
+  ProductStatusSchema,
+  OrderStatusSchema,
+  ProductSchema,
+  ProductOptionalDefaultsSchema,
+  CouponSchema,
+  CouponOptionalDefaultsSchema,
+  ProductOrderSchema,
+  ProductOrderOptionalDefaultsSchema,
+  OrderItemSchema,
+  OrderItemOptionalDefaultsSchema,
 } from '@fitnassist/database';
 
 // =============================================================================
@@ -142,6 +154,7 @@ export * from './forms/payment.schema';
 export * from './forms/review.schema';
 export * from './forms/integration.schema';
 export * from './forms/website.schema';
+export * from './forms/product.schema';
 
 // =============================================================================
 // CONSTANTS

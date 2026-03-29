@@ -27,7 +27,7 @@ export type UpdateSubdomainInput = z.infer<typeof updateSubdomainSchema>;
 export const addSectionSchema = z.object({
   type: z.enum([
     'HERO', 'ABOUT', 'SERVICES', 'GALLERY', 'TESTIMONIALS', 'BLOG',
-    'CONTACT', 'CUSTOM_TEXT', 'VIDEO', 'PRICING', 'FAQ', 'CTA', 'SOCIAL_LINKS',
+    'CONTACT', 'CUSTOM_TEXT', 'VIDEO', 'PRICING', 'FAQ', 'CTA', 'SOCIAL_LINKS', 'SHOP',
   ]),
   title: z.string().max(100).nullable().optional(),
   subtitle: z.string().max(500).nullable().optional(),

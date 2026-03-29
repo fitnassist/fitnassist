@@ -48,11 +48,13 @@ import { PricingPage } from '@/pages/pricing';
 import { AnalyticsPage } from '@/pages/dashboard/analytics';
 import { ReviewsPage } from '@/pages/dashboard/reviews';
 import { WebsitePage } from '@/pages/dashboard/website';
+import { StorefrontPage } from '@/pages/dashboard/storefront';
 import { SiteRoutePage } from '@/pages/site/route';
 import { FeedPage } from '@/pages/dashboard/feed';
 import { FriendsPage } from '@/pages/dashboard/friends';
 import { LeaderboardsPage } from '@/pages/dashboard/leaderboards';
 import { AchievementsPage } from '@/pages/dashboard/achievements';
+import { PurchasesPage } from '@/pages/dashboard/purchases';
 import { NotFoundPage } from '@/pages/not-found';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Toaster } from '@/components/ui';
@@ -123,6 +125,7 @@ function App() {
                       <Route path="/dashboard/bookings/book-client" element={<TrainerBookSessionPage />} />
                       <Route path="/dashboard/bookings/book-client/:clientRosterId" element={<TrainerBookSessionPage />} />
                       <Route path={routes.dashboardWebsite} element={<WebsitePage />} />
+                      <Route path={routes.dashboardStorefront} element={<StorefrontPage />} />
                       <Route path={routes.trainerProfileEdit} element={<ProfileEditPage />} />
                       <Route path="/trainee/profile/:userId" element={<TraineeProfileViewPage />} />
                     </Route>
@@ -138,6 +141,7 @@ function App() {
                       <Route path={routes.dashboardFriends} element={<FriendsPage />} />
                       <Route path={routes.dashboardLeaderboards} element={<LeaderboardsPage />} />
                       <Route path={routes.dashboardAchievements} element={<AchievementsPage />} />
+                      <Route path={routes.dashboardPurchases} element={<PurchasesPage />} />
                       <Route path={routes.traineeProfileEdit} element={<TraineeProfileEditPage />} />
                     </Route>
                   </Route>

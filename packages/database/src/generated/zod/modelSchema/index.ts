@@ -60,3 +60,7 @@ export * from './IntegrationConnectionSchema';
 export * from './WebsiteSchema';
 export * from './WebsiteSectionSchema';
 export * from './BlogPostSchema';
+export * from './ProductSchema';
+export * from './CouponSchema';
+export * from './ProductOrderSchema';
+export * from './OrderItemSchema';

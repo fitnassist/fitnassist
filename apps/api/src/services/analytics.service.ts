@@ -90,6 +90,18 @@ export const analyticsService = {
     return analyticsRepository.getRevenueTransactions(trainer.id, cursor, limit);
   },
 
+  async getProductOrderTransactions(userId: string, cursor?: string, limit?: number) {
+    const trainer = await trainerRepository.findByUserId(userId);
+    if (!trainer) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Trainer profile not found',
+      });
+    }
+
+    return analyticsRepository.getProductOrderTransactions(trainer.id, cursor, limit);
+  },
+
   async getGoalAnalytics(userId: string) {
     const trainer = await trainerRepository.findByUserId(userId);
     if (!trainer) {
