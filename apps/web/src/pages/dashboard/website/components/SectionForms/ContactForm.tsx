@@ -1,6 +1,8 @@
 import { useForm } from 'react-hook-form';
-import { Button, Checkbox, Input, Label } from '@/components/ui';
+import { Button, Checkbox, Label, AddressAutocomplete } from '@/components/ui';
+import type { AddressDetails } from '@/components/ui';
 import { useUpdateSection } from '@/api/website';
+import { env } from '@/config/env';
 
 interface ContactContent {
   showForm: boolean;
@@ -22,10 +24,20 @@ const TOGGLE_FIELDS: { name: keyof Pick<ContactContent, 'showForm' | 'showEmail'
   { name: 'showAddress', label: 'Show address / location' },
 ];
 
+const formatAddressString = (details: AddressDetails): string => {
+  const parts = [
+    details.addressLine1,
+    details.addressLine2,
+    details.city,
+    details.postcode,
+  ].filter(Boolean);
+  return parts.join(', ');
+};
+
 export const ContactForm = ({ sectionId, content }: ContactFormProps) => {
   const updateSection = useUpdateSection();
 
-  const { setValue, watch, register, handleSubmit } = useForm<ContactContent>({
+  const { setValue, watch, handleSubmit } = useForm<ContactContent>({
     defaultValues: {
       showForm: (content.showForm as boolean) ?? true,
       showEmail: (content.showEmail as boolean) ?? true,
@@ -36,6 +48,7 @@ export const ContactForm = ({ sectionId, content }: ContactFormProps) => {
   });
 
   const showAddress = watch('showAddress');
+  const address = watch('address');
 
   const onSubmit = (data: ContactContent) => {
     updateSection.mutate({ sectionId, content: data });
@@ -66,11 +79,13 @@ export const ContactForm = ({ sectionId, content }: ContactFormProps) => {
 
       {showAddress && (
         <div className="space-y-2">
-          <Label htmlFor="address">Address</Label>
-          <Input
-            id="address"
-            {...register('address')}
-            placeholder="123 High Street, London SW1A 1AA"
+          <AddressAutocomplete
+            label="Address"
+            apiKey={env.GOOGLE_MAPS_API_KEY}
+            value={address ? { addressLine1: address } : undefined}
+            onChange={(details) => {
+              setValue('address', details ? formatAddressString(details) : '');
+            }}
           />
           <p className="text-xs text-muted-foreground">
             If left blank, your profile address will be used.

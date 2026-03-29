@@ -311,7 +311,7 @@ const ConnectCardPlaceholder = ({ trainer }: { trainer: PublicTrainer }) => (
 export const ContactSection = ({ section, trainer, preview }: ContactSectionProps) => {
   const content = parseContent(section.content);
 
-  const email = trainer.contactEmail || (trainer as any).user?.email;
+  const email = trainer.contactEmail || (trainer as unknown as { user?: { email: string } }).user?.email;
   const showEmail = content.showEmail !== false && email;
   const showPhone = content.showPhone !== false && trainer.phoneNumber;
   const showForm = content.showForm !== false;
