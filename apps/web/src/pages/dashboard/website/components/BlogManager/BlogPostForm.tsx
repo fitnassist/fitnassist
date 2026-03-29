@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -7,12 +7,14 @@ import {
 } from '@fitnassist/schemas';
 import {
   Button,
+  ImageUpload,
   Input,
   Label,
   Textarea,
   RichTextEditor,
 } from '@/components/ui';
 import { useCreateBlogPost, useUpdateBlogPost } from '@/api/website';
+import { useWebsiteUpload } from '../../hooks';
 import type { BlogPost } from './BlogManager.types';
 
 interface BlogPostFormProps {
@@ -30,6 +32,8 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
   const isEditing = !!post;
   const createBlogPost = useCreateBlogPost();
   const updateBlogPost = useUpdateBlogPost();
+  const { uploadImage, deleteFile } = useWebsiteUpload();
+  const [coverImageUrl, setCoverImageUrl] = useState<string>(post?.coverImageUrl ?? '');
 
   const {
     register,
@@ -63,11 +67,10 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
   const isPending = createBlogPost.isPending || updateBlogPost.isPending;
 
   const onSubmit = (data: CreateBlogPostInput) => {
-    // Clean up empty optional fields
     const cleaned = {
       ...data,
       excerpt: data.excerpt || null,
-      coverImageUrl: data.coverImageUrl || null,
+      coverImageUrl: coverImageUrl || null,
       seoTitle: data.seoTitle || null,
       seoDescription: data.seoDescription || null,
       tags: data.tags?.length ? data.tags : [],
@@ -142,11 +145,14 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="coverImageUrl">Cover Image URL</Label>
-          <Input
-            id="coverImageUrl"
-            {...register('coverImageUrl')}
-            placeholder="https://example.com/image.jpg"
+          <Label>Cover Image</Label>
+          <ImageUpload
+            value={coverImageUrl}
+            onChange={(url) => setCoverImageUrl(url ?? '')}
+            onUpload={uploadImage}
+            onDelete={(url) => deleteFile(url)}
+            aspectRatio="cover"
+            maxSizeMB={10}
           />
           {errors.coverImageUrl && (
             <p className="text-sm text-destructive">

@@ -19,6 +19,25 @@ const parseContent = (raw: unknown): HeroContent => {
   return raw as HeroContent;
 };
 
+const handleCtaClick = (link: string) => {
+  if (!link) return;
+
+  // Scroll to section by type anchor (e.g. #contact, #about)
+  if (link.startsWith('#')) {
+    const sectionType = link.slice(1); // remove #
+    const el = document.querySelector(`[data-section-type="${sectionType}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+  }
+
+  // External URL
+  if (link.startsWith('http://') || link.startsWith('https://')) {
+    window.open(link, '_blank');
+  }
+};
+
 export const HeroSection = ({ section }: HeroSectionProps) => {
   const content = parseContent(section.content);
   const rawOpacity = content.overlayOpacity ?? 50;
@@ -61,16 +80,7 @@ export const HeroSection = ({ section }: HeroSectionProps) => {
             <Button
               size="lg"
               className="bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
-              onClick={() => {
-                if (content.ctaLink) {
-                  if (content.ctaLink.startsWith('#')) {
-                    const el = document.querySelector(content.ctaLink);
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    window.open(content.ctaLink, '_blank');
-                  }
-                }
-              }}
+              onClick={() => content.ctaLink && handleCtaClick(content.ctaLink)}
             >
               {content.ctaText}
             </Button>

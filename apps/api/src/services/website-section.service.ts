@@ -38,6 +38,9 @@ export const websiteSectionService = {
     if (!section || section.websiteId !== website.id) {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Section not found' });
     }
+    if (section.type === 'CONTACT') {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'The contact section cannot be removed' });
+    }
     return websiteSectionRepository.delete(sectionId);
   },
 

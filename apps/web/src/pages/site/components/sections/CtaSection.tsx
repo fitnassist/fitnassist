@@ -59,9 +59,10 @@ export const CtaSection = ({ section }: CtaSectionProps) => {
                 const url = content.ctaLink ?? content.buttonUrl;
                 if (url) {
                   if (url.startsWith('#')) {
-                    const el = document.querySelector(url);
+                    const sectionType = url.slice(1);
+                    const el = document.querySelector(`[data-section-type="${sectionType}"]`);
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  } else {
+                  } else if (url.startsWith('http://') || url.startsWith('https://')) {
                     window.open(url, '_blank');
                   }
                 }

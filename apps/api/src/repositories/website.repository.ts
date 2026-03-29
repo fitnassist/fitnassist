@@ -24,6 +24,7 @@ export const websiteRepository = {
         },
         trainer: {
           select: {
+            id: true,
             displayName: true,
             handle: true,
             profileImageUrl: true,
@@ -58,6 +59,7 @@ export const websiteRepository = {
         },
         trainer: {
           select: {
+            id: true,
             displayName: true,
             handle: true,
             profileImageUrl: true,
