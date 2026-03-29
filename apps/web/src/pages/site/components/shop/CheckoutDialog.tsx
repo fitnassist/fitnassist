@@ -13,20 +13,14 @@ import { stripePromise } from '@/lib/stripe';
 import { useSession } from '@/lib/auth-client';
 import { trpc } from '@/lib/trpc';
 import { CouponInput } from './CouponInput';
-
-interface CheckoutProduct {
-  id: string;
-  name: string;
-  pricePence: number;
-  type: 'DIGITAL' | 'PHYSICAL';
-  imageUrl: string | null;
-}
+import type { CartItem } from './CartDrawer';
 
 interface CheckoutDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  product: CheckoutProduct;
+  items: CartItem[];
   trainerId: string;
+  onSuccess?: () => void;
 }
 
 const formatPrice = (pence: number) => `£${(pence / 100).toFixed(2)}`;
@@ -34,7 +28,7 @@ const formatPrice = (pence: number) => `£${(pence / 100).toFixed(2)}`;
 type CheckoutState =
   | { step: 'details' }
   | { step: 'payment'; clientSecret: string; orderId: string }
-  | { step: 'success'; orderId: string; isDigital: boolean };
+  | { step: 'success'; orderId: string; hasDigital: boolean };
 
 const PaymentForm = ({
   totalPence,
@@ -109,12 +103,11 @@ const PaymentForm = ({
   );
 };
 
-export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: CheckoutDialogProps) => {
+export const CheckoutDialog = ({ open, onOpenChange, items, trainerId, onSuccess }: CheckoutDialogProps) => {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
 
   const [state, setState] = useState<CheckoutState>({ step: 'details' });
-  const [quantity, setQuantity] = useState(1);
   const [coupon, setCoupon] = useState<{
     code: string;
     discountPence: number;
@@ -129,18 +122,17 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
 
   const createOrder = trpc.order.create.useMutation();
 
-  const subtotalPence = product.pricePence * quantity;
+  const subtotalPence = items.reduce((sum, item) => sum + item.pricePence * item.quantity, 0);
   const discountPence = coupon?.discountPence ?? 0;
   const totalPence = Math.max(subtotalPence - discountPence, 1);
-  const isPhysical = product.type === 'PHYSICAL';
+  const hasPhysical = items.some((item) => item.type === 'PHYSICAL');
+  const hasDigital = items.some((item) => item.type === 'DIGITAL');
 
   const handleClose = (open: boolean) => {
-    if (isProcessing) return; // Don't close while payment is processing
+    if (isProcessing) return;
     onOpenChange(open);
     if (!open) {
-      // Reset state on close
       setState({ step: 'details' });
-      setQuantity(1);
       setCoupon(null);
       setShippingName('');
       setShippingAddress('');
@@ -151,7 +143,7 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
   };
 
   const handleProceedToPayment = async () => {
-    if (isPhysical && (!shippingName.trim() || !shippingAddress.trim())) {
+    if (hasPhysical && (!shippingName.trim() || !shippingAddress.trim())) {
       setCreateError('Shipping details are required for physical products');
       return;
     }
@@ -162,10 +154,10 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
     try {
       const result = await createOrder.mutateAsync({
         trainerId,
-        items: [{ productId: product.id, quantity }],
+        items: items.map((item) => ({ productId: item.id, quantity: item.quantity })),
         couponCode: coupon?.code,
-        shippingName: isPhysical ? shippingName : undefined,
-        shippingAddress: isPhysical ? shippingAddress : undefined,
+        shippingName: hasPhysical ? shippingName : undefined,
+        shippingAddress: hasPhysical ? shippingAddress : undefined,
       });
 
       setState({
@@ -183,7 +175,8 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
 
   const handlePaymentSuccess = () => {
     if (state.step === 'payment') {
-      setState({ step: 'success', orderId: state.orderId, isDigital: product.type === 'DIGITAL' });
+      setState({ step: 'success', orderId: state.orderId, hasDigital });
+      onSuccess?.();
     }
   };
 
@@ -228,9 +221,11 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
             <div>
               <h2 className="text-xl font-semibold text-[hsl(var(--foreground))]">Order confirmed!</h2>
               <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
-                {state.isDigital
-                  ? 'Your download will be available in your purchases.'
-                  : 'The trainer will process your order shortly.'}
+                {state.hasDigital && !hasPhysical
+                  ? 'Your downloads will be available in your purchases.'
+                  : hasPhysical
+                    ? 'The trainer will process your order shortly.'
+                    : 'Your order has been confirmed.'}
               </p>
             </div>
             <Button onClick={() => handleClose(false)} className="w-full">
@@ -268,10 +263,16 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
 
           {/* Order summary */}
           <div className="rounded-md border border-[hsl(var(--border))] p-3 space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-[hsl(var(--muted-foreground))]">{product.name} x{quantity}</span>
-              <span className="text-[hsl(var(--foreground))]">{formatPrice(subtotalPence)}</span>
-            </div>
+            {items.map((item) => (
+              <div key={item.id} className="flex justify-between">
+                <span className="text-[hsl(var(--muted-foreground))]">
+                  {item.name} x{item.quantity}
+                </span>
+                <span className="text-[hsl(var(--foreground))]">
+                  {formatPrice(item.pricePence * item.quantity)}
+                </span>
+              </div>
+            ))}
             {discountPence > 0 && (
               <div className="flex justify-between text-green-600">
                 <span>Discount ({coupon?.code})</span>
@@ -313,51 +314,37 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5" />
-            Checkout
+            Checkout ({items.length} {items.length === 1 ? 'item' : 'items'})
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Product summary */}
-          <div className="flex gap-3 rounded-md border border-[hsl(var(--border))] p-3">
-            {product.imageUrl && (
-              <img
-                src={product.imageUrl}
-                alt={product.name}
-                className="h-16 w-16 rounded-md object-cover"
-              />
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-[hsl(var(--foreground))] truncate">{product.name}</p>
-              <p className="text-sm text-[hsl(var(--muted-foreground))]">
-                {formatPrice(product.pricePence)} each
-              </p>
-            </div>
-          </div>
-
-          {/* Quantity */}
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-[hsl(var(--foreground))]">Quantity</label>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                disabled={quantity <= 1}
-                className="h-8 w-8 p-0"
-              >
-                -
-              </Button>
-              <span className="w-8 text-center text-sm font-medium">{quantity}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setQuantity(quantity + 1)}
-                className="h-8 w-8 p-0"
-              >
-                +
-              </Button>
-            </div>
+          {/* Items summary */}
+          <div className="space-y-2 rounded-md border border-[hsl(var(--border))] p-3">
+            {items.map((item) => (
+              <div key={item.id} className="flex gap-3">
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    className="h-12 w-12 rounded-md object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-[hsl(var(--muted))]">
+                    <span className="text-[10px] text-[hsl(var(--muted-foreground))]">No img</span>
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[hsl(var(--foreground))] truncate">{item.name}</p>
+                  <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                    {formatPrice(item.pricePence)} x {item.quantity}
+                  </p>
+                </div>
+                <span className="text-sm font-medium text-[hsl(var(--foreground))] shrink-0">
+                  {formatPrice(item.pricePence * item.quantity)}
+                </span>
+              </div>
+            ))}
           </div>
 
           {/* Coupon */}
@@ -369,8 +356,8 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
             onRemove={() => setCoupon(null)}
           />
 
-          {/* Shipping (physical only) */}
-          {isPhysical && (
+          {/* Shipping (if any physical items) */}
+          {hasPhysical && (
             <div className="space-y-3 rounded-md border border-[hsl(var(--border))] p-3">
               <p className="text-sm font-medium text-[hsl(var(--foreground))]">Shipping details</p>
               <Input
@@ -392,7 +379,7 @@ export const CheckoutDialog = ({ open, onOpenChange, product, trainerId }: Check
           {/* Price summary */}
           <div className="space-y-1 text-sm">
             <div className="flex justify-between text-[hsl(var(--muted-foreground))]">
-              <span>Subtotal</span>
+              <span>Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)</span>
               <span>{formatPrice(subtotalPence)}</span>
             </div>
             {discountPence > 0 && (

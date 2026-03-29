@@ -8,9 +8,10 @@ interface ShopPageProps {
   trainerId: string;
   onNavigateProduct: (slug: string) => void;
   onNavigateHome: () => void;
+  onAddToCart?: (productId: string) => void;
 }
 
-export const ShopPage = ({ trainerId, onNavigateProduct, onNavigateHome }: ShopPageProps) => {
+export const ShopPage = ({ trainerId, onNavigateProduct, onNavigateHome, onAddToCart }: ShopPageProps) => {
   const { data: products, isLoading } = trpc.product.getPublicProducts.useQuery({ trainerId });
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<'default' | 'price-asc' | 'price-desc'>('default');
@@ -89,6 +90,7 @@ export const ShopPage = ({ trainerId, onNavigateProduct, onNavigateHome }: ShopP
             {filtered.map((product) => (
               <ProductCard
                 key={product.id}
+                id={product.id}
                 name={product.name}
                 slug={product.slug}
                 imageUrl={product.imageUrl}
@@ -96,6 +98,7 @@ export const ShopPage = ({ trainerId, onNavigateProduct, onNavigateHome }: ShopP
                 pricePence={product.pricePence}
                 compareAtPricePence={product.compareAtPricePence}
                 onNavigate={onNavigateProduct}
+                onAddToCart={onAddToCart}
               />
             ))}
           </div>

@@ -4,3 +4,5 @@ export { ProductDetailPage } from './ProductDetailPage';
 export { ProductCard } from './ProductCard';
 export { CheckoutDialog } from './CheckoutDialog';
 export { CouponInput } from './CouponInput';
+export { CartDrawer } from './CartDrawer';
+export type { CartItem } from './CartDrawer';

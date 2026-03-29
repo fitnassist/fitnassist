@@ -6,7 +6,8 @@ import { SiteThemeProvider } from './components/ThemeProvider';
 import { SiteLayout } from './components/SiteLayout';
 import { SectionRenderer } from './components/sections';
 import { BlogListPage, BlogPostPage } from './components/blog';
-import { ShopPage, ProductDetailPage, CheckoutDialog } from './components/shop';
+import { ShopPage, ProductDetailPage, CheckoutDialog, CartDrawer } from './components/shop';
+import type { CartItem } from './components/shop';
 
 type SiteView =
   | { page: 'home' }
@@ -50,27 +51,79 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
   );
   const hasProducts = (productsData?.length ?? 0) > 0;
 
-  // Checkout state
-  const [checkoutProduct, setCheckoutProduct] = useState<{
-    id: string;
-    name: string;
-    pricePence: number;
-    type: 'DIGITAL' | 'PHYSICAL';
-    imageUrl: string | null;
-  } | null>(null);
+  // Cart state
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+
+  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleAddToCart = useCallback((productId: string) => {
+    const product = productsData?.find((p) => p.id === productId);
+    if (!product) return;
+
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.id === productId);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: product.id,
+          name: product.name,
+          pricePence: product.pricePence,
+          type: product.type as 'DIGITAL' | 'PHYSICAL',
+          imageUrl: product.imageUrl,
+          quantity: 1,
+        },
+      ];
+    });
+    setCartOpen(true);
+  }, [productsData]);
+
+  const handleUpdateCartQuantity = useCallback((productId: string, quantity: number) => {
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.id === productId ? { ...item, quantity } : item
+      )
+    );
+  }, []);
+
+  const handleRemoveCartItem = useCallback((productId: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== productId));
+  }, []);
+
+  const handleClearCart = useCallback(() => {
+    setCartItems([]);
+  }, []);
+
+  const handleCartCheckout = useCallback(() => {
+    setCartOpen(false);
+    setCheckoutOpen(true);
+  }, []);
 
   const handleBuyNow = useCallback((productId: string) => {
     const product = productsData?.find((p) => p.id === productId);
-    if (product) {
-      setCheckoutProduct({
-        id: product.id,
-        name: product.name,
-        pricePence: product.pricePence,
-        type: product.type as 'DIGITAL' | 'PHYSICAL',
-        imageUrl: product.imageUrl,
-      });
-    }
+    if (!product) return;
+
+    // Set cart to just this product and open checkout directly
+    setCartItems([{
+      id: product.id,
+      name: product.name,
+      pricePence: product.pricePence,
+      type: product.type as 'DIGITAL' | 'PHYSICAL',
+      imageUrl: product.imageUrl,
+      quantity: 1,
+    }]);
+    setCheckoutOpen(true);
   }, [productsData]);
+
+  const handleCheckoutSuccess = useCallback(() => {
+    setCartItems([]);
+  }, []);
 
   // Handle browser back/forward
   useEffect(() => {
@@ -186,7 +239,17 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
 
   return (
     <SiteThemeProvider website={website}>
-      <SiteLayout website={website} onNavigateBlog={handleNavigateBlog} onNavigateHome={handleNavigateHome} onNavigateShop={handleNavigateShop} hasBlogPosts={hasBlogPosts} hasProducts={hasProducts} isHomePage={view.page === 'home'}>
+      <SiteLayout
+        website={website}
+        onNavigateBlog={handleNavigateBlog}
+        onNavigateHome={handleNavigateHome}
+        onNavigateShop={handleNavigateShop}
+        onOpenCart={() => setCartOpen(true)}
+        cartItemCount={cartItemCount}
+        hasBlogPosts={hasBlogPosts}
+        hasProducts={hasProducts}
+        isHomePage={view.page === 'home'}
+      >
         {view.page === 'home' && (
           <>
             {sortedSections.map((section) => (
@@ -199,6 +262,7 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
                 onNavigatePost={handleNavigatePost}
                 onNavigateShop={handleNavigateShop}
                 onNavigateProduct={handleNavigateProduct}
+                onAddToCart={handleAddToCart}
               />
             ))}
           </>
@@ -225,6 +289,7 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
             trainerId={trainerId}
             onNavigateProduct={handleNavigateProduct}
             onNavigateHome={handleNavigateHome}
+            onAddToCart={handleAddToCart}
           />
         )}
 
@@ -234,15 +299,27 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
             slug={view.slug}
             onNavigateBack={handleNavigateShop}
             onBuyNow={handleBuyNow}
+            onAddToCart={handleAddToCart}
           />
         )}
 
-        {checkoutProduct && (
+        <CartDrawer
+          open={cartOpen}
+          onOpenChange={setCartOpen}
+          items={cartItems}
+          onUpdateQuantity={handleUpdateCartQuantity}
+          onRemoveItem={handleRemoveCartItem}
+          onCheckout={handleCartCheckout}
+          onClearCart={handleClearCart}
+        />
+
+        {checkoutOpen && cartItems.length > 0 && (
           <CheckoutDialog
-            open={!!checkoutProduct}
-            onOpenChange={(open) => { if (!open) setCheckoutProduct(null); }}
-            product={checkoutProduct}
+            open={checkoutOpen}
+            onOpenChange={setCheckoutOpen}
+            items={cartItems}
             trainerId={trainerId}
+            onSuccess={handleCheckoutSuccess}
           />
         )}
       </SiteLayout>

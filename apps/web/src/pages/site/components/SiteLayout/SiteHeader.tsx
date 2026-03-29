@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui';
 import type { PublicWebsite, PublicSection } from '../../site.types';
 
@@ -8,6 +8,8 @@ interface SiteHeaderProps {
   onNavigateBlog?: () => void;
   onNavigateHome?: () => void;
   onNavigateShop?: () => void;
+  onOpenCart?: () => void;
+  cartItemCount?: number;
   hasBlogPosts?: boolean;
   hasProducts?: boolean;
   isHomePage?: boolean;
@@ -34,7 +36,7 @@ const getSectionLabel = (section: PublicSection): string => {
   return labels[section.type] ?? section.type;
 };
 
-export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome, onNavigateShop, hasBlogPosts, hasProducts, isHomePage }: SiteHeaderProps) => {
+export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome, onNavigateShop, onOpenCart, cartItemCount = 0, hasBlogPosts, hasProducts, isHomePage }: SiteHeaderProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navSections = website.sections.filter(
@@ -88,15 +90,35 @@ export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome, onNavigate
           )}
         </button>
 
-        {/* Menu toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        <div className="flex items-center gap-1">
+          {/* Cart icon */}
+          {hasProducts && onOpenCart && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onOpenCart}
+              aria-label="Open cart"
+              className="relative"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-[hsl(var(--primary))] px-1 text-[10px] font-bold text-[hsl(var(--primary-foreground))]">
+                  {cartItemCount > 99 ? '99+' : cartItemCount}
+                </span>
+              )}
+            </Button>
+          )}
+
+          {/* Menu toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Navigation menu */}

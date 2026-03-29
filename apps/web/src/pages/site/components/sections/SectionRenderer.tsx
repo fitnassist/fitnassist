@@ -21,11 +21,12 @@ interface SectionRendererProps {
   onNavigatePost?: (slug: string) => void;
   onNavigateShop?: () => void;
   onNavigateProduct?: (slug: string) => void;
+  onAddToCart?: (productId: string) => void;
   subdomain?: string;
   preview?: boolean;
 }
 
-export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePost, onNavigateShop, onNavigateProduct, subdomain, preview }: SectionRendererProps) => {
+export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePost, onNavigateShop, onNavigateProduct, onAddToCart, subdomain, preview }: SectionRendererProps) => {
   if (!section.isVisible) return null;
 
   const renderSection = () => {
@@ -43,7 +44,7 @@ export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePo
       case 'BLOG':
         return preview ? null : <BlogSection section={section} subdomain={subdomain} onNavigateBlog={onNavigateBlog} onNavigatePost={onNavigatePost} />;
       case 'SHOP':
-        return preview ? null : <ShopSection section={section} trainerId={trainer.id} onNavigateShop={onNavigateShop} onNavigateProduct={onNavigateProduct} />;
+        return preview ? null : <ShopSection section={section} trainerId={trainer.id} onNavigateShop={onNavigateShop} onNavigateProduct={onNavigateProduct} onAddToCart={onAddToCart} />;
       case 'CONTACT':
         return <ContactSection section={section} trainer={trainer} preview={preview} />;
       case 'CUSTOM_TEXT':

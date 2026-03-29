@@ -1,4 +1,4 @@
-import { ArrowLeft, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, ShoppingCart } from 'lucide-react';
 import { Button, Skeleton } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 
@@ -7,9 +7,10 @@ interface ProductDetailPageProps {
   slug: string;
   onNavigateBack: () => void;
   onBuyNow?: (productId: string) => void;
+  onAddToCart?: (productId: string) => void;
 }
 
-export const ProductDetailPage = ({ trainerId, slug, onNavigateBack, onBuyNow }: ProductDetailPageProps) => {
+export const ProductDetailPage = ({ trainerId, slug, onNavigateBack, onBuyNow, onAddToCart }: ProductDetailPageProps) => {
   const { data: product, isLoading } = trpc.product.getPublicProduct.useQuery(
     { trainerId, slug },
     { enabled: !!trainerId && !!slug }
@@ -113,16 +114,30 @@ export const ProductDetailPage = ({ trainerId, slug, onNavigateBack, onBuyNow }:
               </span>
             </div>
 
-            {/* Buy button */}
-            {onBuyNow && (
-              <Button
-                onClick={() => onBuyNow(product.id)}
-                className="mt-6"
-                size="lg"
-              >
-                <ShoppingBag className="mr-2 h-5 w-5" />
-                Buy now — £{(product.pricePence / 100).toFixed(2)}
-              </Button>
+            {/* Action buttons */}
+            {(onBuyNow || onAddToCart) && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {onAddToCart && (
+                  <Button
+                    onClick={() => onAddToCart(product.id)}
+                    variant="outline"
+                    size="lg"
+                    className="border-[hsl(var(--border))] text-[hsl(var(--foreground))]"
+                  >
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Add to cart
+                  </Button>
+                )}
+                {onBuyNow && (
+                  <Button
+                    onClick={() => onBuyNow(product.id)}
+                    size="lg"
+                  >
+                    <ShoppingBag className="mr-2 h-5 w-5" />
+                    Buy now — £{(product.pricePence / 100).toFixed(2)}
+                  </Button>
+                )}
+              </div>
             )}
 
             {/* Description */}

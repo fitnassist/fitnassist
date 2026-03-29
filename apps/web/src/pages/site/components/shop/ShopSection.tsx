@@ -9,9 +9,10 @@ interface ShopSectionProps {
   trainerId?: string;
   onNavigateShop?: () => void;
   onNavigateProduct?: (slug: string) => void;
+  onAddToCart?: (productId: string) => void;
 }
 
-export const ShopSection = ({ section, trainerId, onNavigateShop, onNavigateProduct }: ShopSectionProps) => {
+export const ShopSection = ({ section, trainerId, onNavigateShop, onNavigateProduct, onAddToCart }: ShopSectionProps) => {
   const { data: products, isLoading } = trpc.product.getPublicProducts.useQuery(
     { trainerId: trainerId ?? '' },
     { enabled: !!trainerId }
@@ -52,6 +53,7 @@ export const ShopSection = ({ section, trainerId, onNavigateShop, onNavigateProd
               {displayed.map((product) => (
                 <ProductCard
                   key={product.id}
+                  id={product.id}
                   name={product.name}
                   slug={product.slug}
                   imageUrl={product.imageUrl}
@@ -59,6 +61,7 @@ export const ShopSection = ({ section, trainerId, onNavigateShop, onNavigateProd
                   pricePence={product.pricePence}
                   compareAtPricePence={product.compareAtPricePence}
                   onNavigate={onNavigateProduct ?? (() => {})}
+                  onAddToCart={onAddToCart}
                 />
               ))}
             </div>
