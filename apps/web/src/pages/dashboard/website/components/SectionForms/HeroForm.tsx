@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Input, Label } from '@/components/ui';
+import { Button, Input, Label, ImageUpload } from '@/components/ui';
 import { useUpdateSection } from '@/api/website';
+import { useWebsiteUpload } from '../../hooks';
 
 interface HeroContent {
   headline: string;
@@ -18,6 +20,8 @@ interface HeroFormProps {
 
 export const HeroForm = ({ sectionId, content }: HeroFormProps) => {
   const updateSection = useUpdateSection();
+  const { uploadImage, deleteFile } = useWebsiteUpload();
+  const [imageUrl, setImageUrl] = useState<string>((content.backgroundImageUrl as string) || '');
 
   const { register, handleSubmit } = useForm<HeroContent>({
     defaultValues: {
@@ -31,7 +35,7 @@ export const HeroForm = ({ sectionId, content }: HeroFormProps) => {
   });
 
   const onSubmit = (data: HeroContent) => {
-    updateSection.mutate({ sectionId, content: data });
+    updateSection.mutate({ sectionId, content: { ...data, backgroundImageUrl: imageUrl } });
   };
 
   return (
@@ -58,11 +62,14 @@ export const HeroForm = ({ sectionId, content }: HeroFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="backgroundImageUrl">Background Image URL</Label>
-        <Input
-          id="backgroundImageUrl"
-          {...register('backgroundImageUrl')}
-          placeholder="https://..."
+        <Label>Background Image</Label>
+        <ImageUpload
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url ?? '')}
+          onUpload={uploadImage}
+          onDelete={(url) => deleteFile(url)}
+          aspectRatio="cover"
+          maxSizeMB={10}
         />
       </div>
 

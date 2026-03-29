@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Globe, Loader2, CheckCircle, XCircle } from 'lucide-react';
+import { Globe, Loader2, CheckCircle, XCircle, Image } from 'lucide-react';
 import {
   Button,
   Card,
@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
   ConfirmDialog,
+  ImageUpload,
   Input,
   Label,
   Textarea,
@@ -20,6 +21,7 @@ import {
   useUnpublishWebsite,
 } from '@/api/website';
 import { updateWebsiteSettingsSchema, updateSubdomainSchema } from '@fitnassist/schemas';
+import { useWebsiteUpload } from '../../hooks';
 import type { WebsiteData } from '../../website.types';
 import type { z } from 'zod';
 
@@ -31,6 +33,7 @@ export const SiteSettings = ({ website }: SiteSettingsProps) => {
   return (
     <div className="space-y-6">
       <SubdomainSettings website={website} />
+      <LogoSettings website={website} />
       <PublishSettings website={website} />
       <SeoSettings website={website} />
     </div>
@@ -81,6 +84,43 @@ const SubdomainSettings = ({ website }: SiteSettingsProps) => {
             Update Subdomain
           </Button>
         </form>
+      </CardContent>
+    </Card>
+  );
+};
+
+const LogoSettings = ({ website }: SiteSettingsProps) => {
+  const updateSettings = useUpdateWebsiteSettings();
+  const { uploadImage, deleteFile } = useWebsiteUpload();
+  const [logoUrl, setLogoUrl] = useState<string>(website.logoUrl || '');
+
+  const handleSave = () => {
+    updateSettings.mutate({ logoUrl: logoUrl || null });
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Image className="h-5 w-5" />
+          Logo
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Upload a logo to display in your site header. If no logo is set, your display name will be shown instead.
+        </p>
+        <ImageUpload
+          value={logoUrl}
+          onChange={(url) => setLogoUrl(url ?? '')}
+          onUpload={uploadImage}
+          onDelete={(url) => deleteFile(url)}
+          maxSizeMB={5}
+        />
+        <Button size="sm" onClick={handleSave} disabled={updateSettings.isPending}>
+          {updateSettings.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Save Logo
+        </Button>
       </CardContent>
     </Card>
   );
@@ -157,6 +197,9 @@ const PublishSettings = ({ website }: SiteSettingsProps) => {
 
 const SeoSettings = ({ website }: SiteSettingsProps) => {
   const updateSettings = useUpdateWebsiteSettings();
+  const { uploadImage, deleteFile } = useWebsiteUpload();
+  const [ogImageUrl, setOgImageUrl] = useState<string>(website.ogImageUrl || '');
+
   const {
     register,
     handleSubmit,
@@ -171,7 +214,7 @@ const SeoSettings = ({ website }: SiteSettingsProps) => {
   });
 
   const onSubmit = (data: z.infer<typeof updateWebsiteSettingsSchema>) => {
-    updateSettings.mutate(data);
+    updateSettings.mutate({ ...data, ogImageUrl: ogImageUrl || null });
   };
 
   return (
@@ -195,8 +238,15 @@ const SeoSettings = ({ website }: SiteSettingsProps) => {
             />
           </div>
           <div>
-            <Label htmlFor="ogImageUrl">Social Share Image URL</Label>
-            <Input id="ogImageUrl" {...register('ogImageUrl')} placeholder="https://..." />
+            <Label>Social Share Image</Label>
+            <ImageUpload
+              value={ogImageUrl}
+              onChange={(url) => setOgImageUrl(url ?? '')}
+              onUpload={uploadImage}
+              onDelete={(url) => deleteFile(url)}
+              aspectRatio="cover"
+              maxSizeMB={5}
+            />
           </div>
           <div>
             <Label htmlFor="googleAnalyticsId">Google Analytics ID</Label>

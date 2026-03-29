@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Input, Label, Textarea, Select, type SelectOption } from '@/components/ui';
+import { Button, Label, Textarea, Select, ImageUpload, type SelectOption } from '@/components/ui';
 import { useUpdateSection } from '@/api/website';
+import { useWebsiteUpload } from '../../hooks';
 
 interface AboutContent {
   richText: string;
@@ -20,6 +22,8 @@ const IMAGE_POSITION_OPTIONS: SelectOption[] = [
 
 export const AboutForm = ({ sectionId, content }: AboutFormProps) => {
   const updateSection = useUpdateSection();
+  const { uploadImage, deleteFile } = useWebsiteUpload();
+  const [imageUrl, setImageUrl] = useState<string>((content.imageUrl as string) || '');
 
   const { register, handleSubmit, control } = useForm<AboutContent>({
     defaultValues: {
@@ -30,7 +34,7 @@ export const AboutForm = ({ sectionId, content }: AboutFormProps) => {
   });
 
   const onSubmit = (data: AboutContent) => {
-    updateSection.mutate({ sectionId, content: data });
+    updateSection.mutate({ sectionId, content: { ...data, imageUrl } });
   };
 
   return (
@@ -46,8 +50,14 @@ export const AboutForm = ({ sectionId, content }: AboutFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="imageUrl">Image URL</Label>
-        <Input id="imageUrl" {...register('imageUrl')} placeholder="https://..." />
+        <Label>Image</Label>
+        <ImageUpload
+          value={imageUrl}
+          onChange={(url) => setImageUrl(url ?? '')}
+          onUpload={uploadImage}
+          onDelete={(url) => deleteFile(url)}
+          maxSizeMB={10}
+        />
       </div>
 
       <div className="space-y-2">

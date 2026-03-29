@@ -82,8 +82,11 @@ export const SiteThemeProvider = ({ website, children }: SiteThemeProviderProps)
 
   const style = useMemo(() => {
     const colorVars = buildCssVariables(preset.colors, website.customColors);
+    // Set --ring to match primary so form focus rings match the theme
+    const primaryValue = colorVars['--primary'] ?? preset.colors.primary;
     return {
       ...colorVars,
+      '--ring': primaryValue,
       '--font-heading': `"${headingFont}", sans-serif`,
       '--font-body': `"${bodyFont}", sans-serif`,
       '--radius': preset.borderRadius,

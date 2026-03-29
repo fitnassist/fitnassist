@@ -21,9 +21,9 @@ export const CustomTextSection = ({ section }: CustomTextSectionProps) => {
   return (
     <section id={`section-${section.id}`} className="py-16 sm:py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        {(content.title ?? section.title) && (
+        {content.title && (
           <h2 className="site-heading mb-4 text-3xl font-bold text-[hsl(var(--foreground))]">
-            {content.title ?? section.title}
+            {content.title}
           </h2>
         )}
         {section.subtitle && (

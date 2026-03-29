@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Input, Label, Select, type SelectOption } from '@/components/ui';
+import { Button, Input, Label, Select, ImageUpload, type SelectOption } from '@/components/ui';
 import { useUpdateSection } from '@/api/website';
+import { useWebsiteUpload } from '../../hooks';
 
 interface CtaContent {
   headline: string;
@@ -8,6 +10,7 @@ interface CtaContent {
   ctaText: string;
   ctaLink: string;
   style: string;
+  backgroundImageUrl: string;
 }
 
 interface CtaFormProps {
@@ -23,6 +26,10 @@ const STYLE_OPTIONS: SelectOption[] = [
 
 export const CtaForm = ({ sectionId, content }: CtaFormProps) => {
   const updateSection = useUpdateSection();
+  const { uploadImage, deleteFile } = useWebsiteUpload();
+  const [backgroundImageUrl, setBackgroundImageUrl] = useState<string>(
+    (content.backgroundImageUrl as string) || ''
+  );
 
   const { register, handleSubmit, control } = useForm<CtaContent>({
     defaultValues: {
@@ -31,11 +38,12 @@ export const CtaForm = ({ sectionId, content }: CtaFormProps) => {
       ctaText: (content.ctaText as string) || '',
       ctaLink: (content.ctaLink as string) || '',
       style: (content.style as string) || 'accent',
+      backgroundImageUrl: (content.backgroundImageUrl as string) || '',
     },
   });
 
   const onSubmit = (data: CtaContent) => {
-    updateSection.mutate({ sectionId, content: data });
+    updateSection.mutate({ sectionId, content: { ...data, backgroundImageUrl } });
   };
 
   return (
@@ -63,6 +71,18 @@ export const CtaForm = ({ sectionId, content }: CtaFormProps) => {
           <Label htmlFor="ctaLink">CTA Link</Label>
           <Input id="ctaLink" {...register('ctaLink')} placeholder="/contact" />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Background Image (optional)</Label>
+        <ImageUpload
+          value={backgroundImageUrl}
+          onChange={(url) => setBackgroundImageUrl(url ?? '')}
+          onUpload={uploadImage}
+          onDelete={(url) => deleteFile(url)}
+          aspectRatio="cover"
+          maxSizeMB={10}
+        />
       </div>
 
       <div className="space-y-2">

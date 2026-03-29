@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Plus, Trash2 } from 'lucide-react';
-import { Button, Input, Label, Select, type SelectOption } from '@/components/ui';
+import { Button, Input, Label, Select, ImageUpload, type SelectOption } from '@/components/ui';
 import { useUpdateSection } from '@/api/website';
+import { useWebsiteUpload } from '../../hooks';
 
 interface GalleryImage {
   url: string;
@@ -23,6 +24,7 @@ const createEmptyImage = (): GalleryImage => ({ url: '', caption: '' });
 
 export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
   const updateSection = useUpdateSection();
+  const { uploadImage, deleteFile } = useWebsiteUpload();
   const initialImages = Array.isArray(content.images)
     ? (content.images as GalleryImage[])
     : [];
@@ -39,9 +41,27 @@ export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
     initialImages.length > 0 ? initialImages : [createEmptyImage()]
   );
 
-  const handleUpdate = (index: number, field: keyof GalleryImage, value: string) => {
+  const handleImageUpload = async (index: number, file: File) => {
+    const url = await uploadImage(file);
     setImages((prev) =>
-      prev.map((img, i) => (i === index ? { ...img, [field]: value } : img))
+      prev.map((img, i) => (i === index ? { ...img, url } : img))
+    );
+    return url;
+  };
+
+  const handleImageDelete = async (index: number) => {
+    const current = images[index];
+    if (current?.url) {
+      await deleteFile(current.url);
+    }
+    setImages((prev) =>
+      prev.map((img, i) => (i === index ? { ...img, url: '' } : img))
+    );
+  };
+
+  const handleCaptionUpdate = (index: number, caption: string) => {
+    setImages((prev) =>
+      prev.map((img, i) => (i === index ? { ...img, caption } : img))
     );
   };
 
@@ -50,6 +70,10 @@ export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
   };
 
   const handleRemove = (index: number) => {
+    const current = images[index];
+    if (current?.url) {
+      deleteFile(current.url);
+    }
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -96,20 +120,19 @@ export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
                 )}
               </div>
 
-              <div className="space-y-1">
-                <Label className="text-xs">URL</Label>
-                <Input
-                  value={img.url}
-                  onChange={(e) => handleUpdate(index, 'url', e.target.value)}
-                  placeholder="https://..."
-                />
-              </div>
+              <ImageUpload
+                value={img.url}
+                onChange={(url) => setImages((prev) => prev.map((im, i) => (i === index ? { ...im, url: url ?? '' } : im)))}
+                onUpload={(file) => handleImageUpload(index, file)}
+                onDelete={() => handleImageDelete(index)}
+                maxSizeMB={10}
+              />
 
               <div className="space-y-1">
                 <Label className="text-xs">Caption</Label>
                 <Input
                   value={img.caption}
-                  onChange={(e) => handleUpdate(index, 'caption', e.target.value)}
+                  onChange={(e) => handleCaptionUpdate(index, e.target.value)}
                   placeholder="Optional caption"
                 />
               </div>

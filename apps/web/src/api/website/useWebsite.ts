@@ -5,7 +5,10 @@ export const useMyWebsite = () => {
 };
 
 export const useWebsitePreview = () => {
-  return trpc.website.getPreview.useQuery();
+  return trpc.website.getPreview.useQuery(undefined, {
+    staleTime: 0,
+    gcTime: 0,
+  });
 };
 
 export const usePublicWebsite = (subdomain: string) => {

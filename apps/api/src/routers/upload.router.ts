@@ -6,10 +6,13 @@ import { subscriptionService } from '../services/subscription.service';
 import { trainerRepository } from '../repositories/trainer.repository';
 import { hasTierAccess } from '../config/features.js';
 
-const uploadTypeSchema = z.enum(['profile', 'cover', 'gallery', 'video-intro', 'exercise-video', 'exercise-thumbnail', 'recipe-image', 'progress-photo']);
+const uploadTypeSchema = z.enum(['profile', 'cover', 'gallery', 'video-intro', 'exercise-video', 'exercise-thumbnail', 'recipe-image', 'progress-photo', 'website-image', 'website-video']);
 
 // Upload types that require PRO tier
 const PRO_UPLOAD_TYPES = new Set(['gallery', 'video-intro', 'exercise-video', 'exercise-thumbnail', 'recipe-image']);
+
+// Upload types that require ELITE tier
+const ELITE_UPLOAD_TYPES = new Set(['website-image', 'website-video']);
 
 export const uploadRouter = router({
   /**
@@ -23,14 +26,15 @@ export const uploadRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       // Check tier for gated upload types
-      if (PRO_UPLOAD_TYPES.has(input.type)) {
+      if (PRO_UPLOAD_TYPES.has(input.type) || ELITE_UPLOAD_TYPES.has(input.type)) {
+        const requiredTier = ELITE_UPLOAD_TYPES.has(input.type) ? 'ELITE' : 'PRO';
         const profile = await trainerRepository.findByUserId(ctx.user.id);
         if (profile) {
           const tier = await subscriptionService.getEffectiveTier(profile.id);
-          if (!hasTierAccess(tier, 'PRO')) {
+          if (!hasTierAccess(tier, requiredTier)) {
             throw new TRPCError({
               code: 'FORBIDDEN',
-              message: 'Upgrade to Pro to upload this content',
+              message: `Upgrade to ${requiredTier} to upload this content`,
             });
           }
         }

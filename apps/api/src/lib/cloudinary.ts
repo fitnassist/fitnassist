@@ -20,7 +20,7 @@ if (isConfigured) {
   });
 }
 
-export type UploadType = 'profile' | 'cover' | 'gallery' | 'video-intro' | 'exercise-video' | 'exercise-thumbnail' | 'recipe-image' | 'progress-photo';
+export type UploadType = 'profile' | 'cover' | 'gallery' | 'video-intro' | 'exercise-video' | 'exercise-thumbnail' | 'recipe-image' | 'progress-photo' | 'website-image' | 'website-video';
 
 interface UploadConfig {
   folder: string;
@@ -93,6 +93,20 @@ const UPLOAD_CONFIGS: Record<UploadType, UploadConfig> = {
       { quality: 'auto', fetch_format: 'auto' },
     ],
     maxFileSize: 10 * 1024 * 1024, // 10MB
+  },
+  'website-image': {
+    folder: 'fitnassist/websites/images',
+    resourceType: 'image',
+    transformation: [
+      { width: 1920, crop: 'limit' },
+      { quality: 'auto', fetch_format: 'auto' },
+    ],
+    maxFileSize: 10 * 1024 * 1024, // 10MB
+  },
+  'website-video': {
+    folder: 'fitnassist/websites/videos',
+    resourceType: 'video',
+    maxFileSize: 100 * 1024 * 1024, // 100MB
   },
 };
 
