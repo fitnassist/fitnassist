@@ -65,19 +65,34 @@ const LinkPopover = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState('');
+  const [linkText, setLinkText] = useState('');
+  const [needsText, setNeedsText] = useState(false);
 
   const handleOpen = (isOpen: boolean) => {
     if (isOpen) {
       const existing = editor.getAttributes('link').href || '';
       setUrl(existing);
+      const { from, to } = editor.state.selection;
+      const hasSelection = from !== to;
+      setNeedsText(!hasSelection && !editor.isActive('link'));
+      setLinkText('');
     }
     setOpen(isOpen);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!url) {
       editor.chain().focus().extendMarkRange('link').unsetLink().run();
+    } else if (needsText) {
+      // No text selected — insert link text with href
+      const displayText = linkText || url;
+      editor
+        .chain()
+        .focus()
+        .insertContent(`<a href="${url}">${displayText}</a>`)
+        .run();
     } else {
       editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     }
@@ -113,6 +128,16 @@ const LinkPopover = ({
               autoFocus
             />
           </div>
+          {needsText && (
+            <div className="space-y-1">
+              <Label className="text-xs">Link text</Label>
+              <Input
+                value={linkText}
+                onChange={(e) => setLinkText(e.target.value)}
+                placeholder="Click here"
+              />
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <Button type="submit" size="sm">
               {editor.isActive('link') ? 'Update' : 'Add'} Link
