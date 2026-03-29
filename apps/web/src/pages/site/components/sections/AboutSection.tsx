@@ -1,7 +1,7 @@
 import type { PublicSection, PublicTrainer } from '../../site.types';
 
 interface AboutContent {
-  text?: string;
+  richText?: string;
   imageUrl?: string;
   imagePosition?: 'left' | 'right';
 }
@@ -20,7 +20,7 @@ export const AboutSection = ({ section, trainer }: AboutSectionProps) => {
   const content = parseContent(section.content);
   const imagePosition = content.imagePosition ?? 'right';
   const imageUrl = content.imageUrl ?? trainer.profileImageUrl;
-  const text = content.text ?? trainer.bio ?? '';
+  const text = content.richText ?? trainer.bio ?? '';
 
   return (
     <section id={`section-${section.id}`} className="py-16 sm:py-20">

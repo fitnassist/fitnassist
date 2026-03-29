@@ -15,6 +15,7 @@ interface SocialLink {
 }
 
 interface SocialLinksContent {
+  items?: SocialLink[];
   links?: SocialLink[];
   sourceType?: 'profile' | 'custom';
 }
@@ -54,7 +55,7 @@ export const SocialLinksSection = ({ section, trainer }: SocialLinksSectionProps
   const links =
     content.sourceType === 'profile'
       ? parseProfileSocialLinks(trainer.socialLinks)
-      : content.links ?? [];
+      : content.items ?? content.links ?? [];
 
   return (
     <section id={`section-${section.id}`} className="py-12 sm:py-16">

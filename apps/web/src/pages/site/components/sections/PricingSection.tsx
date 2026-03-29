@@ -7,13 +7,14 @@ interface PricingPlan {
   price?: string;
   period?: string;
   description?: string;
-  features?: string[];
+  features?: string | string[];
   ctaText?: string;
   ctaUrl?: string;
   highlighted?: boolean;
 }
 
 interface PricingContent {
+  items?: PricingPlan[];
   plans?: PricingPlan[];
 }
 
@@ -28,7 +29,7 @@ const parseContent = (raw: unknown): PricingContent => {
 
 export const PricingSection = ({ section }: PricingSectionProps) => {
   const content = parseContent(section.content);
-  const plans = content.plans ?? [];
+  const plans = content.items ?? content.plans ?? [];
 
   return (
     <section id={`section-${section.id}`} className="bg-[hsl(var(--muted))] py-16 sm:py-20">
@@ -72,9 +73,12 @@ export const PricingSection = ({ section }: PricingSectionProps) => {
                   )}
                 </div>
 
-                {plan.features && plan.features.length > 0 && (
+                {plan.features && (typeof plan.features === 'string' ? plan.features.length > 0 : plan.features.length > 0) && (
                   <ul className="mt-6 flex-1 space-y-2">
-                    {plan.features.map((feature, fi) => (
+                    {(typeof plan.features === 'string'
+                      ? plan.features.split(',').map((f) => f.trim()).filter(Boolean)
+                      : plan.features
+                    ).map((feature, fi) => (
                       <li key={fi} className="flex items-start gap-2 text-sm text-[hsl(var(--card-foreground))]">
                         <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-[hsl(var(--primary))]" />
                         <span>{feature}</span>

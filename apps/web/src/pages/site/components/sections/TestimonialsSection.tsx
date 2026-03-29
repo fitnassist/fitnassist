@@ -3,6 +3,8 @@ import { Card, CardContent, Avatar, AvatarImage, AvatarFallback } from '@/compon
 import type { PublicSection, PublicTrainer } from '../../site.types';
 
 interface Testimonial {
+  quote?: string;
+  author?: string;
   name?: string;
   text?: string;
   rating?: number;
@@ -11,7 +13,7 @@ interface Testimonial {
 
 interface TestimonialsContent {
   sourceType?: 'reviews' | 'custom';
-  testimonials?: Testimonial[];
+  items?: Testimonial[];
 }
 
 interface TestimonialsSectionProps {
@@ -39,12 +41,14 @@ export const TestimonialsSection = ({ section, trainer }: TestimonialsSectionPro
   const testimonials: Testimonial[] =
     content.sourceType === 'reviews'
       ? trainer.reviews.map((r) => ({
+          author: r.reviewer.name,
           name: r.reviewer.name,
+          quote: r.text ?? '',
           text: r.text ?? '',
           rating: r.rating,
           image: r.reviewer.image,
         }))
-      : content.testimonials ?? [];
+      : content.items ?? [];
 
   return (
     <section id={`section-${section.id}`} className="bg-[hsl(var(--muted))] py-16 sm:py-20">
@@ -78,20 +82,20 @@ export const TestimonialsSection = ({ section, trainer }: TestimonialsSectionPro
                     ))}
                   </div>
                 )}
-                {t.text && (
+                {(t.quote ?? t.text) && (
                   <p className="mb-4 text-sm text-[hsl(var(--card-foreground))]">
-                    &ldquo;{t.text}&rdquo;
+                    &ldquo;{t.quote ?? t.text}&rdquo;
                   </p>
                 )}
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
-                    {t.image && <AvatarImage src={t.image} alt={t.name ?? ''} />}
+                    {t.image && <AvatarImage src={t.image} alt={t.author ?? t.name ?? ''} />}
                     <AvatarFallback className="text-xs">
-                      {getInitials(t.name ?? 'A')}
+                      {getInitials(t.author ?? t.name ?? 'A')}
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-medium text-[hsl(var(--card-foreground))]">
-                    {t.name}
+                    {t.author ?? t.name}
                   </span>
                 </div>
               </CardContent>

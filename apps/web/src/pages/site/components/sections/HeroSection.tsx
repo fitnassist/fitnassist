@@ -7,7 +7,7 @@ interface HeroContent {
   backgroundImageUrl?: string;
   overlayOpacity?: number;
   ctaText?: string;
-  ctaUrl?: string;
+  ctaLink?: string;
 }
 
 interface HeroSectionProps {
@@ -21,7 +21,8 @@ const parseContent = (raw: unknown): HeroContent => {
 
 export const HeroSection = ({ section }: HeroSectionProps) => {
   const content = parseContent(section.content);
-  const overlayOpacity = content.overlayOpacity ?? 0.5;
+  const rawOpacity = content.overlayOpacity ?? 50;
+  const overlayOpacity = rawOpacity > 1 ? rawOpacity / 100 : rawOpacity;
 
   return (
     <section
@@ -61,12 +62,12 @@ export const HeroSection = ({ section }: HeroSectionProps) => {
               size="lg"
               className="bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:bg-[hsl(var(--primary))]/90"
               onClick={() => {
-                if (content.ctaUrl) {
-                  if (content.ctaUrl.startsWith('#')) {
-                    const el = document.querySelector(content.ctaUrl);
+                if (content.ctaLink) {
+                  if (content.ctaLink.startsWith('#')) {
+                    const el = document.querySelector(content.ctaLink);
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   } else {
-                    window.open(content.ctaUrl, '_blank');
+                    window.open(content.ctaLink, '_blank');
                   }
                 }
               }}

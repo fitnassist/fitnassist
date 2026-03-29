@@ -7,6 +7,7 @@ interface ContactContent {
   showForm?: boolean;
   showEmail?: boolean;
   showPhone?: boolean;
+  showBookingLink?: boolean;
   bookingUrl?: string;
   bookingLabel?: string;
 }

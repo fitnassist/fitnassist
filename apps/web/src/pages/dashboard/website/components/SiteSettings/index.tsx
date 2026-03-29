@@ -20,7 +20,6 @@ import {
   useUnpublishWebsite,
 } from '@/api/website';
 import { updateWebsiteSettingsSchema, updateSubdomainSchema } from '@fitnassist/schemas';
-import { env } from '@/config/env';
 import type { WebsiteData } from '../../website.types';
 import type { z } from 'zod';
 
@@ -71,7 +70,7 @@ const SubdomainSettings = ({ website }: SiteSettingsProps) => {
                 {...register('subdomain')}
                 className="max-w-[200px]"
               />
-              <span className="text-sm text-muted-foreground">.{env.SITE_DOMAIN}</span>
+              <span className="text-sm text-muted-foreground ml-1">— fitnassist.co/site/{'{handle}'}</span>
             </div>
             {errors.subdomain && (
               <p className="text-sm text-destructive mt-1">{errors.subdomain.message}</p>
@@ -93,7 +92,7 @@ const PublishSettings = ({ website }: SiteSettingsProps) => {
   const [showUnpublish, setShowUnpublish] = useState(false);
 
   const isPublished = website.status === 'PUBLISHED';
-  const siteUrl = `https://${website.subdomain}.${env.SITE_DOMAIN}`;
+  const siteUrl = `${window.location.origin}/site/${website.subdomain}`;
 
   return (
     <Card>

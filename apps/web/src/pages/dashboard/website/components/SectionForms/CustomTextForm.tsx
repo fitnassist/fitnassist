@@ -1,10 +1,7 @@
-import { useForm } from 'react-hook-form';
-import { Button, Label, Textarea } from '@/components/ui';
+import { useState } from 'react';
+import { Button, Input, Label } from '@/components/ui';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import { useUpdateSection } from '@/api/website';
-
-interface CustomTextContent {
-  richText: string;
-}
 
 interface CustomTextFormProps {
   sectionId: string;
@@ -13,32 +10,33 @@ interface CustomTextFormProps {
 
 export const CustomTextForm = ({ sectionId, content }: CustomTextFormProps) => {
   const updateSection = useUpdateSection();
+  const [richText, setRichText] = useState((content.richText as string) || '');
+  const [title, setTitle] = useState((content.title as string) || '');
 
-  const { register, handleSubmit } = useForm<CustomTextContent>({
-    defaultValues: {
-      richText: (content.richText as string) || '',
-    },
-  });
-
-  const onSubmit = (data: CustomTextContent) => {
-    updateSection.mutate({ sectionId, content: data });
+  const handleSave = () => {
+    updateSection.mutate({ sectionId, content: { richText, title } });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="richText">Content</Label>
-        <Textarea
-          id="richText"
-          {...register('richText')}
-          placeholder="Write your content here..."
-          rows={8}
+        <Label htmlFor="customTitle">Title (optional)</Label>
+        <Input
+          id="customTitle"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Section title"
         />
       </div>
 
-      <Button type="submit" disabled={updateSection.isPending}>
+      <div className="space-y-2">
+        <Label>Content</Label>
+        <RichTextEditor content={richText} onChange={setRichText} />
+      </div>
+
+      <Button onClick={handleSave} disabled={updateSection.isPending}>
         {updateSection.isPending ? 'Saving...' : 'Save'}
       </Button>
-    </form>
+    </div>
   );
 };

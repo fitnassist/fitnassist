@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server';
+import { Prisma } from '@prisma/client';
 import { router, trainerProcedure, publicProcedure, requireTier } from '../lib/trpc';
 import { trainerRepository } from '../repositories/trainer.repository';
 import { websiteService } from '../services/website.service';
@@ -63,7 +64,13 @@ export const websiteRouter = router({
     .input(updateWebsiteSettingsSchema)
     .mutation(async ({ ctx, input }) => {
       const profile = await requireTrainerProfile(ctx.user.id);
-      return websiteService.updateSettings(profile.id, input);
+      // Convert null JSON fields to Prisma.DbNull for nullable Json columns
+      const data = {
+        ...input,
+        customColors: input.customColors === null ? Prisma.DbNull : input.customColors,
+        customFonts: input.customFonts === null ? Prisma.DbNull : input.customFonts,
+      };
+      return websiteService.updateSettings(profile.id, data);
     }),
 
   updateSubdomain: trainerProcedure

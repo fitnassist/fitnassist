@@ -9,7 +9,7 @@ interface ServiceItem {
 }
 
 interface ServicesContent {
-  services?: ServiceItem[];
+  items?: ServiceItem[];
   sourceType?: 'custom' | 'profile';
 }
 
@@ -34,7 +34,7 @@ export const ServicesSection = ({ section, trainer }: ServicesSectionProps) => {
   const services =
     content.sourceType === 'profile'
       ? parseProfileServices(trainer.services)
-      : content.services ?? [];
+      : content.items ?? [];
 
   return (
     <section id={`section-${section.id}`} className="bg-[hsl(var(--muted))] py-16 sm:py-20">

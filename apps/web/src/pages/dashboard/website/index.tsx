@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import {
-  Layout, Palette, FileText, Settings, ExternalLink, Loader2,
-  Eye, Monitor, Smartphone,
+  Layout, Palette, FileText, Settings, ExternalLink, Loader2, Eye,
 } from 'lucide-react';
 import { Button, ResponsiveTabs, TabsContent } from '@/components/ui';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { useMyWebsite, useCreateWebsite } from '@/api/website';
 import { useMyProfile } from '@/api/trainer';
-import { env } from '@/config/env';
 import { SiteSettings } from './components/SiteSettings';
 import { ThemePicker } from './components/ThemePicker';
 import { SectionEditor } from './components/SectionEditor';
@@ -59,7 +57,7 @@ export const WebsitePage = () => {
           <h2 className="text-lg font-semibold mb-2">Create Your Website</h2>
           <p className="text-sm text-muted-foreground max-w-md mb-6">
             Build a branded micro-site for your personal training business.
-            Your site will be available at <strong>{profile?.handle ?? 'yourhandle'}.{env.SITE_DOMAIN}</strong>.
+            Your site will be available at <strong>fitnassist.co/site/{profile?.handle ?? 'yourhandle'}</strong>.
           </p>
           <Button
             onClick={() => createWebsite.mutate()}
@@ -73,7 +71,7 @@ export const WebsitePage = () => {
     );
   }
 
-  const siteUrl = `https://${website.subdomain}.${env.SITE_DOMAIN}`;
+  const siteUrl = `${window.location.origin}/site/${website.subdomain}`;
   const ws = website as unknown as WebsiteData;
 
   if (showPreview) {

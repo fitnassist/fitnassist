@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from '@/components/ui';
 import { useUpdateWebsiteSettings } from '@/api/website';
 import { THEME_PRESETS } from '../../website.constants';
-import type { WebsiteData, ThemeColors } from '../../website.types';
+import type { WebsiteData } from '../../website.types';
 
 interface ColorCustomizerProps {
   website: WebsiteData;
@@ -58,26 +58,29 @@ export const ColorCustomizer = ({ website }: ColorCustomizerProps) => {
   const currentColors: Record<string, string> = { ...theme.colors, ...customColors };
   const [localColors, setLocalColors] = useState<Record<string, string>>(currentColors);
 
+  // Sync local colors when theme changes
+  useEffect(() => {
+    setLocalColors({ ...theme.colors, ...customColors });
+  }, [website.themeId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleColorChange = (key: string, hex: string) => {
     setLocalColors((prev) => ({ ...prev, [key]: hexToHsl(hex) }));
   };
 
   const handleSave = () => {
-    const overrides: Record<string, string> = {};
+    const allColors: Record<string, string> = {};
     for (const field of COLOR_FIELDS) {
       const localValue = localColors[field.key];
-      if (localValue && localValue !== theme.colors[field.key as keyof ThemeColors]) {
-        overrides[field.key] = localValue;
+      if (localValue) {
+        allColors[field.key] = localValue;
       }
     }
-    updateSettings.mutate({
-      customColors: Object.keys(overrides).length > 0 ? overrides : undefined,
-    });
+    updateSettings.mutate({ customColors: allColors });
   };
 
   const handleReset = () => {
     setLocalColors({ ...theme.colors });
-    updateSettings.mutate({});
+    updateSettings.mutate({ customColors: null });
   };
 
   return (

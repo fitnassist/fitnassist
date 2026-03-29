@@ -2,7 +2,8 @@ import type { PublicSection, PublicTrainer } from '../../site.types';
 
 interface GalleryImage {
   id?: string;
-  imageUrl: string;
+  url?: string;
+  imageUrl?: string;
   caption?: string | null;
 }
 
@@ -59,7 +60,7 @@ export const GallerySection = ({ section, trainer }: GallerySectionProps) => {
           {images.map((img, idx) => (
             <div key={img.id ?? idx} className="group relative overflow-hidden rounded-lg">
               <img
-                src={img.imageUrl}
+                src={img.url ?? img.imageUrl ?? ''}
                 alt={img.caption ?? ''}
                 className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />

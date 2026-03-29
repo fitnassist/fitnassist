@@ -3,7 +3,10 @@ import type { PublicSection } from '../../site.types';
 
 interface CtaContent {
   headline?: string;
+  subheadline?: string;
   description?: string;
+  ctaText?: string;
+  ctaLink?: string;
   buttonText?: string;
   buttonUrl?: string;
   backgroundImageUrl?: string;
@@ -41,29 +44,30 @@ export const CtaSection = ({ section }: CtaSectionProps) => {
         <h2 className="site-heading text-3xl font-bold text-[hsl(var(--primary-foreground))] sm:text-4xl">
           {content.headline ?? section.title ?? 'Ready to get started?'}
         </h2>
-        {(content.description ?? section.subtitle) && (
+        {(content.subheadline ?? content.description ?? section.subtitle) && (
           <p className="mt-4 text-lg text-[hsl(var(--primary-foreground))]/90">
-            {content.description ?? section.subtitle}
+            {content.subheadline ?? content.description ?? section.subtitle}
           </p>
         )}
-        {content.buttonText && (
+        {(content.ctaText ?? content.buttonText) && (
           <div className="mt-8">
             <Button
               size="lg"
               variant="secondary"
               className="bg-[hsl(var(--background))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--background))]/90"
               onClick={() => {
-                if (content.buttonUrl) {
-                  if (content.buttonUrl.startsWith('#')) {
-                    const el = document.querySelector(content.buttonUrl);
+                const url = content.ctaLink ?? content.buttonUrl;
+                if (url) {
+                  if (url.startsWith('#')) {
+                    const el = document.querySelector(url);
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   } else {
-                    window.open(content.buttonUrl, '_blank');
+                    window.open(url, '_blank');
                   }
                 }
               }}
             >
-              {content.buttonText}
+              {content.ctaText ?? content.buttonText}
             </Button>
           </div>
         )}

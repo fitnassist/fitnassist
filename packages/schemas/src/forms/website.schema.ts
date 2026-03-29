@@ -3,8 +3,8 @@ import { z } from 'zod';
 // Website settings
 export const updateWebsiteSettingsSchema = z.object({
   themeId: z.string().optional(),
-  customColors: z.record(z.string()).optional(),
-  customFonts: z.record(z.string()).optional(),
+  customColors: z.record(z.string()).nullable().optional(),
+  customFonts: z.record(z.string()).nullable().optional(),
   logoUrl: z.string().url().nullable().optional(),
   faviconUrl: z.string().url().nullable().optional(),
   seoTitle: z.string().max(60).nullable().optional(),
