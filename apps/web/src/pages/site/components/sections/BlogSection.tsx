@@ -18,7 +18,6 @@ export const BlogSection = ({ section, subdomain, onNavigateBlog, onNavigatePost
   );
 
   const posts = data?.posts ?? [];
-  const hasMore = !!data?.nextCursor;
 
   if (!subdomain || (!isLoading && posts.length === 0)) return null;
 
@@ -62,7 +61,7 @@ export const BlogSection = ({ section, subdomain, onNavigateBlog, onNavigatePost
                 />
               ))}
             </div>
-            {hasMore && onNavigateBlog && (
+            {onNavigateBlog && (
               <div className="mt-8 text-center">
                 <Button
                   variant="outline"
