@@ -9,7 +9,7 @@ import './lib/google-maps'; // Initialize Google Maps bootstrap loader
 
 // Subdomain detection
 const hostname = window.location.hostname;
-const siteDomain = import.meta.env.VITE_SITE_DOMAIN || 'sites.fitnassist.co';
+const siteDomain = (import.meta.env.VITE_SITE_DOMAIN || 'sites.fitnassist.co').trim();
 const isSubdomain =
   hostname.endsWith(`.${siteDomain}`) &&
   hostname !== siteDomain &&
