@@ -7,6 +7,7 @@ import { Button, ResponsiveTabs, TabsContent } from '@/components/ui';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { useMyWebsite, useCreateWebsite } from '@/api/website';
+import { useMyProfile } from '@/api/trainer';
 import { env } from '@/config/env';
 import { SiteSettings } from './components/SiteSettings';
 import { ThemePicker } from './components/ThemePicker';
@@ -25,6 +26,7 @@ const TAB_OPTIONS = [
 export const WebsitePage = () => {
   const { hasAccess, isLoading: tierLoading } = useFeatureAccess('websiteBuilder');
   const { data: website, isLoading: websiteLoading } = useMyWebsite();
+  const { data: profile } = useMyProfile();
   const createWebsite = useCreateWebsite();
   const [activeTab, setActiveTab] = useState('sections');
   const [showPreview, setShowPreview] = useState(false);
@@ -57,7 +59,7 @@ export const WebsitePage = () => {
           <h2 className="text-lg font-semibold mb-2">Create Your Website</h2>
           <p className="text-sm text-muted-foreground max-w-md mb-6">
             Build a branded micro-site for your personal training business.
-            Your site will be available at <strong>yourhandle.{env.SITE_DOMAIN}</strong>.
+            Your site will be available at <strong>{profile?.handle ?? 'yourhandle'}.{env.SITE_DOMAIN}</strong>.
           </p>
           <Button
             onClick={() => createWebsite.mutate()}
