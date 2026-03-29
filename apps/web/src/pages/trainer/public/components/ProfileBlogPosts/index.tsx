@@ -52,7 +52,7 @@ export const ProfileBlogPosts = ({ subdomain }: ProfileBlogPostsProps) => {
               return (
                 <a
                   key={post.id}
-                  href={`https://${subdomain}.fitnassist.co/blog/${post.slug}`}
+                  href={`https://${subdomain}.sites.fitnassist.co/blog/${post.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex gap-4 rounded-md p-2 transition-colors hover:bg-muted"
