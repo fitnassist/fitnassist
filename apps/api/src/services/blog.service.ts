@@ -87,7 +87,7 @@ export const blogService = {
     };
   },
 
-  async getPublicPosts(subdomain: string, cursor?: string, limit = 10) {
+  async getPublicPosts(subdomain: string, cursor?: string, limit = 10, search?: string, tag?: string) {
     const website = await websiteRepository.findBySubdomain(subdomain);
     if (!website || website.status !== 'PUBLISHED') {
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Website not found' });
@@ -96,6 +96,8 @@ export const blogService = {
       status: 'PUBLISHED',
       cursor,
       limit,
+      search,
+      tag,
     });
     const hasMore = posts.length > limit;
     if (hasMore) posts.pop();
@@ -103,6 +105,14 @@ export const blogService = {
       posts,
       nextCursor: hasMore ? posts[posts.length - 1]?.id : undefined,
     };
+  },
+
+  async getPublicTags(subdomain: string) {
+    const website = await websiteRepository.findBySubdomain(subdomain);
+    if (!website || website.status !== 'PUBLISHED') {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Website not found' });
+    }
+    return blogPostRepository.findAllTags(website.id);
   },
 
   async getPublicPost(subdomain: string, slug: string) {

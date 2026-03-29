@@ -9,12 +9,13 @@ interface SiteLayoutProps {
   onNavigateBlog?: () => void;
   onNavigateHome?: () => void;
   hasBlogPosts?: boolean;
+  isHomePage?: boolean;
 }
 
-export const SiteLayout = ({ website, children, onNavigateBlog, onNavigateHome, hasBlogPosts }: SiteLayoutProps) => {
+export const SiteLayout = ({ website, children, onNavigateBlog, onNavigateHome, hasBlogPosts, isHomePage }: SiteLayoutProps) => {
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader website={website} onNavigateBlog={onNavigateBlog} onNavigateHome={onNavigateHome} hasBlogPosts={hasBlogPosts} />
+      <SiteHeader website={website} onNavigateBlog={onNavigateBlog} onNavigateHome={onNavigateHome} hasBlogPosts={hasBlogPosts} isHomePage={isHomePage} />
       <main className="flex-1">{children}</main>
       <SiteFooter trainer={website.trainer} />
     </div>

@@ -4,18 +4,41 @@ import type { BlogPostStatus } from '@fitnassist/database';
 export const blogPostRepository = {
   async findByWebsiteId(
     websiteId: string,
-    options: { status?: BlogPostStatus; cursor?: string; limit?: number } = {}
+    options: { status?: BlogPostStatus; cursor?: string; limit?: number; search?: string; tag?: string } = {}
   ) {
-    const { status, cursor, limit = 10 } = options;
+    const { status, cursor, limit = 10, search, tag } = options;
     return prisma.blogPost.findMany({
       where: {
         websiteId,
         ...(status ? { status } : {}),
+        ...(search
+          ? {
+              OR: [
+                { title: { contains: search, mode: 'insensitive' as const } },
+                { excerpt: { contains: search, mode: 'insensitive' as const } },
+              ],
+            }
+          : {}),
+        ...(tag ? { tags: { has: tag } } : {}),
       },
       orderBy: { createdAt: 'desc' },
       take: limit + 1,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
     });
+  },
+
+  async findAllTags(websiteId: string) {
+    const posts = await prisma.blogPost.findMany({
+      where: { websiteId, status: 'PUBLISHED' },
+      select: { tags: true },
+    });
+    const tagSet = new Set<string>();
+    for (const post of posts) {
+      for (const tag of post.tags) {
+        tagSet.add(tag);
+      }
+    }
+    return Array.from(tagSet).sort();
   },
 
   async findBySlug(websiteId: string, slug: string) {

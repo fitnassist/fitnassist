@@ -8,6 +8,7 @@ interface SiteHeaderProps {
   onNavigateBlog?: () => void;
   onNavigateHome?: () => void;
   hasBlogPosts?: boolean;
+  isHomePage?: boolean;
 }
 
 const getSectionLabel = (section: PublicSection): string => {
@@ -31,7 +32,7 @@ const getSectionLabel = (section: PublicSection): string => {
   return labels[section.type] ?? section.type;
 };
 
-export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome, hasBlogPosts }: SiteHeaderProps) => {
+export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome, hasBlogPosts, isHomePage }: SiteHeaderProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navSections = website.sections.filter(
@@ -43,6 +44,15 @@ export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome, hasBlogPos
 
   const handleNav = (section: PublicSection) => {
     setMenuOpen(false);
+    if (!isHomePage && onNavigateHome) {
+      // Navigate home first, then scroll to section after a short delay
+      onNavigateHome();
+      setTimeout(() => {
+        const el = document.getElementById(`section-${section.id}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+      return;
+    }
     const el = document.getElementById(`section-${section.id}`);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });

@@ -139,7 +139,7 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
 
   return (
     <SiteThemeProvider website={website}>
-      <SiteLayout website={website} onNavigateBlog={handleNavigateBlog} onNavigateHome={handleNavigateHome} hasBlogPosts={hasBlogPosts}>
+      <SiteLayout website={website} onNavigateBlog={handleNavigateBlog} onNavigateHome={handleNavigateHome} hasBlogPosts={hasBlogPosts} isHomePage={view.page === 'home'}>
         {view.page === 'home' && (
           <>
             {sortedSections.map((section) => (

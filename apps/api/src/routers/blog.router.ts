@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { router, trainerProcedure, publicProcedure, requireTier } from '../lib/trpc';
 import { trainerRepository } from '../repositories/trainer.repository';
 import { blogService } from '../services/blog.service';
+import { z } from 'zod';
 import {
   createBlogPostSchema,
   updateBlogPostSchema,
@@ -26,7 +27,13 @@ export const blogRouter = router({
   getPublicPosts: publicProcedure
     .input(getPublicBlogPostsSchema)
     .query(async ({ input }) => {
-      return blogService.getPublicPosts(input.subdomain, input.cursor, input.limit);
+      return blogService.getPublicPosts(input.subdomain, input.cursor, input.limit, input.search, input.tag);
+    }),
+
+  getPublicTags: publicProcedure
+    .input(z.object({ subdomain: z.string() }))
+    .query(async ({ input }) => {
+      return blogService.getPublicTags(input.subdomain);
     }),
 
   getPublicPost: publicProcedure
