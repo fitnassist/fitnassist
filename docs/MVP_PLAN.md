@@ -230,22 +230,26 @@ For reference, the following is live:
 
 ---
 
-## Phase 8: Integrations & Wearables
+## Phase 8: Integrations & Wearables ✅
 
 **Goal**: Connect with the fitness ecosystem to import data and reduce manual entry.
 
-### 8.1 Fitness Tracker Integration
-- Fitbit integration (steps, heart rate, sleep)
-- Apple Watch integration
+### 8.1 Third-Party Integrations ✅
+- Strava integration (OAuth, webhooks, activity sync)
+- Google Fit integration (polling sync, steps/sleep/weight)
+- Fitbit integration (OAuth, webhooks, full data sync)
+- Garmin integration (OAuth1a, push endpoints, activity sync)
+- Encrypted token storage (AES-256-GCM)
+- Sync engine with deduplication and manual-entry priority
+- Integration settings UI with connect/disconnect and sync preferences
+- Source badges on diary entries
+- Activity maps (Leaflet with polyline routes)
+- Token refresh service (proactive + on-demand)
 
-### 8.2 Health App Integration
-- Apple Health sync
-- Google Fit sync
-
-### 8.3 Map My Activity
-- GPS-tracked walks, runs, and rides
-- Route mapping and distance/pace tracking
-- Activity history with maps
+### 8.2 Mobile-Only Features (Future)
+- GPS-tracked walks, runs, and rides (requires React Native app)
+- Barcode food scanning (camera API)
+- AI food recognition (Claude Vision)
 
 ---
 
@@ -263,11 +267,15 @@ For reference, the following is live:
 - Payment processing through platform
 - Order management
 
-### 9.3 PT Website Builder (Low Priority)
+### 9.3 PT Website Builder ✅
 - PTs build a branded website through the platform
-- Blog functionality
-- Theme selection and content blocks
-- Custom subdomain (e.g., buffbill.fitnassist.co.uk)
+- 13 section types (hero, about, services, gallery, testimonials, blog, contact, custom text, video, pricing, FAQ, CTA, social links)
+- Blog functionality with search and tag filtering
+- Theme selection with custom colours and fonts
+- Custom subdomain (e.g., trainer.sites.fitnassist.co)
+- Google Places autocomplete for contact address
+- Rich text editor with image upload
+- Drag-and-drop section reordering with optimistic updates
 
 ### 9.4 Affiliate & Rewards
 - Partner discounts for users (meal prep, fitness products)
