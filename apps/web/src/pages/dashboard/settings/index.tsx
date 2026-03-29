@@ -19,7 +19,7 @@ export const SettingsPage = () => {
     ...(isTrainer ? [{ value: 'subscription', label: 'Subscription' }] : []),
     ...(isTrainer ? [{ value: 'scheduling', label: 'Scheduling' }] : []),
     ...(isTrainer ? [{ value: 'payments', label: 'Payments' }] : []),
-    { value: 'integrations', label: 'Integrations' },
+    ...(!isTrainer ? [{ value: 'integrations', label: 'Integrations' }] : []),
     { value: 'danger', label: 'Danger Zone' },
   ];
 
@@ -65,9 +65,11 @@ export const SettingsPage = () => {
             )}
           </TabsContent>
         )}
-        <TabsContent value="integrations">
-          <IntegrationsTab />
-        </TabsContent>
+        {!isTrainer && (
+          <TabsContent value="integrations">
+            <IntegrationsTab />
+          </TabsContent>
+        )}
         <TabsContent value="danger">
           <DangerZoneTab />
         </TabsContent>
