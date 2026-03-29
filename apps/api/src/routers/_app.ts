@@ -31,6 +31,7 @@ import { leaderboardRouter } from './leaderboard.router';
 import { badgeRouter } from './badge.router';
 import { paymentRouter } from './payment.router';
 import { reviewRouter } from './review.router';
+import { integrationRouter } from './integration.router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -65,6 +66,7 @@ export const appRouter = router({
   badge: badgeRouter,
   payment: paymentRouter,
   review: reviewRouter,
+  integration: integrationRouter,
 });
 
 export type AppRouter = typeof appRouter;

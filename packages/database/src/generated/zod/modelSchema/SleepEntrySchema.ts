@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { ActivitySourceSchema } from '../inputTypeSchemas/ActivitySourceSchema'
 
 /////////////////////////////////////////
 // SLEEP ENTRY SCHEMA
 /////////////////////////////////////////
 
 export const SleepEntrySchema = z.object({
+  source: ActivitySourceSchema,
   id: z.string().cuid(),
   diaryEntryId: z.string(),
   hoursSlept: z.number().min(0, { message: "Hours slept cannot be negative" }).max(24, { message: "Hours slept cannot exceed 24" }),
@@ -18,6 +20,7 @@ export type SleepEntry = z.infer<typeof SleepEntrySchema>
 /////////////////////////////////////////
 
 export const SleepEntryOptionalDefaultsSchema = SleepEntrySchema.merge(z.object({
+  source: ActivitySourceSchema.optional(),
   id: z.string().cuid().optional(),
 }))
 

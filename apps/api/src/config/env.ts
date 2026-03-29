@@ -51,6 +51,27 @@ const envSchema = z.object({
 
   // Cron job authentication
   CRON_SECRET: z.string().optional(),
+
+  // Integration encryption (32-byte hex for AES-256-GCM)
+  INTEGRATION_ENCRYPTION_KEY: z.string().length(64).optional(),
+
+  // Strava
+  STRAVA_CLIENT_ID: z.string().optional(),
+  STRAVA_CLIENT_SECRET: z.string().optional(),
+  STRAVA_WEBHOOK_VERIFY_TOKEN: z.string().optional(),
+
+  // Google Fit
+  GOOGLE_FIT_CLIENT_ID: z.string().optional(),
+  GOOGLE_FIT_CLIENT_SECRET: z.string().optional(),
+
+  // Fitbit
+  FITBIT_CLIENT_ID: z.string().optional(),
+  FITBIT_CLIENT_SECRET: z.string().optional(),
+  FITBIT_WEBHOOK_VERIFY_CODE: z.string().optional(),
+
+  // Garmin
+  GARMIN_CONSUMER_KEY: z.string().optional(),
+  GARMIN_CONSUMER_SECRET: z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

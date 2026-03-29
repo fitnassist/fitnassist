@@ -269,6 +269,7 @@ model User {
   bookingSuggestions BookingSuggestion[]
   reviews          Review[]
   reviewReports    ReviewReport[]
+  integrations     IntegrationConnection[]
 
   @@map("users")
 }
@@ -1005,6 +1006,21 @@ enum ActivitySource {
   GARMIN
   APPLE_HEALTH
   GOOGLE_FIT
+  FITBIT
+}
+
+enum IntegrationProvider {
+  STRAVA
+  GOOGLE_FIT
+  FITBIT
+  GARMIN
+}
+
+enum IntegrationStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+  SYNCING
 }
 
 enum PersonalBestCategory {
@@ -1053,20 +1069,22 @@ model DiaryEntry {
 }
 
 model WeightEntry {
-  id           String     @id @default(cuid())
-  diaryEntryId String     @unique
+  id           String         @id @default(cuid())
+  diaryEntryId String         @unique
   /// @zod.number.positive({ message: "Weight must be a positive number" })
   weightKg     Float
+  source       ActivitySource @default(MANUAL)
 
   diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
   @@map("weight_entries")
 }
 
 model WaterEntry {
-  id           String     @id @default(cuid())
-  diaryEntryId String     @unique
+  id           String         @id @default(cuid())
+  diaryEntryId String         @unique
   /// @zod.number.int().min(0, { message: "Water intake cannot be negative" })
   totalMl      Int
+  source       ActivitySource @default(MANUAL)
 
   diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
   @@map("water_entries")
@@ -1106,12 +1124,13 @@ model MoodEntry {
 }
 
 model SleepEntry {
-  id           String     @id @default(cuid())
-  diaryEntryId String     @unique
+  id           String         @id @default(cuid())
+  diaryEntryId String         @unique
   /// @zod.number.min(0, { message: "Hours slept cannot be negative" }).max(24, { message: "Hours slept cannot exceed 24" })
   hoursSlept   Float
   /// @zod.number.int().min(1, { message: "Quality must be at least 1" }).max(5, { message: "Quality must be at most 5" })
   quality      Int
+  source       ActivitySource @default(MANUAL)
 
   diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
   @@map("sleep_entries")
@@ -1166,10 +1185,11 @@ model WorkoutLogEntry {
 }
 
 model StepsEntry {
-  id           String     @id @default(cuid())
-  diaryEntryId String     @unique
+  id           String         @id @default(cuid())
+  diaryEntryId String         @unique
   /// @zod.number.int().min(0, { message: "Steps cannot be negative" })
   totalSteps   Int
+  source       ActivitySource @default(MANUAL)
 
   diaryEntry   DiaryEntry @relation(fields: [diaryEntryId], references: [id], onDelete: Cascade)
   @@map("steps_entries")
@@ -1785,4 +1805,34 @@ model ReviewReport {
   @@unique([reviewId, reporterId])
   @@index([reviewId])
   @@map("review_reports")
+}
+
+// =============================================================================
+// INTEGRATIONS
+// =============================================================================
+
+model IntegrationConnection {
+  id                    String              @id @default(cuid())
+  userId                String
+  provider              IntegrationProvider
+  status                IntegrationStatus   @default(CONNECTED)
+  accessToken           String              @db.Text
+  refreshToken          String?             @db.Text
+  tokenExpiresAt        DateTime?
+  scope                 String?
+  externalUserId        String?
+  webhookSubscriptionId String?
+  lastSyncAt            DateTime?
+  lastSyncError         String?
+  syncPreferences       Json?
+  initialImportComplete Boolean             @default(false)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider])
+  @@index([provider, status])
+  @@index([externalUserId])
+  @@map("integration_connections")
 }

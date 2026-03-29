@@ -1,5 +1,5 @@
 import { Footprints, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, ConfirmDialog } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, ConfirmDialog, SourceBadge } from '@/components/ui';
 import { useLogSteps, useDeleteDiaryEntry } from '@/api/diary';
 import { STEPS_PRESETS, formatSteps } from '../../diary.utils';
 import { useState } from 'react';
@@ -8,7 +8,7 @@ interface StepsTrackerProps {
   date: string;
   entry?: {
     id: string;
-    stepsEntry?: { totalSteps: number } | null;
+    stepsEntry?: { totalSteps: number; source?: string } | null;
   } | null;
 }
 
@@ -32,6 +32,7 @@ export const StepsTracker = ({ date, entry }: StepsTrackerProps) => {
           <CardTitle className="flex items-center gap-2 text-base">
             <Footprints className="h-4 w-4 text-green-500" />
             Steps
+            <SourceBadge source={entry?.stepsEntry?.source ?? ''} />
           </CardTitle>
           {entry && (
             <>

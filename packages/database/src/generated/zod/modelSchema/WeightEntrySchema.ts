@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { ActivitySourceSchema } from '../inputTypeSchemas/ActivitySourceSchema'
 
 /////////////////////////////////////////
 // WEIGHT ENTRY SCHEMA
 /////////////////////////////////////////
 
 export const WeightEntrySchema = z.object({
+  source: ActivitySourceSchema,
   id: z.string().cuid(),
   diaryEntryId: z.string(),
   weightKg: z.number().positive({ message: "Weight must be a positive number" }),
@@ -17,6 +19,7 @@ export type WeightEntry = z.infer<typeof WeightEntrySchema>
 /////////////////////////////////////////
 
 export const WeightEntryOptionalDefaultsSchema = WeightEntrySchema.merge(z.object({
+  source: ActivitySourceSchema.optional(),
   id: z.string().cuid().optional(),
 }))
 

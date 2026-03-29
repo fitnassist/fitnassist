@@ -57,6 +57,7 @@ export { DiaryEntryLikeScalarFieldEnumSchema } from './DiaryEntryLikeScalarField
 export { UserBadgeScalarFieldEnumSchema } from './UserBadgeScalarFieldEnumSchema';
 export { ReviewScalarFieldEnumSchema } from './ReviewScalarFieldEnumSchema';
 export { ReviewReportScalarFieldEnumSchema } from './ReviewReportScalarFieldEnumSchema';
+export { IntegrationConnectionScalarFieldEnumSchema } from './IntegrationConnectionScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { NullableJsonNullValueInputSchema } from './NullableJsonNullValueInputSchema';
 export { JsonNullValueInputSchema } from './JsonNullValueInputSchema';
@@ -90,6 +91,8 @@ export { OnboardingStatusSchema } from './OnboardingStatusSchema';
 export { DiaryEntryTypeSchema } from './DiaryEntryTypeSchema';
 export { ActivityTypeSchema } from './ActivityTypeSchema';
 export { ActivitySourceSchema } from './ActivitySourceSchema';
+export { IntegrationProviderSchema } from './IntegrationProviderSchema';
+export { IntegrationStatusSchema } from './IntegrationStatusSchema';
 export { PersonalBestCategorySchema } from './PersonalBestCategorySchema';
 export { MoodLevelSchema } from './MoodLevelSchema';
 export { GoalTypeSchema } from './GoalTypeSchema';

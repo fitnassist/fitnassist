@@ -145,6 +145,16 @@ export const logActivitySchema = z.object({
   elevationGainM: z.number().min(0).optional(),
   caloriesBurned: z.number().int().min(0).optional(),
   notes: z.string().max(500).optional(),
+  // Integration sync fields
+  source: z.enum(['MANUAL', 'STRAVA', 'GARMIN', 'APPLE_HEALTH', 'GOOGLE_FIT', 'FITBIT']).optional(),
+  externalId: z.string().optional(),
+  routePolyline: z.string().optional(),
+  startLatitude: z.number().optional(),
+  startLongitude: z.number().optional(),
+  endLatitude: z.number().optional(),
+  endLongitude: z.number().optional(),
+  avgHeartRate: z.number().int().min(0).optional(),
+  maxHeartRate: z.number().int().min(0).optional(),
 });
 export type LogActivityInput = z.infer<typeof logActivitySchema>;
 

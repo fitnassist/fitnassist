@@ -11,6 +11,8 @@ import { notFoundHandler, errorHandler } from './middleware';
 import { sseRouter } from './routes/sse';
 import { cronRouter } from './routes/cron';
 import { stripeWebhookRouter } from './routes/stripe-webhook';
+import { integrationRouter as integrationOAuthRouter } from './routes/integrations';
+import { integrationWebhookRouter } from './routes/integration-webhooks';
 
 const app = express();
 
@@ -40,6 +42,12 @@ app.get('/health', (_req, res) => {
 
 // SSE endpoint (before tRPC so it's not caught by body parsing issues)
 app.use('/api/sse', sseRouter);
+
+// Integration OAuth redirects
+app.use('/api/integrations', integrationOAuthRouter);
+
+// Integration webhooks (Strava, Fitbit, Garmin push)
+app.use('/api/webhooks', integrationWebhookRouter);
 
 // Cron endpoints (external cron service calls these)
 app.use('/api/cron', cronRouter);

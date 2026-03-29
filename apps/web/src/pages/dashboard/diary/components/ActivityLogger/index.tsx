@@ -1,9 +1,11 @@
-import { useState, useMemo } from 'react';
-import { Bike, Plus, Trash2, Clock, MapPin, Flame, TrendingUp } from 'lucide-react';
+import { useState, useMemo, lazy, Suspense } from 'react';
+import { Bike, Plus, Trash2, Clock, MapPin, Flame, TrendingUp, Heart } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog, SourceBadge } from '@/components/ui';
 import { Select } from '@/components/ui';
+
+const ActivityMap = lazy(() => import('@/components/ActivityMap').then(m => ({ default: m.ActivityMap })));
 import { useLogActivity, useDeleteDiaryEntry } from '@/api/diary';
 import { logActivitySchema, type LogActivityInput } from '@fitnassist/schemas';
 import {
@@ -27,6 +29,14 @@ interface ActivityLoggerProps {
       elevationGainM: number | null;
       caloriesBurned: number | null;
       notes: string | null;
+      source?: string;
+      routePolyline?: string | null;
+      startLatitude?: number | null;
+      startLongitude?: number | null;
+      endLatitude?: number | null;
+      endLongitude?: number | null;
+      avgHeartRate?: number | null;
+      maxHeartRate?: number | null;
     } | null;
   }>;
 }
@@ -103,9 +113,12 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
               return (
                 <div key={entry.id} className="flex items-center justify-between rounded-lg border p-2.5">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">
-                      {act.activityName || ACTIVITY_TYPE_LABELS[act.activityType] || act.activityType}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="truncate text-sm font-medium">
+                        {act.activityName || ACTIVITY_TYPE_LABELS[act.activityType] || act.activityType}
+                      </p>
+                      <SourceBadge source={act.source ?? ''} />
+                    </div>
                     <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                       {act.distanceKm != null && act.distanceKm > 0 && (
                         <span className="flex items-center gap-1">
@@ -129,9 +142,27 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
                           {act.caloriesBurned} kcal
                         </span>
                       )}
+                      {act.avgHeartRate != null && act.avgHeartRate > 0 && (
+                        <span className="flex items-center gap-1">
+                          <Heart className="h-3 w-3" />
+                          {act.avgHeartRate} bpm{act.maxHeartRate ? ` (max ${act.maxHeartRate})` : ''}
+                        </span>
+                      )}
                     </div>
                     {act.notes && (
                       <p className="mt-1 truncate text-xs text-muted-foreground">{act.notes}</p>
+                    )}
+                    {act.routePolyline && (
+                      <Suspense fallback={<div className="mt-2 h-[240px] rounded-lg bg-muted animate-pulse" />}>
+                        <ActivityMap
+                          routePolyline={act.routePolyline}
+                          startLatitude={act.startLatitude}
+                          startLongitude={act.startLongitude}
+                          endLatitude={act.endLatitude}
+                          endLongitude={act.endLongitude}
+                          className="mt-2"
+                        />
+                      </Suspense>
                     )}
                   </div>
                   <Button

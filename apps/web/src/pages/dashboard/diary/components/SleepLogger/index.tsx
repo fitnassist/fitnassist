@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Moon, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog, SourceBadge } from '@/components/ui';
 import { useLogSleep, useDeleteDiaryEntry } from '@/api/diary';
 import { getSleepQualityLabel } from '../../diary.utils';
 
@@ -8,7 +8,7 @@ interface SleepLoggerProps {
   date: string;
   entry?: {
     id: string;
-    sleepEntry?: { hoursSlept: number; quality: number } | null;
+    sleepEntry?: { hoursSlept: number; quality: number; source?: string } | null;
   } | null;
 }
 
@@ -38,6 +38,7 @@ export const SleepLogger = ({ date, entry }: SleepLoggerProps) => {
           <CardTitle className="flex items-center gap-2 text-base">
             <Moon className="h-4 w-4 text-indigo-500" />
             Sleep
+            <SourceBadge source={entry?.sleepEntry?.source ?? ''} />
           </CardTitle>
           {entry && (
             <>

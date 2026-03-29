@@ -56,3 +56,4 @@ export * from './DiaryEntryLikeSchema';
 export * from './UserBadgeSchema';
 export * from './ReviewSchema';
 export * from './ReviewReportSchema';
+export * from './IntegrationConnectionSchema';

@@ -2,7 +2,7 @@ import { Settings } from 'lucide-react';
 import { ResponsiveTabs, TabsContent } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { useTabParam, useAuth } from '@/hooks';
-import { AccountTab, NotificationsTab, DangerZoneTab, SubscriptionTab, SchedulingTab, PaymentsTab } from './components';
+import { AccountTab, NotificationsTab, DangerZoneTab, SubscriptionTab, SchedulingTab, PaymentsTab, IntegrationsTab } from './components';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 
@@ -19,6 +19,7 @@ export const SettingsPage = () => {
     ...(isTrainer ? [{ value: 'subscription', label: 'Subscription' }] : []),
     ...(isTrainer ? [{ value: 'scheduling', label: 'Scheduling' }] : []),
     ...(isTrainer ? [{ value: 'payments', label: 'Payments' }] : []),
+    { value: 'integrations', label: 'Integrations' },
     { value: 'danger', label: 'Danger Zone' },
   ];
 
@@ -64,6 +65,9 @@ export const SettingsPage = () => {
             )}
           </TabsContent>
         )}
+        <TabsContent value="integrations">
+          <IntegrationsTab />
+        </TabsContent>
         <TabsContent value="danger">
           <DangerZoneTab />
         </TabsContent>

@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
-export const StepsEntryScalarFieldEnumSchema = z.enum(['id','diaryEntryId','totalSteps']);
+export const StepsEntryScalarFieldEnumSchema = z.enum(['id','diaryEntryId','totalSteps','source']);
 
 export default StepsEntryScalarFieldEnumSchema;

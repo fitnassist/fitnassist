@@ -1,5 +1,5 @@
 import { Droplets, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, ConfirmDialog } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, ConfirmDialog, SourceBadge } from '@/components/ui';
 import { useLogWater, useDeleteDiaryEntry } from '@/api/diary';
 import { formatWater, WATER_PRESETS } from '../../diary.utils';
 import { useState } from 'react';
@@ -8,7 +8,7 @@ interface WaterTrackerProps {
   date: string;
   entry?: {
     id: string;
-    waterEntry?: { totalMl: number } | null;
+    waterEntry?: { totalMl: number; source?: string } | null;
   } | null;
   unitPreference: 'METRIC' | 'IMPERIAL';
 }
@@ -33,6 +33,7 @@ export const WaterTracker = ({ date, entry, unitPreference }: WaterTrackerProps)
           <CardTitle className="flex items-center gap-2 text-base">
             <Droplets className="h-4 w-4 text-cyan-500" />
             Water
+            <SourceBadge source={entry?.waterEntry?.source ?? ''} />
           </CardTitle>
           {entry && (
             <>

@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { ActivitySourceSchema } from '../inputTypeSchemas/ActivitySourceSchema'
 
 /////////////////////////////////////////
 // STEPS ENTRY SCHEMA
 /////////////////////////////////////////
 
 export const StepsEntrySchema = z.object({
+  source: ActivitySourceSchema,
   id: z.string().cuid(),
   diaryEntryId: z.string(),
   totalSteps: z.number().int().min(0, { message: "Steps cannot be negative" }),
@@ -17,6 +19,7 @@ export type StepsEntry = z.infer<typeof StepsEntrySchema>
 /////////////////////////////////////////
 
 export const StepsEntryOptionalDefaultsSchema = StepsEntrySchema.merge(z.object({
+  source: ActivitySourceSchema.optional(),
   id: z.string().cuid().optional(),
 }))
 

@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import type { DiaryEntryType, MoodLevel, ActivityType } from '@fitnassist/database';
+import type { DiaryEntryType, MoodLevel, ActivityType, ActivitySource } from '@fitnassist/database';
 
 const DIARY_ENTRY_INCLUDE = {
   weightEntry: true,
@@ -78,7 +78,7 @@ export const diaryRepository = {
   },
 
   // ---- Weight ----
-  async upsertWeight(userId: string, date: Date, weightKg: number) {
+  async upsertWeight(userId: string, date: Date, weightKg: number, source: ActivitySource = 'MANUAL') {
     const existing = await prisma.diaryEntry.findFirst({
       where: { userId, date, type: 'WEIGHT' },
     });
@@ -88,7 +88,7 @@ export const diaryRepository = {
         where: { id: existing.id },
         data: {
           weightEntry: {
-            update: { weightKg },
+            update: { weightKg, source },
           },
         },
         include: DIARY_ENTRY_INCLUDE,
@@ -101,7 +101,7 @@ export const diaryRepository = {
         date,
         type: 'WEIGHT',
         weightEntry: {
-          create: { weightKg },
+          create: { weightKg, source },
         },
       },
       include: DIARY_ENTRY_INCLUDE,
@@ -109,7 +109,7 @@ export const diaryRepository = {
   },
 
   // ---- Water ----
-  async upsertWater(userId: string, date: Date, totalMl: number) {
+  async upsertWater(userId: string, date: Date, totalMl: number, source: ActivitySource = 'MANUAL') {
     const existing = await prisma.diaryEntry.findFirst({
       where: { userId, date, type: 'WATER' },
     });
@@ -119,7 +119,7 @@ export const diaryRepository = {
         where: { id: existing.id },
         data: {
           waterEntry: {
-            update: { totalMl },
+            update: { totalMl, source },
           },
         },
         include: DIARY_ENTRY_INCLUDE,
@@ -132,7 +132,7 @@ export const diaryRepository = {
         date,
         type: 'WATER',
         waterEntry: {
-          create: { totalMl },
+          create: { totalMl, source },
         },
       },
       include: DIARY_ENTRY_INCLUDE,
@@ -345,6 +345,15 @@ export const diaryRepository = {
     elevationGainM?: number;
     caloriesBurned?: number;
     notes?: string;
+    source?: ActivitySource;
+    externalId?: string;
+    routePolyline?: string;
+    startLatitude?: number;
+    startLongitude?: number;
+    endLatitude?: number;
+    endLongitude?: number;
+    avgHeartRate?: number;
+    maxHeartRate?: number;
   }) {
     return prisma.diaryEntry.create({
       data: {
@@ -359,8 +368,15 @@ export const diaryRepository = {
     });
   },
 
+  async findActivityByExternalId(externalId: string) {
+    return prisma.activityEntry.findFirst({
+      where: { externalId },
+      include: { diaryEntry: true },
+    });
+  },
+
   // ---- Steps ----
-  async upsertSteps(userId: string, date: Date, totalSteps: number) {
+  async upsertSteps(userId: string, date: Date, totalSteps: number, source: ActivitySource = 'MANUAL') {
     const existing = await prisma.diaryEntry.findFirst({
       where: { userId, date, type: 'STEPS' },
     });
@@ -370,7 +386,7 @@ export const diaryRepository = {
         where: { id: existing.id },
         data: {
           stepsEntry: {
-            update: { totalSteps },
+            update: { totalSteps, source },
           },
         },
         include: DIARY_ENTRY_INCLUDE,
@@ -383,7 +399,7 @@ export const diaryRepository = {
         date,
         type: 'STEPS',
         stepsEntry: {
-          create: { totalSteps },
+          create: { totalSteps, source },
         },
       },
       include: DIARY_ENTRY_INCLUDE,
@@ -497,7 +513,7 @@ export const diaryRepository = {
   },
 
   // ---- Sleep ----
-  async upsertSleep(userId: string, date: Date, hoursSlept: number, quality: number) {
+  async upsertSleep(userId: string, date: Date, hoursSlept: number, quality: number, source: ActivitySource = 'MANUAL') {
     const existing = await prisma.diaryEntry.findFirst({
       where: { userId, date, type: 'SLEEP' },
     });
@@ -507,7 +523,7 @@ export const diaryRepository = {
         where: { id: existing.id },
         data: {
           sleepEntry: {
-            update: { hoursSlept, quality },
+            update: { hoursSlept, quality, source },
           },
         },
         include: DIARY_ENTRY_INCLUDE,
@@ -520,7 +536,7 @@ export const diaryRepository = {
         date,
         type: 'SLEEP',
         sleepEntry: {
-          create: { hoursSlept, quality },
+          create: { hoursSlept, quality, source },
         },
       },
       include: DIARY_ENTRY_INCLUDE,
@@ -546,6 +562,40 @@ export const diaryRepository = {
       },
       orderBy: { date: 'desc' },
       take: limit,
+    });
+  },
+
+  async hasManualEntryForDate(userId: string, date: Date, type: DiaryEntryType) {
+    const entry = await prisma.diaryEntry.findFirst({
+      where: { userId, date, type },
+      include: {
+        weightEntry: type === 'WEIGHT' ? { select: { source: true } } : false,
+        waterEntry: type === 'WATER' ? { select: { source: true } } : false,
+        sleepEntry: type === 'SLEEP' ? { select: { source: true } } : false,
+        stepsEntry: type === 'STEPS' ? { select: { source: true } } : false,
+        activityEntry: type === 'ACTIVITY' ? { select: { source: true } } : false,
+      },
+    });
+    if (!entry) return false;
+
+    // Check if the existing entry is manual
+    const subEntry = entry.weightEntry || entry.waterEntry || entry.sleepEntry || entry.stepsEntry || entry.activityEntry;
+    if (subEntry && 'source' in subEntry) {
+      return subEntry.source === 'MANUAL';
+    }
+    return false;
+  },
+
+  async findActivitiesInTimeWindow(userId: string, startTime: Date, endTime: Date) {
+    return prisma.diaryEntry.findMany({
+      where: {
+        userId,
+        type: 'ACTIVITY',
+        date: { gte: startTime, lte: endTime },
+      },
+      include: {
+        activityEntry: true,
+      },
     });
   },
 

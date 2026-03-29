@@ -1,10 +1,12 @@
 import { z } from 'zod';
+import { ActivitySourceSchema } from '../inputTypeSchemas/ActivitySourceSchema'
 
 /////////////////////////////////////////
 // WATER ENTRY SCHEMA
 /////////////////////////////////////////
 
 export const WaterEntrySchema = z.object({
+  source: ActivitySourceSchema,
   id: z.string().cuid(),
   diaryEntryId: z.string(),
   totalMl: z.number().int().min(0, { message: "Water intake cannot be negative" }),
@@ -17,6 +19,7 @@ export type WaterEntry = z.infer<typeof WaterEntrySchema>
 /////////////////////////////////////////
 
 export const WaterEntryOptionalDefaultsSchema = WaterEntrySchema.merge(z.object({
+  source: ActivitySourceSchema.optional(),
   id: z.string().cuid().optional(),
 }))
 

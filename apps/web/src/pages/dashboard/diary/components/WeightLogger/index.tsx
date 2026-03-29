@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Scale, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog } from '@/components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog, SourceBadge } from '@/components/ui';
 import { useLogWeight, useDeleteDiaryEntry } from '@/api/diary';
 import { formatWeight } from '../../diary.utils';
 
@@ -8,7 +8,7 @@ interface WeightLoggerProps {
   date: string;
   entry?: {
     id: string;
-    weightEntry?: { weightKg: number } | null;
+    weightEntry?: { weightKg: number; source?: string } | null;
   } | null;
   unitPreference: 'METRIC' | 'IMPERIAL';
 }
@@ -41,6 +41,7 @@ export const WeightLogger = ({ date, entry, unitPreference }: WeightLoggerProps)
           <CardTitle className="flex items-center gap-2 text-base">
             <Scale className="h-4 w-4 text-blue-500" />
             Weight
+            <SourceBadge source={entry?.weightEntry?.source ?? ''} />
           </CardTitle>
           {entry && (
             <>

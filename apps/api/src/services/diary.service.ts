@@ -9,7 +9,7 @@ import { badgeService } from './badge.service';
 import { inAppNotificationService } from './in-app-notification.service';
 import { sseManager } from '../lib/sse';
 import { prisma } from '../lib/prisma';
-import type { DiaryEntryType, MoodLevel, MealType, ActivityType } from '@fitnassist/database';
+import type { DiaryEntryType, MoodLevel, MealType, ActivityType, ActivitySource } from '@fitnassist/database';
 import type { SseDiaryEntryEvent, SseDiaryCommentEvent } from '@fitnassist/types';
 
 /**
@@ -155,9 +155,9 @@ const broadcastDiaryComment = async (commenterId: string, diaryEntryId: string, 
 };
 
 export const diaryService = {
-  async logWeight(callerId: string, data: { clientRosterId?: string; date: string; weightKg: number }) {
+  async logWeight(callerId: string, data: { clientRosterId?: string; date: string; weightKg: number; source?: ActivitySource }) {
     const userId = await resolveUserId(callerId, data.clientRosterId);
-    const result = await diaryRepository.upsertWeight(userId, parseDate(data.date), data.weightKg);
+    const result = await diaryRepository.upsertWeight(userId, parseDate(data.date), data.weightKg, data.source);
     goalService.checkAutoProgress(userId, 'WEIGHT', data.weightKg).catch(() => {});
     personalBestService.checkWeightPB(userId, data.weightKg, parseDate(data.date)).catch(() => {});
     broadcastDiaryEntry(userId, 'WEIGHT', data.date).catch(() => {});
@@ -165,9 +165,9 @@ export const diaryService = {
     return result;
   },
 
-  async logWater(callerId: string, data: { clientRosterId?: string; date: string; totalMl: number }) {
+  async logWater(callerId: string, data: { clientRosterId?: string; date: string; totalMl: number; source?: ActivitySource }) {
     const userId = await resolveUserId(callerId, data.clientRosterId);
-    const result = await diaryRepository.upsertWater(userId, parseDate(data.date), data.totalMl);
+    const result = await diaryRepository.upsertWater(userId, parseDate(data.date), data.totalMl, data.source);
     broadcastDiaryEntry(userId, 'WATER', data.date).catch(() => {});
     badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
@@ -200,9 +200,9 @@ export const diaryService = {
     return result;
   },
 
-  async logSleep(callerId: string, data: { clientRosterId?: string; date: string; hoursSlept: number; quality: number }) {
+  async logSleep(callerId: string, data: { clientRosterId?: string; date: string; hoursSlept: number; quality: number; source?: ActivitySource }) {
     const userId = await resolveUserId(callerId, data.clientRosterId);
-    const result = await diaryRepository.upsertSleep(userId, parseDate(data.date), data.hoursSlept, data.quality);
+    const result = await diaryRepository.upsertSleep(userId, parseDate(data.date), data.hoursSlept, data.quality, data.source);
     broadcastDiaryEntry(userId, 'SLEEP', data.date).catch(() => {});
     badgeService.checkAndAwardBadges(userId, 'DIARY_ENTRY').catch(() => {});
     return result;
@@ -229,9 +229,9 @@ export const diaryService = {
   },
 
   // ---- Steps ----
-  async logSteps(callerId: string, data: { clientRosterId?: string; date: string; totalSteps: number }) {
+  async logSteps(callerId: string, data: { clientRosterId?: string; date: string; totalSteps: number; source?: ActivitySource }) {
     const userId = await resolveUserId(callerId, data.clientRosterId);
-    const result = await diaryRepository.upsertSteps(userId, parseDate(data.date), data.totalSteps);
+    const result = await diaryRepository.upsertSteps(userId, parseDate(data.date), data.totalSteps, data.source);
     goalService.checkAutoProgress(userId, 'STEPS').catch(() => {});
     personalBestService.checkStepsPB(userId, data.totalSteps, parseDate(data.date)).catch(() => {});
     broadcastDiaryEntry(userId, 'STEPS', data.date).catch(() => {});
@@ -250,6 +250,15 @@ export const diaryService = {
     elevationGainM?: number;
     caloriesBurned?: number;
     notes?: string;
+    source?: ActivitySource;
+    externalId?: string;
+    routePolyline?: string;
+    startLatitude?: number;
+    startLongitude?: number;
+    endLatitude?: number;
+    endLongitude?: number;
+    avgHeartRate?: number;
+    maxHeartRate?: number;
   }) {
     const userId = await resolveUserId(callerId, data.clientRosterId);
     const { clientRosterId: _, date, ...activityData } = data;

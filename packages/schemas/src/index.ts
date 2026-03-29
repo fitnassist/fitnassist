@@ -96,6 +96,10 @@ export {
   ReviewReportSchema,
   ReviewReportOptionalDefaultsSchema,
   ReportReasonSchema,
+  IntegrationProviderSchema,
+  IntegrationStatusSchema,
+  IntegrationConnectionSchema,
+  IntegrationConnectionOptionalDefaultsSchema,
 } from '@fitnassist/database';
 
 // =============================================================================
@@ -127,6 +131,7 @@ export * from './forms/availability.schema';
 export * from './forms/booking.schema';
 export * from './forms/payment.schema';
 export * from './forms/review.schema';
+export * from './forms/integration.schema';
 
 // =============================================================================
 // CONSTANTS
