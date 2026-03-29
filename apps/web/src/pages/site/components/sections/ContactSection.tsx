@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
+import { env } from '@/config/env';
 import {
   callbackRequestSchema,
   connectionRequestSchema,
@@ -30,6 +31,13 @@ interface ContactContent {
   showEmail?: boolean;
   showPhone?: boolean;
   showAddress?: boolean;
+  // New location fields
+  addressSource?: 'profile' | 'custom';
+  addressDetail?: 'postcode' | 'full';
+  customAddress?: string;
+  customLatitude?: number | null;
+  customLongitude?: number | null;
+  // Legacy
   address?: string;
 }
 
@@ -42,6 +50,12 @@ interface ContactSectionProps {
 const parseContent = (raw: unknown): ContactContent => {
   if (!raw || typeof raw !== 'object') return {};
   return raw as ContactContent;
+};
+
+const getPostcodeArea = (postcode: string | null | undefined): string => {
+  if (!postcode) return '';
+  const match = postcode.match(/^([A-Z]{1,2}\d{1,2}[A-Z]?)/i);
+  return match?.[1]?.toUpperCase() || postcode;
 };
 
 const ConnectCard = ({ trainer }: { trainer: PublicTrainer }) => {
@@ -268,19 +282,6 @@ const ConnectCard = ({ trainer }: { trainer: PublicTrainer }) => {
   );
 };
 
-const formatAddress = (trainer: PublicTrainer, customAddress?: string): string | null => {
-  if (customAddress) return customAddress;
-
-  const parts = [
-    trainer.addressLine1,
-    trainer.addressLine2,
-    trainer.city,
-    trainer.postcode,
-  ].filter(Boolean);
-
-  return parts.length > 0 ? parts.join(', ') : null;
-};
-
 const ConnectCardPlaceholder = ({ trainer }: { trainer: PublicTrainer }) => (
   <Card className="border-[hsl(var(--border))] bg-[hsl(var(--card))]">
     <CardContent className="p-6 space-y-4">
@@ -308,6 +309,74 @@ const ConnectCardPlaceholder = ({ trainer }: { trainer: PublicTrainer }) => (
   </Card>
 );
 
+interface LocationInfo {
+  displayText: string;
+  latitude: number | null;
+  longitude: number | null;
+  zoom: number;
+}
+
+const resolveLocation = (
+  content: ContactContent,
+  trainer: PublicTrainer
+): LocationInfo | null => {
+  const source = content.addressSource ?? 'profile';
+  const detail = content.addressDetail ?? 'postcode';
+
+  if (source === 'custom') {
+    const customAddr = content.customAddress || content.address;
+    if (!customAddr) return null;
+
+    const lat = content.customLatitude ?? null;
+    const lng = content.customLongitude ?? null;
+
+    return {
+      displayText: detail === 'full' ? customAddr : getPostcodeArea(customAddr.split(',').pop()?.trim() ?? null) + ' area',
+      latitude: lat,
+      longitude: lng,
+      zoom: detail === 'full' ? 15 : 12,
+    };
+  }
+
+  // Profile source
+  const hasAddress = trainer.addressLine1 || trainer.city || trainer.postcode;
+  if (!hasAddress) return null;
+
+  const lat = (trainer as unknown as { latitude?: number | null }).latitude ?? null;
+  const lng = (trainer as unknown as { longitude?: number | null }).longitude ?? null;
+
+  if (detail === 'full') {
+    const parts = [
+      trainer.addressLine1,
+      trainer.addressLine2,
+      trainer.city,
+      trainer.postcode,
+    ].filter(Boolean);
+    return {
+      displayText: parts.join(', '),
+      latitude: lat,
+      longitude: lng,
+      zoom: 15,
+    };
+  }
+
+  // Postcode area
+  const postcodeArea = getPostcodeArea(trainer.postcode);
+  const city = trainer.city;
+  const displayText = postcodeArea && city
+    ? `${city}, ${postcodeArea} area`
+    : postcodeArea
+      ? `${postcodeArea} area`
+      : city || '';
+
+  return {
+    displayText,
+    latitude: lat,
+    longitude: lng,
+    zoom: 12,
+  };
+};
+
 export const ContactSection = ({ section, trainer, preview }: ContactSectionProps) => {
   const content = parseContent(section.content);
 
@@ -315,7 +384,11 @@ export const ContactSection = ({ section, trainer, preview }: ContactSectionProp
   const showEmail = content.showEmail !== false && email;
   const showPhone = content.showPhone !== false && trainer.phoneNumber;
   const showForm = content.showForm !== false;
-  const address = content.showAddress ? formatAddress(trainer, content.address) : null;
+  const location = content.showAddress ? resolveLocation(content, trainer) : null;
+
+  const mapUrl = location?.latitude && location?.longitude
+    ? `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=${location.zoom}&size=600x300&scale=2&maptype=roadmap&markers=color:red%7C${location.latitude},${location.longitude}&key=${env.GOOGLE_MAPS_API_KEY}`
+    : null;
 
   return (
     <section id={`section-${section.id}`} className="py-16 sm:py-20">
@@ -332,7 +405,7 @@ export const ContactSection = ({ section, trainer, preview }: ContactSectionProp
         )}
 
         <div className="mx-auto grid max-w-4xl gap-8 lg:grid-cols-2">
-          {/* Contact info */}
+          {/* Contact info + location */}
           <div className="flex flex-col gap-4">
             {showEmail && (
               <a
@@ -352,10 +425,21 @@ export const ContactSection = ({ section, trainer, preview }: ContactSectionProp
                 <span>{trainer.phoneNumber}</span>
               </a>
             )}
-            {address && (
+            {location && (
               <div className="flex items-start gap-3 text-[hsl(var(--foreground))]">
                 <MapPin className="h-5 w-5 mt-0.5 text-[hsl(var(--primary))]" />
-                <span>{address}</span>
+                <span>{location.displayText}</span>
+              </div>
+            )}
+
+            {/* Map */}
+            {mapUrl && (
+              <div className="overflow-hidden rounded-lg border border-[hsl(var(--border))]">
+                <img
+                  src={mapUrl}
+                  alt={`Map showing ${location?.displayText}`}
+                  className="w-full h-auto"
+                />
               </div>
             )}
           </div>

@@ -4,12 +4,19 @@ import type { AddressDetails } from '@/components/ui';
 import { useUpdateSection } from '@/api/website';
 import { env } from '@/config/env';
 
+type AddressSource = 'profile' | 'custom';
+type AddressDetail = 'postcode' | 'full';
+
 interface ContactContent {
   showForm: boolean;
   showEmail: boolean;
   showPhone: boolean;
   showAddress: boolean;
-  address: string;
+  addressSource: AddressSource;
+  addressDetail: AddressDetail;
+  customAddress: string;
+  customLatitude: number | null;
+  customLongitude: number | null;
 }
 
 interface ContactFormProps {
@@ -21,7 +28,7 @@ const TOGGLE_FIELDS: { name: keyof Pick<ContactContent, 'showForm' | 'showEmail'
   { name: 'showForm', label: 'Show callback & connect buttons', description: 'Allow visitors to request a callback or connect with you through Fitnassist' },
   { name: 'showEmail', label: 'Show email address' },
   { name: 'showPhone', label: 'Show phone number' },
-  { name: 'showAddress', label: 'Show address / location' },
+  { name: 'showAddress', label: 'Show address & map' },
 ];
 
 const formatAddressString = (details: AddressDetails): string => {
@@ -43,12 +50,18 @@ export const ContactForm = ({ sectionId, content }: ContactFormProps) => {
       showEmail: (content.showEmail as boolean) ?? true,
       showPhone: (content.showPhone as boolean) ?? true,
       showAddress: (content.showAddress as boolean) ?? false,
-      address: (content.address as string) || '',
+      addressSource: (content.addressSource as AddressSource) ?? 'profile',
+      addressDetail: (content.addressDetail as AddressDetail) ?? 'postcode',
+      customAddress: (content.customAddress as string) || (content.address as string) || '',
+      customLatitude: (content.customLatitude as number) ?? null,
+      customLongitude: (content.customLongitude as number) ?? null,
     },
   });
 
   const showAddress = watch('showAddress');
-  const address = watch('address');
+  const addressSource = watch('addressSource');
+  const addressDetail = watch('addressDetail');
+  const customAddress = watch('customAddress');
 
   const onSubmit = (data: ContactContent) => {
     updateSection.mutate({ sectionId, content: data });
@@ -78,18 +91,82 @@ export const ContactForm = ({ sectionId, content }: ContactFormProps) => {
       </div>
 
       {showAddress && (
-        <div className="space-y-2">
-          <AddressAutocomplete
-            label="Address"
-            apiKey={env.GOOGLE_MAPS_API_KEY}
-            value={address ? { addressLine1: address } : undefined}
-            onChange={(details) => {
-              setValue('address', details ? formatAddressString(details) : '');
-            }}
-          />
-          <p className="text-xs text-muted-foreground">
-            If left blank, your profile address will be used.
-          </p>
+        <div className="space-y-4 rounded-md border p-3">
+          {/* Address source */}
+          <div className="space-y-2">
+            <Label className="text-xs font-medium">Address source</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant={addressSource === 'profile' ? 'default' : 'outline'}
+                onClick={() => setValue('addressSource', 'profile')}
+              >
+                From profile
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={addressSource === 'custom' ? 'default' : 'outline'}
+                onClick={() => setValue('addressSource', 'custom')}
+              >
+                Custom address
+              </Button>
+            </div>
+            {addressSource === 'profile' && (
+              <p className="text-xs text-muted-foreground">
+                Uses the address from your trainer profile settings.
+              </p>
+            )}
+          </div>
+
+          {/* Custom address lookup */}
+          {addressSource === 'custom' && (
+            <AddressAutocomplete
+              label="Custom address"
+              apiKey={env.GOOGLE_MAPS_API_KEY}
+              value={customAddress ? { addressLine1: customAddress } : undefined}
+              onChange={(details) => {
+                if (details) {
+                  setValue('customAddress', formatAddressString(details));
+                  setValue('customLatitude', details.latitude);
+                  setValue('customLongitude', details.longitude);
+                } else {
+                  setValue('customAddress', '');
+                  setValue('customLatitude', null);
+                  setValue('customLongitude', null);
+                }
+              }}
+            />
+          )}
+
+          {/* Detail level */}
+          <div className="space-y-2">
+            <Label className="text-xs font-medium">Location detail shown to visitors</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant={addressDetail === 'postcode' ? 'default' : 'outline'}
+                onClick={() => setValue('addressDetail', 'postcode')}
+              >
+                Postcode area only
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={addressDetail === 'full' ? 'default' : 'outline'}
+                onClick={() => setValue('addressDetail', 'full')}
+              >
+                Full address
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {addressDetail === 'postcode'
+                ? 'Shows your general area (e.g. "SW1A area") and a zoomed-out map.'
+                : 'Shows your full address and a close-up map with pin.'}
+            </p>
+          </div>
         </div>
       )}
 
