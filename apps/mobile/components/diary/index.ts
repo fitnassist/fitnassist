@@ -6,3 +6,4 @@ export { SleepLogger } from './SleepLogger';
 export { StepsLogger } from './StepsLogger';
 export { WorkoutLogger } from './WorkoutLogger';
 export { FoodLogger } from './FoodLogger';
+export { ActivityLogger } from './ActivityLogger';

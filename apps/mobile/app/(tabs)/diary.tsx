@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, ScrollView, RefreshControl, TouchableOpacity as RNTouchableOpacity } from 'react-native';
+import { View, ScrollView, RefreshControl, TouchableOpacity as RNTouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -12,6 +12,8 @@ import {
   Moon,
   Dumbbell,
   Footprints,
+  Activity,
+  Trash2,
   Users,
   Plus,
 } from 'lucide-react-native';
@@ -27,7 +29,9 @@ import {
   StepsLogger,
   WorkoutLogger,
   FoodLogger,
+  ActivityLogger,
 } from '@/components/diary';
+import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
 const ENTRY_TYPES = [
@@ -38,6 +42,7 @@ const ENTRY_TYPES = [
   { type: 'SLEEP', icon: Moon, color: '#6366f1', label: 'Sleep' },
   { type: 'WORKOUT_LOG', icon: Dumbbell, color: '#8b5cf6', label: 'Workout' },
   { type: 'STEPS', icon: Footprints, color: '#22c55e', label: 'Steps' },
+  { type: 'ACTIVITY', icon: Activity, color: '#ec4899', label: 'Activity' },
 ] as const;
 
 const formatDate = (d: Date) => d.toISOString().split('T')[0]!;
@@ -50,11 +55,14 @@ const LOGGER_MAP: Record<string, string> = {
   SLEEP: 'sleep',
   WORKOUT_LOG: 'workout',
   STEPS: 'steps',
+  ACTIVITY: 'activity',
 };
 
 const TraineeDiary = () => {
   const [date, setDate] = useState(() => new Date());
   const [activeLogger, setActiveLogger] = useState<string | null>(null);
+  const deleteEntry = trpc.diary.deleteEntry.useMutation();
+  const diaryUtils = trpc.useUtils();
   const dateStr = formatDate(date);
   const { data: entries, isLoading, refetch } = useDiaryEntries(dateStr);
   const { data: nutrition } = useDailyNutrition(dateStr);
@@ -163,16 +171,34 @@ const TraineeDiary = () => {
 
                   {/* Show entry summaries */}
                   {typeEntries.map((entry: any) => (
-                    <View key={entry.id} className="mt-2 pt-2 border-t border-border">
-                      <Text className="text-xs text-foreground">
-                        {type === 'WEIGHT' && `${entry.valueNumeric ?? entry.weight ?? '-'} kg`}
-                        {type === 'WATER' && `${entry.valueNumeric ?? entry.amount ?? '-'} ml`}
-                        {type === 'STEPS' && `${entry.valueNumeric ?? entry.steps ?? '-'} steps`}
-                        {type === 'MOOD' && (entry.valueText ?? entry.mood ?? '-')}
-                        {type === 'SLEEP' && `${entry.valueNumeric ?? '-'} hrs`}
-                        {type === 'FOOD' && (entry.valueText ?? entry.foodName ?? 'Food entry')}
-                        {type === 'WORKOUT_LOG' && (entry.valueText ?? 'Workout logged')}
+                    <View key={entry.id} className="mt-2 pt-2 border-t border-border flex-row items-center justify-between">
+                      <Text className="text-xs text-foreground flex-1">
+                        {type === 'WEIGHT' && `${entry.weightKg ?? entry.valueNumeric ?? '-'} kg`}
+                        {type === 'WATER' && `${entry.totalMl ?? entry.valueNumeric ?? '-'} ml`}
+                        {type === 'STEPS' && `${entry.totalSteps ?? entry.valueNumeric ?? '-'} steps`}
+                        {type === 'MOOD' && (entry.level ?? entry.valueText ?? '-')}
+                        {type === 'SLEEP' && `${entry.hoursSlept ?? entry.valueNumeric ?? '-'} hrs`}
+                        {type === 'FOOD' && (entry.items?.[0]?.name ?? entry.valueText ?? 'Food entry')}
+                        {type === 'WORKOUT_LOG' && `${entry.durationMinutes ?? '-'} min workout`}
+                        {type === 'ACTIVITY' && `${entry.activityType ?? 'Activity'} - ${entry.durationMinutes ?? '-'} min`}
                       </Text>
+                      <RNTouchableOpacity
+                        onPress={() => {
+                          Alert.alert('Delete Entry', 'Are you sure?', [
+                            { text: 'Cancel', style: 'cancel' },
+                            {
+                              text: 'Delete',
+                              style: 'destructive',
+                              onPress: () => deleteEntry.mutate(
+                                { id: entry.id },
+                                { onSuccess: () => diaryUtils.diary.getEntries.invalidate({ date: dateStr }) },
+                              ),
+                            },
+                          ]);
+                        }}
+                      >
+                        <Trash2 size={14} color={colors.destructive} />
+                      </RNTouchableOpacity>
                     </View>
                   ))}
                 </CardContent>
@@ -190,6 +216,7 @@ const TraineeDiary = () => {
       <StepsLogger visible={activeLogger === 'steps'} onClose={() => setActiveLogger(null)} date={dateStr} />
       <WorkoutLogger visible={activeLogger === 'workout'} onClose={() => setActiveLogger(null)} date={dateStr} />
       <FoodLogger visible={activeLogger === 'food'} onClose={() => setActiveLogger(null)} date={dateStr} />
+      <ActivityLogger visible={activeLogger === 'activity'} onClose={() => setActiveLogger(null)} date={dateStr} />
     </ScrollView>
   );
 };

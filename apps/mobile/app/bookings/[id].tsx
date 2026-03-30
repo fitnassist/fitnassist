@@ -1,4 +1,5 @@
-import { View, ScrollView, Alert, Linking } from 'react-native';
+import { useState } from 'react';
+import { View, ScrollView, Alert, Linking, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -15,6 +16,7 @@ import {
 import { TouchableOpacity } from 'react-native';
 import { Text, Button, Card, CardContent, Skeleton, Badge } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
+import { Calendar as RNCalendar } from 'react-native-calendars';
 import {
   useBooking,
   useConfirmBooking,
@@ -22,7 +24,10 @@ import {
   useCancelBooking,
   useCompleteBooking,
   useNoShowBooking,
+  useRescheduleBooking,
 } from '@/api/booking';
+import { useAvailableSlots } from '@/api/availability';
+import { Input } from '@/components/ui';
 import { colors } from '@/constants/theme';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -43,11 +48,26 @@ const BookingDetailScreen = () => {
   const isTrainer = role === 'TRAINER';
   const { data: booking, isLoading } = useBooking(id ?? '');
 
+  const [showReschedule, setShowReschedule] = useState(false);
+  const [rescheduleDate, setRescheduleDate] = useState('');
+  const [rescheduleSlot, setRescheduleSlot] = useState<any>(null);
   const confirmBooking = useConfirmBooking();
   const declineBooking = useDeclineBooking();
   const cancelBooking = useCancelBooking();
   const completeBooking = useCompleteBooking();
   const noShowBooking = useNoShowBooking();
+  const rescheduleBooking = useRescheduleBooking();
+
+  const trainerId = (booking as any)?.trainerId ?? '';
+  const { data: rescheduleSlots } = useAvailableSlots(trainerId, rescheduleDate);
+
+  const handleReschedule = () => {
+    if (!rescheduleSlot || !id) return;
+    rescheduleBooking.mutate(
+      { id, date: rescheduleDate, startTime: rescheduleSlot.startTime, durationMin: rescheduleSlot.durationMin },
+      { onSuccess: () => { setShowReschedule(false); router.back(); } },
+    );
+  };
 
   if (isLoading || !booking) {
     return (
@@ -230,11 +250,64 @@ const BookingDetailScreen = () => {
           </Button>
         )}
 
+        {(isPending || isConfirmed) && (
+          <Button variant="outline" onPress={() => setShowReschedule(true)}>
+            Reschedule
+          </Button>
+        )}
+
         {canCancel && (
           <Button variant="ghost" onPress={handleCancel} loading={cancelBooking.isPending}>
             <Text className="text-destructive font-semibold">Cancel Booking</Text>
           </Button>
         )}
+
+        {/* Reschedule Modal */}
+        <Modal visible={showReschedule} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowReschedule(false)}>
+          <SafeAreaView className="flex-1 bg-background">
+            <View className="flex-row items-center justify-between px-4 py-4 border-b border-border">
+              <Text className="text-base font-semibold text-foreground">Reschedule</Text>
+              <TouchableOpacity onPress={() => setShowReschedule(false)}>
+                <ArrowLeft size={24} color={colors.foreground} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">
+              <RNCalendar
+                minDate={new Date().toISOString().split('T')[0]}
+                onDayPress={(day: { dateString: string }) => { setRescheduleDate(day.dateString); setRescheduleSlot(null); }}
+                markedDates={rescheduleDate ? { [rescheduleDate]: { selected: true, selectedColor: colors.primary } } : {}}
+                theme={{
+                  calendarBackground: 'transparent',
+                  todayTextColor: colors.teal,
+                  dayTextColor: colors.foreground,
+                  textDisabledColor: colors.muted,
+                  arrowColor: colors.teal,
+                  monthTextColor: colors.foreground,
+                  selectedDayBackgroundColor: colors.primary,
+                  selectedDayTextColor: '#fff',
+                }}
+              />
+              {rescheduleDate && rescheduleSlots && (
+                <View className="flex-row flex-wrap gap-2">
+                  {(rescheduleSlots as any[]).map((slot: any) => (
+                    <TouchableOpacity
+                      key={slot.startTime}
+                      className={`px-4 py-3 rounded-lg border ${rescheduleSlot?.startTime === slot.startTime ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                      onPress={() => setRescheduleSlot(slot)}
+                    >
+                      <Text className={`text-sm ${rescheduleSlot?.startTime === slot.startTime ? 'text-primary font-semibold' : 'text-foreground'}`}>
+                        {slot.startTime} - {slot.endTime}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              <Button onPress={handleReschedule} disabled={!rescheduleSlot} loading={rescheduleBooking.isPending}>
+                Confirm Reschedule
+              </Button>
+            </ScrollView>
+          </SafeAreaView>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
