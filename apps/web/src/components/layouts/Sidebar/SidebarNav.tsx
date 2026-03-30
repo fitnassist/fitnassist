@@ -17,13 +17,13 @@ interface SidebarNavProps {
 
 const groupItems = (items: NavItem[]) => {
   const groups: { label: string | null; items: NavItem[] }[] = [];
-  let currentGroup: string | null = null;
+  let currentGroup: string | undefined;
 
   for (const item of items) {
     const group = item.group ?? null;
-    if (group !== currentGroup) {
+    if (groups.length === 0 || group !== currentGroup) {
       groups.push({ label: group, items: [item] });
-      currentGroup = group;
+      currentGroup = group ?? undefined;
     } else {
       groups[groups.length - 1]!.items.push(item);
     }
