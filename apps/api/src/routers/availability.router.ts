@@ -110,7 +110,7 @@ export const availabilityRouter = router({
       return prisma.trainerProfile.update({
         where: { userId: ctx.user.id },
         data: input,
-        select: { offersVideoSessions: true },
+        select: { offersVideoSessions: true, videoCallsFree: true },
       });
     }),
 
@@ -118,9 +118,9 @@ export const availabilityRouter = router({
   getVideoSettings: trainerProcedure.query(async ({ ctx }) => {
     const trainer = await prisma.trainerProfile.findUnique({
       where: { userId: ctx.user.id },
-      select: { offersVideoSessions: true },
+      select: { offersVideoSessions: true, videoCallsFree: true },
     });
-    return trainer ?? { offersVideoSessions: false };
+    return trainer ?? { offersVideoSessions: false, videoCallsFree: true };
   }),
 
   // Public: get available slots for a trainer on a date

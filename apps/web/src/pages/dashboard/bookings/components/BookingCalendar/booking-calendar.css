@@ -104,44 +104,44 @@
 
 /* Event status colours */
 .fc-event--pending {
-  background-color: hsl(45 93% 47% / 0.15) !important;
-  color: hsl(45 93% 30%) !important;
+  background-color: hsl(45 93% 47%) !important;
+  color: #fff !important;
 }
 
 .fc-event--confirmed {
-  background-color: hsl(217 91% 60% / 0.15) !important;
-  color: hsl(217 91% 40%) !important;
+  background-color: hsl(217 91% 60%) !important;
+  color: #fff !important;
 }
 
 .fc-event--completed {
-  background-color: hsl(142 71% 45% / 0.15) !important;
-  color: hsl(142 71% 30%) !important;
+  background-color: hsl(142 71% 45%) !important;
+  color: #fff !important;
 }
 
 .fc-event--no-show {
-  background-color: hsl(45 93% 47% / 0.1) !important;
-  color: hsl(45 80% 35%) !important;
+  background-color: hsl(0 0% 55%) !important;
+  color: #fff !important;
 }
 
 /* Dark mode event colours */
 .dark .fc-event--pending {
-  background-color: hsl(45 93% 47% / 0.2) !important;
-  color: hsl(45 93% 70%) !important;
+  background-color: hsl(45 93% 40%) !important;
+  color: #fff !important;
 }
 
 .dark .fc-event--confirmed {
-  background-color: hsl(217 91% 60% / 0.2) !important;
-  color: hsl(217 91% 75%) !important;
+  background-color: hsl(217 91% 50%) !important;
+  color: #fff !important;
 }
 
 .dark .fc-event--completed {
-  background-color: hsl(142 71% 45% / 0.2) !important;
-  color: hsl(142 71% 70%) !important;
+  background-color: hsl(142 71% 38%) !important;
+  color: #fff !important;
 }
 
 .dark .fc-event--no-show {
-  background-color: hsl(45 93% 47% / 0.15) !important;
-  color: hsl(45 80% 65%) !important;
+  background-color: hsl(0 0% 45%) !important;
+  color: #fff !important;
 }
 
 /* Remove FullCalendar's default event dots in daygrid */

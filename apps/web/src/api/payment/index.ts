@@ -66,9 +66,9 @@ export const usePaymentStatus = (bookingId: string) => {
   );
 };
 
-export const usePaymentRequirement = (trainerId: string, clientRosterId: string) => {
+export const usePaymentRequirement = (trainerId: string, clientRosterId: string, sessionType?: string) => {
   return trpc.payment.getPaymentRequirement.useQuery(
-    { trainerId, clientRosterId },
+    { trainerId, clientRosterId, sessionType },
     { enabled: !!trainerId && !!clientRosterId }
   );
 };

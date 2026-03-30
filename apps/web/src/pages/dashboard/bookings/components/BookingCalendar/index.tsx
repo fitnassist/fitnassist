@@ -44,12 +44,12 @@ const EventContent = ({ event }: EventContentArg) => {
           {sessionType === 'VIDEO_CALL' ? <Video className="h-3 w-3 shrink-0" /> : <User className="h-3 w-3 shrink-0" />}
           <span className="truncate">{name}</span>
         </div>
-        <span className="text-[0.65rem] opacity-75">
+        <span className="text-[0.65rem] text-white/80">
           {event.start?.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
           {' - '}
           {event.end?.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
         </span>
-        <span className="text-[0.65rem] opacity-75">{STATUS_LABEL[status] ?? status}</span>
+        <span className="text-[0.65rem] text-white/80">{STATUS_LABEL[status] ?? status}</span>
       </div>
     );
   }

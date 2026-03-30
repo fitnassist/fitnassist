@@ -107,7 +107,7 @@ export const sessionPaymentService = {
    * Check if payment is required for a booking.
    * Returns pricing info or null if no payment needed.
    */
-  getPaymentRequirement: async (trainerId: string, clientRosterId: string) => {
+  getPaymentRequirement: async (trainerId: string, clientRosterId: string, sessionType?: string) => {
     const trainer = await prisma.trainerProfile.findUnique({
       where: { id: trainerId },
       select: {
@@ -115,11 +115,17 @@ export const sessionPaymentService = {
         firstSessionFree: true,
         stripeConnectedAccountId: true,
         stripeOnboardingComplete: true,
+        videoCallsFree: true,
       },
     });
 
     if (!trainer?.paymentsEnabled || !trainer.stripeConnectedAccountId || !trainer.stripeOnboardingComplete) {
       return null;
+    }
+
+    // Video calls are free if trainer has that setting enabled
+    if (sessionType === 'VIDEO_CALL' && trainer.videoCallsFree) {
+      return { paymentRequired: false as const, reason: 'video_calls_free' as const };
     }
 
     const sessionPrice = await sessionPriceRepository.findByTrainerId(trainerId);

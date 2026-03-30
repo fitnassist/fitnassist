@@ -77,7 +77,8 @@ export const BookSessionPage = () => {
   // Check if payment is required
   const { data: paymentReq } = usePaymentRequirement(
     trainerId ?? '',
-    myRoster?.id ?? ''
+    myRoster?.id ?? '',
+    sessionType
   );
 
   const handleDateSelect = (date: string) => {

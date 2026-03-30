@@ -428,6 +428,7 @@ model TrainerProfile {
   travelBufferMin      Int              @default(15)
   smartTravelEnabled   Boolean          @default(false)
   offersVideoSessions  Boolean          @default(false)
+  videoCallsFree       Boolean          @default(true)
 
   // Payment settings
   paymentsEnabled            Boolean  @default(false)

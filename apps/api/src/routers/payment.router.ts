@@ -232,8 +232,8 @@ export const paymentRouter = router({
 
   // Check if payment is required for a booking (used before creating booking)
   getPaymentRequirement: protectedProcedure
-    .input(z.object({ trainerId: z.string().cuid(), clientRosterId: z.string().cuid() }))
+    .input(z.object({ trainerId: z.string().cuid(), clientRosterId: z.string().cuid(), sessionType: z.string().optional() }))
     .query(async ({ input }) => {
-      return sessionPaymentService.getPaymentRequirement(input.trainerId, input.clientRosterId);
+      return sessionPaymentService.getPaymentRequirement(input.trainerId, input.clientRosterId, input.sessionType);
     }),
 });

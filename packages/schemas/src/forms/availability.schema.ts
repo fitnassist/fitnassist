@@ -52,6 +52,7 @@ export type UpdateTravelSettingsInput = z.infer<typeof updateTravelSettingsSchem
 
 export const updateVideoSettingsSchema = z.object({
   offersVideoSessions: z.boolean(),
+  videoCallsFree: z.boolean().optional(),
 });
 
 export type UpdateVideoSettingsInput = z.infer<typeof updateVideoSettingsSchema>;
