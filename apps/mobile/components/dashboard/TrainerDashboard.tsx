@@ -174,23 +174,31 @@ export const TrainerDashboard = () => {
           <Text className="text-sm font-medium text-teal uppercase mb-1" style={{ letterSpacing: 1 }}>
             Recent Client Activity
           </Text>
-          {(recentActivity as any[]).slice(0, 10).map((entry: any) => (
-            <Card key={entry.id}>
-              <CardContent className="py-3 px-4 flex-row items-center gap-3">
-                <View className="w-8 h-8 rounded-full bg-secondary items-center justify-center">
-                  <Text className="text-xs font-semibold text-foreground">
-                    {(entry.user?.name ?? '?').charAt(0).toUpperCase()}
-                  </Text>
+          {(recentActivity as any[]).slice(0, 10).map((entry: any) => {
+            const typeIcons: Record<string, { icon: any; color: string }> = {
+              WEIGHT: { icon: Eye, color: '#10b981' },
+              WATER: { icon: Eye, color: '#3b82f6' },
+              FOOD: { icon: Eye, color: '#f97316' },
+              MOOD: { icon: Eye, color: '#f59e0b' },
+              SLEEP: { icon: Eye, color: '#6366f1' },
+              WORKOUT_LOG: { icon: Eye, color: '#8b5cf6' },
+              STEPS: { icon: Eye, color: '#22c55e' },
+            };
+            const typeInfo = typeIcons[entry.type] ?? { icon: Eye, color: colors.mutedForeground };
+            return (
+              <View key={entry.id} className="flex-row items-center gap-3 py-2">
+                <View className="w-8 h-8 rounded-full items-center justify-center" style={{ backgroundColor: typeInfo.color + '20' }}>
+                  <View className="w-2 h-2 rounded-full" style={{ backgroundColor: typeInfo.color }} />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-sm text-foreground">{entry.user?.name ?? 'Client'}</Text>
+                  <Text className="text-sm font-medium text-foreground">{entry.user?.name ?? 'Client'}</Text>
                   <Text className="text-xs text-muted-foreground">
-                    {entry.type?.replace(/_/g, ' ').toLowerCase() ?? 'activity'}
+                    Logged {entry.type?.replace(/_/g, ' ').toLowerCase() ?? 'activity'}
                   </Text>
                 </View>
-              </CardContent>
-            </Card>
-          ))}
+              </View>
+            );
+          })}
         </View>
       )}
     </ScrollView>

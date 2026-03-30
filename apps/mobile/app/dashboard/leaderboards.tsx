@@ -15,6 +15,7 @@ type Scope = 'FRIENDS' | 'GLOBAL';
 const CATEGORIES: { key: Category; label: string }[] = [
   { key: 'STEPS', label: 'Steps' },
   { key: 'WORKOUTS', label: 'Workouts' },
+  { key: 'ACTIVITY_DURATION', label: 'Activity' },
   { key: 'GOALS', label: 'Goals' },
   { key: 'STREAKS', label: 'Streaks' },
 ];
