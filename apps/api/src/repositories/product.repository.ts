@@ -25,6 +25,17 @@ export const productRepository = {
     });
   },
 
+  async findTopSellingByTrainerId(trainerId: string, limit: number = 3) {
+    return prisma.product.findMany({
+      where: { trainerId, status: 'ACTIVE' },
+      include: {
+        _count: { select: { orderItems: true } },
+      },
+      orderBy: { orderItems: { _count: 'desc' } },
+      take: limit,
+    });
+  },
+
   async findBySlug(trainerId: string, slug: string) {
     return prisma.product.findUnique({
       where: { trainerId_slug: { trainerId, slug } },

@@ -37,6 +37,12 @@ export const productRouter = router({
       return productService.getPublicProduct(input.trainerId, input.slug);
     }),
 
+  getTopSelling: publicProcedure
+    .input(z.object({ trainerId: z.string(), limit: z.number().int().min(1).max(6).default(3) }))
+    .query(async ({ input }) => {
+      return productService.getTopSellingProducts(input.trainerId, input.limit);
+    }),
+
   // =========================================================================
   // Trainer (ELITE)
   // =========================================================================

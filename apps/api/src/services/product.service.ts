@@ -127,6 +127,14 @@ export const productService = {
     return productRepository.findPublicByTrainerId(trainerId);
   },
 
+  async getTopSellingProducts(trainerId: string, limit: number = 3) {
+    const products = await productRepository.findTopSellingByTrainerId(trainerId, limit);
+    return products.map(({ _count, ...product }) => ({
+      ...product,
+      orderCount: _count.orderItems,
+    }));
+  },
+
   async getPublicProduct(trainerId: string, slug: string) {
     const product = await productRepository.findBySlug(trainerId, slug);
     if (!product || product.status !== 'ACTIVE') {
