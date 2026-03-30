@@ -90,10 +90,11 @@ const MessageThreadScreen = () => {
     }
   }, [connectionId, messages?.length]);
 
+  // Fallback polling - SSE handles real-time, this catches missed events
   useEffect(() => {
     const interval = setInterval(() => {
       refetch();
-    }, 2000);
+    }, 10000);
     return () => clearInterval(interval);
   }, [refetch]);
 

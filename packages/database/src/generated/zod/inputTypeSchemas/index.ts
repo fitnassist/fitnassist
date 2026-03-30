@@ -66,6 +66,7 @@ export { CouponScalarFieldEnumSchema } from './CouponScalarFieldEnumSchema';
 export { ProductOrderScalarFieldEnumSchema } from './ProductOrderScalarFieldEnumSchema';
 export { OrderItemScalarFieldEnumSchema } from './OrderItemScalarFieldEnumSchema';
 export { ReferralScalarFieldEnumSchema } from './ReferralScalarFieldEnumSchema';
+export { ExpoPushTokenScalarFieldEnumSchema } from './ExpoPushTokenScalarFieldEnumSchema';
 export { SortOrderSchema } from './SortOrderSchema';
 export { NullableJsonNullValueInputSchema } from './NullableJsonNullValueInputSchema';
 export { JsonNullValueInputSchema } from './JsonNullValueInputSchema';

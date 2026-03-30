@@ -65,3 +65,4 @@ export * from './CouponSchema';
 export * from './ProductOrderSchema';
 export * from './OrderItemSchema';
 export * from './ReferralSchema';
+export * from './ExpoPushTokenSchema';

@@ -8,6 +8,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { queryClient } from '@/lib/queryClient';
 import { trpc, createTRPCClient } from '@/lib/trpc';
 import { useAuth } from '@/hooks/useAuth';
+import { useSse } from '@/lib/sse';
+import { useNotifications } from '@/hooks/useNotifications';
+
+const AuthenticatedProviders = ({ children }: { children: React.ReactNode }) => {
+  useSse();
+  useNotifications();
+  return <>{children}</>;
+};
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -26,7 +34,9 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isAuthenticated, isLoading, segments]);
 
-  return <>{children}</>;
+  if (!isAuthenticated) return <>{children}</>;
+
+  return <AuthenticatedProviders>{children}</AuthenticatedProviders>;
 };
 
 const RootLayout = () => {
