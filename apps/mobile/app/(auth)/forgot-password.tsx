@@ -33,10 +33,10 @@ const ForgotPasswordScreen = () => {
   const onSubmit = async (data: ForgotPasswordForm) => {
     setLoading(true);
     try {
-      await authClient.forgetPassword({
+      await authClient.resetPassword({
         email: data.email,
         redirectTo: 'fitnassist://reset-password',
-      });
+      } as never);
 
       Alert.alert(
         'Check Your Email',

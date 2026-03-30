@@ -1,3 +1,4 @@
+export { Badge, type BadgeProps } from './badge';
 export { Text, type TextProps } from './text';
 export { Button, type ButtonProps } from './button';
 export { Input, type InputProps } from './input';

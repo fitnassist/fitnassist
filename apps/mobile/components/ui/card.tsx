@@ -6,7 +6,7 @@ export type CardProps = ViewProps;
 export const Card = ({ className, ...props }: CardProps) => {
   return (
     <View
-      className={`rounded-lg border border-border bg-card p-4 ${className ?? ''}`}
+      className={`rounded-lg border border-border bg-card ${className ?? ''}`}
       {...props}
     />
   );
