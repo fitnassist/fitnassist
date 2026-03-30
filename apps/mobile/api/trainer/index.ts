@@ -27,9 +27,7 @@ export const useTrainerSearch = (params: {
   page?: number;
   limit?: number;
 }) => {
-  return trpc.trainer.search.useQuery(params, {
-    enabled: !!params.latitude && !!params.longitude,
-  });
+  return trpc.trainer.search.useQuery(params);
 };
 
 export const useTrainerByHandle = (handle: string) => {
