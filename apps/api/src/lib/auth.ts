@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { expo } from '@better-auth/expo';
 import { prisma } from './prisma';
 import { sendEmail } from './email';
 import { env } from '../config/env';
@@ -110,6 +111,10 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
   },
+
+  plugins: [
+    expo(),
+  ],
 
   trustedOrigins: [env.FRONTEND_URL],
 });

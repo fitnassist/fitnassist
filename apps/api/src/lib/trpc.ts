@@ -27,10 +27,12 @@ setInterval(() => {
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<Context> {
-  // Extract session token from cookie for cache key
+  // Extract session token from cookie or Authorization header for cache key
+  const authHeader = opts.req.headers.authorization;
   const cookieHeader = opts.req.headers.cookie || '';
   const tokenMatch = cookieHeader.match(/better-auth\.session_token=([^;]+)/);
-  const cacheKey = tokenMatch?.[1];
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const cacheKey = bearerToken || tokenMatch?.[1];
 
   // Check cache first
   if (cacheKey) {
