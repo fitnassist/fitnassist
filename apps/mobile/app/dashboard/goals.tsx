@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { View, FlatList, RefreshControl, Alert } from 'react-native';
+import { View, FlatList, RefreshControl, Alert, Modal, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Target, CheckCircle, Trophy } from 'lucide-react-native';
+import { ArrowLeft, Target, CheckCircle, Trophy, Plus, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Card, CardContent, Skeleton, Badge, Button } from '@/components/ui';
+import { Text, Card, CardContent, Skeleton, Badge, Button, Input } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
@@ -72,9 +72,12 @@ const GoalCard = ({ goal, onComplete, onAbandon }: { goal: any; onComplete: () =
 const GoalsScreen = () => {
   const router = useRouter();
   const [filter, setFilter] = useState<GoalFilter>('ACTIVE');
+  const [showCreate, setShowCreate] = useState(false);
+  const [newGoal, setNewGoal] = useState({ name: '', description: '', type: 'TARGET' as 'TARGET' | 'HABIT', targetValue: '', deadline: '' });
   const { data: goals, isLoading, refetch } = trpc.goal.list.useQuery({ status: filter });
   const completeGoal = trpc.goal.complete.useMutation();
   const abandonGoal = trpc.goal.abandon.useMutation();
+  const createGoal = trpc.goal.create.useMutation();
   const utils = trpc.useUtils();
 
   const invalidate = () => utils.goal.list.invalidate();
@@ -92,12 +95,77 @@ const GoalsScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-row items-center gap-3 px-4 py-3 border-b border-border">
-        <TouchableOpacity onPress={() => router.back()}>
-          <ArrowLeft size={24} color={colors.foreground} />
+      <View className="flex-row items-center justify-between px-4 py-3 border-b border-border">
+        <View className="flex-row items-center gap-3">
+          <TouchableOpacity onPress={() => router.back()}>
+            <ArrowLeft size={24} color={colors.foreground} />
+          </TouchableOpacity>
+          <Text className="text-base font-semibold text-foreground">Goals</Text>
+        </View>
+        <TouchableOpacity onPress={() => setShowCreate(true)} className="flex-row items-center gap-1">
+          <Plus size={18} color={colors.teal} />
+          <Text className="text-sm font-medium text-teal">New</Text>
         </TouchableOpacity>
-        <Text className="text-base font-semibold text-foreground">Goals</Text>
       </View>
+
+      {/* Create Goal Modal */}
+      <Modal visible={showCreate} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowCreate(false)}>
+        <View className="flex-1 bg-background">
+          <View className="flex-row items-center justify-between px-4 py-4 border-b border-border">
+            <Text className="text-base font-semibold text-foreground">Create Goal</Text>
+            <TouchableOpacity onPress={() => setShowCreate(false)}>
+              <X size={24} color={colors.foreground} />
+            </TouchableOpacity>
+          </View>
+          <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8" keyboardShouldPersistTaps="handled">
+              <Input label="Goal Name" value={newGoal.name} onChangeText={(v) => setNewGoal((g) => ({ ...g, name: v }))} placeholder="e.g. Lose 5kg" />
+              <Input label="Description (optional)" value={newGoal.description} onChangeText={(v) => setNewGoal((g) => ({ ...g, description: v }))} multiline />
+              <Text className="text-sm font-medium text-foreground">Type</Text>
+              <View className="flex-row gap-2">
+                {(['TARGET', 'HABIT'] as const).map((t) => (
+                  <TouchableOpacity
+                    key={t}
+                    className={`flex-1 items-center py-3 rounded-lg border-2 ${newGoal.type === t ? 'border-primary bg-primary/10' : 'border-border'}`}
+                    onPress={() => setNewGoal((g) => ({ ...g, type: t }))}
+                  >
+                    <Text className={`text-sm font-medium ${newGoal.type === t ? 'text-primary' : 'text-muted-foreground'}`}>{t}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              {newGoal.type === 'TARGET' && (
+                <Input label="Target Value" value={newGoal.targetValue} onChangeText={(v) => setNewGoal((g) => ({ ...g, targetValue: v }))} keyboardType="decimal-pad" placeholder="e.g. 70" />
+              )}
+              <Input label="Deadline (optional)" value={newGoal.deadline} onChangeText={(v) => setNewGoal((g) => ({ ...g, deadline: v }))} placeholder="YYYY-MM-DD" />
+              <Button
+                onPress={() => {
+                  if (!newGoal.name.trim()) { Alert.alert('Error', 'Name is required'); return; }
+                  createGoal.mutate(
+                    {
+                      name: newGoal.name,
+                      description: newGoal.description || undefined,
+                      type: newGoal.type,
+                      targetValue: newGoal.targetValue ? parseFloat(newGoal.targetValue) : undefined,
+                      deadline: newGoal.deadline || undefined,
+                    } as any,
+                    {
+                      onSuccess: () => {
+                        invalidate();
+                        setShowCreate(false);
+                        setNewGoal({ name: '', description: '', type: 'TARGET', targetValue: '', deadline: '' });
+                      },
+                      onError: () => Alert.alert('Error', 'Failed to create goal'),
+                    },
+                  );
+                }}
+                loading={createGoal.isPending}
+              >
+                Create Goal
+              </Button>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
 
       <View className="flex-row px-4 py-3 gap-2">
         {FILTERS.map(({ key, label }) => (

@@ -19,6 +19,15 @@ import { Text, Card, CardContent, Skeleton } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useDiaryEntries, useDailyNutrition } from '@/api/diary';
 import { useClients } from '@/api/client';
+import {
+  WeightLogger,
+  WaterLogger,
+  MoodLogger,
+  SleepLogger,
+  StepsLogger,
+  WorkoutLogger,
+  FoodLogger,
+} from '@/components/diary';
 import { colors } from '@/constants/theme';
 
 const ENTRY_TYPES = [
@@ -33,8 +42,19 @@ const ENTRY_TYPES = [
 
 const formatDate = (d: Date) => d.toISOString().split('T')[0]!;
 
+const LOGGER_MAP: Record<string, string> = {
+  FOOD: 'food',
+  WATER: 'water',
+  WEIGHT: 'weight',
+  MOOD: 'mood',
+  SLEEP: 'sleep',
+  WORKOUT_LOG: 'workout',
+  STEPS: 'steps',
+};
+
 const TraineeDiary = () => {
   const [date, setDate] = useState(() => new Date());
+  const [activeLogger, setActiveLogger] = useState<string | null>(null);
   const dateStr = formatDate(date);
   const { data: entries, isLoading, refetch } = useDiaryEntries(dateStr);
   const { data: nutrition } = useDailyNutrition(dateStr);
@@ -133,7 +153,10 @@ const TraineeDiary = () => {
                         )}
                       </View>
                     </View>
-                    <RNTouchableOpacity className="w-8 h-8 rounded-full bg-secondary items-center justify-center">
+                    <RNTouchableOpacity
+                      className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
+                      onPress={() => setActiveLogger(LOGGER_MAP[type] ?? null)}
+                    >
                       <Plus size={16} color={colors.mutedForeground} />
                     </RNTouchableOpacity>
                   </View>
@@ -158,6 +181,15 @@ const TraineeDiary = () => {
           })}
         </View>
       )}
+
+      {/* Logger Modals */}
+      <WeightLogger visible={activeLogger === 'weight'} onClose={() => setActiveLogger(null)} date={dateStr} />
+      <WaterLogger visible={activeLogger === 'water'} onClose={() => setActiveLogger(null)} date={dateStr} />
+      <MoodLogger visible={activeLogger === 'mood'} onClose={() => setActiveLogger(null)} date={dateStr} />
+      <SleepLogger visible={activeLogger === 'sleep'} onClose={() => setActiveLogger(null)} date={dateStr} />
+      <StepsLogger visible={activeLogger === 'steps'} onClose={() => setActiveLogger(null)} date={dateStr} />
+      <WorkoutLogger visible={activeLogger === 'workout'} onClose={() => setActiveLogger(null)} date={dateStr} />
+      <FoodLogger visible={activeLogger === 'food'} onClose={() => setActiveLogger(null)} date={dateStr} />
     </ScrollView>
   );
 };

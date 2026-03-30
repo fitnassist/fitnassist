@@ -1,9 +1,10 @@
-import { View, FlatList, RefreshControl, Image } from 'react-native';
+import { useState } from 'react';
+import { View, FlatList, RefreshControl, Image, Alert, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Heart, MessageCircle } from 'lucide-react-native';
+import { ArrowLeft, Heart, MessageCircle, Send } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Skeleton } from '@/components/ui';
+import { Text, Button, Skeleton } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { formatDistanceToNow } from '@/lib/dates';
 import { colors } from '@/constants/theme';
@@ -55,9 +56,25 @@ const FeedScreen = () => {
     { limit: 20 },
     { getNextPageParam: (lastPage: any) => lastPage.nextCursor },
   );
+  const [postText, setPostText] = useState('');
   const likeMutation = trpc.post.like.useMutation();
   const unlikeMutation = trpc.post.unlike.useMutation();
+  const createPost = trpc.post.create.useMutation();
   const utils = trpc.useUtils();
+
+  const handleCreatePost = () => {
+    if (!postText.trim()) return;
+    createPost.mutate(
+      { content: postText.trim() } as any,
+      {
+        onSuccess: () => {
+          setPostText('');
+          utils.post.getFeed.invalidate();
+        },
+        onError: () => Alert.alert('Error', 'Failed to create post'),
+      },
+    );
+  };
 
   const posts = data?.pages.flatMap((p: any) => p.items ?? p) ?? [];
 
@@ -85,6 +102,30 @@ const FeedScreen = () => {
       ) : (
         <FlatList
           data={posts}
+          ListHeaderComponent={
+            <View className="px-4 py-4 border-b border-border gap-2">
+              <TextInput
+                value={postText}
+                onChangeText={setPostText}
+                placeholder="What's on your mind?"
+                placeholderTextColor={colors.mutedForeground}
+                multiline
+                className="bg-card border border-border rounded-lg px-4 py-3 text-sm text-foreground"
+                style={{ fontSize: 14, minHeight: 60 }}
+              />
+              {postText.trim().length > 0 && (
+                <View className="flex-row justify-between items-center">
+                  <Text className="text-xs text-muted-foreground">{postText.length}/2000</Text>
+                  <Button size="sm" onPress={handleCreatePost} loading={createPost.isPending}>
+                    <View className="flex-row items-center gap-1">
+                      <Send size={14} color="#fff" />
+                      <Text className="text-sm font-semibold text-white">Post</Text>
+                    </View>
+                  </Button>
+                </View>
+              )}
+            </View>
+          }
           keyExtractor={(item: any) => item.id}
           renderItem={({ item }) => (
             <PostCard post={item} onLike={() => handleLike(item.id)} onUnlike={() => handleUnlike(item.id)} />
