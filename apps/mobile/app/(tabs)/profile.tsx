@@ -29,6 +29,9 @@ import { Text, Card, CardContent } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile } from '@/api/trainee';
+import { trpc } from '@/lib/trpc';
+import { hasFeatureAccess, type Feature } from '@fitnassist/schemas';
+import { Lock } from 'lucide-react-native';
 import { colors } from '@/constants/theme';
 
 interface MenuItemProps {
@@ -36,19 +39,31 @@ interface MenuItemProps {
   icon: React.ElementType;
   onPress: () => void;
   destructive?: boolean;
+  locked?: boolean;
+  lockedLabel?: string;
 }
 
-const MenuItem = ({ label, icon: Icon, onPress, destructive }: MenuItemProps) => (
+const MenuItem = ({ label, icon: Icon, onPress, destructive, locked, lockedLabel }: MenuItemProps) => (
   <TouchableOpacity
-    className="flex-row items-center py-3.5 px-1 gap-3"
+    className={`flex-row items-center py-3.5 px-1 gap-3 ${locked ? 'opacity-40' : ''}`}
     activeOpacity={0.6}
-    onPress={onPress}
+    onPress={() => {
+      if (locked) {
+        Alert.alert('Upgrade Required', lockedLabel ?? 'Upgrade your subscription to unlock this feature');
+      } else {
+        onPress();
+      }
+    }}
   >
     <Icon size={20} color={destructive ? colors.destructive : colors.mutedForeground} />
     <Text className={`flex-1 text-base ${destructive ? 'text-destructive' : 'text-foreground'}`}>
       {label}
     </Text>
-    {!destructive && <ChevronRight size={18} color={colors.mutedForeground} />}
+    {locked ? (
+      <Lock size={14} color={colors.mutedForeground} />
+    ) : !destructive ? (
+      <ChevronRight size={18} color={colors.mutedForeground} />
+    ) : null}
   </TouchableOpacity>
 );
 
@@ -60,6 +75,11 @@ const ProfileScreen = () => {
   const isTrainer = role === 'TRAINER';
   const { data: trainerProfile } = useMyTrainerProfile();
   const { data: traineeProfile } = useMyTraineeProfile();
+  const { data: subscription } = trpc.subscription.getCurrent.useQuery(undefined, {
+    enabled: isTrainer,
+  });
+  const currentTier = (subscription?.effectiveTier ?? 'FREE') as 'FREE' | 'PRO' | 'ELITE';
+  const canAccess = (feature: Feature) => hasFeatureAccess(currentTier, feature);
 
   const profileImage = isTrainer ? trainerProfile?.profileImageUrl : traineeProfile?.avatarUrl;
   const displayName = isTrainer ? trainerProfile?.displayName : user?.name;
@@ -168,24 +188,32 @@ const ProfileScreen = () => {
                     label="Clients"
                     icon={Users}
                     onPress={() => router.push('/dashboard/clients')}
+                    locked={!canAccess('clientManagement')}
+                    lockedLabel="Upgrade to Pro to manage clients"
                   />
                   <Divider />
                   <MenuItem
                     label="Onboarding"
                     icon={ClipboardCheck}
                     onPress={() => router.push('/dashboard/onboarding')}
+                    locked={!canAccess('clientManagement')}
+                    lockedLabel="Upgrade to Pro to use onboarding"
                   />
                   <Divider />
                   <MenuItem
                     label="Resources"
                     icon={BookOpen}
                     onPress={() => router.push('/dashboard/resources')}
+                    locked={!canAccess('resources')}
+                    lockedLabel="Upgrade to Pro to access resources"
                   />
                   <Divider />
                   <MenuItem
                     label="Analytics"
                     icon={BarChart3}
                     onPress={() => router.push('/dashboard/analytics')}
+                    locked={!canAccess('advancedAnalytics')}
+                    lockedLabel="Upgrade to Elite for advanced analytics"
                   />
                   <Divider />
                   <MenuItem
@@ -206,12 +234,16 @@ const ProfileScreen = () => {
                     label="Website Builder"
                     icon={Globe}
                     onPress={() => router.push('/dashboard/website')}
+                    locked={!canAccess('websiteBuilder')}
+                    lockedLabel="Upgrade to Elite for the website builder"
                   />
                   <Divider />
                   <MenuItem
                     label="Storefront"
                     icon={ShoppingBag}
                     onPress={() => router.push('/dashboard/storefront')}
+                    locked={!canAccess('productStorefront')}
+                    lockedLabel="Upgrade to Elite for the product storefront"
                   />
                 </CardContent>
               </Card>
