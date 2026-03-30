@@ -13,6 +13,7 @@ import {
 import { Text, Card, CardContent, Skeleton, Badge } from '@/components/ui';
 import { useMyTrainerProfile, useDashboardStats } from '@/api/trainer';
 import { useContactStats } from '@/api/connection';
+import { useRecentClientActivity } from '@/api/diary';
 import { useUnreadMessageCount } from '@/api/message';
 import { StatCard } from './StatCard';
 import { QuickAction } from './QuickAction';
@@ -24,6 +25,7 @@ export const TrainerDashboard = () => {
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useDashboardStats();
   const { data: contactStats, refetch: refetchContacts } = useContactStats();
   const { data: unreadCount } = useUnreadMessageCount();
+  const { data: recentActivity } = useRecentClientActivity();
 
   const onRefresh = async () => {
     await Promise.all([refetchProfile(), refetchStats(), refetchContacts()]);
@@ -139,7 +141,7 @@ export const TrainerDashboard = () => {
             label="Edit Profile"
             description="Update bio, services, photos"
             icon={UserPen}
-            onPress={() => router.push('/dashboard/settings')}
+            onPress={() => router.push('/dashboard/profile/edit')}
           />
           <QuickAction
             label="View Profile"
@@ -165,6 +167,32 @@ export const TrainerDashboard = () => {
           />
         </View>
       </View>
+
+      {/* Client Activity Feed */}
+      {recentActivity && (recentActivity as any[]).length > 0 && (
+        <View className="px-4 mt-4 gap-2">
+          <Text className="text-sm font-medium text-teal uppercase mb-1" style={{ letterSpacing: 1 }}>
+            Recent Client Activity
+          </Text>
+          {(recentActivity as any[]).slice(0, 10).map((entry: any) => (
+            <Card key={entry.id}>
+              <CardContent className="py-3 px-4 flex-row items-center gap-3">
+                <View className="w-8 h-8 rounded-full bg-secondary items-center justify-center">
+                  <Text className="text-xs font-semibold text-foreground">
+                    {(entry.user?.name ?? '?').charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <View className="flex-1">
+                  <Text className="text-sm text-foreground">{entry.user?.name ?? 'Client'}</Text>
+                  <Text className="text-xs text-muted-foreground">
+                    {entry.type?.replace(/_/g, ' ').toLowerCase() ?? 'activity'}
+                  </Text>
+                </View>
+              </CardContent>
+            </Card>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 };

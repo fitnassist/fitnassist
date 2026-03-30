@@ -10,7 +10,9 @@ interface ConversationItemProps {
   lastMessage: string | null;
   lastMessageAt: string | null;
   unreadCount: number;
+  status?: string;
   onPress: () => void;
+  onLongPress?: () => void;
 }
 
 export const ConversationItem = ({
@@ -19,8 +21,11 @@ export const ConversationItem = ({
   lastMessage,
   lastMessageAt,
   unreadCount,
+  status,
   onPress,
+  onLongPress,
 }: ConversationItemProps) => {
+  const isDisconnected = status === 'CLOSED';
   const hasUnread = unreadCount > 0;
 
   return (
@@ -28,6 +33,7 @@ export const ConversationItem = ({
       className="flex-row items-center px-4 py-3 gap-3"
       activeOpacity={0.6}
       onPress={onPress}
+      onLongPress={onLongPress}
     >
       {imageUrl ? (
         <Image source={{ uri: imageUrl }} className="w-12 h-12 rounded-full" />
@@ -58,7 +64,7 @@ export const ConversationItem = ({
             className={`text-sm flex-1 mr-2 ${hasUnread ? 'text-foreground' : 'text-muted-foreground'}`}
             numberOfLines={1}
           >
-            {lastMessage ?? 'No messages yet'}
+            {isDisconnected ? 'Disconnected' : (lastMessage ?? 'No messages yet')}
           </Text>
           {hasUnread && (
             <View

@@ -44,6 +44,47 @@ const NameSection = () => {
   );
 };
 
+const EmailSection = () => {
+  const { user } = useAuth();
+  const [newEmail, setNewEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!newEmail.trim() || !password) return;
+    setSaving(true);
+    try {
+      await authClient.changeEmail({
+        newEmail: newEmail.trim(),
+        currentPassword: password,
+      } as any);
+      Alert.alert('Success', 'Check your new email for a verification link');
+      setNewEmail('');
+      setPassword('');
+    } catch {
+      Alert.alert('Error', 'Failed to change email. Check your password.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent className="py-4 px-4 gap-3">
+        <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+          Email
+        </Text>
+        <Text className="text-xs text-muted-foreground">Current: {user?.email}</Text>
+        <Input value={newEmail} onChangeText={setNewEmail} placeholder="New email" keyboardType="email-address" />
+        <Input value={password} onChangeText={setPassword} placeholder="Current password" secureTextEntry />
+        <Button onPress={handleSave} loading={saving} size="sm">
+          Change Email
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
 const PasswordSection = () => {
   const [current, setCurrent] = useState('');
   const [newPw, setNewPw] = useState('');
@@ -164,6 +205,7 @@ const SettingsScreen = () => {
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">
         <NameSection />
+        <EmailSection />
         <PasswordSection />
         <DangerSection />
       </ScrollView>

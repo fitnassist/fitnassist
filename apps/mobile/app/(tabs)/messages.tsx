@@ -1,9 +1,9 @@
-import { View, FlatList, RefreshControl } from 'react-native';
+import { View, FlatList, RefreshControl, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MessageCircle } from 'lucide-react-native';
 import { Text, Skeleton } from '@/components/ui';
-import { useConnections } from '@/api/message';
+import { useConnections, useArchiveConversation, useDeleteConversation } from '@/api/message';
 import { useAuth } from '@/hooks/useAuth';
 import { ConversationItem } from '@/components/messages';
 import { colors } from '@/constants/theme';
@@ -12,6 +12,28 @@ const MessagesScreen = () => {
   const router = useRouter();
   const { user } = useAuth();
   const { data: connections, isLoading, refetch } = useConnections(false);
+  const archiveConversation = useArchiveConversation();
+  const deleteConversation = useDeleteConversation();
+
+  const handleLongPress = (connectionId: string, name: string) => {
+    Alert.alert(name, 'What would you like to do?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Archive',
+        onPress: () => archiveConversation.mutate({ connectionId }),
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          Alert.alert('Delete Conversation', 'This will hide all messages. New messages will make it reappear.', [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Delete', style: 'destructive', onPress: () => deleteConversation.mutate({ connectionId }) },
+          ]);
+        },
+      },
+    ]);
+  };
 
   const conversations = connections ?? [];
 
@@ -94,7 +116,9 @@ const MessagesScreen = () => {
               <ConversationItem
                 id={item.id}
                 {...info}
+                status={item.status}
                 onPress={() => router.push(`/messages/${item.id}`)}
+                onLongPress={() => handleLongPress(item.id, info.name)}
               />
             );
           }}
