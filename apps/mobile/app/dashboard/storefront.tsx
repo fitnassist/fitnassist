@@ -14,7 +14,7 @@ const webUrl = apiUrl.replace(':3001', ':5173');
 
 const StorefrontScreen = () => {
   const router = useRouter();
-  const { data: products, isLoading, refetch } = trpc.product.list.useQuery({});
+  const { data: products, isLoading, refetch } = trpc.product.list.useQuery();
 
   const items = Array.isArray(products) ? products : (products as any)?.items ?? [];
 

@@ -15,8 +15,8 @@ const STATUS_COLORS: Record<string, 'default' | 'secondary' | 'destructive'> = {
 };
 
 const ClientCard = ({ client, onPress }: { client: any; onPress: () => void }) => {
-  const name = client.client?.user?.name ?? client.clientName ?? 'Unknown';
-  const image = client.client?.user?.traineeProfile?.avatarUrl ?? client.client?.user?.image ?? null;
+  const name = client.connection?.sender?.name ?? client.connection?.name ?? 'Unknown';
+  const image = client.connection?.sender?.traineeProfile?.avatarUrl ?? client.connection?.sender?.image ?? null;
   const status = client.status ?? 'ACTIVE';
 
   return (
@@ -33,8 +33,8 @@ const ClientCard = ({ client, onPress }: { client: any; onPress: () => void }) =
             )}
             <View className="flex-1 gap-0.5">
               <Text className="text-base font-semibold text-foreground">{name}</Text>
-              {client.client?.user?.email && (
-                <Text className="text-xs text-muted-foreground">{client.client.user.email}</Text>
+              {client.connection?.sender?.email && (
+                <Text className="text-xs text-muted-foreground">{client.connection.sender.email}</Text>
               )}
             </View>
             <Badge variant={STATUS_COLORS[status] ?? 'secondary'}>

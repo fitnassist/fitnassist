@@ -67,7 +67,7 @@ const BookingDetailScreen = () => {
   }
 
   const otherName = isTrainer
-    ? (booking as any).clientRoster?.client?.user?.name ?? 'Client'
+    ? (booking as any).clientRoster?.connection?.sender?.name ?? (booking as any).clientRoster?.connection?.name ?? 'Client'
     : (booking as any).trainer?.displayName ?? 'Trainer';
   const date = new Date(booking.date);
   const dateStr = date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });

@@ -16,11 +16,11 @@ const webUrl = apiUrl.replace(':3001', ':5173');
 const WebsiteScreen = () => {
   const router = useRouter();
   const { data: profile, isLoading } = useMyTrainerProfile();
-  const { data: website, refetch } = trpc.website.get.useQuery(undefined, {
+  const { data: website, refetch } = trpc.website.getMyWebsite.useQuery(undefined, {
     retry: false,
   });
 
-  const isPublished = website?.isPublished ?? false;
+  const isPublished = (website as any)?.isPublished || !!(website as any)?.publishedAt;
 
   const openEditor = () => {
     WebBrowser.openBrowserAsync(`${webUrl}/dashboard/website`);

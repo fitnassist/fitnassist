@@ -25,6 +25,8 @@ const ToggleRow = ({ label, value, onToggle }: ToggleRowProps) => (
   </View>
 );
 
+const Divider = () => <View className="border-b border-border" />;
+
 const NotificationsScreen = () => {
   const router = useRouter();
   const { data: prefs, isLoading } = trpc.user.getNotificationPreferences.useQuery();
@@ -34,13 +36,14 @@ const NotificationsScreen = () => {
   const utils = trpc.useUtils();
 
   const toggle = (key: string, value: boolean) => {
-    utils.user.getNotificationPreferences.setData(undefined, (old) =>
-      old ? { ...old, [key]: value } : old,
-    );
-    update.mutate({ [key]: value } as never);
+    if (!prefs) return;
+    // Send full object with the toggled field
+    const updated = { ...prefs, [key]: value };
+    utils.user.getNotificationPreferences.setData(undefined, updated);
+    update.mutate(updated as any);
   };
 
-  if (isLoading) {
+  if (isLoading || !prefs) {
     return (
       <SafeAreaView className="flex-1 bg-background">
         <View className="flex-row items-center gap-3 px-4 py-3 border-b border-border">
@@ -72,41 +75,21 @@ const NotificationsScreen = () => {
             <Text className="text-sm font-medium text-teal uppercase mb-2" style={{ letterSpacing: 1 }}>
               Push Notifications
             </Text>
-            <ToggleRow
-              label="Connection requests"
-              value={prefs?.pushNotifyConnectionRequests ?? true}
-              onToggle={(v) => toggle('pushNotifyConnectionRequests', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Messages"
-              value={prefs?.pushNotifyMessages ?? true}
-              onToggle={(v) => toggle('pushNotifyMessages', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Bookings"
-              value={prefs?.pushNotifyBookings ?? true}
-              onToggle={(v) => toggle('pushNotifyBookings', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Booking reminders"
-              value={prefs?.pushNotifyBookingReminders ?? true}
-              onToggle={(v) => toggle('pushNotifyBookingReminders', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Plan assignments"
-              value={prefs?.pushNotifyPlanAssignments ?? true}
-              onToggle={(v) => toggle('pushNotifyPlanAssignments', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Goals"
-              value={prefs?.pushNotifyGoals ?? true}
-              onToggle={(v) => toggle('pushNotifyGoals', v)}
-            />
+            <ToggleRow label="Connection requests" value={prefs.pushNotifyConnectionRequests} onToggle={(v) => toggle('pushNotifyConnectionRequests', v)} />
+            <Divider />
+            <ToggleRow label="Messages" value={prefs.pushNotifyMessages} onToggle={(v) => toggle('pushNotifyMessages', v)} />
+            <Divider />
+            <ToggleRow label="Bookings" value={prefs.pushNotifyBookings} onToggle={(v) => toggle('pushNotifyBookings', v)} />
+            <Divider />
+            <ToggleRow label="Booking reminders" value={prefs.pushNotifyBookingReminders} onToggle={(v) => toggle('pushNotifyBookingReminders', v)} />
+            <Divider />
+            <ToggleRow label="Plan assignments" value={prefs.pushNotifyPlanAssignments} onToggle={(v) => toggle('pushNotifyPlanAssignments', v)} />
+            <Divider />
+            <ToggleRow label="Goals" value={prefs.pushNotifyGoals} onToggle={(v) => toggle('pushNotifyGoals', v)} />
+            <Divider />
+            <ToggleRow label="Onboarding" value={prefs.pushNotifyOnboarding} onToggle={(v) => toggle('pushNotifyOnboarding', v)} />
+            <Divider />
+            <ToggleRow label="Diary updates" value={prefs.pushNotifyDiary} onToggle={(v) => toggle('pushNotifyDiary', v)} />
           </CardContent>
         </Card>
 
@@ -115,35 +98,32 @@ const NotificationsScreen = () => {
             <Text className="text-sm font-medium text-teal uppercase mb-2" style={{ letterSpacing: 1 }}>
               Email Notifications
             </Text>
-            <ToggleRow
-              label="Connection requests"
-              value={prefs?.emailNotifyConnectionRequests ?? true}
-              onToggle={(v) => toggle('emailNotifyConnectionRequests', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Messages"
-              value={prefs?.emailNotifyMessages ?? true}
-              onToggle={(v) => toggle('emailNotifyMessages', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Bookings"
-              value={prefs?.emailNotifyBookings ?? true}
-              onToggle={(v) => toggle('emailNotifyBookings', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Weekly report"
-              value={prefs?.emailNotifyWeeklyReport ?? true}
-              onToggle={(v) => toggle('emailNotifyWeeklyReport', v)}
-            />
-            <View className="border-b border-border" />
-            <ToggleRow
-              label="Marketing"
-              value={prefs?.emailNotifyMarketing ?? false}
-              onToggle={(v) => toggle('emailNotifyMarketing', v)}
-            />
+            <ToggleRow label="Connection requests" value={prefs.emailNotifyConnectionRequests} onToggle={(v) => toggle('emailNotifyConnectionRequests', v)} />
+            <Divider />
+            <ToggleRow label="Messages" value={prefs.emailNotifyMessages} onToggle={(v) => toggle('emailNotifyMessages', v)} />
+            <Divider />
+            <ToggleRow label="Bookings" value={prefs.emailNotifyBookings} onToggle={(v) => toggle('emailNotifyBookings', v)} />
+            <Divider />
+            <ToggleRow label="Booking reminders" value={prefs.emailNotifyBookingReminders} onToggle={(v) => toggle('emailNotifyBookingReminders', v)} />
+            <Divider />
+            <ToggleRow label="Weekly report" value={prefs.emailNotifyWeeklyReport} onToggle={(v) => toggle('emailNotifyWeeklyReport', v)} />
+            <Divider />
+            <ToggleRow label="Marketing" value={prefs.emailNotifyMarketing} onToggle={(v) => toggle('emailNotifyMarketing', v)} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="py-3 px-4">
+            <Text className="text-sm font-medium text-teal uppercase mb-2" style={{ letterSpacing: 1 }}>
+              SMS Notifications
+            </Text>
+            <ToggleRow label="Connection requests" value={prefs.smsNotifyConnectionRequests} onToggle={(v) => toggle('smsNotifyConnectionRequests', v)} />
+            <Divider />
+            <ToggleRow label="Messages" value={prefs.smsNotifyMessages} onToggle={(v) => toggle('smsNotifyMessages', v)} />
+            <Divider />
+            <ToggleRow label="Bookings" value={prefs.smsNotifyBookings} onToggle={(v) => toggle('smsNotifyBookings', v)} />
+            <Divider />
+            <ToggleRow label="Booking reminders" value={prefs.smsNotifyBookingReminders} onToggle={(v) => toggle('smsNotifyBookingReminders', v)} />
           </CardContent>
         </Card>
       </ScrollView>

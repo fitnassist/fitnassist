@@ -34,7 +34,7 @@ interface BookingCardProps {
 export const BookingCard = ({ booking, isTrainer, onPress }: BookingCardProps) => {
   const status = STATUS_STYLES[booking.status] ?? { label: booking.status, variant: 'secondary' as const };
   const otherName = isTrainer
-    ? booking.clientRoster?.client?.user?.name ?? 'Client'
+    ? (booking as any).clientRoster?.connection?.sender?.name ?? (booking as any).clientRoster?.connection?.name ?? 'Client'
     : booking.trainer?.displayName ?? 'Trainer';
   const date = new Date(booking.date);
   const dateStr = date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });

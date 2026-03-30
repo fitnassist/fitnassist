@@ -184,7 +184,7 @@ const TrainerClientsTab = () => {
       ) : (
         <View className="gap-2">
           {((clients as any)?.clients ?? []).map((client: any) => {
-            const name = client.client?.user?.name ?? client.clientName ?? 'Unknown';
+            const name = client.connection?.sender?.name ?? client.connection?.name ?? 'Unknown';
             return (
               <RNTouchableOpacity
                 key={client.id}
