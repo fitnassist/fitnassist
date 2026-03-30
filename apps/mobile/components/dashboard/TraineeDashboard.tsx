@@ -61,14 +61,14 @@ export const TraineeDashboard = () => {
       className="flex-1"
       contentContainerClassName="pb-8"
       refreshControl={
-        <RefreshControl refreshing={false} onRefresh={onRefresh} tintColor={colors.primary} />
+        <RefreshControl refreshing={false} onRefresh={onRefresh} tintColor={colors.teal} />
       }
     >
       {/* Today Summary */}
       <View className="px-4 mb-6">
         <Card>
           <CardContent className="py-4 px-4 gap-4">
-            <Text className="text-sm font-medium text-muted-foreground uppercase" style={{ letterSpacing: 1 }}>
+            <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
               Today
             </Text>
 
@@ -87,7 +87,7 @@ export const TraineeDashboard = () => {
                 </View>
                 <View className="h-2 bg-secondary rounded-full overflow-hidden">
                   <View
-                    className="h-full bg-primary rounded-full"
+                    className="h-full bg-teal rounded-full"
                     style={{ width: `${calorieProgress * 100}%` }}
                   />
                 </View>
@@ -127,10 +127,10 @@ export const TraineeDashboard = () => {
                         className={`w-9 h-9 rounded-full items-center justify-center ${
                           logged ? '' : 'opacity-30'
                         }`}
-                        style={{ backgroundColor: logged ? color : 'transparent', borderWidth: logged ? 0 : 1, borderColor: color }}
+                        style={{ backgroundColor: logged ? colors.teal : 'transparent', borderWidth: logged ? 0 : 1, borderColor: logged ? colors.teal : color }}
                       >
                         {logged ? (
-                          <CheckCircle size={16} color="#fff" />
+                          <CheckCircle size={16} color={colors.tealForeground} />
                         ) : (
                           <Icon size={16} color={color} />
                         )}
@@ -150,7 +150,7 @@ export const TraineeDashboard = () => {
         <View className="px-4 mb-6">
           <Card>
             <CardContent className="py-4 px-4 gap-2">
-              <Text className="text-sm font-medium text-muted-foreground uppercase" style={{ letterSpacing: 1 }}>
+              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
                 Upcoming Bookings
               </Text>
               {bookings.slice(0, 3).map((booking: { id: string; startTime: string; trainer?: { displayName?: string } }) => (
@@ -178,7 +178,7 @@ export const TraineeDashboard = () => {
 
       {/* Quick Actions */}
       <View className="px-4 gap-2">
-        <Text className="text-sm font-medium text-muted-foreground uppercase mb-1" style={{ letterSpacing: 1 }}>
+        <Text className="text-sm font-medium text-teal uppercase mb-1" style={{ letterSpacing: 1 }}>
           Quick Actions
         </Text>
         <View className="flex-row gap-2">

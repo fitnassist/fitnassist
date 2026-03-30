@@ -9,7 +9,7 @@ interface StatCardProps {
   iconColor?: string;
 }
 
-export const StatCard = ({ label, value, icon: Icon, iconColor = 'hsl(346, 66%, 55%)' }: StatCardProps) => {
+export const StatCard = ({ label, value, icon: Icon, iconColor = 'hsl(170, 58%, 57%)' }: StatCardProps) => {
   return (
     <Card className="flex-1">
       <CardContent className="py-3 px-3 gap-2">

@@ -42,6 +42,10 @@ module.exports = {
           DEFAULT: 'hsl(346, 66%, 55%)',
           foreground: '#ffffff',
         },
+        teal: {
+          DEFAULT: 'hsl(170, 58%, 57%)',
+          foreground: 'hsl(170, 50%, 12%)',
+        },
       },
       borderRadius: {
         lg: 12,

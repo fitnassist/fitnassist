@@ -36,7 +36,7 @@ export const TrainerDashboard = () => {
       className="flex-1"
       contentContainerClassName="pb-8"
       refreshControl={
-        <RefreshControl refreshing={false} onRefresh={onRefresh} tintColor={colors.primary} />
+        <RefreshControl refreshing={false} onRefresh={onRefresh} tintColor={colors.teal} />
       }
     >
       {/* Profile Card */}
@@ -131,7 +131,7 @@ export const TrainerDashboard = () => {
 
       {/* Quick Actions */}
       <View className="px-4 gap-2">
-        <Text className="text-sm font-medium text-muted-foreground uppercase mb-1" style={{ letterSpacing: 1 }}>
+        <Text className="text-sm font-medium text-teal uppercase mb-1" style={{ letterSpacing: 1 }}>
           Quick Actions
         </Text>
         <View className="flex-row gap-2">

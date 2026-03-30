@@ -9,4 +9,6 @@ export const colors = {
   border: 'hsl(230, 15%, 22%)',
   card: 'hsl(230, 18%, 14%)',
   coral: 'hsl(346, 66%, 55%)',
+  teal: 'hsl(170, 58%, 57%)',
+  tealForeground: 'hsl(170, 50%, 12%)',
 } as const;

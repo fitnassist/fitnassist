@@ -10,9 +10,9 @@ export const trpc = createTRPCReact<AppRouter>();
 const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:3001';
 
 const getAuthHeaders = async () => {
-  const cookieHeader = await SecureStore.getItemAsync('better-auth.session_token');
-  if (cookieHeader) {
-    return { Authorization: `Bearer ${cookieHeader}` };
+  const cookieData = await SecureStore.getItemAsync('fitnassist_cookie');
+  if (cookieData) {
+    return { Cookie: cookieData };
   }
   return {};
 };

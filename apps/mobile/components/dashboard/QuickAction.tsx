@@ -18,7 +18,7 @@ export const QuickAction = ({ label, description, icon: Icon, onPress, badge }: 
       onPress={onPress}
     >
       <View className="flex-row items-center justify-between">
-        <Icon size={20} color="hsl(346, 66%, 55%)" />
+        <Icon size={20} color="hsl(170, 58%, 57%)" />
         {badge !== undefined && badge > 0 && (
           <View className="bg-primary rounded-full h-5 min-w-[20px] items-center justify-center px-1">
             <Text className="text-[10px] font-bold text-white">{badge}</Text>
