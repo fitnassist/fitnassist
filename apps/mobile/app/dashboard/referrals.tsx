@@ -102,11 +102,11 @@ const ReferralsScreen = () => {
           <View className="gap-2">
             {[1, 2].map((i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
           </View>
-        ) : (history?.referrals ?? []).length === 0 ? (
+        ) : (history?.items ?? []).length === 0 ? (
           <Text className="text-sm text-muted-foreground text-center py-6">No referrals yet. Share your link to get started!</Text>
         ) : (
           <View className="gap-2">
-            {(history?.referrals ?? []).map((ref: any) => (
+            {(history?.items ?? []).map((ref: any) => (
               <Card key={ref.id}>
                 <CardContent className="py-3 px-4 flex-row items-center justify-between">
                   <View>

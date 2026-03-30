@@ -105,19 +105,29 @@ const AnalyticsScreen = () => {
             <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
               Booking Trends (12 weeks)
             </Text>
-            {bookingData ? (
+            {bookingData && Array.isArray(bookingData) && bookingData.length > 0 ? (
               <View className="gap-2">
                 <View className="flex-row justify-between">
                   <View className="items-center">
-                    <Text className="text-lg font-bold text-foreground">{bookingData.totalBookings ?? 0}</Text>
+                    <Text className="text-lg font-bold text-foreground">
+                      {bookingData.reduce((sum: number, w: any) => sum + (w.completed ?? 0) + (w.cancelled ?? 0) + (w.upcoming ?? 0), 0)}
+                    </Text>
                     <Text className="text-xs text-muted-foreground">Total</Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-lg font-bold text-foreground">{bookingData.avgPerWeek?.toFixed(1) ?? '0'}</Text>
+                    <Text className="text-lg font-bold text-foreground">
+                      {(bookingData.reduce((sum: number, w: any) => sum + (w.completed ?? 0) + (w.cancelled ?? 0) + (w.upcoming ?? 0), 0) / bookingData.length).toFixed(1)}
+                    </Text>
                     <Text className="text-xs text-muted-foreground">Avg/Week</Text>
                   </View>
                   <View className="items-center">
-                    <Text className="text-lg font-bold text-teal">{bookingData.completionRate ?? 0}%</Text>
+                    <Text className="text-lg font-bold text-teal">
+                      {(() => {
+                        const total = bookingData.reduce((s: number, w: any) => s + (w.completed ?? 0) + (w.cancelled ?? 0), 0);
+                        const completed = bookingData.reduce((s: number, w: any) => s + (w.completed ?? 0), 0);
+                        return total > 0 ? Math.round((completed / total) * 100) : 0;
+                      })()}%
+                    </Text>
                     <Text className="text-xs text-muted-foreground">Completion</Text>
                   </View>
                 </View>

@@ -97,7 +97,7 @@ const CreateBookingScreen = () => {
               </View>
             ) : (
               <View className="gap-2">
-                {(clients ?? []).map((client: any) => {
+                {((clients as any)?.clients ?? []).map((client: any) => {
                   const name = client.client?.user?.name ?? client.clientName ?? 'Unknown';
                   const selected = client.id === clientRosterId;
                   return (

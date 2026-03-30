@@ -1,7 +1,7 @@
 import { trpc } from '@/lib/trpc';
 
 export const useClients = () => {
-  return trpc.clientRoster.list.useQuery();
+  return trpc.clientRoster.list.useQuery({});
 };
 
 export const useClient = (id: string) => {

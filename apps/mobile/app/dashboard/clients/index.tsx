@@ -66,7 +66,7 @@ const ClientsScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={clients ?? []}
+          data={(clients as any)?.clients ?? []}
           keyExtractor={(item: any) => item.id}
           renderItem={({ item }) => (
             <ClientCard client={item} onPress={() => router.push(`/dashboard/clients/${item.id}`)} />

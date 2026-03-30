@@ -81,13 +81,13 @@ const RequestsScreen = () => {
   };
 
   const handleAccept = (id: string) => {
-    acceptConnection.mutate({ id }, { onSuccess: invalidate, onError: () => Alert.alert('Error', 'Failed to accept') });
+    acceptConnection.mutate({ requestId: id }, { onSuccess: invalidate, onError: () => Alert.alert('Error', 'Failed to accept') });
   };
 
   const handleDecline = (id: string) => {
     Alert.alert('Decline Request', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Decline', style: 'destructive', onPress: () => declineConnection.mutate({ id }, { onSuccess: invalidate }) },
+      { text: 'Decline', style: 'destructive', onPress: () => declineConnection.mutate({ requestId: id }, { onSuccess: invalidate }) },
     ]);
   };
 
