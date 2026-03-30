@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { AppState } from 'react-native';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const RNEventSource = require('rn-eventsource-reborn').default;
+import { RNEventSource } from 'rn-eventsource-reborn';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
 import { getCookie } from '@better-auth/expo/client';
