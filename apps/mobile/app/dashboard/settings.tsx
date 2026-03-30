@@ -191,8 +191,63 @@ const DangerSection = () => {
   );
 };
 
+const SchedulingSection = () => {
+  const { data: weekly, isLoading } = trpc.availability.getWeekly.useQuery();
+  const { data: travel } = trpc.availability.getTravelSettings.useQuery();
+  const { data: video } = trpc.availability.getVideoSettings.useQuery();
+
+  return (
+    <Card>
+      <CardContent className="py-4 px-4 gap-3">
+        <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+          Scheduling
+        </Text>
+        {isLoading ? (
+          <Text className="text-sm text-muted-foreground">Loading...</Text>
+        ) : (
+          <>
+            <Text className="text-sm text-foreground font-medium">Weekly Availability</Text>
+            {(weekly ?? []).length === 0 ? (
+              <Text className="text-sm text-muted-foreground">No availability set. Use the web app to configure your schedule.</Text>
+            ) : (
+              (weekly as any[])?.map((slot: any, i: number) => (
+                <View key={i} className="flex-row justify-between py-1">
+                  <Text className="text-sm text-foreground">{slot.dayOfWeek}</Text>
+                  <Text className="text-sm text-muted-foreground">{slot.startTime} - {slot.endTime}</Text>
+                </View>
+              ))
+            )}
+
+            {travel && (
+              <View className="mt-2">
+                <Text className="text-sm text-foreground font-medium">Travel Buffer</Text>
+                <Text className="text-sm text-muted-foreground">{(travel as any).travelBufferMin ?? 15} minutes between sessions</Text>
+              </View>
+            )}
+
+            {video && (
+              <View className="mt-2">
+                <Text className="text-sm text-foreground font-medium">Video Sessions</Text>
+                <Text className="text-sm text-muted-foreground">
+                  {(video as any).offersVideoSessions ? 'Enabled' : 'Disabled'}
+                </Text>
+              </View>
+            )}
+
+            <Text className="text-xs text-muted-foreground mt-2">
+              Edit availability, date overrides, and session locations in the web app.
+            </Text>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
 const SettingsScreen = () => {
   const router = useRouter();
+  const { role } = useAuth();
+  const isTrainer = role === 'TRAINER';
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -207,6 +262,7 @@ const SettingsScreen = () => {
         <NameSection />
         <EmailSection />
         <PasswordSection />
+        {isTrainer && <SchedulingSection />}
         <DangerSection />
       </ScrollView>
     </SafeAreaView>
