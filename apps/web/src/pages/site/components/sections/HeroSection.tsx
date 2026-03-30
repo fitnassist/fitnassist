@@ -25,9 +25,7 @@ const handleCtaClick = (link: string) => {
   // Scroll to section by type anchor (e.g. #contact, #about)
   if (link.startsWith('#')) {
     const sectionType = link.slice(1); // remove #
-    console.info('[HeroSection] CTA clicked, scrolling to section type:', sectionType, '| raw link:', link);
     const el = document.querySelector(`[data-section-type="${sectionType}"]`);
-    console.info('[HeroSection] Found element:', el);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
       return;
