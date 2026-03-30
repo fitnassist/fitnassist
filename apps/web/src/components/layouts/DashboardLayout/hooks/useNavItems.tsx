@@ -16,25 +16,12 @@ const TIER_LABELS: Partial<Record<SubscriptionTier, string>> = {
 };
 
 const BASE_NAV_ITEMS: DashboardNavItem[] = [
+  // No group — always visible at top
   {
     label: 'Dashboard',
     href: routes.dashboard,
     icon: <Home className="h-5 w-5" />,
     mobileBottom: true,
-  },
-  {
-    label: 'Feed',
-    href: routes.dashboardFeed,
-    icon: <Rss className="h-5 w-5" />,
-    roles: ['TRAINEE'] as const,
-    badgeKey: 'newFeed' as const,
-  },
-  {
-    label: 'Requests',
-    href: routes.dashboardRequests,
-    icon: <Phone className="h-5 w-5" />,
-    roles: ['TRAINER'] as const,
-    badgeKey: 'requests' as const,
   },
   {
     label: 'Messages',
@@ -44,11 +31,30 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     mobileBottom: true,
   },
   {
+    label: 'Bookings',
+    href: routes.dashboardBookings,
+    icon: <Calendar className="h-5 w-5" />,
+    badgeKey: 'pendingBookings' as const,
+    requiredFeature: 'booking',
+    mobileBottom: true,
+  },
+
+  // Trainer: Business
+  {
+    label: 'Requests',
+    href: routes.dashboardRequests,
+    icon: <Phone className="h-5 w-5" />,
+    roles: ['TRAINER'] as const,
+    badgeKey: 'requests' as const,
+    group: 'Business',
+  },
+  {
     label: 'Clients',
     href: routes.dashboardClients,
     icon: <Users className="h-5 w-5" />,
     roles: ['TRAINER'] as const,
     requiredFeature: 'clientManagement',
+    group: 'Business',
   },
   {
     label: 'Onboarding',
@@ -57,47 +63,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     roles: ['TRAINER'] as const,
     badgeKey: 'onboarding' as const,
     requiredFeature: 'clientManagement',
-  },
-  {
-    label: 'Bookings',
-    href: routes.dashboardBookings,
-    icon: <Calendar className="h-5 w-5" />,
-    badgeKey: 'pendingBookings' as const,
-    requiredFeature: 'booking',
-    mobileBottom: true,
-  },
-  {
-    label: 'Analytics',
-    href: routes.dashboardAnalytics,
-    icon: <BarChart3 className="h-5 w-5" />,
-    roles: ['TRAINER'] as const,
-    requiredFeature: 'advancedAnalytics',
-  },
-  {
-    label: 'Reviews',
-    href: routes.dashboardReviews,
-    icon: <Star className="h-5 w-5" />,
-    roles: ['TRAINER'] as const,
-  },
-  {
-    label: 'Website',
-    href: routes.dashboardWebsite,
-    icon: <Globe className="h-5 w-5" />,
-    roles: ['TRAINER'] as const,
-    requiredFeature: 'websiteBuilder',
-  },
-  {
-    label: 'Storefront',
-    href: routes.dashboardStorefront,
-    icon: <ShoppingBag className="h-5 w-5" />,
-    roles: ['TRAINER'] as const,
-    requiredFeature: 'productStorefront',
-  },
-  {
-    label: 'Referrals',
-    href: routes.dashboardReferrals,
-    icon: <UserPlus className="h-5 w-5" />,
-    roles: ['TRAINER'] as const,
+    group: 'Business',
   },
   {
     label: 'Resources',
@@ -105,37 +71,90 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     icon: <BookOpen className="h-5 w-5" />,
     roles: ['TRAINER'] as const,
     requiredFeature: 'resources',
+    group: 'Business',
   },
+  {
+    label: 'Analytics',
+    href: routes.dashboardAnalytics,
+    icon: <BarChart3 className="h-5 w-5" />,
+    roles: ['TRAINER'] as const,
+    requiredFeature: 'advancedAnalytics',
+    group: 'Business',
+  },
+  {
+    label: 'Reviews',
+    href: routes.dashboardReviews,
+    icon: <Star className="h-5 w-5" />,
+    roles: ['TRAINER'] as const,
+    group: 'Business',
+  },
+
+  // Trainer: Online Presence
+  {
+    label: 'Website',
+    href: routes.dashboardWebsite,
+    icon: <Globe className="h-5 w-5" />,
+    roles: ['TRAINER'] as const,
+    requiredFeature: 'websiteBuilder',
+    group: 'Online Presence',
+  },
+  {
+    label: 'Storefront',
+    href: routes.dashboardStorefront,
+    icon: <ShoppingBag className="h-5 w-5" />,
+    roles: ['TRAINER'] as const,
+    requiredFeature: 'productStorefront',
+    group: 'Online Presence',
+  },
+
+  // Trainer: Growth
+  {
+    label: 'Referrals',
+    href: routes.dashboardReferrals,
+    icon: <UserPlus className="h-5 w-5" />,
+    roles: ['TRAINER'] as const,
+    group: 'Growth',
+  },
+
+  // Trainee: Tracking
   {
     label: 'Diary',
     href: routes.dashboardDiary,
     icon: <BookHeart className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
     mobileBottom: true,
+    group: 'Tracking',
   },
   {
     label: 'Goals',
     href: routes.dashboardGoals,
     icon: <Target className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
+    group: 'Tracking',
   },
   {
     label: 'My Plans',
     href: routes.dashboardMyPlans,
     icon: <ClipboardList className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
-  },
-  {
-    label: 'Purchases',
-    href: routes.dashboardPurchases,
-    icon: <Package className="h-5 w-5" />,
-    roles: ['TRAINEE'] as const,
+    group: 'Tracking',
   },
   {
     label: 'My Contacts',
     href: routes.dashboardContacts,
     icon: <User className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
+    group: 'Tracking',
+  },
+
+  // Trainee: Social
+  {
+    label: 'Feed',
+    href: routes.dashboardFeed,
+    icon: <Rss className="h-5 w-5" />,
+    roles: ['TRAINEE'] as const,
+    badgeKey: 'newFeed' as const,
+    group: 'Social',
   },
   {
     label: 'Friends',
@@ -143,18 +162,28 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     icon: <Heart className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
     badgeKey: 'friendRequests' as const,
+    group: 'Social',
   },
   {
     label: 'Leaderboards',
     href: routes.dashboardLeaderboards,
     icon: <Trophy className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
+    group: 'Social',
   },
   {
     label: 'Achievements',
     href: routes.dashboardAchievements,
     icon: <Award className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
+    group: 'Social',
+  },
+  {
+    label: 'Purchases',
+    href: routes.dashboardPurchases,
+    icon: <Package className="h-5 w-5" />,
+    roles: ['TRAINEE'] as const,
+    group: 'Social',
   },
 ];
 
@@ -171,7 +200,7 @@ export const useNavItems = (
         if (!isTrainer && item.roles.includes('TRAINEE')) return true;
         return false;
       })
-      .map(({ roles: _roles, badgeKey, requiredFeature, mobileBottom, ...item }) => {
+      .map(({ roles: _roles, badgeKey, requiredFeature, mobileBottom, group, ...item }) => {
         // Only gate trainer features — trainees see bookings as gated on their trainer's tier,
         // but we only show the gate for trainer-side nav
         const isGated = isTrainer && requiredFeature && !checkAccess(currentTier, requiredFeature);
@@ -185,6 +214,7 @@ export const useNavItems = (
             ? `Upgrade to ${TIER_LABELS[requiredTier] ?? requiredTier} to unlock`
             : undefined,
           mobileBottom,
+          group,
         };
       });
   }, [isTrainer, badgeCounts, currentTier]);

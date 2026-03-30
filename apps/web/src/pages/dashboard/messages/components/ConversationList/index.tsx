@@ -121,7 +121,7 @@ const ConversationRow = ({
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 focus:opacity-100 flex-shrink-0"
+              className="h-8 w-8 p-0 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 flex-shrink-0"
               onClick={(e) => e.stopPropagation()}
             >
               <MoreVertical className="h-4 w-4" />

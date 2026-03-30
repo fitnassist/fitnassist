@@ -8,6 +8,7 @@ export interface NavItem {
   disabled?: boolean;
   disabledTooltip?: string;
   mobileBottom?: boolean;
+  group?: string;
 }
 
 export interface SidebarUser {

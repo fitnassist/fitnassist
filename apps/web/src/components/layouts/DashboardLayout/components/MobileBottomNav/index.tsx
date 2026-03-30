@@ -234,8 +234,24 @@ export const MobileBottomNav = ({
           <SheetHeader className="text-left pb-2">
             <SheetTitle className="text-base">Menu</SheetTitle>
           </SheetHeader>
-          <nav className="space-y-1">
-            {moreItems.map((item) => renderNavLink(item, 'sheet'))}
+          <nav>
+            {(() => {
+              let lastGroup: string | undefined;
+              return moreItems.map((item) => {
+                const showHeader = item.group && item.group !== lastGroup;
+                lastGroup = item.group;
+                return (
+                  <div key={item.href}>
+                    {showHeader && (
+                      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mt-4 mb-1 px-3">
+                        {item.group}
+                      </p>
+                    )}
+                    {renderNavLink(item, 'sheet')}
+                  </div>
+                );
+              });
+            })()}
           </nav>
         </SheetContent>
       </Sheet>
