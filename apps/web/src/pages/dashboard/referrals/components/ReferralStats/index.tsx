@@ -1,5 +1,5 @@
 import { Users, UserCheck, Clock, Gift } from 'lucide-react';
-import { Card } from '@/components/ui';
+import { Card, CardContent, Skeleton } from '@/components/ui';
 import { useReferralStats } from '@/api/referral';
 
 const stats = [
@@ -16,8 +16,10 @@ export const ReferralStats = () => {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {stats.map((s) => (
-          <Card key={s.key} className="p-4">
-            <div className="h-16 bg-muted animate-pulse rounded" />
+          <Card key={s.key}>
+            <CardContent className="p-4 sm:p-6">
+              <Skeleton className="h-16 w-full" />
+            </CardContent>
           </Card>
         ))}
       </div>
@@ -30,12 +32,14 @@ export const ReferralStats = () => {
         const Icon = s.icon;
         const value = data?.[s.key] ?? 0;
         return (
-          <Card key={s.key} className="p-4">
-            <div className="flex items-center gap-2 text-muted-foreground mb-1">
-              <Icon className="h-4 w-4" />
-              <span className="text-xs font-medium">{s.label}</span>
-            </div>
-            <p className="text-2xl font-bold">{value}</p>
+          <Card key={s.key}>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center gap-2 text-muted-foreground mb-2">
+                <Icon className="h-4 w-4" />
+                <span className="text-xs font-medium uppercase tracking-wide">{s.label}</span>
+              </div>
+              <p className="text-2xl sm:text-3xl font-bold">{value}</p>
+            </CardContent>
           </Card>
         );
       })}

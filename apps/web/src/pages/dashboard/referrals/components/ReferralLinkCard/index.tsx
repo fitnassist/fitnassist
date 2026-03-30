@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Copy, Check, Link as LinkIcon } from 'lucide-react';
-import { Button, Card } from '@/components/ui';
+import { Button, Card, CardContent, Skeleton } from '@/components/ui';
 import { useReferralLink } from '@/api/referral';
 
 export const ReferralLinkCard = () => {
@@ -16,8 +16,10 @@ export const ReferralLinkCard = () => {
 
   if (isLoading) {
     return (
-      <Card className="p-6">
-        <div className="h-20 bg-muted animate-pulse rounded" />
+      <Card>
+        <CardContent className="p-6">
+          <Skeleton className="h-20 w-full" />
+        </CardContent>
       </Card>
     );
   }
@@ -25,37 +27,39 @@ export const ReferralLinkCard = () => {
   if (!data?.url) return null;
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center gap-2 mb-3">
-        <LinkIcon className="h-5 w-5 text-primary" />
-        <h3 className="font-semibold">Your Referral Link</h3>
-      </div>
-      <p className="text-sm text-muted-foreground mb-4">
-        Share this link with other trainers. When they subscribe, you get 1 month free and they get 20% off their first payment.
-      </p>
-      <div className="flex gap-2">
-        <div className="flex-1 bg-muted rounded-md px-3 py-2 text-sm font-mono truncate">
-          {data.url}
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex items-center gap-2 mb-3">
+          <LinkIcon className="h-5 w-5 text-primary" />
+          <h3 className="font-semibold">Your Referral Link</h3>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          className="shrink-0"
-        >
-          {copied ? (
-            <>
-              <Check className="h-4 w-4 mr-1" />
-              Copied
-            </>
-          ) : (
-            <>
-              <Copy className="h-4 w-4 mr-1" />
-              Copy
-            </>
-          )}
-        </Button>
-      </div>
+        <p className="text-sm text-muted-foreground mb-4">
+          Share this link with other trainers. When they subscribe, you get 1 month free and they get 20% off their first payment.
+        </p>
+        <div className="flex gap-2">
+          <div className="flex-1 bg-muted rounded-md px-3 py-2 text-sm font-mono truncate">
+            {data.url}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopy}
+            className="shrink-0"
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4 mr-1" />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4 mr-1" />
+                Copy
+              </>
+            )}
+          </Button>
+        </div>
+      </CardContent>
     </Card>
   );
 };
