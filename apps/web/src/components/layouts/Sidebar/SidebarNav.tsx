@@ -15,15 +15,17 @@ interface SidebarNavProps {
   isCollapsed: boolean;
 }
 
+const UNSET = Symbol('unset');
+
 const groupItems = (items: NavItem[]) => {
   const groups: { label: string | null; items: NavItem[] }[] = [];
-  let currentGroup: string | undefined;
+  let currentGroup: string | null | typeof UNSET = UNSET;
 
   for (const item of items) {
     const group = item.group ?? null;
-    if (groups.length === 0 || group !== currentGroup) {
+    if (currentGroup === UNSET || group !== currentGroup) {
       groups.push({ label: group, items: [item] });
-      currentGroup = group ?? undefined;
+      currentGroup = group;
     } else {
       groups[groups.length - 1]!.items.push(item);
     }
