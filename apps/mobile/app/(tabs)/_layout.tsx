@@ -21,6 +21,7 @@ const TabLayout = () => {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.mutedForeground,
         tabBarStyle: {
+          backgroundColor: colors.card,
           borderTopColor: colors.border,
         },
       }}

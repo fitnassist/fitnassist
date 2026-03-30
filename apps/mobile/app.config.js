@@ -21,13 +21,13 @@ module.exports = {
     version: '0.1.0',
     orientation: 'portrait',
     icon: './assets/icon.png',
-    userInterfaceStyle: 'automatic',
+    userInterfaceStyle: 'dark',
     newArchEnabled: true,
     scheme: 'fitnassist',
     splash: {
-      image: './assets/splash-icon.png',
-      resizeMode: 'contain',
-      backgroundColor: '#ffffff',
+      image: './assets/splash.png',
+      resizeMode: 'cover',
+      backgroundColor: '#3d2743',
     },
     ios: {
       supportsTablet: true,

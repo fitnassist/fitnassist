@@ -5,7 +5,8 @@ const AuthLayout = () => {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: 'hsl(0, 0%, 100%)' },
+        contentStyle: { backgroundColor: 'transparent' },
+        animation: 'fade',
       }}
     />
   );

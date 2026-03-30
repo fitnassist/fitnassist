@@ -9,37 +9,37 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        border: 'hsl(230, 15%, 88%)',
-        input: 'hsl(230, 15%, 88%)',
-        ring: 'hsl(170, 58%, 57%)',
-        background: 'hsl(0, 0%, 100%)',
-        foreground: 'hsl(230, 25%, 10%)',
+        border: 'hsl(230, 15%, 22%)',
+        input: 'hsl(230, 15%, 22%)',
+        ring: 'hsl(346, 66%, 55%)',
+        background: 'hsl(230, 20%, 10%)',
+        foreground: 'hsl(0, 0%, 95%)',
         primary: {
-          DEFAULT: 'hsl(170, 58%, 57%)',
+          DEFAULT: 'hsl(346, 66%, 55%)',
           foreground: 'hsl(0, 0%, 100%)',
         },
         secondary: {
-          DEFAULT: 'hsl(230, 20%, 95%)',
-          foreground: 'hsl(230, 25%, 10%)',
+          DEFAULT: 'hsl(230, 15%, 18%)',
+          foreground: 'hsl(0, 0%, 90%)',
         },
         destructive: {
           DEFAULT: 'hsl(0, 84.2%, 60.2%)',
           foreground: 'hsl(0, 0%, 98%)',
         },
         muted: {
-          DEFAULT: 'hsl(230, 20%, 95%)',
-          foreground: 'hsl(230, 15%, 45%)',
+          DEFAULT: 'hsl(230, 15%, 18%)',
+          foreground: 'hsl(230, 10%, 55%)',
         },
         accent: {
-          DEFAULT: 'hsl(230, 20%, 95%)',
-          foreground: 'hsl(230, 25%, 10%)',
+          DEFAULT: 'hsl(230, 15%, 18%)',
+          foreground: 'hsl(0, 0%, 95%)',
         },
         card: {
-          DEFAULT: 'hsl(0, 0%, 100%)',
-          foreground: 'hsl(230, 25%, 10%)',
+          DEFAULT: 'hsl(230, 18%, 14%)',
+          foreground: 'hsl(0, 0%, 95%)',
         },
         coral: {
-          DEFAULT: 'hsl(346, 66%, 52%)',
+          DEFAULT: 'hsl(346, 66%, 55%)',
           foreground: '#ffffff',
         },
       },

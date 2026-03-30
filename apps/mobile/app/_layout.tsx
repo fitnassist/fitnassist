@@ -20,7 +20,7 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     const inAuthGroup = segments[0] === '(auth)';
 
     if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/(auth)/login');
+      router.replace('/(auth)');
     } else if (isAuthenticated && inAuthGroup) {
       router.replace('/(tabs)');
     }
@@ -40,7 +40,7 @@ const RootLayout = () => {
             <AuthGuard>
               <Slot />
             </AuthGuard>
-            <StatusBar style="auto" />
+            <StatusBar style="light" />
           </SafeAreaProvider>
         </QueryClientProvider>
       </trpc.Provider>

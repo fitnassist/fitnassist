@@ -16,4 +16,12 @@ config.resolver.nodeModulesPaths = [
   path.resolve(monorepoRoot, 'node_modules'),
 ];
 
+// Ensure singleton packages always resolve to the mobile app's copies
+// to prevent duplicate React instances from the hoisted root node_modules
+config.resolver.extraNodeModules = {
+  react: path.resolve(projectRoot, 'node_modules/react'),
+  'react-native': path.resolve(projectRoot, 'node_modules/react-native'),
+  'react-native-css-interop': path.resolve(projectRoot, 'node_modules/react-native-css-interop'),
+};
+
 module.exports = withNativeWind(config, { input: './global.css' });

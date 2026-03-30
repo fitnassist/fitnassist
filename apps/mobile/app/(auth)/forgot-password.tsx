@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Input } from '@/components/ui';
+import { GradientBackground } from '@/components/GradientBackground';
 import { authClient } from '@/lib/auth';
 
 const forgotPasswordSchema = z.object({
@@ -50,62 +51,65 @@ const ForgotPasswordScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-      >
-        <ScrollView
-          contentContainerClassName="flex-1 justify-center px-6"
-          keyboardShouldPersistTaps="handled"
+    <GradientBackground>
+      <SafeAreaView className="flex-1">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1"
         >
-          <View className="gap-8">
-            <View className="gap-2">
-              <Text className="text-3xl font-bold text-foreground">
-                Forgot password
-              </Text>
-              <Text className="text-base text-muted-foreground">
-                Enter your email and we'll send you a reset link
-              </Text>
-            </View>
+          <ScrollView
+            contentContainerClassName="flex-1 justify-center px-6"
+            keyboardShouldPersistTaps="handled"
+          >
+            <View className="gap-8">
+              <View className="gap-2 items-center">
+                <Text className="text-3xl font-extralight text-white uppercase text-center" style={{ letterSpacing: 2 }}>
+                  Forgot Password
+                </Text>
+                <Text className="text-base text-white/60 text-center">
+                  Enter your email and we'll send you a reset link
+                </Text>
+              </View>
 
-            <View className="gap-4">
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    label="Email"
-                    placeholder="you@example.com"
-                    keyboardType="email-address"
-                    autoComplete="email"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    error={errors.email?.message}
-                  />
-                )}
-              />
+              <View className="gap-4">
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label="Email"
+                      placeholder="you@example.com"
+                      keyboardType="email-address"
+                      autoComplete="email"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      error={errors.email?.message}
+                      variant="dark"
+                    />
+                  )}
+                />
+
+                <Button
+                  onPress={handleSubmit(onSubmit)}
+                  loading={loading}
+                >
+                  Send Reset Link
+                </Button>
+              </View>
 
               <Button
-                onPress={handleSubmit(onSubmit)}
-                loading={loading}
+                variant="link"
+                size="sm"
+                onPress={() => router.back()}
               >
-                Send Reset Link
+                Back to Sign In
               </Button>
             </View>
-
-            <Button
-              variant="link"
-              size="sm"
-              onPress={() => router.back()}
-            >
-              Back to Sign In
-            </Button>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 };
 

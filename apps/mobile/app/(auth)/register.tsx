@@ -13,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Input } from '@/components/ui';
+import { GradientBackground } from '@/components/GradientBackground';
 import { signUp } from '@/lib/auth';
 
 const registerSchema = z
@@ -74,155 +75,161 @@ const RegisterScreen = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1"
-      >
-        <ScrollView
-          contentContainerClassName="py-12 px-6"
-          keyboardShouldPersistTaps="handled"
+    <GradientBackground>
+      <SafeAreaView className="flex-1">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className="flex-1"
         >
-          <View className="gap-8">
-            <View className="gap-2">
-              <Text className="text-3xl font-bold text-foreground">
-                Create account
-              </Text>
-              <Text className="text-base text-muted-foreground">
-                Join Fitnassist to get started
-              </Text>
-            </View>
+          <ScrollView
+            contentContainerClassName="py-12 px-6"
+            keyboardShouldPersistTaps="handled"
+          >
+            <View className="gap-8">
+              <View className="gap-2 items-center">
+                <Text className="text-3xl font-extralight text-white uppercase text-center" style={{ letterSpacing: 2 }}>
+                  Create Account
+                </Text>
+                <Text className="text-base text-white/60 text-center">
+                  Join Fitnassist to get started
+                </Text>
+              </View>
 
-            <View className="gap-2">
-              <Text className="text-sm font-medium text-foreground">I am a...</Text>
-              <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 items-center rounded-lg border-2 py-4 ${
-                    selectedRole === 'TRAINEE'
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border'
-                  }`}
-                  onPress={() => setValue('role', 'TRAINEE')}
-                >
-                  <Text
-                    className={`text-base font-semibold ${
-                      selectedRole === 'TRAINEE' ? 'text-primary' : 'text-muted-foreground'
+              <View className="gap-2">
+                <Text className="text-sm font-medium text-white">I am a...</Text>
+                <View className="flex-row gap-3">
+                  <TouchableOpacity
+                    className={`flex-1 items-center rounded-lg border-2 py-4 ${
+                      selectedRole === 'TRAINEE'
+                        ? 'border-primary bg-primary'
+                        : 'border-white/20'
                     }`}
+                    onPress={() => setValue('role', 'TRAINEE')}
                   >
-                    Trainee
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 items-center rounded-lg border-2 py-4 ${
-                    selectedRole === 'TRAINER'
-                      ? 'border-primary bg-primary/10'
-                      : 'border-border'
-                  }`}
-                  onPress={() => setValue('role', 'TRAINER')}
-                >
-                  <Text
-                    className={`text-base font-semibold ${
-                      selectedRole === 'TRAINER' ? 'text-primary' : 'text-muted-foreground'
+                    <Text
+                      className={`text-base font-semibold ${
+                        selectedRole === 'TRAINEE' ? 'text-white' : 'text-white/50'
+                      }`}
+                    >
+                      Trainee
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    className={`flex-1 items-center rounded-lg border-2 py-4 ${
+                      selectedRole === 'TRAINER'
+                        ? 'border-primary bg-primary'
+                        : 'border-white/20'
                     }`}
+                    onPress={() => setValue('role', 'TRAINER')}
                   >
-                    Trainer
-                  </Text>
-                </TouchableOpacity>
+                    <Text
+                      className={`text-base font-semibold ${
+                        selectedRole === 'TRAINER' ? 'text-white' : 'text-white/50'
+                      }`}
+                    >
+                      Trainer
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View className="gap-4">
+                <Controller
+                  control={control}
+                  name="name"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label="Full Name"
+                      placeholder="John Doe"
+                      autoComplete="name"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      error={errors.name?.message}
+                      variant="dark"
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label="Email"
+                      placeholder="you@example.com"
+                      keyboardType="email-address"
+                      autoComplete="email"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      error={errors.email?.message}
+                      variant="dark"
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label="Password"
+                      placeholder="At least 8 characters"
+                      secureTextEntry
+                      autoComplete="new-password"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      error={errors.password?.message}
+                      variant="dark"
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="confirmPassword"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label="Confirm Password"
+                      placeholder="Repeat your password"
+                      secureTextEntry
+                      autoComplete="new-password"
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      error={errors.confirmPassword?.message}
+                      variant="dark"
+                    />
+                  )}
+                />
+
+                <Button
+                  onPress={handleSubmit(onSubmit)}
+                  loading={loading}
+                >
+                  Create Account
+                </Button>
+              </View>
+
+              <View className="flex-row items-center justify-center gap-1">
+                <Text className="text-white/60">
+                  Already have an account?
+                </Text>
+                <Button
+                  variant="link"
+                  size="sm"
+                  onPress={() => router.push('/(auth)/login')}
+                >
+                  Sign In
+                </Button>
               </View>
             </View>
-
-            <View className="gap-4">
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    label="Full Name"
-                    placeholder="John Doe"
-                    autoComplete="name"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    error={errors.name?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    label="Email"
-                    placeholder="you@example.com"
-                    keyboardType="email-address"
-                    autoComplete="email"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    error={errors.email?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    label="Password"
-                    placeholder="At least 8 characters"
-                    secureTextEntry
-                    autoComplete="new-password"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    error={errors.password?.message}
-                  />
-                )}
-              />
-
-              <Controller
-                control={control}
-                name="confirmPassword"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <Input
-                    label="Confirm Password"
-                    placeholder="Repeat your password"
-                    secureTextEntry
-                    autoComplete="new-password"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    error={errors.confirmPassword?.message}
-                  />
-                )}
-              />
-
-              <Button
-                onPress={handleSubmit(onSubmit)}
-                loading={loading}
-              >
-                Create Account
-              </Button>
-            </View>
-
-            <View className="flex-row items-center justify-center gap-1">
-              <Text className="text-muted-foreground">
-                Already have an account?
-              </Text>
-              <Button
-                variant="link"
-                size="sm"
-                onPress={() => router.push('/(auth)/login')}
-              >
-                Sign In
-              </Button>
-            </View>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </GradientBackground>
   );
 };
 
