@@ -17,14 +17,24 @@ const MessagesScreen = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getConversationInfo = (connection: any) => {
-    // Match web logic: senderId === userId means current user is the trainee
-    const isTrainee = connection.senderId === user?.id;
-    const otherName = isTrainee
-      ? (connection.trainer?.displayName ?? 'Unknown')
-      : (connection.sender?.name ?? connection.name ?? 'Unknown');
-    const otherImage = isTrainee
-      ? (connection.trainer?.profileImageUrl ?? connection.trainer?.user?.image ?? null)
-      : (connection.sender?.traineeProfile?.avatarUrl ?? connection.sender?.image ?? null);
+    // Determine if current user is the trainee (sender) or the trainer
+    // senderId matches current user = we're the trainee, show trainer info
+    // senderId doesn't match (or is null) = we're the trainer, show sender info
+    const iAmTheTrainee = connection.senderId === user?.id;
+
+    let otherName: string;
+    let otherImage: string | null;
+
+    if (iAmTheTrainee) {
+      // I'm the trainee - show the trainer's info
+      otherName = connection.trainer?.displayName ?? 'Unknown';
+      otherImage = connection.trainer?.profileImageUrl ?? connection.trainer?.user?.image ?? null;
+    } else {
+      // I'm the trainer - show the sender's (client's) info
+      otherName = connection.sender?.name ?? connection.name ?? 'Unknown';
+      otherImage = connection.sender?.traineeProfile?.avatarUrl ?? connection.sender?.image ?? null;
+    }
+
     const lastMsg = connection.messages?.[0];
 
     return {
