@@ -13,7 +13,7 @@ import {
 import { Text, Card, CardContent, Skeleton, Badge } from '@/components/ui';
 import { useMyTrainerProfile, useDashboardStats } from '@/api/trainer';
 import { useContactStats } from '@/api/connection';
-import { useUnreadNotificationCount } from '@/api/notification';
+import { useUnreadMessageCount } from '@/api/message';
 import { StatCard } from './StatCard';
 import { QuickAction } from './QuickAction';
 import { colors } from '@/constants/theme';
@@ -23,7 +23,7 @@ export const TrainerDashboard = () => {
   const { data: profile, isLoading: profileLoading, refetch: refetchProfile } = useMyTrainerProfile();
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useDashboardStats();
   const { data: contactStats, refetch: refetchContacts } = useContactStats();
-  const { data: unreadCount } = useUnreadNotificationCount();
+  const { data: unreadCount } = useUnreadMessageCount();
 
   const onRefresh = async () => {
     await Promise.all([refetchProfile(), refetchStats(), refetchContacts()]);
@@ -161,7 +161,7 @@ export const TrainerDashboard = () => {
             description="Chat with your trainees"
             icon={MessageCircle}
             onPress={() => router.push('/(tabs)/messages')}
-            badge={typeof unreadCount === 'number' ? unreadCount : 0}
+            badge={unreadCount?.count ?? 0}
           />
         </View>
       </View>

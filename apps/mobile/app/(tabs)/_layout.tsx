@@ -72,7 +72,7 @@ const TabLayout = () => {
           title: 'Messages',
           tabBarIcon: ({ color, size }) => {
             const { data: unread } = useUnreadMessageCount();
-            const count = typeof unread === 'number' ? unread : 0;
+            const count = unread?.count ?? 0;
             return (
               <View>
                 <MessageCircle size={size} color={color} />

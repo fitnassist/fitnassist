@@ -19,7 +19,7 @@ import { Text, Card, CardContent, Skeleton } from '@/components/ui';
 import { useMyTraineeProfile, useNutritionTargets } from '@/api/trainee';
 import { useDiaryEntries, useDailyNutrition } from '@/api/diary';
 import { useUpcomingBookings } from '@/api/booking';
-import { useUnreadNotificationCount } from '@/api/notification';
+import { useUnreadMessageCount } from '@/api/message';
 import { QuickAction } from './QuickAction';
 import { colors } from '@/constants/theme';
 
@@ -42,7 +42,7 @@ export const TraineeDashboard = () => {
   const { data: nutrition, isLoading: nutritionLoading, refetch: refetchNutrition } = useDailyNutrition(today);
   const { data: targets } = useNutritionTargets();
   const { data: bookings, refetch: refetchBookings } = useUpcomingBookings();
-  const { data: unreadCount } = useUnreadNotificationCount();
+  const { data: unreadCount } = useUnreadMessageCount();
 
   const onRefresh = async () => {
     await Promise.all([refetchProfile(), refetchEntries(), refetchNutrition(), refetchBookings()]);
@@ -221,7 +221,7 @@ export const TraineeDashboard = () => {
             description="Chat with your trainers"
             icon={MessageCircle}
             onPress={() => router.push('/(tabs)/messages')}
-            badge={typeof unreadCount === 'number' ? unreadCount : 0}
+            badge={unreadCount?.count ?? 0}
           />
         </View>
       </View>
