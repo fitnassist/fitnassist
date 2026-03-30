@@ -13,19 +13,18 @@ const MessagesScreen = () => {
   const { user } = useAuth();
   const { data: connections, isLoading, refetch } = useConnections(false);
 
-  const accepted = (connections ?? []).filter(
-    (c: { status: string }) => c.status === 'ACCEPTED',
-  );
+  const conversations = connections ?? [];
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getConversationInfo = (connection: any) => {
-    const isTrainer = connection.trainer?.userId === user?.id;
-    const otherName = isTrainer
-      ? (connection.sender?.name ?? 'Unknown')
-      : (connection.trainer?.displayName ?? 'Unknown');
-    const otherImage = isTrainer
-      ? (connection.sender?.traineeProfile?.avatarUrl ?? connection.sender?.image ?? null)
-      : (connection.trainer?.profileImageUrl ?? connection.trainer?.user?.image ?? null);
+    // Match web logic: senderId === userId means current user is the trainee
+    const isTrainee = connection.senderId === user?.id;
+    const otherName = isTrainee
+      ? (connection.trainer?.displayName ?? 'Unknown')
+      : (connection.sender?.name ?? connection.name ?? 'Unknown');
+    const otherImage = isTrainee
+      ? (connection.trainer?.profileImageUrl ?? connection.trainer?.user?.image ?? null)
+      : (connection.sender?.traineeProfile?.avatarUrl ?? connection.sender?.image ?? null);
     const lastMsg = connection.messages?.[0];
 
     return {
@@ -68,7 +67,7 @@ const MessagesScreen = () => {
         </Text>
       </View>
 
-      {accepted.length === 0 ? (
+      {conversations.length === 0 ? (
         <View className="flex-1 items-center justify-center px-6 gap-3">
           <MessageCircle size={48} color={colors.mutedForeground} />
           <Text className="text-base text-muted-foreground text-center">
@@ -77,7 +76,7 @@ const MessagesScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={accepted}
+          data={conversations}
           keyExtractor={(item: { id: string }) => item.id}
           renderItem={({ item }) => {
             const info = getConversationInfo(item);

@@ -50,15 +50,19 @@ export const useNotifications = () => {
   const registerToken = trpc.notification.registerPushToken.useMutation();
 
   useEffect(() => {
-    registerForPushNotifications().then((token) => {
-      if (token) {
-        setExpoPushToken(token);
-        registerToken.mutate(
-          { token, platform: Platform.OS },
-          { onError: () => { /* endpoint may not be deployed yet */ } },
-        );
-      }
-    });
+    registerForPushNotifications()
+      .then((token) => {
+        if (token) {
+          setExpoPushToken(token);
+          registerToken.mutate(
+            { token, platform: Platform.OS },
+            { onError: () => { /* endpoint may not be deployed yet */ } },
+          );
+        }
+      })
+      .catch(() => {
+        // Fails in Expo Go without projectId - works in dev builds
+      });
 
     // Handle notification taps (app was backgrounded or closed)
     responseListener.current = Notifications.addNotificationResponseReceivedListener(
