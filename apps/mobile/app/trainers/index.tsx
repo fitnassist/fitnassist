@@ -73,7 +73,8 @@ const TrainerSearchScreen = () => {
     limit: 50,
   });
 
-  const trainers = (data ?? []).filter((t: any) =>
+  const allTrainers = Array.isArray(data) ? data : (data?.trainers ?? []);
+  const trainers = allTrainers.filter((t: any) =>
     !query || t.displayName?.toLowerCase().includes(query.toLowerCase()) ||
     t.city?.toLowerCase().includes(query.toLowerCase()),
   );

@@ -89,7 +89,7 @@ export const useSse = () => {
       retryCountRef.current = 0;
     });
 
-    es.addEventListener('message', (event: { data?: string }) => {
+    es.addEventListener('message', (event: any) => {
       if (!event.data) return;
       try {
         const data = JSON.parse(event.data);

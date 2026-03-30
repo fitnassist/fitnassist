@@ -150,10 +150,10 @@ const TrainerProfileScreen = () => {
               Gallery
             </Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="gap-2">
-              {trainer.galleryImages.map((url: string, i: number) => (
+              {trainer.galleryImages.map((img: any, i: number) => (
                 <Image
                   key={i}
-                  source={{ uri: url }}
+                  source={{ uri: typeof img === 'string' ? img : img.url }}
                   className="w-48 h-48 rounded-lg mr-2"
                   resizeMode="cover"
                 />
