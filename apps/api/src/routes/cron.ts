@@ -10,6 +10,7 @@ import { integrationService } from '../services/integration.service';
 import { googleFitService } from '../services/google-fit.service';
 import { stravaService } from '../services/strava.service';
 import { stravaClient } from '../lib/strava';
+import { referralService } from '../services/referral.service';
 
 export const cronRouter = Router();
 
@@ -198,6 +199,27 @@ cronRouter.post('/strava-catchup', async (req, res) => {
     res.json({ ok: true, strava: { synced, total: connections.length } });
   } catch (error) {
     console.error('[Cron] Strava catchup failed:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// =============================================================================
+// REFERRAL CRONS
+// =============================================================================
+
+cronRouter.post('/expire-referrals', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!env.CRON_SECRET || authHeader !== `Bearer ${env.CRON_SECRET}`) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const result = await referralService.expireStaleReferrals();
+    console.log(`[Cron] Referral expiry: expired=${result.expired}`);
+    res.json({ ok: true, ...result });
+  } catch (error) {
+    console.error('[Cron] Referral expiry failed:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

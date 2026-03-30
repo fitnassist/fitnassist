@@ -37,6 +37,7 @@ import { blogRouter } from './blog.router';
 import { productRouter } from './product.router';
 import { couponRouter } from './coupon.router';
 import { orderRouter } from './order.router';
+import { referralRouter } from './referral.router';
 
 export const appRouter = router({
   auth: authRouter,
@@ -77,6 +78,7 @@ export const appRouter = router({
   product: productRouter,
   coupon: couponRouter,
   order: orderRouter,
+  referral: referralRouter,
 });
 
 export type AppRouter = typeof appRouter;

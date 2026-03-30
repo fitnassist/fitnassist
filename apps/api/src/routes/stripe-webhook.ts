@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { stripeService } from '../services/stripe.service';
 import { subscriptionService } from '../services/subscription.service';
+import { referralService } from '../services/referral.service';
 import { inAppNotificationService } from '../services/in-app-notification.service';
 import { sessionPaymentRepository } from '../repositories/session-payment.repository';
 import { bookingNotificationService } from '../services/booking-notification.service';
@@ -74,6 +75,15 @@ stripeWebhookRouter.post(
               session.customer as string,
               session.subscription as string
             );
+
+            // Activate referral if this user was referred
+            const sub = await prisma.subscription.findUnique({
+              where: { stripeCustomerId: session.customer as string },
+              select: { trainer: { select: { userId: true } } },
+            });
+            if (sub?.trainer?.userId) {
+              referralService.activateReferral(sub.trainer.userId).catch(console.error);
+            }
           }
           break;
         }

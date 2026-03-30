@@ -45,6 +45,7 @@ export {
   ProductType,
   ProductStatus,
   OrderStatus,
+  ReferralStatus,
 } from '@prisma/client';
 
 // Re-export model types with explicit names to avoid conflicts
@@ -115,6 +116,7 @@ export type {
   Coupon,
   ProductOrder,
   OrderItem,
+  Referral,
 } from '@prisma/client';
 
 // Re-export generated Zod schemas from model schemas
@@ -161,4 +163,5 @@ export {
   ProductTypeSchema,
   ProductStatusSchema,
   OrderStatusSchema,
+  ReferralStatusSchema,
 } from './generated/zod/inputTypeSchemas';

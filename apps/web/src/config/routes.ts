@@ -64,6 +64,7 @@ export const routes = {
   dashboardSettings: '/dashboard/settings',
   dashboardWebsite: '/dashboard/website',
   dashboardStorefront: '/dashboard/storefront',
+  dashboardReferrals: '/dashboard/referrals',
 
   // Pricing
   pricing: '/pricing',

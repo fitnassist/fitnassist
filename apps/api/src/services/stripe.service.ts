@@ -46,7 +46,8 @@ export const stripeService = {
     tier: PaidTier,
     billingPeriod: BillingPeriod,
     successUrl: string,
-    cancelUrl: string
+    cancelUrl: string,
+    couponId?: string
   ): Promise<Stripe.Checkout.Session> => {
     const stripe = getStripe();
     const priceId = PRICE_ID_MAP[tier]?.[billingPeriod];
@@ -67,6 +68,7 @@ export const stripeService = {
       subscription_data: {
         metadata: { tier, billingPeriod },
       },
+      ...(couponId ? { discounts: [{ coupon: couponId }] } : {}),
     });
   },
 

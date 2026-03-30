@@ -49,6 +49,7 @@ import { AnalyticsPage } from '@/pages/dashboard/analytics';
 import { ReviewsPage } from '@/pages/dashboard/reviews';
 import { WebsitePage } from '@/pages/dashboard/website';
 import { StorefrontPage } from '@/pages/dashboard/storefront';
+import { ReferralsPage } from '@/pages/dashboard/referrals';
 import { SiteRoutePage } from '@/pages/site/route';
 import { FeedPage } from '@/pages/dashboard/feed';
 import { FriendsPage } from '@/pages/dashboard/friends';
@@ -126,6 +127,7 @@ function App() {
                       <Route path="/dashboard/bookings/book-client/:clientRosterId" element={<TrainerBookSessionPage />} />
                       <Route path={routes.dashboardWebsite} element={<WebsitePage />} />
                       <Route path={routes.dashboardStorefront} element={<StorefrontPage />} />
+                      <Route path={routes.dashboardReferrals} element={<ReferralsPage />} />
                       <Route path={routes.trainerProfileEdit} element={<ProfileEditPage />} />
                       <Route path="/trainee/profile/:userId" element={<TraineeProfileViewPage />} />
                     </Route>

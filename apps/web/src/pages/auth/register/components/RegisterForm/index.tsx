@@ -6,11 +6,12 @@ import { Eye, EyeOff } from 'lucide-react';
 import { registerFormSchema, type RegisterFormInput } from '@fitnassist/schemas';
 import { Button, Input } from '@/components/ui';
 import { signUp } from '@/lib/auth-client';
+import { trpc } from '@/lib/trpc';
 import type { RegisterFormProps } from './RegisterForm.types';
 
 const inputClass = "bg-white/10 border-white/20 text-white placeholder:text-white/40";
 
-export function RegisterForm({ onSuccess }: RegisterFormProps) {
+export function RegisterForm({ onSuccess, referralCode }: RegisterFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -28,6 +29,8 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     },
   });
 
+  const claimReferral = trpc.referral.claimReferral.useMutation();
+
   const onSubmit = async (data: RegisterFormInput) => {
     setError(null);
     setIsLoading(true);
@@ -44,6 +47,14 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
       if (result.error) {
         setError(result.error.message || 'Registration failed');
         return;
+      }
+
+      // Claim referral if a referral code was provided
+      if (referralCode && result.data?.user?.id) {
+        claimReferral.mutate({
+          referralCode,
+          userId: result.data.user.id,
+        });
       }
 
       setIsSuccess(true);

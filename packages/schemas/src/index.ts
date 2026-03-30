@@ -109,6 +109,10 @@ export {
   WebsiteSectionOptionalDefaultsSchema,
   BlogPostSchema,
   BlogPostOptionalDefaultsSchema,
+  // Referral program
+  ReferralStatusSchema,
+  ReferralSchema,
+  ReferralOptionalDefaultsSchema,
   // Product storefront
   ProductTypeSchema,
   ProductStatusSchema,
@@ -155,6 +159,7 @@ export * from './forms/review.schema';
 export * from './forms/integration.schema';
 export * from './forms/website.schema';
 export * from './forms/product.schema';
+export * from './forms/referral.schema';
 
 // =============================================================================
 // CONSTANTS

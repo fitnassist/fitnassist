@@ -162,6 +162,8 @@ enum NotificationType {
   ORDER_SHIPPED
   ORDER_DELIVERED
   ORDER_REFUNDED
+  REFERRAL_SIGNED_UP
+  REFERRAL_ACTIVATED
 }
 
 enum ReportReason {
@@ -213,6 +215,12 @@ enum ProductStatus {
   DRAFT
   ACTIVE
   ARCHIVED
+}
+
+enum ReferralStatus {
+  PENDING
+  ACTIVATED
+  EXPIRED
 }
 
 enum OrderStatus {
@@ -297,6 +305,7 @@ model User {
   reviewReports    ReviewReport[]
   integrations     IntegrationConnection[]
   productOrders    ProductOrder[]
+  referredBy       Referral?        @relation("ReferredBy")
 
   @@map("users")
 }
@@ -456,6 +465,7 @@ model TrainerProfile {
   products               Product[]
   coupons                Coupon[]
   productOrders          ProductOrder[]
+  referralsMade          Referral[]     @relation("ReferralsMade")
 
   @@index([latitude, longitude])
   @@index([city])
@@ -2096,4 +2106,28 @@ model OrderItem {
 
   @@index([orderId])
   @@map("order_items")
+}
+
+// =============================================================================
+// REFERRAL PROGRAM
+// =============================================================================
+
+model Referral {
+  id                     String         @id @default(cuid())
+  referrerId             String
+  referredUserId         String         @unique
+  status                 ReferralStatus @default(PENDING)
+  referrerRewardApplied  Boolean        @default(false)
+  referredDiscountApplied Boolean       @default(false)
+  activatedAt            DateTime?
+  expiresAt              DateTime
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  referrer               TrainerProfile @relation("ReferralsMade", fields: [referrerId], references: [id], onDelete: Cascade)
+  referredUser           User           @relation("ReferredBy", fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@index([referrerId, status])
+  @@index([status, expiresAt])
+  @@map("referrals")
 }

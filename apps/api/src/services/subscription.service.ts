@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server';
 import type { SubscriptionTier, SubscriptionStatus } from '@fitnassist/database';
 import { subscriptionRepository } from '../repositories/subscription.repository';
 import { stripeService } from './stripe.service';
+import { referralService } from './referral.service';
 import { hasTierAccess } from '../config/features';
 import { TRIAL_DURATION_DAYS } from '@fitnassist/schemas';
 import { prisma } from '../lib/prisma';
@@ -131,12 +132,22 @@ export const subscriptionService = {
   ) => {
     const subscription = await subscriptionService.ensureSubscriptionRecord(trainerId);
 
+    // Check if the trainer was referred and should get a discount
+    const trainer = await prisma.trainerProfile.findUnique({
+      where: { id: trainerId },
+      select: { userId: true },
+    });
+    const referralCouponId = trainer
+      ? await referralService.getReferredDiscount(trainer.userId)
+      : null;
+
     const session = await stripeService.createCheckoutSession(
       subscription.stripeCustomerId,
       tier,
       billingPeriod,
       `${frontendUrl}/dashboard/settings?tab=subscription&session_id={CHECKOUT_SESSION_ID}`,
-      `${frontendUrl}/pricing`
+      `${frontendUrl}/pricing`,
+      referralCouponId ?? undefined
     );
 
     return { url: session.url };
