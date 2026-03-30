@@ -65,7 +65,7 @@ export const ShopSection = ({ section, trainerId, onNavigateShop, onNavigateProd
                 />
               ))}
             </div>
-            {onNavigateShop && (products ?? []).length > 6 && (
+            {onNavigateShop && (
               <div className="mt-8 text-center">
                 <Button
                   variant="outline"

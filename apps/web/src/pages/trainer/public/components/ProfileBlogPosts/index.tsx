@@ -1,5 +1,5 @@
-import { Calendar, BookOpen } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/components/ui';
+import { Calendar, BookOpen, ArrowRight } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, Button, Skeleton } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 
 interface ProfileBlogPostsProps {
@@ -40,7 +40,7 @@ export const ProfileBlogPosts = ({ subdomain }: ProfileBlogPostsProps) => {
           </div>
         ) : (
           <div className="space-y-4">
-            {posts.map((post) => {
+            {posts.slice(0, 3).map((post) => {
               const formattedDate = post.publishedAt
                 ? new Date(post.publishedAt).toLocaleDateString('en-GB', {
                     day: 'numeric',
@@ -83,6 +83,19 @@ export const ProfileBlogPosts = ({ subdomain }: ProfileBlogPostsProps) => {
                 </a>
               );
             })}
+
+            <div className="pt-2">
+              <Button asChild variant="outline" size="sm">
+                <a
+                  href={`https://${subdomain}.sites.fitnassist.co/blog`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Blog
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>

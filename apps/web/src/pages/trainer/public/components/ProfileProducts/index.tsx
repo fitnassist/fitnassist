@@ -27,9 +27,9 @@ export const ProfileProducts = ({ trainerId, shopUrl }: ProfileProductsProps) =>
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex gap-3">
+              <div key={i} className="flex gap-4">
                 <Skeleton className="h-16 w-16 shrink-0 rounded-md" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-3/4" />
@@ -39,14 +39,14 @@ export const ProfileProducts = ({ trainerId, shopUrl }: ProfileProductsProps) =>
             ))}
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {products?.map((product) => (
               <a
                 key={product.id}
                 href={`${shopUrl}/${product.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex gap-3 rounded-md p-2 transition-colors hover:bg-muted"
+                className="flex gap-4 rounded-md p-2 transition-colors hover:bg-muted"
               >
                 <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
                   {product.imageUrl ? (
@@ -75,12 +75,14 @@ export const ProfileProducts = ({ trainerId, shopUrl }: ProfileProductsProps) =>
               </a>
             ))}
 
-            <Button asChild className="w-full mt-2">
-              <a href={shopUrl} target="_blank" rel="noopener noreferrer">
-                Visit Shop
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </a>
-            </Button>
+            <div className="pt-2">
+              <Button asChild variant="outline" size="sm">
+                <a href={shopUrl} target="_blank" rel="noopener noreferrer">
+                  Visit Shop
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>
