@@ -2,8 +2,8 @@ import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Skeleton } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
-import { TrainerDashboard } from './components/TrainerDashboard';
-import { TraineeDashboard } from './components/TraineeDashboard';
+import { TrainerDashboard } from '@/components/dashboard/TrainerDashboard';
+import { TraineeDashboard } from '@/components/dashboard/TraineeDashboard';
 
 const HomeScreen = () => {
   const { user, role, isLoading } = useAuth();
