@@ -33,7 +33,7 @@ export const TestimonialsForm = ({ sectionId, content }: TestimonialsFormProps) 
     : [];
 
   const { control, watch } = useForm({
-    defaultValues: {
+    values: {
       sourceType: (content.sourceType as string) || 'reviews',
     },
   });

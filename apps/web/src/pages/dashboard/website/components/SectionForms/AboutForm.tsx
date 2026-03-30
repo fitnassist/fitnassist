@@ -26,7 +26,7 @@ export const AboutForm = ({ sectionId, content }: AboutFormProps) => {
   const [imageUrl, setImageUrl] = useState<string>((content.imageUrl as string) || '');
 
   const { register, handleSubmit, control } = useForm<AboutContent>({
-    defaultValues: {
+    values: {
       richText: (content.richText as string) || '',
       imageUrl: (content.imageUrl as string) || '',
       imagePosition: (content.imagePosition as string) || 'right',

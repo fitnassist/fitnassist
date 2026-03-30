@@ -32,7 +32,7 @@ export const CtaForm = ({ sectionId, content }: CtaFormProps) => {
   );
 
   const { register, handleSubmit, control } = useForm<CtaContent>({
-    defaultValues: {
+    values: {
       headline: (content.headline as string) || '',
       subheadline: (content.subheadline as string) || '',
       ctaText: (content.ctaText as string) || '',

@@ -45,7 +45,7 @@ export const ContactForm = ({ sectionId, content }: ContactFormProps) => {
   const updateSection = useUpdateSection();
 
   const { setValue, watch, handleSubmit } = useForm<ContactContent>({
-    defaultValues: {
+    values: {
       showForm: (content.showForm as boolean) ?? true,
       showEmail: (content.showEmail as boolean) ?? true,
       showPhone: (content.showPhone as boolean) ?? true,

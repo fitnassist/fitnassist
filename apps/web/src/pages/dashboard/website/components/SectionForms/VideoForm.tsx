@@ -20,7 +20,7 @@ export const VideoForm = ({ sectionId, content }: VideoFormProps) => {
   const [videoUrl, setVideoUrl] = useState<string>((content.videoUrl as string) || '');
 
   const { register, handleSubmit } = useForm<VideoContent>({
-    defaultValues: {
+    values: {
       videoUrl: (content.videoUrl as string) || '',
       caption: (content.caption as string) || '',
     },

@@ -50,7 +50,7 @@ export const HeroForm = ({ sectionId, content }: HeroFormProps) => {
   const ctaLinkValue = (content.ctaLink as string) || '';
 
   const { register, handleSubmit, control, watch } = useForm<HeroContent>({
-    defaultValues: {
+    values: {
       headline: (content.headline as string) || '',
       subheadline: (content.subheadline as string) || '',
       ctaText: (content.ctaText as string) || '',

@@ -21,7 +21,7 @@ export const BlogForm = ({ sectionId, content }: BlogFormProps) => {
   const updateSection = useUpdateSection();
 
   const { register, handleSubmit, control } = useForm<BlogContent>({
-    defaultValues: {
+    values: {
       postsToShow: (content.postsToShow as number) || 3,
       layout: (content.layout as string) || 'grid',
     },

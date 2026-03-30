@@ -30,7 +30,7 @@ export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
     : [];
 
   const { control, watch } = useForm({
-    defaultValues: {
+    values: {
       sourceType: (content.sourceType as string) || 'profile',
     },
   });
