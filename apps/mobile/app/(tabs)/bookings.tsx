@@ -1,30 +1,33 @@
 import { useState, useMemo } from 'react';
-import { View, SectionList, RefreshControl } from 'react-native';
+import { View, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar as CalendarIcon } from 'lucide-react-native';
+import { Calendar as CalendarIcon, List, Plus } from 'lucide-react-native';
 import { Text, Skeleton } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useUpcomingBookings, useTrainerBookings } from '@/api/booking';
 import { BookingCard } from '@/components/bookings';
+import { BookingCalendar } from '@/components/bookings/BookingCalendar';
 import { colors } from '@/constants/theme';
 
-const getDateRange = () => {
-  const start = new Date();
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 30);
+const getMonthRange = (date: Date) => {
+  const start = new Date(date.getFullYear(), date.getMonth(), 1);
+  const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
   return {
-    startDate: start.toISOString(),
-    endDate: end.toISOString(),
+    startDate: start.toISOString().split('T')[0]!,
+    endDate: end.toISOString().split('T')[0]!,
   };
 };
+
+const today = new Date().toISOString().split('T')[0]!;
 
 const BookingsScreen = () => {
   const router = useRouter();
   const { role } = useAuth();
   const isTrainer = role === 'TRAINER';
-  const [range] = useState(getDateRange);
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>(isTrainer ? 'calendar' : 'list');
+  const [selectedDate, setSelectedDate] = useState(today);
+  const [range] = useState(() => getMonthRange(new Date()));
 
   const {
     data: upcomingBookings,
@@ -39,28 +42,25 @@ const BookingsScreen = () => {
   } = useTrainerBookings(range.startDate, range.endDate);
 
   const isLoading = isTrainer ? trainerLoading : upcomingLoading;
-  const bookings = isTrainer ? (trainerBookings ?? []) : (upcomingBookings ?? []);
+  const allBookings: any[] = isTrainer ? (trainerBookings ?? []) : (upcomingBookings ?? []);
 
   const onRefresh = async () => {
     if (isTrainer) await refetchTrainer();
     else await refetchUpcoming();
   };
 
-  // Group bookings by date
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sections = useMemo(() => {
-    const grouped = new Map<string, any[]>();
-    for (const booking of bookings) {
-      const dateKey = new Date(booking.date).toLocaleDateString(undefined, {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-      });
-      if (!grouped.has(dateKey)) grouped.set(dateKey, []);
-      grouped.get(dateKey)!.push(booking);
-    }
-    return Array.from(grouped.entries()).map(([title, data]) => ({ title, data }));
-  }, [bookings]);
+  // Filter bookings for selected date (calendar view)
+  const selectedDayBookings = useMemo(() => {
+    if (!selectedDate) return allBookings;
+    return allBookings.filter((b: any) => {
+      const bDate = typeof b.date === 'string'
+        ? b.date.split('T')[0]
+        : new Date(b.date).toISOString().split('T')[0];
+      return bDate === selectedDate;
+    });
+  }, [allBookings, selectedDate]);
+
+  const displayBookings = viewMode === 'calendar' ? selectedDayBookings : allBookings;
 
   if (isLoading) {
     return (
@@ -81,30 +81,62 @@ const BookingsScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
-      <View className="px-4 py-4">
+      {/* Header with view toggle */}
+      <View className="flex-row items-center justify-between px-4 py-4">
         <Text className="text-2xl font-extralight text-foreground uppercase" style={{ letterSpacing: 2 }}>
           Bookings
         </Text>
+        {isTrainer && (
+          <View className="flex-row gap-1 bg-card border border-border rounded-lg p-1">
+            <TouchableOpacity
+              className={`px-3 py-1.5 rounded-md ${viewMode === 'calendar' ? 'bg-primary' : ''}`}
+              onPress={() => setViewMode('calendar')}
+            >
+              <CalendarIcon size={16} color={viewMode === 'calendar' ? '#fff' : colors.mutedForeground} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`px-3 py-1.5 rounded-md ${viewMode === 'list' ? 'bg-primary' : ''}`}
+              onPress={() => setViewMode('list')}
+            >
+              <List size={16} color={viewMode === 'list' ? '#fff' : colors.mutedForeground} />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
-      {sections.length === 0 ? (
-        <View className="flex-1 items-center justify-center px-6 gap-3">
-          <CalendarIcon size={48} color={colors.mutedForeground} />
-          <Text className="text-base text-muted-foreground text-center">
-            No upcoming bookings
+      {/* Calendar (trainer only, calendar mode) */}
+      {viewMode === 'calendar' && isTrainer && (
+        <BookingCalendar
+          bookings={allBookings}
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
+      )}
+
+      {/* Date label when in calendar mode */}
+      {viewMode === 'calendar' && selectedDate && (
+        <View className="px-4 pt-3 pb-1">
+          <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+            {new Date(selectedDate + 'T12:00:00').toLocaleDateString(undefined, {
+              weekday: 'long',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </Text>
+        </View>
+      )}
+
+      {/* Bookings list */}
+      {displayBookings.length === 0 ? (
+        <View className="flex-1 items-center justify-center px-6 gap-2">
+          <Text className="text-sm text-muted-foreground">
+            {viewMode === 'calendar' ? 'No bookings on this day' : 'No upcoming bookings'}
           </Text>
         </View>
       ) : (
-        <SectionList
-          sections={sections}
+        <FlatList
+          data={displayBookings}
           keyExtractor={(item: any) => item.id}
-          renderSectionHeader={({ section }) => (
-            <View className="px-4 pt-4 pb-2">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
-                {section.title}
-              </Text>
-            </View>
-          )}
           renderItem={({ item }) => (
             <View className="px-4 mb-2">
               <BookingCard
@@ -117,8 +149,20 @@ const BookingsScreen = () => {
           refreshControl={
             <RefreshControl refreshing={false} onRefresh={onRefresh} tintColor={colors.teal} />
           }
-          contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={{ paddingTop: 8, paddingBottom: 100 }}
         />
+      )}
+
+      {/* FAB - Create booking (trainer) */}
+      {isTrainer && (
+        <TouchableOpacity
+          className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center"
+          style={{ elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4 }}
+          onPress={() => router.push('/bookings/create')}
+          activeOpacity={0.8}
+        >
+          <Plus size={24} color="#fff" />
+        </TouchableOpacity>
       )}
     </SafeAreaView>
   );
