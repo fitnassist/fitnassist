@@ -28,13 +28,13 @@ const playDing = () => {
 
 export const toast = {
   success: (message: string) => {
-    playDing();
     return sonnerToast.success(message);
   },
   error: (message: string) => {
     return sonnerToast.error(message);
   },
   info: (message: string) => {
+    playDing();
     return sonnerToast.info(message);
   },
   warning: (message: string) => {
