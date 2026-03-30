@@ -262,10 +262,15 @@ For reference, the following is live:
 - In-app video with lobby, controls, error handling
 - Trainer and trainee initiated video bookings
 
-### 9.2 Product Storefront
+### 9.2 Product Storefront ✅
 - PTs can sell fitness products, programs, and digital content
-- Payment processing through platform
-- Order management
+- Payment processing through platform (Stripe Connect, 3% platform fee)
+- Order management with status tracking and email notifications
+- Shopping cart with multi-product checkout
+- Coupon/discount system
+- Digital file downloads
+- Revenue analytics (combined session + product)
+- Shop section on trainer website and public profile
 
 ### 9.3 PT Website Builder ✅
 - PTs build a branded website through the platform
