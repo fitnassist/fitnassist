@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Send } from 'lucide-react-native';
 import { Text, Skeleton } from '@/components/ui';
 import { useThread, useSendMessage, useMarkAsRead } from '@/api/message';
+import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/hooks/useAuth';
 import { formatMessageTime } from '@/lib/dates';
 import { colors } from '@/constants/theme';
@@ -79,6 +80,11 @@ const MessageThreadScreen = () => {
   const router = useRouter();
   const { user } = useAuth();
   const { data: messages, isLoading, refetch } = useThread(connectionId ?? '');
+  const { data: connectionData } = trpc.message.getConnection.useQuery(
+    { connectionId: connectionId ?? '' },
+    { enabled: !!connectionId },
+  );
+  const isDisconnected = (connectionData as any)?.status === 'CLOSED';
   const sendMessage = useSendMessage();
   const markAsRead = useMarkAsRead();
   const [text, setText] = useState('');
@@ -140,11 +146,18 @@ const MessageThreadScreen = () => {
   return (
     <SafeAreaView className="flex-1 bg-background">
       {/* Header */}
-      <View className="flex-row items-center gap-3 px-4 py-3 border-b border-border">
-        <TouchableOpacity onPress={() => router.back()}>
-          <ArrowLeft size={24} color={colors.foreground} />
-        </TouchableOpacity>
-        <Text className="text-base font-semibold text-foreground">{headerName}</Text>
+      <View className="px-4 py-3 border-b border-border">
+        <View className="flex-row items-center gap-3">
+          <TouchableOpacity onPress={() => router.back()}>
+            <ArrowLeft size={24} color={colors.foreground} />
+          </TouchableOpacity>
+          <View>
+            <Text className="text-base font-semibold text-foreground">{headerName}</Text>
+            {isDisconnected && (
+              <Text className="text-xs text-destructive">Disconnected</Text>
+            )}
+          </View>
+        </View>
       </View>
 
       <KeyboardAvoidingView
@@ -170,6 +183,13 @@ const MessageThreadScreen = () => {
         />
 
         {/* Input */}
+        {isDisconnected ? (
+          <View className="px-4 py-4 border-t border-border">
+            <Text className="text-sm text-muted-foreground text-center">
+              This connection has been disconnected. Messages are read-only.
+            </Text>
+          </View>
+        ) : (
         <View className="flex-row items-end gap-2 px-4 py-3 border-t border-border">
           <View className="flex-1 bg-card border border-border rounded-2xl px-4 py-2 max-h-24">
             <TextInput
@@ -192,6 +212,7 @@ const MessageThreadScreen = () => {
             <Send size={18} color={text.trim() ? '#fff' : colors.mutedForeground} />
           </TouchableOpacity>
         </View>
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
