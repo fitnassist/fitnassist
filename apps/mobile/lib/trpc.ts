@@ -3,6 +3,7 @@ import { httpBatchLink } from '@trpc/client';
 import superjson from 'superjson';
 import * as SecureStore from 'expo-secure-store';
 import Constants from 'expo-constants';
+import { getCookie } from '@better-auth/expo/client';
 import type { AppRouter } from '@fitnassist/api/src/routers';
 
 export const trpc = createTRPCReact<AppRouter>();
@@ -10,9 +11,12 @@ export const trpc = createTRPCReact<AppRouter>();
 const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:3001';
 
 const getAuthHeaders = async () => {
-  const cookieData = await SecureStore.getItemAsync('fitnassist_cookie');
-  if (cookieData) {
-    return { Cookie: cookieData };
+  const raw = SecureStore.getItem('fitnassist_cookie');
+  if (raw) {
+    const cookie = getCookie(raw);
+    if (cookie) {
+      return { Cookie: cookie };
+    }
   }
   return {};
 };

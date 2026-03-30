@@ -8,13 +8,23 @@ import {
   BarChart3,
   Star,
   Gift,
-  Trophy,
+  Globe,
   ShoppingBag,
+  BookOpen,
+  ClipboardCheck,
   Users,
+  Trophy,
+  Award,
+  Heart,
+  Package,
+  User,
+  Target,
+  ClipboardList,
+  Rss,
   ChevronRight,
   LogOut,
 } from 'lucide-react-native';
-import { Text, Card, CardContent, Button } from '@/components/ui';
+import { Text, Card, CardContent } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile } from '@/api/trainee';
@@ -40,6 +50,8 @@ const MenuItem = ({ label, icon: Icon, onPress, destructive }: MenuItemProps) =>
     {!destructive && <ChevronRight size={18} color={colors.mutedForeground} />}
   </TouchableOpacity>
 );
+
+const Divider = () => <View className="border-b border-border" />;
 
 const ProfileScreen = () => {
   const router = useRouter();
@@ -117,7 +129,7 @@ const ProfileScreen = () => {
                 icon={Settings}
                 onPress={() => router.push('/dashboard/settings')}
               />
-              <View className="border-b border-border" />
+              <Divider />
               <MenuItem
                 label="Notifications"
                 icon={Bell}
@@ -128,58 +140,159 @@ const ProfileScreen = () => {
 
           {/* Trainer-specific */}
           {isTrainer && (
-            <Card>
-              <CardContent className="py-1 px-4">
-                <MenuItem
-                  label="Analytics"
-                  icon={BarChart3}
-                  onPress={() => router.push('/dashboard/analytics')}
-                />
-                <View className="border-b border-border" />
-                <MenuItem
-                  label="Reviews"
-                  icon={Star}
-                  onPress={() => router.push('/dashboard/reviews')}
-                />
-                <View className="border-b border-border" />
-                <MenuItem
-                  label="Referrals"
-                  icon={Gift}
-                  onPress={() => router.push('/dashboard/referrals')}
-                />
-                <View className="border-b border-border" />
-                <MenuItem
-                  label="Subscription"
-                  icon={CreditCard}
-                  onPress={() => router.push('/dashboard/settings')}
-                />
-              </CardContent>
-            </Card>
+            <>
+              {/* Business */}
+              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+                Business
+              </Text>
+              <Card>
+                <CardContent className="py-1 px-4">
+                  <MenuItem
+                    label="Clients"
+                    icon={Users}
+                    onPress={() => router.push('/dashboard/clients')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Onboarding"
+                    icon={ClipboardCheck}
+                    onPress={() => router.push('/dashboard/onboarding')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Resources"
+                    icon={BookOpen}
+                    onPress={() => router.push('/dashboard/resources')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Analytics"
+                    icon={BarChart3}
+                    onPress={() => router.push('/dashboard/analytics')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Reviews"
+                    icon={Star}
+                    onPress={() => router.push('/dashboard/reviews')}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Online Presence */}
+              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+                Online Presence
+              </Text>
+              <Card>
+                <CardContent className="py-1 px-4">
+                  <MenuItem
+                    label="Website Builder"
+                    icon={Globe}
+                    onPress={() => router.push('/dashboard/website')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Storefront"
+                    icon={ShoppingBag}
+                    onPress={() => router.push('/dashboard/storefront')}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Growth */}
+              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+                Growth
+              </Text>
+              <Card>
+                <CardContent className="py-1 px-4">
+                  <MenuItem
+                    label="Referrals"
+                    icon={Gift}
+                    onPress={() => router.push('/dashboard/referrals')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Subscription"
+                    icon={CreditCard}
+                    onPress={() => router.push('/dashboard/settings')}
+                  />
+                </CardContent>
+              </Card>
+            </>
           )}
 
           {/* Trainee-specific */}
           {!isTrainer && (
-            <Card>
-              <CardContent className="py-1 px-4">
-                <MenuItem
-                  label="Achievements"
-                  icon={Trophy}
-                  onPress={() => router.push('/dashboard/achievements')}
-                />
-                <View className="border-b border-border" />
-                <MenuItem
-                  label="Leaderboards"
-                  icon={Users}
-                  onPress={() => router.push('/dashboard/leaderboards')}
-                />
-                <View className="border-b border-border" />
-                <MenuItem
-                  label="Purchases"
-                  icon={ShoppingBag}
-                  onPress={() => router.push('/dashboard/purchases')}
-                />
-              </CardContent>
-            </Card>
+            <>
+              {/* Tracking */}
+              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+                Tracking
+              </Text>
+              <Card>
+                <CardContent className="py-1 px-4">
+                  <MenuItem
+                    label="Goals"
+                    icon={Target}
+                    onPress={() => router.push('/dashboard/goals')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="My Plans"
+                    icon={ClipboardList}
+                    onPress={() => router.push('/dashboard/my-plans')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="My Contacts"
+                    icon={User}
+                    onPress={() => router.push('/dashboard/contacts')}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Social */}
+              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+                Social
+              </Text>
+              <Card>
+                <CardContent className="py-1 px-4">
+                  <MenuItem
+                    label="Feed"
+                    icon={Rss}
+                    onPress={() => router.push('/dashboard/feed')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Friends"
+                    icon={Heart}
+                    onPress={() => router.push('/dashboard/friends')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Leaderboards"
+                    icon={Trophy}
+                    onPress={() => router.push('/dashboard/leaderboards')}
+                  />
+                  <Divider />
+                  <MenuItem
+                    label="Achievements"
+                    icon={Award}
+                    onPress={() => router.push('/dashboard/achievements')}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Purchases */}
+              <Card>
+                <CardContent className="py-1 px-4">
+                  <MenuItem
+                    label="Purchases"
+                    icon={Package}
+                    onPress={() => router.push('/dashboard/purchases')}
+                  />
+                </CardContent>
+              </Card>
+            </>
           )}
 
           {/* Sign Out */}
