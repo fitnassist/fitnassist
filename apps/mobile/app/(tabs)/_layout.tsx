@@ -8,9 +8,11 @@ import {
   BookHeart,
   User,
 } from 'lucide-react-native';
+import { Text } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile } from '@/api/trainee';
+import { useUnreadMessageCount } from '@/api/message';
 import { colors } from '@/constants/theme';
 
 const AvatarTabIcon = ({ color, size, focused }: { color: string; size: number; focused: boolean }) => {
@@ -68,9 +70,24 @@ const TabLayout = () => {
         name="messages"
         options={{
           title: 'Messages',
-          tabBarIcon: ({ color, size }) => (
-            <MessageCircle size={size} color={color} />
-          ),
+          tabBarIcon: ({ color, size }) => {
+            const { data: unread } = useUnreadMessageCount();
+            const count = typeof unread === 'number' ? unread : 0;
+            return (
+              <View>
+                <MessageCircle size={size} color={color} />
+                {count > 0 && (
+                  <View
+                    className="absolute -top-1 -right-2 bg-primary rounded-full h-4 min-w-[16px] items-center justify-center px-0.5"
+                  >
+                    <Text className="text-[9px] font-bold text-white">
+                      {count > 9 ? '9+' : count}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            );
+          },
         }}
       />
       <Tabs.Screen
