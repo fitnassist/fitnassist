@@ -92,7 +92,7 @@ const RequestsScreen = () => {
   };
 
   const handleResponded = (id: string) => {
-    updateStatus.mutate({ id, status: 'RESPONDED' } as any, { onSuccess: invalidate });
+    updateStatus.mutate({ requestId: id, status: 'RESPONDED' } as any, { onSuccess: invalidate });
   };
 
   return (

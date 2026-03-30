@@ -1,8 +1,8 @@
-import { View, ScrollView, RefreshControl, Alert } from 'react-native';
+import { useState } from 'react';
+import { View, ScrollView, RefreshControl, Alert, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Check, Crown, Zap, Star } from 'lucide-react-native';
-import { TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { Text, Button, Card, CardContent, Skeleton, Badge } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
@@ -34,15 +34,16 @@ const TIERS = [
 
 const SubscriptionScreen = () => {
   const router = useRouter();
+  const [billingPeriod, setBillingPeriod] = useState<'MONTHLY' | 'ANNUAL'>('MONTHLY');
   const { data: current, isLoading, refetch } = trpc.subscription.getCurrent.useQuery();
   const createCheckout = trpc.subscription.createCheckoutSession.useMutation();
   const createPortal = trpc.subscription.createPortalSession.useMutation();
 
   const currentTier = current?.effectiveTier ?? 'FREE';
 
-  const handleSubscribe = async (tier: string) => {
+  const handleSubscribe = async (tier: string, billingPeriod: 'MONTHLY' | 'ANNUAL' = 'MONTHLY') => {
     try {
-      const result = await createCheckout.mutateAsync({ tier } as any);
+      const result = await createCheckout.mutateAsync({ tier, billingPeriod } as any);
       if (result.url) {
         await WebBrowser.openBrowserAsync(result.url);
         refetch();
@@ -84,6 +85,22 @@ const SubscriptionScreen = () => {
           </View>
         ) : (
           <>
+            {/* Billing period toggle */}
+            <View className="flex-row bg-card border border-border rounded-lg p-1">
+              <TouchableOpacity
+                className={`flex-1 items-center py-2 rounded-md ${billingPeriod === 'MONTHLY' ? 'bg-primary' : ''}`}
+                onPress={() => setBillingPeriod('MONTHLY')}
+              >
+                <Text className={`text-sm font-medium ${billingPeriod === 'MONTHLY' ? 'text-white' : 'text-muted-foreground'}`}>Monthly</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className={`flex-1 items-center py-2 rounded-md ${billingPeriod === 'ANNUAL' ? 'bg-primary' : ''}`}
+                onPress={() => setBillingPeriod('ANNUAL')}
+              >
+                <Text className={`text-sm font-medium ${billingPeriod === 'ANNUAL' ? 'text-white' : 'text-muted-foreground'}`}>Annual (save 20%)</Text>
+              </TouchableOpacity>
+            </View>
+
             {TIERS.map((tier) => {
               const isCurrent = currentTier === tier.id;
               const Icon = tier.icon;
@@ -112,7 +129,7 @@ const SubscriptionScreen = () => {
 
                     {!isCurrent && tier.id !== 'FREE' && (
                       <Button
-                        onPress={() => handleSubscribe(tier.id)}
+                        onPress={() => handleSubscribe(tier.id, billingPeriod)}
                         loading={createCheckout.isPending}
                         className="mt-2"
                       >
