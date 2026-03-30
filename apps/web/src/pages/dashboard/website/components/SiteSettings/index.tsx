@@ -149,7 +149,7 @@ const PublishSettings = ({ website }: SiteSettingsProps) => {
                 href={siteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline ml-2"
+                className="text-sm text-coral hover:underline ml-2"
               >
                 {siteUrl}
               </a>
