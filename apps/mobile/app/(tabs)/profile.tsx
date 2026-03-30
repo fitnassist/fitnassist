@@ -18,6 +18,7 @@ import {
   Heart,
   Package,
   User,
+  UserPen,
   Target,
   ClipboardList,
   Rss,
@@ -125,6 +126,12 @@ const ProfileScreen = () => {
           <Card>
             <CardContent className="py-1 px-4">
               <MenuItem
+                label="Edit Profile"
+                icon={UserPen}
+                onPress={() => router.push(isTrainer ? '/dashboard/profile/edit' : '/dashboard/profile/edit')}
+              />
+              <Divider />
+              <MenuItem
                 label="Account Settings"
                 icon={Settings}
                 onPress={() => router.push('/dashboard/settings')}
@@ -133,8 +140,18 @@ const ProfileScreen = () => {
               <MenuItem
                 label="Notifications"
                 icon={Bell}
-                onPress={() => router.push('/dashboard/settings')}
+                onPress={() => router.push('/dashboard/notifications')}
               />
+              {isTrainer && (
+                <>
+                  <Divider />
+                  <MenuItem
+                    label="Subscription"
+                    icon={CreditCard}
+                    onPress={() => router.push('/dashboard/subscription')}
+                  />
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -209,12 +226,6 @@ const ProfileScreen = () => {
                     label="Referrals"
                     icon={Gift}
                     onPress={() => router.push('/dashboard/referrals')}
-                  />
-                  <Divider />
-                  <MenuItem
-                    label="Subscription"
-                    icon={CreditCard}
-                    onPress={() => router.push('/dashboard/settings')}
                   />
                 </CardContent>
               </Card>
