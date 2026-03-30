@@ -1,3 +1,4 @@
+import { View, Image } from 'react-native';
 import { Tabs } from 'expo-router';
 import {
   Home,
@@ -8,7 +9,37 @@ import {
   User,
 } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
+import { useMyTrainerProfile } from '@/api/trainer';
+import { useMyTraineeProfile } from '@/api/trainee';
 import { colors } from '@/constants/theme';
+
+const AvatarTabIcon = ({ color, size, focused }: { color: string; size: number; focused: boolean }) => {
+  const { role } = useAuth();
+  const { data: trainerProfile } = useMyTrainerProfile();
+  const { data: traineeProfile } = useMyTraineeProfile();
+
+  const imageUrl = role === 'TRAINER' ? trainerProfile?.profileImageUrl : traineeProfile?.avatarUrl;
+
+  const avatarSize = 40;
+
+  if (imageUrl) {
+    return (
+      <Image
+        source={{ uri: imageUrl }}
+        style={{
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarSize / 2,
+          borderWidth: 2,
+          borderColor: focused ? colors.primary : colors.border,
+          marginTop: 14,
+        }}
+      />
+    );
+  }
+
+  return <User size={size} color={color} />;
+};
 
 const TabLayout = () => {
   const { role } = useAuth();
@@ -66,8 +97,10 @@ const TabLayout = () => {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
+          title: '',
+          tabBarIcon: ({ color, size, focused }) => (
+            <AvatarTabIcon color={color} size={size} focused={focused} />
+          ),
         }}
       />
     </Tabs>
