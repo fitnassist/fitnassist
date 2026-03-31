@@ -161,6 +161,243 @@ const AddressAutocomplete = ({ value, onSelect }: {
   );
 };
 
+// Gallery hooks
+const useGallery = (trainerId: string) => {
+  const list = trpc.gallery.list.useQuery({ trainerId }, { enabled: !!trainerId });
+  const add = trpc.gallery.add.useMutation();
+  const remove = trpc.gallery.remove.useMutation();
+  const reorder = trpc.gallery.reorder.useMutation();
+  const utils = trpc.useUtils();
+  const invalidate = () => utils.gallery.list.invalidate({ trainerId });
+  return { images: list.data ?? [], isLoading: list.isLoading, add, remove, reorder, invalidate, refetch: list.refetch };
+};
+
+// Media Tab Component
+const MediaTab = ({ profile, fields, update, uploading, setUploading, handlePickImage, getUploadParams, updateProfile }: any) => {
+  const gallery = useGallery(profile?.id ?? '');
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [videoUploading, setVideoUploading] = useState(false);
+  const deleteFile = trpc.upload.deleteFile.useMutation();
+
+  const handleCoverUpload = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [3, 1],
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets[0]) return;
+    setCoverUploading(true);
+    const url = await uploadImage(result.assets[0].uri, 'cover', getUploadParams);
+    setCoverUploading(false);
+    if (url) {
+      update('coverImageUrl', url);
+      await updateProfile.mutateAsync({ coverImageUrl: url });
+      Alert.alert('Success', 'Cover photo updated');
+    }
+  };
+
+  const handleGalleryAdd = async () => {
+    if ((gallery.images as any[]).length >= 6) {
+      Alert.alert('Limit Reached', 'You can have up to 6 gallery images');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets[0]) return;
+    setGalleryUploading(true);
+    const url = await uploadImage(result.assets[0].uri, 'gallery', getUploadParams);
+    setGalleryUploading(false);
+    if (url) {
+      gallery.add.mutate(
+        { url } as any,
+        { onSuccess: () => gallery.invalidate(), onError: () => Alert.alert('Error', 'Failed to add gallery image') },
+      );
+    }
+  };
+
+  const handleGalleryRemove = (imageId: string) => {
+    Alert.alert('Remove Image', 'Remove this image from your gallery?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => gallery.remove.mutate(
+          { id: imageId } as any,
+          { onSuccess: () => gallery.invalidate() },
+        ),
+      },
+    ]);
+  };
+
+  const handleVideoUpload = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['videos'],
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets[0]) return;
+    setVideoUploading(true);
+    try {
+      const params = await getUploadParams.mutateAsync({ type: 'video-intro' });
+      const formData = new FormData();
+      formData.append('file', { uri: result.assets[0].uri, type: 'video/mp4', name: 'video.mp4' } as any);
+      formData.append('api_key', params.apiKey);
+      formData.append('timestamp', String(params.timestamp));
+      formData.append('signature', params.signature);
+      formData.append('folder', params.folder);
+      formData.append('resource_type', 'video');
+
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${params.cloudName}/video/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.secure_url) {
+        await updateProfile.mutateAsync({ videoIntroUrl: data.secure_url });
+        Alert.alert('Success', 'Video intro uploaded');
+      } else {
+        Alert.alert('Error', 'Upload failed');
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to upload video');
+    } finally {
+      setVideoUploading(false);
+    }
+  };
+
+  const handleVideoRemove = async () => {
+    const url = (profile as any)?.videoIntroUrl;
+    if (!url) return;
+    Alert.alert('Remove Video', 'Remove your video introduction?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteFile.mutateAsync({ url, resourceType: 'video' });
+            await updateProfile.mutateAsync({ videoIntroUrl: null });
+          } catch {
+            Alert.alert('Error', 'Failed to remove video');
+          }
+        },
+      },
+    ]);
+  };
+
+  return (
+    <>
+      {/* Profile Photo */}
+      <Card>
+        <CardContent className="py-4 px-4 gap-3">
+          <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Photo</Text>
+          <TouchableOpacity onPress={handlePickImage} disabled={uploading}>
+            {fields.profileImageUrl ? (
+              <Image source={{ uri: fields.profileImageUrl }} className="w-full h-48 rounded-lg" resizeMode="cover" />
+            ) : (
+              <View className="w-full h-48 rounded-lg bg-secondary items-center justify-center">
+                <Camera size={32} color={colors.mutedForeground} />
+                <Text className="text-sm text-muted-foreground mt-2">Tap to upload profile photo</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          {uploading && <Text className="text-sm text-teal text-center">Uploading...</Text>}
+        </CardContent>
+      </Card>
+
+      {/* Cover Photo */}
+      <Card>
+        <CardContent className="py-4 px-4 gap-3">
+          <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Cover Photo</Text>
+          <TouchableOpacity onPress={handleCoverUpload} disabled={coverUploading}>
+            {(fields.coverImageUrl || (profile as any)?.coverImageUrl) ? (
+              <Image source={{ uri: fields.coverImageUrl || (profile as any)?.coverImageUrl }} className="w-full h-32 rounded-lg" resizeMode="cover" />
+            ) : (
+              <View className="w-full h-32 rounded-lg bg-secondary items-center justify-center">
+                <Camera size={32} color={colors.mutedForeground} />
+                <Text className="text-sm text-muted-foreground mt-2">Tap to upload cover photo (3:1)</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          {coverUploading && <Text className="text-sm text-teal text-center">Uploading...</Text>}
+        </CardContent>
+      </Card>
+
+      {/* Gallery */}
+      <Card>
+        <CardContent className="py-4 px-4 gap-3">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+              Gallery ({(gallery.images as any[]).length}/6)
+            </Text>
+            <TouchableOpacity onPress={handleGalleryAdd} disabled={galleryUploading}>
+              <Text className="text-sm font-medium text-teal">+ Add</Text>
+            </TouchableOpacity>
+          </View>
+          {galleryUploading && <Text className="text-sm text-teal text-center">Uploading...</Text>}
+          {(gallery.images as any[]).length === 0 ? (
+            <TouchableOpacity onPress={handleGalleryAdd} disabled={galleryUploading}>
+              <View className="w-full h-32 rounded-lg bg-secondary items-center justify-center">
+                <Camera size={32} color={colors.mutedForeground} />
+                <Text className="text-sm text-muted-foreground mt-2">Add gallery images (up to 6)</Text>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View className="flex-row flex-wrap gap-2">
+              {(gallery.images as any[]).map((img: any) => (
+                <View key={img.id} className="relative" style={{ width: '31%' }}>
+                  <Image source={{ uri: img.url }} className="w-full rounded-lg" style={{ aspectRatio: 1 }} resizeMode="cover" />
+                  <TouchableOpacity
+                    className="absolute top-1 right-1 bg-black/60 rounded-full w-6 h-6 items-center justify-center"
+                    onPress={() => handleGalleryRemove(img.id)}
+                  >
+                    <X size={14} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Video Introduction */}
+      <Card>
+        <CardContent className="py-4 px-4 gap-3">
+          <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Video Introduction</Text>
+          {(profile as any)?.videoIntroUrl ? (
+            <View className="gap-2">
+              <View className="w-full h-48 rounded-lg bg-secondary items-center justify-center">
+                <Text className="text-sm text-teal">Video uploaded</Text>
+                <Text className="text-xs text-muted-foreground mt-1" numberOfLines={1}>{(profile as any).videoIntroUrl}</Text>
+              </View>
+              <View className="flex-row gap-2">
+                <Button size="sm" variant="outline" onPress={handleVideoUpload} className="flex-1" loading={videoUploading}>
+                  Replace Video
+                </Button>
+                <Button size="sm" variant="destructive" onPress={handleVideoRemove} className="flex-1">
+                  Remove
+                </Button>
+              </View>
+            </View>
+          ) : (
+            <TouchableOpacity onPress={handleVideoUpload} disabled={videoUploading}>
+              <View className="w-full h-32 rounded-lg bg-secondary items-center justify-center">
+                <Camera size={32} color={colors.mutedForeground} />
+                <Text className="text-sm text-muted-foreground mt-2">Tap to upload video intro</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          {videoUploading && <Text className="text-sm text-teal text-center">Uploading video...</Text>}
+        </CardContent>
+      </Card>
+    </>
+  );
+};
+
 // Upload helper
 const uploadImage = async (uri: string, type: string, getUploadParams: any) => {
   try {
@@ -372,27 +609,16 @@ const TrainerProfileEdit = () => {
         )}
 
         {tab === 'media' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Photo</Text>
-              <TouchableOpacity onPress={handlePickImage} disabled={uploading}>
-                {fields.profileImageUrl ? (
-                  <Image source={{ uri: fields.profileImageUrl }} className="w-full h-48 rounded-lg" resizeMode="cover" />
-                ) : (
-                  <View className="w-full h-48 rounded-lg bg-secondary items-center justify-center">
-                    <Camera size={32} color={colors.mutedForeground} />
-                    <Text className="text-sm text-muted-foreground mt-2">Tap to upload</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-              {uploading && <Text className="text-sm text-teal text-center">Uploading...</Text>}
-
-              <Text className="text-sm font-medium text-teal uppercase mt-4" style={{ letterSpacing: 1 }}>Gallery & Video</Text>
-              <Text className="text-sm text-muted-foreground">
-                Gallery images, cover photo, and video intro can be managed from the web app for now.
-              </Text>
-            </CardContent>
-          </Card>
+          <MediaTab
+            profile={profile}
+            fields={fields}
+            update={update}
+            uploading={uploading}
+            setUploading={setUploading}
+            handlePickImage={handlePickImage}
+            getUploadParams={getUploadParams}
+            updateProfile={updateProfile}
+          />
         )}
 
         {tab === 'settings' && (
