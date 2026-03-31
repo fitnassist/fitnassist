@@ -35,11 +35,12 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
   const utils = trpc.useUtils();
 
   const handleSelectFood = (food: any) => {
-    setName(food.name ?? food.description ?? '');
-    setCalories(String(Math.round(food.calories ?? food.energy ?? 0)));
-    setProtein(String(Math.round(food.protein ?? 0)));
-    setCarbs(String(Math.round(food.carbs ?? food.carbohydrates ?? 0)));
-    setFat(String(Math.round(food.fat ?? 0)));
+    setName(food.food_name ?? '');
+    setCalories(String(food.calories ?? 0));
+    setProtein(String(food.protein_g ?? 0));
+    setCarbs(String(food.carbs_g ?? 0));
+    setFat(String(food.fat_g ?? 0));
+    setServingSize(String(food.serving_qty ?? 1));
     setMode('manual');
   };
 
@@ -113,17 +114,17 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
 
           {searching && <Skeleton className="h-20 rounded-lg" />}
 
-          {searchResults && ((searchResults as any)?.results ?? searchResults as any)?.length > 0 && (
+          {searchResults && (searchResults as any)?.products?.length > 0 && (
             <View className="gap-1 max-h-48">
-              {((searchResults as any)?.results ?? searchResults as any).slice(0, 8).map((food: any, i: number) => (
+              {(searchResults as any).products.slice(0, 8).map((food: any, i: number) => (
                 <TouchableOpacity
                   key={i}
                   className="bg-card border border-border rounded-lg px-3 py-2"
                   onPress={() => handleSelectFood(food)}
                 >
-                  <Text className="text-sm text-foreground" numberOfLines={1}>{food.name ?? food.description}</Text>
+                  <Text className="text-sm text-foreground" numberOfLines={1}>{food.food_name}{food.brand_name ? ` (${food.brand_name})` : ''}</Text>
                   <Text className="text-xs text-muted-foreground">
-                    {Math.round(food.calories ?? food.energy ?? 0)} kcal
+                    {food.calories} kcal · {food.serving_qty}{food.serving_unit}
                   </Text>
                 </TouchableOpacity>
               ))}
