@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { View, FlatList, RefreshControl, Image, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Users, MessageCircle, Search, User as UserIcon } from 'lucide-react-native';
+import { ArrowLeft, Users, MessageCircle, Search } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import { Text, Skeleton, Badge, Card, CardContent, TabBar } from '@/components/ui';
 import { useClients } from '@/api/client';
@@ -86,13 +86,6 @@ const ClientCard = ({ client, onPress, onMessage }: { client: any; onPress: () =
             >
               <MessageCircle size={14} color={colors.teal} />
               <Text className="text-xs text-foreground">Message</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className="flex-row items-center gap-1 bg-secondary rounded-lg px-3 py-1.5"
-              onPress={(e) => { e.stopPropagation(); onPress(); }}
-            >
-              <UserIcon size={14} color={colors.teal} />
-              <Text className="text-xs text-foreground">Profile</Text>
             </TouchableOpacity>
           </View>
         </CardContent>

@@ -123,14 +123,6 @@ export const ClientOverview = ({ client, onStatusChange, isUpdating, onDisconnec
               )}
 
               <div className="flex gap-2">
-                {sender && (
-                  <Link to={routes.traineeProfileView(sender.id)}>
-                    <Button variant="outline" size="sm">
-                      <User className="h-4 w-4 mr-2" />
-                      View Profile
-                    </Button>
-                  </Link>
-                )}
                 {!isDisconnected && (
                   <>
                     <Link to={routes.dashboardBookingsBookClientWithId(client.id)}>
