@@ -6,3 +6,4 @@ export { Card, CardHeader, CardTitle, CardContent } from './card';
 export { Skeleton, type SkeletonProps } from './skeleton';
 export { TabBar } from './tab-bar';
 export { ListPicker, type ListPickerItem } from './list-picker';
+export { AlertProvider, useAlert } from './styled-alert';

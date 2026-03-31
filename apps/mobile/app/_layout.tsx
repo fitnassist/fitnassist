@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { queryClient } from '@/lib/queryClient';
 import { trpc, createTRPCClient } from '@/lib/trpc';
 import { useAuth } from '@/hooks/useAuth';
+import { AlertProvider } from '@/components/ui';
 import { useSse } from '@/lib/sse';
 import { useNotifications } from '@/hooks/useNotifications';
 
@@ -47,22 +48,24 @@ const RootLayout = () => {
       <trpc.Provider client={trpcClient} queryClient={queryClient}>
         <QueryClientProvider client={queryClient}>
           <SafeAreaProvider>
-            <AuthGuard>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  animation: 'slide_from_right',
-                }}
-              >
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
-                <Stack.Screen name="dashboard" />
-                <Stack.Screen name="trainers" />
-                <Stack.Screen name="bookings" />
-                <Stack.Screen name="messages" />
-              </Stack>
-            </AuthGuard>
-            <StatusBar style="light" />
+            <AlertProvider>
+              <AuthGuard>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    animation: 'slide_from_right',
+                  }}
+                >
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
+                  <Stack.Screen name="dashboard" />
+                  <Stack.Screen name="trainers" />
+                  <Stack.Screen name="bookings" />
+                  <Stack.Screen name="messages" />
+                </Stack>
+              </AuthGuard>
+              <StatusBar style="light" />
+            </AlertProvider>
           </SafeAreaProvider>
         </QueryClientProvider>
       </trpc.Provider>

@@ -1,4 +1,4 @@
-import { View, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -26,7 +26,8 @@ import {
   ChevronRight,
   LogOut,
 } from 'lucide-react-native';
-import { Text, Card, CardContent } from '@/components/ui';
+import { Text, Card, CardContent, useAlert } from '@/components/ui';
+import { Crown } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile } from '@/api/trainee';
@@ -44,29 +45,42 @@ interface MenuItemProps {
   lockedLabel?: string;
 }
 
-const MenuItem = ({ label, icon: Icon, onPress, destructive, locked, lockedLabel }: MenuItemProps) => (
-  <TouchableOpacity
-    className={`flex-row items-center py-3.5 px-1 gap-3 ${locked ? 'opacity-40' : ''}`}
-    activeOpacity={0.6}
-    onPress={() => {
-      if (locked) {
-        Alert.alert('Upgrade Required', lockedLabel ?? 'Upgrade your subscription to unlock this feature');
-      } else {
-        onPress();
-      }
-    }}
-  >
-    <Icon size={20} color={destructive ? colors.destructive : colors.mutedForeground} />
-    <Text className={`flex-1 text-base ${destructive ? 'text-destructive' : 'text-foreground'}`}>
-      {label}
-    </Text>
-    {locked ? (
-      <Lock size={14} color={colors.mutedForeground} />
-    ) : !destructive ? (
-      <ChevronRight size={18} color={colors.mutedForeground} />
-    ) : null}
-  </TouchableOpacity>
-);
+const MenuItem = ({ label, icon: Icon, onPress, destructive, locked, lockedLabel }: MenuItemProps) => {
+  const { showAlert } = useAlert();
+  const router = useRouter();
+
+  return (
+    <TouchableOpacity
+      className={`flex-row items-center py-3.5 px-1 gap-3 ${locked ? 'opacity-40' : ''}`}
+      activeOpacity={0.6}
+      onPress={() => {
+        if (locked) {
+          showAlert({
+            title: 'Upgrade Required',
+            message: lockedLabel ?? 'Upgrade your subscription to unlock this feature.',
+            icon: <Crown size={32} color={colors.primary} />,
+            actions: [
+              { label: 'View Plans', onPress: () => router.push('/dashboard/subscription') },
+              { label: 'Maybe Later', variant: 'outline' },
+            ],
+          });
+        } else {
+          onPress();
+        }
+      }}
+    >
+      <Icon size={20} color={destructive ? colors.destructive : colors.mutedForeground} />
+      <Text className={`flex-1 text-base ${destructive ? 'text-destructive' : 'text-foreground'}`}>
+        {label}
+      </Text>
+      {locked ? (
+        <Lock size={14} color={colors.mutedForeground} />
+      ) : !destructive ? (
+        <ChevronRight size={18} color={colors.mutedForeground} />
+      ) : null}
+    </TouchableOpacity>
+  );
+};
 
 const Divider = () => <View className="border-b border-border" />;
 
@@ -85,21 +99,27 @@ const ProfileScreen = () => {
   const profileImage = isTrainer ? trainerProfile?.profileImageUrl : traineeProfile?.avatarUrl;
   const displayName = isTrainer ? trainerProfile?.displayName : user?.name;
 
-  const handleSignOut = async () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Sign Out',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await signOut();
-          } catch {
-            Alert.alert('Error', 'Failed to sign out');
-          }
+  const { showAlert } = useAlert();
+
+  const handleSignOut = () => {
+    showAlert({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out?',
+      actions: [
+        {
+          label: 'Sign Out',
+          variant: 'destructive',
+          onPress: async () => {
+            try {
+              await signOut();
+            } catch {
+              showAlert({ title: 'Error', message: 'Failed to sign out' });
+            }
+          },
         },
-      },
-    ]);
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   return (
