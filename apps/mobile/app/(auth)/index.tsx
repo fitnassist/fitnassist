@@ -1,11 +1,25 @@
-import { View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { View, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button } from '@/components/ui';
 import { GradientBackground } from '@/components/GradientBackground';
+import { useAuth } from '@/hooks/useAuth';
 
 const WelcomeScreen = () => {
   const router = useRouter();
+  const { isLoading, isAuthenticated } = useAuth();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isLoading, isAuthenticated, fadeAnim]);
 
   return (
     <GradientBackground>
@@ -21,10 +35,8 @@ const WelcomeScreen = () => {
           </Text>
         </View>
 
-        <View className="px-8 pb-8 gap-3">
-          <Button
-            onPress={() => router.push('/(auth)/login')}
-          >
+        <Animated.View style={{ opacity: fadeAnim, paddingHorizontal: 32, paddingBottom: 32, gap: 12 }}>
+          <Button onPress={() => router.push('/(auth)/login')}>
             Sign In
           </Button>
           <Button
@@ -34,7 +46,7 @@ const WelcomeScreen = () => {
           >
             <Text className="text-white font-semibold">Create Account</Text>
           </Button>
-        </View>
+        </Animated.View>
       </SafeAreaView>
     </GradientBackground>
   );
