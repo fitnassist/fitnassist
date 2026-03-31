@@ -11,6 +11,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile, useUpdateTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile, useUpdateTraineeProfile } from '@/api/trainee';
 import { trpc } from '@/lib/trpc';
+import {
+  TRAINER_SERVICES as SERVICES_DATA,
+  TRAINER_QUALIFICATIONS as QUALS_DATA,
+} from '@fitnassist/schemas';
 import { colors } from '@/constants/theme';
 
 type TrainerTab = 'basic' | 'location' | 'services' | 'media' | 'settings';
@@ -19,17 +23,16 @@ type TraineeTab = 'personal' | 'body' | 'fitness' | 'nutrition' | 'privacy';
 const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:3001';
 const GOOGLE_API_KEY = '***REDACTED***';
 
-const TRAINER_SERVICES = [
-  'personal-training', 'strength-conditioning', 'weight-loss', 'bodybuilding',
-  'sports-performance', 'group-fitness', 'hiit', 'crossfit', 'nutrition-coaching',
-  'rehabilitation', 'mobility-flexibility', 'pre-postnatal', 'senior-fitness',
-  'stress-management', 'yoga', 'pilates',
+// Group services by category
+const SERVICE_GROUPS = [
+  { label: 'Fitness', items: SERVICES_DATA.filter((s) => s.category === 'fitness') },
+  { label: 'Wellness', items: SERVICES_DATA.filter((s) => s.category === 'wellness') },
 ];
 
-const TRAINER_QUALIFICATIONS = [
-  'level-2-gym', 'level-3-pt', 'level-4-specialist', 'cimspa', 'reps',
-  'first-aid', 'sports-massage', 'level-3-nutrition', 'nasm-cpt', 'ace-cpt',
-  'acsm', 'nsca-cscs', 'issa', 'crossfit-l1', 'crossfit-l2', 'precision-nutrition',
+// Group qualifications by region
+const QUAL_GROUPS = [
+  { label: 'UK Qualifications', items: QUALS_DATA.filter((q) => q.region === 'uk') },
+  { label: 'International', items: QUALS_DATA.filter((q) => q.region === 'international') },
 ];
 
 const TRAVEL_OPTIONS = [
@@ -72,6 +75,36 @@ const ChipSelect = ({ options, selected, onToggle }: {
         </TouchableOpacity>
       );
     })}
+  </View>
+);
+
+const GroupedChipSelect = ({ groups, selected, onToggle }: {
+  groups: { label: string; items: readonly { value: string; label: string }[] }[];
+  selected: string[];
+  onToggle: (val: string) => void;
+}) => (
+  <View className="gap-3">
+    {groups.map((group) => (
+      <View key={group.label} className="gap-2">
+        <Text className="text-xs font-medium text-muted-foreground">{group.label}</Text>
+        <View className="flex-row flex-wrap gap-2">
+          {group.items.map((item) => {
+            const active = selected.includes(item.value);
+            return (
+              <TouchableOpacity
+                key={item.value}
+                className={`px-3 py-2 rounded-lg border ${active ? 'border-teal bg-teal/10' : 'border-border'}`}
+                onPress={() => onToggle(item.value)}
+              >
+                <Text className={`text-xs font-medium ${active ? 'text-teal' : 'text-muted-foreground'}`}>
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    ))}
   </View>
 );
 
@@ -600,15 +633,39 @@ const TrainerProfileEdit = () => {
         )}
 
         {tab === 'services' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-4">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Services Offered</Text>
-              <ChipSelect options={TRAINER_SERVICES} selected={fields.services ?? []} onToggle={(s) => toggleArrayItem('services', s)} />
+          <>
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+                  Services & Specializations
+                </Text>
+                <Text className="text-xs text-muted-foreground">
+                  Select the services you offer to clients
+                </Text>
+                <GroupedChipSelect
+                  groups={SERVICE_GROUPS}
+                  selected={fields.services ?? []}
+                  onToggle={(s) => toggleArrayItem('services', s)}
+                />
+              </CardContent>
+            </Card>
 
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Qualifications</Text>
-              <ChipSelect options={TRAINER_QUALIFICATIONS} selected={fields.qualifications ?? []} onToggle={(q) => toggleArrayItem('qualifications', q)} />
-            </CardContent>
-          </Card>
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+                  Qualifications & Certifications
+                </Text>
+                <Text className="text-xs text-muted-foreground">
+                  Select your professional qualifications
+                </Text>
+                <GroupedChipSelect
+                  groups={QUAL_GROUPS}
+                  selected={fields.qualifications ?? []}
+                  onToggle={(q) => toggleArrayItem('qualifications', q)}
+                />
+              </CardContent>
+            </Card>
+          </>
         )}
 
         {tab === 'media' && (
