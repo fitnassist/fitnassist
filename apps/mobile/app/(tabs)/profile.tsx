@@ -10,6 +10,7 @@ import {
   Gift,
   Globe,
   ShoppingBag,
+  Phone,
   BookOpen,
   ClipboardCheck,
   Users,
@@ -184,6 +185,12 @@ const ProfileScreen = () => {
               </Text>
               <Card>
                 <CardContent className="py-1 px-4">
+                  <MenuItem
+                    label="Requests"
+                    icon={Phone}
+                    onPress={() => router.push('/dashboard/requests')}
+                  />
+                  <Divider />
                   <MenuItem
                     label="Clients"
                     icon={Users}
