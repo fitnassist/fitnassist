@@ -16,13 +16,21 @@ import { useUnreadMessageCount } from '@/api/message';
 import { colors } from '@/constants/theme';
 
 const AvatarTabIcon = ({ color, size, focused }: { color: string; size: number; focused: boolean }) => {
-  const { role } = useAuth();
+  const { user, role } = useAuth();
   const { data: trainerProfile } = useMyTrainerProfile();
   const { data: traineeProfile } = useMyTraineeProfile();
 
   const imageUrl = role === 'TRAINER' ? trainerProfile?.profileImageUrl : traineeProfile?.avatarUrl;
+  const displayName = role === 'TRAINER' ? trainerProfile?.displayName : user?.name;
+  const initials = (displayName ?? user?.name ?? '?')
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   const avatarSize = 40;
+  const borderColor = focused ? colors.primary : colors.border;
 
   if (imageUrl) {
     return (
@@ -33,14 +41,30 @@ const AvatarTabIcon = ({ color, size, focused }: { color: string; size: number; 
           height: avatarSize,
           borderRadius: avatarSize / 2,
           borderWidth: 2,
-          borderColor: focused ? colors.primary : colors.border,
+          borderColor,
           marginTop: 14,
         }}
       />
     );
   }
 
-  return <User size={size} color={color} />;
+  return (
+    <View
+      style={{
+        width: avatarSize,
+        height: avatarSize,
+        borderRadius: avatarSize / 2,
+        borderWidth: 2,
+        borderColor,
+        backgroundColor: 'hsl(230, 15%, 18%)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 14,
+      }}
+    >
+      <Text className="text-xs font-semibold text-foreground">{initials}</Text>
+    </View>
+  );
 };
 
 const TabLayout = () => {
