@@ -6,6 +6,7 @@ import { ArrowLeft, Camera, Check, X, MapPin } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
+import { Calendar as RNCalendar } from 'react-native-calendars';
 import { Text, Button, Input, Card, CardContent, TabBar } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile, useUpdateTrainerProfile } from '@/api/trainer';
@@ -979,7 +980,33 @@ const TraineeProfileEdit = () => {
               <CardContent className="py-4 px-4 gap-3">
                 <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Personal Info</Text>
                 <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={3} />
-                <Input label="Date of Birth" value={fields.dateOfBirth} onChangeText={(v) => update('dateOfBirth', v)} placeholder="YYYY-MM-DD" />
+                <Text className="text-sm font-medium text-foreground">Date of Birth</Text>
+                <TouchableOpacity
+                  className="h-12 rounded-lg border border-border bg-background justify-center px-4"
+                  onPress={() => update('_showDobPicker', !fields._showDobPicker)}
+                >
+                  <Text className={`text-base ${fields.dateOfBirth ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    {fields.dateOfBirth ? new Date(fields.dateOfBirth + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Select date of birth'}
+                  </Text>
+                </TouchableOpacity>
+                {fields._showDobPicker && (
+                  <RNCalendar
+                    maxDate={new Date().toISOString().split('T')[0]}
+                    onDayPress={(day: { dateString: string }) => { update('dateOfBirth', day.dateString); update('_showDobPicker', false); }}
+                    markedDates={fields.dateOfBirth ? { [fields.dateOfBirth]: { selected: true, selectedColor: colors.primary } } : {}}
+                    theme={{
+                      calendarBackground: 'transparent',
+                      todayTextColor: colors.teal,
+                      dayTextColor: colors.foreground,
+                      textDisabledColor: colors.muted,
+                      arrowColor: colors.teal,
+                      monthTextColor: colors.foreground,
+                      textMonthFontWeight: '300',
+                      selectedDayBackgroundColor: colors.primary,
+                      selectedDayTextColor: '#fff',
+                    }}
+                  />
+                )}
                 <Text className="text-sm font-medium text-foreground">Gender</Text>
                 <View className="flex-row flex-wrap gap-2">
                   {GENDERS.map(({ value, label }) => (

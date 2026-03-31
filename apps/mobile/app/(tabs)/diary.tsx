@@ -20,7 +20,6 @@ import {
 import { Text, Card, CardContent, Skeleton } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useDiaryEntries, useDailyNutrition } from '@/api/diary';
-import { useClients } from '@/api/client';
 import {
   WeightLogger,
   WaterLogger,
@@ -223,7 +222,9 @@ const TraineeDiary = () => {
 
 const TrainerClientsTab = () => {
   const router = useRouter();
-  const { data: clients, isLoading, refetch } = useClients();
+  const { data: activity, isLoading, refetch } = trpc.diary.getRecentClientActivity.useQuery({});
+
+  const entries = (activity ?? []) as any[];
 
   return (
     <ScrollView
@@ -231,32 +232,43 @@ const TrainerClientsTab = () => {
       contentContainerClassName="px-4 py-2 pb-8"
       refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} tintColor={colors.teal} />}
     >
+      <RNTouchableOpacity
+        className="bg-primary rounded-lg py-3 items-center mb-4"
+        onPress={() => router.push('/dashboard/clients')}
+      >
+        <Text className="text-sm font-semibold text-white">View All Clients</Text>
+      </RNTouchableOpacity>
+
+      <Text className="text-sm font-medium text-teal uppercase mb-2" style={{ letterSpacing: 1 }}>
+        Recent Client Activity
+      </Text>
+
       {isLoading ? (
         <View className="gap-2">
-          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 rounded-lg" />)}
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 rounded-lg" />)}
         </View>
-      ) : ((clients as any)?.clients ?? []).length === 0 ? (
+      ) : entries.length === 0 ? (
         <View className="items-center justify-center py-12 gap-2">
           <Users size={48} color={colors.mutedForeground} />
-          <Text className="text-base text-muted-foreground">No clients yet</Text>
+          <Text className="text-base text-muted-foreground">No recent client activity</Text>
         </View>
       ) : (
-        <View className="gap-2">
-          {((clients as any)?.clients ?? []).map((client: any) => {
-            const name = client.connection?.sender?.name ?? client.connection?.name ?? 'Unknown';
-            return (
-              <RNTouchableOpacity
-                key={client.id}
-                className="bg-card border border-border rounded-lg p-4 flex-row items-center gap-3"
-                onPress={() => router.push(`/dashboard/clients/${client.id}`)}
-              >
-                <View className="w-10 h-10 rounded-full bg-secondary items-center justify-center">
-                  <Text className="text-sm font-semibold text-foreground">{name.charAt(0).toUpperCase()}</Text>
-                </View>
-                <Text className="text-base font-medium text-foreground">{name}</Text>
-              </RNTouchableOpacity>
-            );
-          })}
+        <View className="gap-1">
+          {entries.slice(0, 20).map((entry: any) => (
+            <View key={entry.id} className="flex-row items-center gap-3 py-2 border-b border-border">
+              <View className="w-8 h-8 rounded-full bg-secondary items-center justify-center">
+                <Text className="text-xs font-semibold text-foreground">
+                  {(entry.user?.name ?? '?').charAt(0).toUpperCase()}
+                </Text>
+              </View>
+              <View className="flex-1">
+                <Text className="text-sm font-medium text-foreground">{entry.user?.name ?? 'Client'}</Text>
+                <Text className="text-xs text-muted-foreground">
+                  Logged {entry.type?.replace(/_/g, ' ').toLowerCase() ?? 'activity'}
+                </Text>
+              </View>
+            </View>
+          ))}
         </View>
       )}
     </ScrollView>

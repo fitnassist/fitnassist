@@ -102,13 +102,11 @@ const TabLayout = () => {
       <Tabs.Screen
         name="diary"
         options={{
-          title: isTrainer ? 'Clients' : 'Diary',
-          tabBarIcon: ({ color, size }) =>
-            isTrainer ? (
-              <Users size={size} color={color} />
-            ) : (
-              <BookHeart size={size} color={color} />
-            ),
+          title: 'Diary',
+          href: isTrainer ? null : '/(tabs)/diary',
+          tabBarIcon: ({ color, size }) => (
+            <BookHeart size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
