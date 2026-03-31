@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { View, ScrollView, Alert, TextInput, Switch } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useRouter } from 'expo-router';
@@ -7,7 +7,7 @@ import { ArrowLeft, Plus, Trash2, MapPin, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import Constants from 'expo-constants';
-import { Text, Button, Input, Card, CardContent, TabBar } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar, AddressInput } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { authClient } from '@/lib/auth';
@@ -89,70 +89,7 @@ const BUFFER_OPTIONS = [
   { value: 120, label: '120 minutes' },
 ];
 
-// Address autocomplete for session locations
-const LocationAddressInput = ({ value, onChangeText, onSelect }: {
-  value: string;
-  onChangeText: (t: string) => void;
-  onSelect: (addr: { address: string; latitude: number; longitude: number; placeId: string }) => void;
-}) => {
-  const [predictions, setPredictions] = useState<any[]>([]);
-
-  const search = useCallback(async (text: string) => {
-    onChangeText(text);
-    if (text.length < 3) { setPredictions([]); return; }
-    try {
-      const res = await fetch(`https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(text)}&components=country:gb&key=${GOOGLE_API_KEY}`);
-      const data = await res.json();
-      setPredictions(data.predictions ?? []);
-    } catch { setPredictions([]); }
-  }, [onChangeText]);
-
-  const selectPlace = async (placeId: string, description: string) => {
-    setPredictions([]);
-    onChangeText(description);
-    try {
-      const res = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=formatted_address,geometry&key=${GOOGLE_API_KEY}`);
-      const data = await res.json();
-      onSelect({
-        address: data.result?.formatted_address ?? description,
-        latitude: data.result?.geometry?.location?.lat ?? 0,
-        longitude: data.result?.geometry?.location?.lng ?? 0,
-        placeId,
-      });
-    } catch {}
-  };
-
-  return (
-    <View>
-      <View className="flex-row items-center h-12 bg-card border border-border rounded-lg px-3">
-        <MapPin size={16} color={colors.mutedForeground} />
-        <TextInput
-          value={value}
-          onChangeText={search}
-          placeholder="Search address..."
-          placeholderTextColor="hsl(230, 10%, 55%)"
-          className="flex-1 text-foreground ml-2"
-          style={{ fontSize: 16, padding: 0, margin: 0 }}
-          autoCapitalize="none"
-        />
-        {value.length > 0 && (
-          <TouchableOpacity onPress={() => { onChangeText(''); setPredictions([]); }}>
-            <X size={16} color={colors.mutedForeground} />
-          </TouchableOpacity>
-        )}
-      </View>
-      {predictions.length > 0 && (
-        <View className="bg-card border border-border rounded-lg mt-1 max-h-36">
-          {predictions.slice(0, 5).map((p: any) => (
-            <TouchableOpacity key={p.place_id} className="px-3 py-2 border-b border-border" onPress={() => selectPlace(p.place_id, p.description)}>
-              <Text className="text-sm text-foreground" numberOfLines={1}>{p.description}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-};
+// LocationAddressInput removed - using shared AddressInput component
 
 const SchedulingTab = () => {
   const { data: weekly, refetch: refetchWeekly } = trpc.availability.getWeekly.useQuery();
@@ -320,12 +257,10 @@ const SchedulingTab = () => {
           {showAddLocation && (
             <View className="bg-secondary/50 rounded-lg p-3 gap-3 border border-border">
               <Input label="Name" value={newLocationName} onChangeText={setNewLocationName} placeholder="e.g. Home Gym" />
-              <Text className="text-xs font-medium text-foreground">Address</Text>
-              <LocationAddressInput
-                value={newLocationAddress}
-                onChangeText={setNewLocationAddress}
+              <AddressInput
+                currentAddress={{}}
                 onSelect={(addr) => {
-                  setNewLocationAddress(addr.address);
+                  setNewLocationAddress([addr.addressLine1, addr.city, addr.postcode].filter(Boolean).join(', '));
                   setNewLocationLatLng({ latitude: addr.latitude, longitude: addr.longitude, placeId: addr.placeId });
                 }}
               />

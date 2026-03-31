@@ -7,7 +7,7 @@ import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import { Calendar as RNCalendar } from 'react-native-calendars';
-import { Text, Button, Input, Card, CardContent, TabBar } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar, AddressInput } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile, useUpdateTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile, useUpdateTraineeProfile } from '@/api/trainee';
@@ -667,13 +667,12 @@ const TrainerProfileEdit = () => {
             <Card>
               <CardContent className="py-4 px-4 gap-3">
                 <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Location</Text>
-                <AddressAutocomplete
+                <AddressInput
                   currentAddress={{
                     addressLine1: fields.addressLine1,
                     city: fields.city,
                     county: fields.county,
                     postcode: fields.postcode,
-                    country: fields.country,
                   }}
                   onSelect={(addr) => {
                     update('addressLine1', addr.addressLine1);
