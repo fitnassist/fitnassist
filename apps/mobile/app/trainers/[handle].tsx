@@ -63,7 +63,7 @@ const TrainerProfileScreen = () => {
   const followMut = trpc.follow.follow.useMutation();
   const unfollowMut = trpc.follow.unfollow.useMutation();
   const followUtils = trpc.useUtils();
-  const isFollowing = (isFollowingQuery.data as any)?.isFollowing ?? false;
+  const isFollowing = isFollowingQuery.data === true;
   const followers = (followCounts.data as any)?.followers ?? 0;
 
   // Contact
