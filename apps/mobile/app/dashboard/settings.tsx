@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { View, ScrollView, Alert, TextInput, Switch } from 'react-native';
-import { Calendar } from 'react-native-calendars';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Plus, Trash2, MapPin, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import Constants from 'expo-constants';
-import { Text, Button, Input, Card, CardContent, TabBar, AddressInput } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, DatePicker } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { authClient } from '@/lib/auth';
@@ -383,24 +382,11 @@ const SchedulingTab = () => {
 
           {showBlockDate && (
             <View className="bg-secondary/50 rounded-lg p-3 gap-3 border border-border">
-              <Calendar
-                minDate={new Date().toISOString().split('T')[0]}
-                onDayPress={(day: { dateString: string }) => setNewBlockDate(day.dateString)}
-                markedDates={newBlockDate ? { [newBlockDate]: { selected: true, selectedColor: colors.primary } } : {}}
-                theme={{
-                  calendarBackground: 'transparent',
-                  todayTextColor: colors.teal,
-                  dayTextColor: colors.foreground,
-                  textDisabledColor: colors.muted,
-                  arrowColor: colors.teal,
-                  monthTextColor: colors.foreground,
-                  textMonthFontWeight: '300',
-                  selectedDayBackgroundColor: colors.primary,
-                  selectedDayTextColor: '#fff',
-                  textDayFontSize: 14,
-                  textMonthFontSize: 16,
-                  textDayHeaderFontSize: 12,
-                }}
+              <DatePicker
+                value={newBlockDate}
+                onChange={setNewBlockDate}
+                minDate={new Date()}
+                placeholder="Select date to block"
               />
               <Input label="Reason (optional)" value={newBlockReason} onChangeText={setNewBlockReason} placeholder="e.g. Holiday" />
               <View className="flex-row gap-2">

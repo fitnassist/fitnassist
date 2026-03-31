@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Target, CheckCircle, Trophy, Plus, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Card, CardContent, Skeleton, Badge, Button, Input, TabBar } from '@/components/ui';
+import { Text, Card, CardContent, Skeleton, Badge, Button, Input, TabBar, DatePicker } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
@@ -137,33 +137,12 @@ const GoalsScreen = () => {
               {newGoal.type === 'TARGET' && (
                 <Input label="Target Value" value={newGoal.targetValue} onChangeText={(v) => setNewGoal((g) => ({ ...g, targetValue: v }))} keyboardType="decimal-pad" placeholder="e.g. 70" />
               )}
-              <Text className="text-sm font-medium text-foreground">Deadline (optional)</Text>
-              <TouchableOpacity
-                className="h-12 rounded-lg border border-border bg-background justify-center px-4"
-                onPress={() => setNewGoal((g) => ({ ...g, _showPicker: !g._showPicker } as any))}
-              >
-                <Text className={`text-base ${newGoal.deadline ? 'text-foreground' : 'text-muted-foreground'}`}>
-                  {newGoal.deadline ? new Date(newGoal.deadline + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Select deadline'}
-                </Text>
-              </TouchableOpacity>
-              {(newGoal as any)._showPicker && (
-                <Calendar
-                  minDate={new Date().toISOString().split('T')[0]}
-                  onDayPress={(day: { dateString: string }) => setNewGoal((g) => ({ ...g, deadline: day.dateString, _showPicker: false } as any))}
-                  markedDates={newGoal.deadline ? { [newGoal.deadline]: { selected: true, selectedColor: colors.primary } } : {}}
-                  theme={{
-                    calendarBackground: 'transparent',
-                    todayTextColor: colors.teal,
-                    dayTextColor: colors.foreground,
-                    textDisabledColor: colors.muted,
-                    arrowColor: colors.teal,
-                    monthTextColor: colors.foreground,
-                    textMonthFontWeight: '300',
-                    selectedDayBackgroundColor: colors.primary,
-                    selectedDayTextColor: '#fff',
-                  }}
-                />
-              )}
+              <DatePicker
+                value={newGoal.deadline}
+                onChange={(v) => setNewGoal((g) => ({ ...g, deadline: v }))}
+                minDate={new Date()}
+                placeholder="Select deadline (optional)"
+              />
               <Button
                 onPress={() => {
                   if (!newGoal.name.trim()) { Alert.alert('Error', 'Name is required'); return; }

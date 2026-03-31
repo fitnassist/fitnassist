@@ -9,7 +9,7 @@ import {
 } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar, ListPicker, type ListPickerItem } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar, ListPicker, type ListPickerItem, DatePicker } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { formatDistanceToNow, formatMessageTime } from '@/lib/dates';
 import { colors } from '@/constants/theme';
@@ -232,17 +232,12 @@ const ProgressTab = ({ clientRosterId, clientUserId }: { clientRosterId: string;
               {goalType === 'TARGET' && (
                 <Input label="Target Value" value={goalTarget} onChangeText={setGoalTarget} keyboardType="decimal-pad" placeholder="e.g. 70" />
               )}
-              <TouchableOpacity className="h-12 rounded-lg border border-border bg-background justify-center px-4" onPress={() => setShowDeadlinePicker(!showDeadlinePicker)}>
-                <Text className={`text-base ${goalDeadline ? 'text-foreground' : 'text-muted-foreground'}`}>
-                  {goalDeadline ? new Date(goalDeadline + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Set deadline (optional)'}
-                </Text>
-              </TouchableOpacity>
-              {showDeadlinePicker && (
-                <Calendar minDate={today} onDayPress={(d: any) => { setGoalDeadline(d.dateString); setShowDeadlinePicker(false); }}
-                  markedDates={goalDeadline ? { [goalDeadline]: { selected: true, selectedColor: colors.primary } } : {}}
-                  theme={{ calendarBackground: 'transparent', todayTextColor: colors.teal, dayTextColor: colors.foreground, textDisabledColor: colors.muted, arrowColor: colors.teal, monthTextColor: colors.foreground, selectedDayBackgroundColor: colors.primary, selectedDayTextColor: '#fff' }}
-                />
-              )}
+              <DatePicker
+                value={goalDeadline}
+                onChange={setGoalDeadline}
+                minDate={new Date()}
+                placeholder="Set deadline (optional)"
+              />
               <Button size="sm" onPress={handleCreateGoal} loading={createGoal.isPending}>Create Goal</Button>
             </View>
           )}
