@@ -618,7 +618,7 @@ const TrainerProfileEdit = () => {
 
   return (
     <>
-      <View className="flex-row px-4 py-2 gap-1">
+      <View className="flex-row px-4 pt-4 pb-2 gap-1">
         {TABS.map(({ key, label }) => (
           <TouchableOpacity
             key={key}
@@ -962,7 +962,7 @@ const TraineeProfileEdit = () => {
 
   return (
     <>
-      <View className="flex-row px-4 py-2 gap-1">
+      <View className="flex-row px-4 pt-4 pb-2 gap-1">
         {TABS.map(({ key, label }) => (
           <TouchableOpacity
             key={key}

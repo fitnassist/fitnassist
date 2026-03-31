@@ -53,7 +53,7 @@ const ResourcesScreen = () => {
       </View>
 
       {/* Tabs */}
-      <View className="flex-row px-4 py-3 gap-2">
+      <View className="flex-row px-4 pt-4 pb-2 gap-2">
         {TABS.map(({ key, label, icon: Icon }) => (
           <TouchableOpacity
             key={key}
