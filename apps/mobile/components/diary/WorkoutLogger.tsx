@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Alert } from 'react-native';
-import { Input, Button } from '@/components/ui';
+import { Input, Button, useAlert } from '@/components/ui';
 import { LoggerModal } from './LoggerModal';
 import { trpc } from '@/lib/trpc';
 
@@ -11,6 +10,7 @@ interface WorkoutLoggerProps {
 }
 
 export const WorkoutLogger = ({ visible, onClose, date }: WorkoutLoggerProps) => {
+  const { showAlert } = useAlert();
   const [duration, setDuration] = useState('');
   const [calories, setCalories] = useState('');
   const [notes, setNotes] = useState('');
@@ -20,7 +20,7 @@ export const WorkoutLogger = ({ visible, onClose, date }: WorkoutLoggerProps) =>
   const handleSubmit = () => {
     const dur = parseInt(duration);
     if (isNaN(dur) || dur <= 0) {
-      Alert.alert('Error', 'Please enter a duration');
+      showAlert({ title: 'Error', message: 'Please enter a duration' });
       return;
     }
     logWorkout.mutate(
@@ -38,7 +38,7 @@ export const WorkoutLogger = ({ visible, onClose, date }: WorkoutLoggerProps) =>
           setNotes('');
           onClose();
         },
-        onError: () => Alert.alert('Error', 'Failed to log workout'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to log workout' }),
       },
     );
   };

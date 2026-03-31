@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { View, FlatList, RefreshControl, Alert, Modal, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, FlatList, RefreshControl, Modal, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Target, CheckCircle, Trophy, Plus, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Card, CardContent, Skeleton, Badge, Button, Input, TabBar, DatePicker } from '@/components/ui';
+import { Text, Card, CardContent, Skeleton, Badge, Button, Input, TabBar, DatePicker, PillSelect, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
@@ -71,6 +71,7 @@ const GoalCard = ({ goal, onComplete, onAbandon }: { goal: any; onComplete: () =
 };
 
 const GoalsScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const [filter, setFilter] = useState<GoalFilter>('ACTIVE');
   const [showCreate, setShowCreate] = useState(false);
@@ -88,10 +89,14 @@ const GoalsScreen = () => {
   };
 
   const handleAbandon = (id: string) => {
-    Alert.alert('Abandon Goal', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Abandon', style: 'destructive', onPress: () => abandonGoal.mutate({ id }, { onSuccess: invalidate }) },
-    ]);
+    showAlert({
+      title: 'Abandon Goal',
+      message: 'Are you sure?',
+      actions: [
+        { label: 'Abandon', variant: 'destructive', onPress: () => abandonGoal.mutate({ id }, { onSuccess: invalidate }) },
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   return (
@@ -123,17 +128,7 @@ const GoalsScreen = () => {
               <Input label="Goal Name" value={newGoal.name} onChangeText={(v) => setNewGoal((g) => ({ ...g, name: v }))} placeholder="e.g. Lose 5kg" />
               <Input label="Description (optional)" value={newGoal.description} onChangeText={(v) => setNewGoal((g) => ({ ...g, description: v }))} multiline />
               <Text className="text-sm font-medium text-foreground">Type</Text>
-              <View className="flex-row gap-2">
-                {(['TARGET', 'HABIT'] as const).map((t) => (
-                  <TouchableOpacity
-                    key={t}
-                    className={`flex-1 items-center py-3 rounded-lg border-2 ${newGoal.type === t ? 'border-teal bg-teal/10' : 'border-border'}`}
-                    onPress={() => setNewGoal((g) => ({ ...g, type: t }))}
-                  >
-                    <Text className={`text-sm font-medium ${newGoal.type === t ? 'text-teal' : 'text-muted-foreground'}`}>{t}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <PillSelect options={['TARGET', 'HABIT']} value={newGoal.type} onChange={(v: string) => setNewGoal((g) => ({ ...g, type: v }))} />
               {newGoal.type === 'TARGET' && (
                 <Input label="Target Value" value={newGoal.targetValue} onChangeText={(v) => setNewGoal((g) => ({ ...g, targetValue: v }))} keyboardType="decimal-pad" placeholder="e.g. 70" />
               )}
@@ -145,7 +140,7 @@ const GoalsScreen = () => {
               />
               <Button
                 onPress={() => {
-                  if (!newGoal.name.trim()) { Alert.alert('Error', 'Name is required'); return; }
+                  if (!newGoal.name.trim()) { showAlert({ title: 'Error', message: 'Name is required' }); return; }
                   createGoal.mutate(
                     {
                       name: newGoal.name,
@@ -160,7 +155,7 @@ const GoalsScreen = () => {
                         setShowCreate(false);
                         setNewGoal({ name: '', description: '', type: 'TARGET', targetValue: '', deadline: '' });
                       },
-                      onError: () => Alert.alert('Error', 'Failed to create goal'),
+                      onError: () => showAlert({ title: 'Error', message: 'Failed to create goal' }),
                     },
                   );
                 }}

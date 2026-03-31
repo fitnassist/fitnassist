@@ -3,11 +3,12 @@ import { View, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar as CalendarIcon, List, Plus } from 'lucide-react-native';
-import { Text, Skeleton } from '@/components/ui';
+import { Text, Skeleton, ListPicker, type ListPickerItem } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useUpcomingBookings, useTrainerBookings } from '@/api/booking';
 import { BookingCard } from '@/components/bookings';
 import { BookingCalendar } from '@/components/bookings/BookingCalendar';
+import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
 const getMonthRange = (date: Date) => {
@@ -43,6 +44,14 @@ const BookingsScreen = () => {
 
   const isLoading = isTrainer ? trainerLoading : upcomingLoading;
   const allBookings: any[] = isTrainer ? (trainerBookings ?? []) : (upcomingBookings ?? []);
+
+  const [showTrainerPicker, setShowTrainerPicker] = useState(false);
+  const { data: myTrainers, isLoading: trainersLoading } = trpc.clientRoster.myTrainers.useQuery(undefined, { enabled: !isTrainer });
+  const trainerItems: ListPickerItem[] = ((myTrainers as any[]) ?? []).map((r: any) => ({
+    id: r.trainer?.id ?? r.trainerId,
+    label: r.trainer?.displayName ?? 'Trainer',
+    avatarUrl: r.trainer?.profileImageUrl ?? undefined,
+  }));
 
   const onRefresh = async () => {
     if (isTrainer) await refetchTrainer();
@@ -153,8 +162,8 @@ const BookingsScreen = () => {
         />
       )}
 
-      {/* FAB - Create booking (trainer) */}
-      {isTrainer && (
+      {/* FAB */}
+      {isTrainer ? (
         <TouchableOpacity
           className="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary items-center justify-center"
           style={{ elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4 }}
@@ -163,6 +172,35 @@ const BookingsScreen = () => {
         >
           <Plus size={24} color="#fff" />
         </TouchableOpacity>
+      ) : (
+        <>
+          <TouchableOpacity
+            className="absolute bottom-6 right-6 rounded-full bg-primary px-5 h-14 items-center justify-center flex-row gap-2"
+            style={{ elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4 }}
+            onPress={() => {
+              if (trainersLoading) return;
+              if (trainerItems.length >= 1) {
+                setShowTrainerPicker(true);
+              } else {
+                router.push('/trainers');
+              }
+            }}
+            activeOpacity={0.8}
+          >
+            <Plus size={20} color="#fff" />
+            <Text className="text-white font-semibold text-sm">Book a Session</Text>
+          </TouchableOpacity>
+          <ListPicker
+            visible={showTrainerPicker}
+            onClose={() => setShowTrainerPicker(false)}
+            title="Select Trainer"
+            items={trainerItems}
+            onSelect={(item) => {
+              setShowTrainerPicker(false);
+              router.push(`/bookings/book/${item.id}`);
+            }}
+          />
+        </>
       )}
     </SafeAreaView>
   );

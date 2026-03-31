@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { View, ScrollView, Alert, TextInput, Switch } from 'react-native';
+import { View, ScrollView, TextInput, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Plus, Trash2, MapPin, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import Constants from 'expo-constants';
-import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, DatePicker, Badge, useAlert } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, DatePicker, Badge, useAlert, PillSelect } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { authClient } from '@/lib/auth';
-import { hasFeatureAccess } from '@fitnassist/schemas';
+import { hasFeatureAccess } from '@fitnassist/schemas/src/constants/subscription.constants';
 import { colors } from '@/constants/theme';
 
 const GOOGLE_API_KEY = Constants.expoConfig?.extra?.googleMapsApiKey ?? '';
@@ -19,6 +19,7 @@ const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'
 
 // ===== ACCOUNT TAB =====
 const AccountTab = () => {
+  const { showAlert } = useAlert();
   const { user } = useAuth();
   const [name, setName] = useState(user?.name ?? '');
   const [newEmail, setNewEmail] = useState('');
@@ -37,7 +38,7 @@ const AccountTab = () => {
           <Input label="Name" value={name} onChangeText={setName} placeholder="Your name" />
           <Button size="sm" loading={updateName.isPending} onPress={async () => {
             if (!name.trim()) return;
-            try { await updateName.mutateAsync({ name: name.trim() }); Alert.alert('Success', 'Name updated'); } catch { Alert.alert('Error', 'Failed to update name'); }
+            try { await updateName.mutateAsync({ name: name.trim() }); showAlert({ title: 'Success', message: 'Name updated' }); } catch { showAlert({ title: 'Error', message: 'Failed to update name' }); }
           }}>Update Name</Button>
         </CardContent>
       </Card>
@@ -51,7 +52,7 @@ const AccountTab = () => {
           <Input label="Current Password" value={emailPw} onChangeText={setEmailPw} placeholder="Enter your current password" secureTextEntry />
           <Button size="sm" onPress={async () => {
             if (!newEmail.trim() || !emailPw) return;
-            try { await (authClient as any).changeEmail({ newEmail: newEmail.trim(), currentPassword: emailPw }); Alert.alert('Success', 'Check your new email for verification'); setNewEmail(''); setEmailPw(''); } catch { Alert.alert('Error', 'Failed to change email'); }
+            try { await (authClient as any).changeEmail({ newEmail: newEmail.trim(), currentPassword: emailPw }); showAlert({ title: 'Success', message: 'Check your new email for verification' }); setNewEmail(''); setEmailPw(''); } catch { showAlert({ title: 'Error', message: 'Failed to change email' }); }
           }}>Update Email</Button>
         </CardContent>
       </Card>
@@ -64,9 +65,9 @@ const AccountTab = () => {
           <Input label="New Password" value={newPw} onChangeText={setNewPw} placeholder="Enter new password" secureTextEntry />
           <Input label="Confirm New Password" value={confirmPw} onChangeText={setConfirmPw} placeholder="Confirm new password" secureTextEntry />
           <Button size="sm" onPress={async () => {
-            if (newPw !== confirmPw) { Alert.alert('Error', 'Passwords do not match'); return; }
-            if (newPw.length < 8) { Alert.alert('Error', 'Password must be at least 8 characters'); return; }
-            try { await authClient.changePassword({ currentPassword: currentPw, newPassword: newPw }); Alert.alert('Success', 'Password updated'); setCurrentPw(''); setNewPw(''); setConfirmPw(''); } catch { Alert.alert('Error', 'Failed to update password'); }
+            if (newPw !== confirmPw) { showAlert({ title: 'Error', message: 'Passwords do not match' }); return; }
+            if (newPw.length < 8) { showAlert({ title: 'Error', message: 'Password must be at least 8 characters' }); return; }
+            try { await authClient.changePassword({ currentPassword: currentPw, newPassword: newPw }); showAlert({ title: 'Success', message: 'Password updated' }); setCurrentPw(''); setNewPw(''); setConfirmPw(''); } catch { showAlert({ title: 'Error', message: 'Failed to update password' }); }
           }}>Update Password</Button>
         </CardContent>
       </Card>
@@ -91,6 +92,7 @@ const BUFFER_OPTIONS = [
 // LocationAddressInput removed - using shared AddressInput component
 
 const SchedulingTab = () => {
+  const { showAlert } = useAlert();
   const { data: weekly, refetch: refetchWeekly } = trpc.availability.getWeekly.useQuery();
   const { data: travel, refetch: refetchTravel } = trpc.availability.getTravelSettings.useQuery();
   const { data: video, refetch: refetchVideo } = trpc.availability.getVideoSettings.useQuery();
@@ -141,7 +143,7 @@ const SchedulingTab = () => {
 
   const handleAddSlot = () => {
     const dur = parseInt(newSlotDuration);
-    if (dur < 15 || dur > 180) { Alert.alert('Error', 'Duration must be 15-180 minutes'); return; }
+    if (dur < 15 || dur > 180) { showAlert({ title: 'Error', message: 'Duration must be 15-180 minutes' }); return; }
     const updated = [...slots, { dayOfWeek: newSlotDay, startTime: newSlotStart, endTime: newSlotEnd, sessionDurationMin: dur }];
     setWeekly.mutate({ slots: updated } as any, { onSuccess: () => { refetchWeekly(); setShowAddSlot(false); } });
   };
@@ -242,10 +244,14 @@ const SchedulingTab = () => {
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity onPress={() => {
-                  Alert.alert('Delete', `Remove ${loc.name}?`, [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Delete', style: 'destructive', onPress: () => deleteLocation.mutate({ id: loc.id }, { onSuccess: () => refetchLocations() }) },
-                  ]);
+                  showAlert({
+                    title: 'Delete',
+                    message: `Remove ${loc.name}?`,
+                    actions: [
+                      { label: 'Delete', variant: 'destructive', onPress: () => deleteLocation.mutate({ id: loc.id }, { onSuccess: () => refetchLocations() }) },
+                      { label: 'Cancel', variant: 'outline' },
+                    ],
+                  });
                 }}>
                   <Trash2 size={14} color={colors.destructive} />
                 </TouchableOpacity>
@@ -288,17 +294,7 @@ const SchedulingTab = () => {
             <Text className="text-xs font-medium text-foreground">Travel buffer between sessions</Text>
             <Text className="text-xs text-muted-foreground">Minimum time between sessions to account for travel.</Text>
           </View>
-          <View className="flex-row flex-wrap gap-1">
-            {BUFFER_OPTIONS.map(({ value, label }) => (
-              <TouchableOpacity
-                key={value}
-                className={`px-3 py-2 rounded-lg border ${travelBuffer === value ? 'border-teal bg-teal/10' : 'border-border'}`}
-                onPress={() => setTravelBuffer(value)}
-              >
-                <Text className={`text-xs ${travelBuffer === value ? 'text-teal' : 'text-muted-foreground'}`}>{label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <PillSelect options={BUFFER_OPTIONS} value={travelBuffer} onChange={setTravelBuffer} />
           <View className="flex-row items-center justify-between py-2">
             <View className="flex-1 gap-0.5">
               <Text className="text-sm text-foreground">Smart travel time</Text>
@@ -308,7 +304,7 @@ const SchedulingTab = () => {
           </View>
           <Button size="sm" variant="outline" onPress={() => {
             updateTravel.mutate({ travelBufferMin: travelBuffer, smartTravelEnabled: smartTravel } as any, {
-              onSuccess: () => { refetchTravel(); Alert.alert('Success', 'Travel settings saved'); },
+              onSuccess: () => { refetchTravel(); showAlert({ title: 'Success', message: 'Travel settings saved' }); },
             });
           }} loading={updateTravel.isPending}>Save</Button>
         </CardContent>
@@ -370,10 +366,14 @@ const SchedulingTab = () => {
                 {o.reason && <Text className="text-xs text-muted-foreground">{o.reason}</Text>}
               </View>
               <TouchableOpacity onPress={() => {
-                Alert.alert('Unblock', 'Remove this blocked date?', [
-                  { text: 'Cancel', style: 'cancel' },
-                  { text: 'Unblock', onPress: () => deleteOverride.mutate({ id: o.id }, { onSuccess: () => refetchOverrides() }) },
-                ]);
+                showAlert({
+                  title: 'Unblock',
+                  message: 'Remove this blocked date?',
+                  actions: [
+                    { label: 'Unblock', onPress: () => deleteOverride.mutate({ id: o.id }, { onSuccess: () => refetchOverrides() }) },
+                    { label: 'Cancel', variant: 'outline' },
+                  ],
+                });
               }}>
                 <Trash2 size={14} color={colors.destructive} />
               </TouchableOpacity>
@@ -407,6 +407,7 @@ const SchedulingTab = () => {
 
 // ===== PAYMENTS TAB =====
 const PaymentsTab = () => {
+  const { showAlert } = useAlert();
   const { data: settings, refetch } = trpc.payment.getSettings.useQuery();
   const updateSettings = trpc.payment.updateSettings.useMutation();
   const updatePrice = trpc.payment.updateSessionPrice.useMutation();
@@ -435,7 +436,7 @@ const PaymentsTab = () => {
                 try {
                   const result = await getDashboard.mutateAsync();
                   if ((result as any).url) await WebBrowser.openBrowserAsync((result as any).url);
-                } catch { Alert.alert('Error', 'Failed to open Stripe dashboard'); }
+                } catch { showAlert({ title: 'Error', message: 'Failed to open Stripe dashboard' }); }
               }} loading={getDashboard.isPending}>Open Stripe Dashboard</Button>
             </View>
           ) : (
@@ -443,7 +444,7 @@ const PaymentsTab = () => {
               try {
                 const result = await createOnboarding.mutateAsync();
                 if ((result as any).url) { await WebBrowser.openBrowserAsync((result as any).url); refetch(); }
-              } catch { Alert.alert('Error', 'Failed to start Stripe setup'); }
+              } catch { showAlert({ title: 'Error', message: 'Failed to start Stripe setup' }); }
             }} loading={createOnboarding.isPending}>Connect Stripe</Button>
           )}
         </CardContent>
@@ -487,8 +488,8 @@ const PaymentsTab = () => {
             <Input label="Price per session (£)" value={price} onChangeText={setPrice} keyboardType="decimal-pad" placeholder="e.g. 45" />
             <Button size="sm" onPress={() => {
               const amount = Math.round(parseFloat(price) * 100);
-              if (isNaN(amount) || amount < 100 || amount > 100000) { Alert.alert('Error', 'Price must be between £1 and £1,000'); return; }
-              updatePrice.mutate({ amount, currency: 'gbp' }, { onSuccess: () => { refetch(); Alert.alert('Success', 'Session price updated'); } });
+              if (isNaN(amount) || amount < 100 || amount > 100000) { showAlert({ title: 'Error', message: 'Price must be between £1 and £1,000' }); return; }
+              updatePrice.mutate({ amount, currency: 'gbp' }, { onSuccess: () => { refetch(); showAlert({ title: 'Success', message: 'Session price updated' }); } });
             }} loading={updatePrice.isPending}>Save Price</Button>
           </CardContent>
         </Card>
@@ -640,6 +641,7 @@ const IntegrationsTab = () => {
 
 // ===== DANGER ZONE TAB =====
 const DangerZoneTab = () => {
+  const { showAlert } = useAlert();
   const { signOut } = useAuth();
 
   return (
@@ -648,12 +650,16 @@ const DangerZoneTab = () => {
         <Text className="text-sm font-medium text-destructive uppercase" style={{ letterSpacing: 1 }}>Danger Zone</Text>
         <Text className="text-xs text-muted-foreground">Permanently delete your account and all associated data. This cannot be undone.</Text>
         <Button variant="destructive" size="sm" onPress={() => {
-          Alert.alert('Delete Account', 'This action is permanent and cannot be undone. Are you sure?', [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Delete', style: 'destructive', onPress: async () => {
-              try { await authClient.deleteUser(); await signOut(); } catch { Alert.alert('Error', 'Failed to delete account'); }
-            }},
-          ]);
+          showAlert({
+            title: 'Delete Account',
+            message: 'This action is permanent and cannot be undone. Are you sure?',
+            actions: [
+              { label: 'Delete', variant: 'destructive', onPress: async () => {
+                try { await authClient.deleteUser(); await signOut(); } catch { showAlert({ title: 'Error', message: 'Failed to delete account' }); }
+              }},
+              { label: 'Cancel', variant: 'outline' },
+            ],
+          });
         }}>Delete Account</Button>
       </CardContent>
     </Card>

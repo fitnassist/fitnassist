@@ -6,6 +6,7 @@ const userSelect = {
   image: true,
   trainerProfile: {
     select: {
+      displayName: true,
       profileImageUrl: true,
       handle: true,
     },

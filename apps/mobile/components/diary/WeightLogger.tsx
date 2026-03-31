@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Alert } from 'react-native';
-import { Input, Button } from '@/components/ui';
+import { Input, Button, useAlert } from '@/components/ui';
 import { LoggerModal } from './LoggerModal';
 import { trpc } from '@/lib/trpc';
 
@@ -11,6 +10,7 @@ interface WeightLoggerProps {
 }
 
 export const WeightLogger = ({ visible, onClose, date }: WeightLoggerProps) => {
+  const { showAlert } = useAlert();
   const [weight, setWeight] = useState('');
   const logWeight = trpc.diary.logWeight.useMutation();
   const utils = trpc.useUtils();
@@ -18,7 +18,7 @@ export const WeightLogger = ({ visible, onClose, date }: WeightLoggerProps) => {
   const handleSubmit = () => {
     const val = parseFloat(weight);
     if (isNaN(val) || val <= 0) {
-      Alert.alert('Error', 'Please enter a valid weight');
+      showAlert({ title: 'Error', message: 'Please enter a valid weight' });
       return;
     }
     logWeight.mutate(
@@ -29,7 +29,7 @@ export const WeightLogger = ({ visible, onClose, date }: WeightLoggerProps) => {
           setWeight('');
           onClose();
         },
-        onError: () => Alert.alert('Error', 'Failed to log weight'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to log weight' }),
       },
     );
   };

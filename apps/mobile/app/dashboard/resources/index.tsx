@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, FlatList, RefreshControl, Alert, ScrollView, Modal } from 'react-native';
+import { View, FlatList, RefreshControl, ScrollView, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -7,7 +7,7 @@ import {
   Plus, Trash2, Pencil, X, Search,
 } from 'lucide-react-native';
 import { TouchableOpacity, TextInput } from 'react-native';
-import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar, ListPicker, type ListPickerItem } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar, ListPicker, PillSelect, type ListPickerItem, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { formatDistanceToNow } from '@/lib/dates';
 import { colors } from '@/constants/theme';
@@ -27,21 +27,10 @@ const RECIPE_TAGS = ['High Protein', 'Low Carb', 'Low Fat', 'Vegan', 'Vegetarian
 const MEAL_TYPES = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const ChipToggle = ({ options, selected, onToggle }: { options: string[]; selected: string[]; onToggle: (v: string) => void }) => (
-  <View className="flex-row flex-wrap gap-1">
-    {options.map((opt) => {
-      const active = selected.includes(opt);
-      return (
-        <TouchableOpacity key={opt} className={`px-2.5 py-1.5 rounded-lg border ${active ? 'border-teal bg-teal/10' : 'border-border'}`} onPress={() => onToggle(opt)}>
-          <Text className={`text-xs ${active ? 'text-teal' : 'text-muted-foreground'}`}>{opt.replace(/_/g, ' ')}</Text>
-        </TouchableOpacity>
-      );
-    })}
-  </View>
-);
 
 // ===== EXERCISE FORM =====
 const ExerciseForm = ({ exercise, onClose }: { exercise?: any; onClose: () => void }) => {
+  const { showAlert } = useAlert();
   const isEdit = !!exercise;
   const create = trpc.exercise.create.useMutation();
   const update = trpc.exercise.update.useMutation();
@@ -54,10 +43,10 @@ const ExerciseForm = ({ exercise, onClose }: { exercise?: any; onClose: () => vo
   const toggleMuscle = (m: string) => setMuscleGroups((prev) => prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m]);
 
   const handleSave = () => {
-    if (!name.trim()) { Alert.alert('Error', 'Name is required'); return; }
+    if (!name.trim()) { showAlert({ title: 'Error', message: 'Name is required' }); return; }
     const payload = { name, description: description || null, instructions: instructions || null, muscleGroups, equipment: [], difficulty } as any;
     const mutation = isEdit ? update.mutateAsync({ ...payload, id: exercise.id }) : create.mutateAsync(payload);
-    mutation.then(() => { utils.exercise.list.invalidate(); onClose(); }).catch(() => Alert.alert('Error', 'Failed to save'));
+    mutation.then(() => { utils.exercise.list.invalidate(); onClose(); }).catch(() => showAlert({ title: 'Error', message: 'Failed to save' }));
   };
 
   return (
@@ -72,15 +61,9 @@ const ExerciseForm = ({ exercise, onClose }: { exercise?: any; onClose: () => vo
           <Input label="Description (optional)" value={description} onChangeText={setDescription} multiline style={{ minHeight: 60, textAlignVertical: 'top' }} />
           <Input label="Instructions" value={instructions} onChangeText={setInstructions} multiline numberOfLines={4} style={{ minHeight: 80, textAlignVertical: 'top' }} placeholder="Step-by-step instructions..." />
           <Text className="text-xs font-medium text-foreground">Muscle Groups</Text>
-          <ChipToggle options={MUSCLE_GROUPS} selected={muscleGroups} onToggle={toggleMuscle} />
+          <PillSelect options={MUSCLE_GROUPS} value={muscleGroups} onChange={(vals: string[]) => { const added = vals.find((v: string) => !muscleGroups.includes(v)); const removed = muscleGroups.find((v) => !vals.includes(v)); if (added) toggleMuscle(added); if (removed) toggleMuscle(removed); }} multiple />
           <Text className="text-xs font-medium text-foreground">Difficulty</Text>
-          <View className="flex-row gap-2">
-            {DIFFICULTY_LEVELS.map((d) => (
-              <TouchableOpacity key={d} className={`flex-1 items-center py-2 rounded-lg border ${difficulty === d ? 'border-teal bg-teal/10' : 'border-border'}`} onPress={() => setDifficulty(difficulty === d ? null : d)}>
-                <Text className={`text-xs ${difficulty === d ? 'text-teal' : 'text-muted-foreground'}`}>{d}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <PillSelect options={DIFFICULTY_LEVELS} value={difficulty ?? ''} onChange={(v: string) => setDifficulty(difficulty === v ? null : v)} />
           <Button onPress={handleSave} loading={create.isPending || update.isPending}>{isEdit ? 'Update' : 'Create'}</Button>
         </ScrollView>
       </SafeAreaView>
@@ -90,6 +73,7 @@ const ExerciseForm = ({ exercise, onClose }: { exercise?: any; onClose: () => vo
 
 // ===== RECIPE FORM =====
 const RecipeForm = ({ recipe, onClose }: { recipe?: any; onClose: () => void }) => {
+  const { showAlert } = useAlert();
   const isEdit = !!recipe;
   const create = trpc.recipe.create.useMutation();
   const update = trpc.recipe.update.useMutation();
@@ -113,8 +97,8 @@ const RecipeForm = ({ recipe, onClose }: { recipe?: any; onClose: () => void }) 
   const int = (v: string) => v ? parseInt(v) : null;
 
   const handleSave = () => {
-    if (!name.trim()) { Alert.alert('Error', 'Name is required'); return; }
-    if (!instructions.trim()) { Alert.alert('Error', 'Instructions are required'); return; }
+    if (!name.trim()) { showAlert({ title: 'Error', message: 'Name is required' }); return; }
+    if (!instructions.trim()) { showAlert({ title: 'Error', message: 'Instructions are required' }); return; }
     const payload = {
       name, description: description || null, instructions,
       calories: int(calories), proteinG: num(proteinG), carbsG: num(carbsG), fatG: num(fatG),
@@ -122,7 +106,7 @@ const RecipeForm = ({ recipe, onClose }: { recipe?: any; onClose: () => void }) 
       tags, ingredients: ingredients.filter((i) => i.name.trim()),
     } as any;
     const mutation = isEdit ? update.mutateAsync({ ...payload, id: recipe.id }) : create.mutateAsync(payload);
-    mutation.then(() => { utils.recipe.list.invalidate(); onClose(); }).catch(() => Alert.alert('Error', 'Failed to save'));
+    mutation.then(() => { utils.recipe.list.invalidate(); onClose(); }).catch(() => showAlert({ title: 'Error', message: 'Failed to save' }));
   };
 
   return (
@@ -168,7 +152,7 @@ const RecipeForm = ({ recipe, onClose }: { recipe?: any; onClose: () => void }) 
           </View>
 
           <Text className="text-xs font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Tags</Text>
-          <ChipToggle options={RECIPE_TAGS} selected={tags} onToggle={toggleTag} />
+          <PillSelect options={RECIPE_TAGS} value={tags} onChange={(vals: string[]) => { const added = vals.find((v: string) => !tags.includes(v)); const removed = tags.find((v) => !vals.includes(v)); if (added) toggleTag(added); if (removed) toggleTag(removed); }} multiple />
           <Button onPress={handleSave} loading={create.isPending || update.isPending}>{isEdit ? 'Update' : 'Create'}</Button>
         </ScrollView>
       </SafeAreaView>
@@ -178,6 +162,7 @@ const RecipeForm = ({ recipe, onClose }: { recipe?: any; onClose: () => void }) 
 
 // ===== WORKOUT PLAN FORM =====
 const WorkoutPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void }) => {
+  const { showAlert } = useAlert();
   const isEdit = !!plan;
   const create = trpc.workoutPlan.create.useMutation();
   const update = trpc.workoutPlan.update.useMutation();
@@ -194,7 +179,7 @@ const WorkoutPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void })
   const pickerItems: ListPickerItem[] = allExercises.filter((e: any) => !addedIds.has(e.id)).map((e: any) => ({ id: e.id, label: e.name, description: e.difficulty ?? undefined }));
 
   const handleSave = async () => {
-    if (!name.trim()) { Alert.alert('Error', 'Name is required'); return; }
+    if (!name.trim()) { showAlert({ title: 'Error', message: 'Name is required' }); return; }
     try {
       let planId = plan?.id;
       if (isEdit) { await update.mutateAsync({ id: planId, name, description: description || null }); }
@@ -203,7 +188,7 @@ const WorkoutPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void })
         await setExercisesMut.mutateAsync({ id: planId, exercises: exercises.map((e: any, i: number) => ({ exerciseId: e.exerciseId, sets: e.sets ?? 3, reps: e.reps ?? '', restSeconds: e.restSeconds ?? 60, notes: e.notes ?? '', sortOrder: i })) } as any);
       }
       utils.workoutPlan.list.invalidate(); onClose();
-    } catch { Alert.alert('Error', 'Failed to save'); }
+    } catch { showAlert({ title: 'Error', message: 'Failed to save' }); }
   };
 
   return (
@@ -248,6 +233,7 @@ const WorkoutPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void })
 
 // ===== MEAL PLAN FORM =====
 const MealPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void }) => {
+  const { showAlert } = useAlert();
   const isEdit = !!plan;
   const create = trpc.mealPlan.create.useMutation();
   const update = trpc.mealPlan.update.useMutation();
@@ -263,7 +249,7 @@ const MealPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void }) =>
   const pickerItems: ListPickerItem[] = allRecipes.map((r: any) => ({ id: r.id, label: r.name, description: r.calories ? `${r.calories} kcal` : undefined }));
 
   const handleSave = async () => {
-    if (!name.trim()) { Alert.alert('Error', 'Name is required'); return; }
+    if (!name.trim()) { showAlert({ title: 'Error', message: 'Name is required' }); return; }
     try {
       let planId = plan?.id;
       if (isEdit) { await update.mutateAsync({ id: planId, name, description: description || null }); }
@@ -272,7 +258,7 @@ const MealPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void }) =>
         await setRecipesMut.mutateAsync({ id: planId, recipes: recipes.map((r: any, i: number) => ({ recipeId: r.recipeId, dayOfWeek: r.dayOfWeek ?? null, mealType: r.mealType ?? null, sortOrder: i })) } as any);
       }
       utils.mealPlan.list.invalidate(); onClose();
-    } catch { Alert.alert('Error', 'Failed to save'); }
+    } catch { showAlert({ title: 'Error', message: 'Failed to save' }); }
   };
 
   return (
@@ -305,14 +291,7 @@ const MealPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void }) =>
                     </TouchableOpacity>
                   ))}
                 </View>
-                <View className="flex-row gap-1">
-                  {MEAL_TYPES.map((m) => (
-                    <TouchableOpacity key={m} className={`flex-1 items-center py-1.5 rounded-lg border ${rec.mealType === m ? 'border-teal bg-teal/10' : 'border-border'}`}
-                      onPress={() => { const u = [...recipes]; u[i] = { ...u[i], mealType: rec.mealType === m ? null : m }; setRecipes(u); }}>
-                      <Text className={`text-[10px] ${rec.mealType === m ? 'text-teal' : 'text-muted-foreground'}`}>{m}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                <PillSelect options={MEAL_TYPES} value={rec.mealType ?? ''} onChange={(v: string) => { const u = [...recipes]; u[i] = { ...u[i], mealType: rec.mealType === v ? null : v }; setRecipes(u); }} />
               </CardContent>
             </Card>
           ))}
@@ -327,6 +306,7 @@ const MealPlanForm = ({ plan, onClose }: { plan?: any; onClose: () => void }) =>
 
 // ===== MAIN SCREEN =====
 const ResourcesScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('exercises');
   const [editItem, setEditItem] = useState<any>(null);
@@ -352,14 +332,18 @@ const ResourcesScreen = () => {
   const current = dataMap[tab];
 
   const handleDelete = (id: string, name: string) => {
-    Alert.alert('Delete', `Delete "${name}"?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => {
-        const m: Record<Tab, any> = { exercises: deleteExercise, recipes: deleteRecipe, workouts: deleteWorkout, meals: deleteMeal };
-        const k: Record<Tab, any> = { exercises: utils.exercise.list, recipes: utils.recipe.list, workouts: utils.workoutPlan.list, meals: utils.mealPlan.list };
-        m[tab].mutate({ id }, { onSuccess: () => k[tab].invalidate() });
-      }},
-    ]);
+    showAlert({
+      title: 'Delete',
+      message: `Delete "${name}"?`,
+      actions: [
+        { label: 'Delete', variant: 'destructive', onPress: () => {
+          const m: Record<Tab, any> = { exercises: deleteExercise, recipes: deleteRecipe, workouts: deleteWorkout, meals: deleteMeal };
+          const k: Record<Tab, any> = { exercises: utils.exercise.list, recipes: utils.recipe.list, workouts: utils.workoutPlan.list, meals: utils.mealPlan.list };
+          m[tab].mutate({ id }, { onSuccess: () => k[tab].invalidate() });
+        }},
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   return (

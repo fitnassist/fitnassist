@@ -4,14 +4,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, Input } from '@/components/ui';
+import { Text, Button, Input, useAlert } from '@/components/ui';
 import { GradientBackground } from '@/components/GradientBackground';
 import { signIn } from '@/lib/auth';
 
@@ -23,6 +22,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 const LoginScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -40,10 +40,10 @@ const LoginScreen = () => {
       });
 
       if (result.error) {
-        Alert.alert('Login Failed', result.error.message ?? 'Invalid credentials');
+        showAlert({ title: 'Login Failed', message: result.error.message ?? 'Invalid credentials' });
       }
     } catch {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      showAlert({ title: 'Error', message: 'Something went wrong. Please try again.' });
     } finally {
       setLoading(false);
     }

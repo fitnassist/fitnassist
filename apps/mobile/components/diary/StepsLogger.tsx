@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { View, Alert } from 'react-native';
+import { View } from 'react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Input, Button } from '@/components/ui';
+import { Text, Input, Button, useAlert } from '@/components/ui';
 import { LoggerModal } from './LoggerModal';
 import { trpc } from '@/lib/trpc';
 
@@ -14,6 +14,7 @@ interface StepsLoggerProps {
 }
 
 export const StepsLogger = ({ visible, onClose, date }: StepsLoggerProps) => {
+  const { showAlert } = useAlert();
   const [steps, setSteps] = useState('');
   const logSteps = trpc.diary.logSteps.useMutation();
   const utils = trpc.useUtils();
@@ -21,7 +22,7 @@ export const StepsLogger = ({ visible, onClose, date }: StepsLoggerProps) => {
   const handleSubmit = (preset?: number) => {
     const val = preset ?? parseInt(steps);
     if (isNaN(val) || val <= 0) {
-      Alert.alert('Error', 'Please enter a valid step count');
+      showAlert({ title: 'Error', message: 'Please enter a valid step count' });
       return;
     }
     logSteps.mutate(
@@ -32,7 +33,7 @@ export const StepsLogger = ({ visible, onClose, date }: StepsLoggerProps) => {
           setSteps('');
           onClose();
         },
-        onError: () => Alert.alert('Error', 'Failed to log steps'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to log steps' }),
       },
     );
   };

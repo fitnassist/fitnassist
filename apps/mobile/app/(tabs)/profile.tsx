@@ -32,7 +32,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile } from '@/api/trainee';
 import { trpc } from '@/lib/trpc';
-import { hasFeatureAccess, type Feature } from '@fitnassist/schemas';
+import { hasFeatureAccess, type Feature } from '@fitnassist/schemas/src/constants/subscription.constants';
 import { Lock } from 'lucide-react-native';
 import { colors } from '@/constants/theme';
 

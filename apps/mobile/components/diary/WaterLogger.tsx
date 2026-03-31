@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { View, Alert } from 'react-native';
+import { View } from 'react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Input, Button } from '@/components/ui';
+import { Text, Input, Button, useAlert } from '@/components/ui';
 import { LoggerModal } from './LoggerModal';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
@@ -15,6 +15,7 @@ interface WaterLoggerProps {
 }
 
 export const WaterLogger = ({ visible, onClose, date }: WaterLoggerProps) => {
+  const { showAlert } = useAlert();
   const [amount, setAmount] = useState('');
   const logWater = trpc.diary.logWater.useMutation();
   const utils = trpc.useUtils();
@@ -22,7 +23,7 @@ export const WaterLogger = ({ visible, onClose, date }: WaterLoggerProps) => {
   const handleSubmit = (ml?: number) => {
     const val = ml ?? parseInt(amount);
     if (isNaN(val) || val <= 0) {
-      Alert.alert('Error', 'Please enter a valid amount');
+      showAlert({ title: 'Error', message: 'Please enter a valid amount' });
       return;
     }
     logWater.mutate(
@@ -34,7 +35,7 @@ export const WaterLogger = ({ visible, onClose, date }: WaterLoggerProps) => {
           setAmount('');
           onClose();
         },
-        onError: () => Alert.alert('Error', 'Failed to log water'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to log water' }),
       },
     );
   };

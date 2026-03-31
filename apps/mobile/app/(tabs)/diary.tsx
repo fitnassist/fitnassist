@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, ScrollView, RefreshControl, TouchableOpacity as RNTouchableOpacity, Alert } from 'react-native';
+import { View, ScrollView, RefreshControl, TouchableOpacity as RNTouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -17,7 +17,7 @@ import {
   Users,
   Plus,
 } from 'lucide-react-native';
-import { Text, Card, CardContent, Skeleton } from '@/components/ui';
+import { Text, Card, CardContent, Skeleton, useAlert } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useDiaryEntries, useDailyNutrition } from '@/api/diary';
 import {
@@ -58,6 +58,7 @@ const LOGGER_MAP: Record<string, string> = {
 };
 
 const TraineeDiary = () => {
+  const { showAlert } = useAlert();
   const [date, setDate] = useState(() => new Date());
   const [activeLogger, setActiveLogger] = useState<string | null>(null);
   const deleteEntry = trpc.diary.deleteEntry.useMutation();
@@ -172,28 +173,28 @@ const TraineeDiary = () => {
                   {typeEntries.map((entry: any) => (
                     <View key={entry.id} className="mt-2 pt-2 border-t border-border flex-row items-center justify-between">
                       <Text className="text-xs text-foreground flex-1">
-                        {type === 'WEIGHT' && `${entry.weightKg ?? entry.valueNumeric ?? '-'} kg`}
-                        {type === 'WATER' && `${entry.totalMl ?? entry.valueNumeric ?? '-'} ml`}
-                        {type === 'STEPS' && `${entry.totalSteps ?? entry.valueNumeric ?? '-'} steps`}
-                        {type === 'MOOD' && (entry.level ?? entry.valueText ?? '-')}
-                        {type === 'SLEEP' && `${entry.hoursSlept ?? entry.valueNumeric ?? '-'} hrs`}
-                        {type === 'FOOD' && (entry.items?.[0]?.name ?? entry.valueText ?? 'Food entry')}
-                        {type === 'WORKOUT_LOG' && `${entry.durationMinutes ?? '-'} min workout`}
-                        {type === 'ACTIVITY' && `${entry.activityType ?? 'Activity'} - ${entry.durationMinutes ?? '-'} min`}
+                        {type === 'WEIGHT' && `${entry.weightEntry?.weightKg ?? '-'} kg`}
+                        {type === 'WATER' && `${entry.waterEntry?.totalMl ?? '-'} ml`}
+                        {type === 'STEPS' && `${entry.stepsEntry?.totalSteps ?? '-'} steps`}
+                        {type === 'MOOD' && (entry.moodEntry?.level ?? '-')}
+                        {type === 'SLEEP' && `${entry.sleepEntry?.hoursSlept ?? '-'} hrs (quality: ${entry.sleepEntry?.quality ?? '-'}/5)`}
+                        {type === 'FOOD' && (entry.foodEntries?.[0]?.name ?? 'Food entry')}
+                        {type === 'WORKOUT_LOG' && `${entry.workoutLogEntry?.durationMinutes ?? '-'} min workout`}
+                        {type === 'ACTIVITY' && `${entry.activityEntry?.activityType ?? 'Activity'} - ${Math.round((entry.activityEntry?.durationSeconds ?? 0) / 60)} min`}
                       </Text>
                       <RNTouchableOpacity
                         onPress={() => {
-                          Alert.alert('Delete Entry', 'Are you sure?', [
-                            { text: 'Cancel', style: 'cancel' },
-                            {
-                              text: 'Delete',
-                              style: 'destructive',
-                              onPress: () => deleteEntry.mutate(
+                          showAlert({
+                            title: 'Delete Entry',
+                            message: 'Are you sure?',
+                            actions: [
+                              { label: 'Delete', variant: 'destructive', onPress: () => deleteEntry.mutate(
                                 { id: entry.id },
                                 { onSuccess: () => diaryUtils.diary.getEntries.invalidate({ date: dateStr }) },
-                              ),
-                            },
-                          ]);
+                              )},
+                              { label: 'Cancel', variant: 'outline' },
+                            ],
+                          });
                         }}
                       >
                         <Trash2 size={14} color={colors.destructive} />

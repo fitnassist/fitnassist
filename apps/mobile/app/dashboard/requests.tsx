@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
-import { View, FlatList, RefreshControl, Alert } from 'react-native';
+import { View, FlatList, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Phone, UserPlus, Clock, CheckCircle, XCircle } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Card, CardContent, Skeleton, Badge, TabBar } from '@/components/ui';
+import { Text, Button, Card, CardContent, Skeleton, Badge, TabBar, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { formatDistanceToNow } from '@/lib/dates';
 import { colors } from '@/constants/theme';
@@ -87,6 +87,7 @@ const RequestCard = ({ request, onAccept, onDecline, onResponded }: {
 };
 
 const RequestsScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const [tab, setTab] = useState<RequestTab>('all');
   const { data: requests, isLoading, refetch } = trpc.contact.getMyRequests.useQuery();
@@ -129,15 +130,19 @@ const RequestsScreen = () => {
         invalidate();
         if ((data as any)?.id) router.push(`/messages/${(data as any).id}`);
       },
-      onError: () => Alert.alert('Error', 'Failed to accept'),
+      onError: () => showAlert({ title: 'Error', message: 'Failed to accept' }),
     });
   };
 
   const handleDecline = (id: string) => {
-    Alert.alert('Decline Request', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Decline', style: 'destructive', onPress: () => declineConnection.mutate({ requestId: id }, { onSuccess: invalidate }) },
-    ]);
+    showAlert({
+      title: 'Decline Request',
+      message: 'Are you sure?',
+      actions: [
+        { label: 'Decline', variant: 'destructive', onPress: () => declineConnection.mutate({ requestId: id }, { onSuccess: invalidate }) },
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   const handleResponded = (id: string) => {

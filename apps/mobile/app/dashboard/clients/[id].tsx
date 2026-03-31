@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, ScrollView, RefreshControl, Image, Alert, TextInput } from 'react-native';
+import { View, ScrollView, RefreshControl, Image, TextInput } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -9,7 +9,7 @@ import {
 } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar, ListPicker, type ListPickerItem, DatePicker } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar, ListPicker, PillSelect, type ListPickerItem, DatePicker, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { formatDistanceToNow, formatMessageTime } from '@/lib/dates';
 import { colors } from '@/constants/theme';
@@ -33,6 +33,7 @@ const ENTRY_ICONS: Record<string, { icon: any; color: string }> = {
 
 // ===== PLANS TAB =====
 const PlansTab = ({ clientRosterId, isDisconnected }: { clientRosterId: string; isDisconnected: boolean }) => {
+  const { showAlert } = useAlert();
   const { data: client } = trpc.clientRoster.get.useQuery({ id: clientRosterId });
   const { data: workoutPlans } = trpc.workoutPlan.list.useQuery({ limit: 50 });
   const { data: mealPlans } = trpc.mealPlan.list.useQuery({ limit: 50 });
@@ -88,10 +89,10 @@ const PlansTab = ({ clientRosterId, isDisconnected }: { clientRosterId: string; 
               </View>
               {!isDisconnected && (
                 <TouchableOpacity onPress={() => {
-                  Alert.alert('Remove Plan', `Unassign ${a.workoutPlan?.name}?`, [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Remove', style: 'destructive', onPress: () => unassignWorkout.mutate({ clientRosterId, workoutPlanId: a.workoutPlanId } as any, { onSuccess: invalidate }) },
-                  ]);
+                  showAlert({ title: 'Remove Plan', message: `Unassign ${a.workoutPlan?.name}?`, actions: [
+                    { label: 'Remove', variant: 'destructive', onPress: () => unassignWorkout.mutate({ clientRosterId, workoutPlanId: a.workoutPlanId } as any, { onSuccess: invalidate }) },
+                    { label: 'Cancel', variant: 'outline' },
+                  ]});
                 }}>
                   <Trash2 size={14} color={colors.destructive} />
                 </TouchableOpacity>
@@ -120,10 +121,10 @@ const PlansTab = ({ clientRosterId, isDisconnected }: { clientRosterId: string; 
               </View>
               {!isDisconnected && (
                 <TouchableOpacity onPress={() => {
-                  Alert.alert('Remove Plan', `Unassign ${a.mealPlan?.name}?`, [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Remove', style: 'destructive', onPress: () => unassignMeal.mutate({ clientRosterId, mealPlanId: a.mealPlanId } as any, { onSuccess: invalidate }) },
-                  ]);
+                  showAlert({ title: 'Remove Plan', message: `Unassign ${a.mealPlan?.name}?`, actions: [
+                    { label: 'Remove', variant: 'destructive', onPress: () => unassignMeal.mutate({ clientRosterId, mealPlanId: a.mealPlanId } as any, { onSuccess: invalidate }) },
+                    { label: 'Cancel', variant: 'outline' },
+                  ]});
                 }}>
                   <Trash2 size={14} color={colors.destructive} />
                 </TouchableOpacity>
@@ -160,6 +161,7 @@ const PlansTab = ({ clientRosterId, isDisconnected }: { clientRosterId: string; 
 
 // ===== PROGRESS TAB =====
 const ProgressTab = ({ clientRosterId, clientUserId }: { clientRosterId: string; clientUserId: string }) => {
+  const { showAlert } = useAlert();
   const today = new Date().toISOString().split('T')[0]!;
   const [selectedDate, setSelectedDate] = useState(today);
   const [showCreateGoal, setShowCreateGoal] = useState(false);
@@ -184,7 +186,7 @@ const ProgressTab = ({ clientRosterId, clientUserId }: { clientRosterId: string;
   const commentList = (comments ?? []) as any[];
 
   const handleCreateGoal = () => {
-    if (!goalName.trim()) { Alert.alert('Error', 'Name is required'); return; }
+    if (!goalName.trim()) { showAlert({ title: 'Error', message: 'Name is required' }); return; }
     createGoal.mutate({
       name: goalName, description: goalDesc || undefined, type: goalType,
       targetValue: goalType === 'TARGET' && goalTarget ? parseFloat(goalTarget) : undefined,
@@ -194,7 +196,7 @@ const ProgressTab = ({ clientRosterId, clientUserId }: { clientRosterId: string;
         refetchGoals(); setShowCreateGoal(false);
         setGoalName(''); setGoalDesc(''); setGoalTarget(''); setGoalDeadline('');
       },
-      onError: () => Alert.alert('Error', 'Failed to create goal'),
+      onError: () => showAlert({ title: 'Error', message: 'Failed to create goal' }),
     });
   };
 
@@ -202,7 +204,7 @@ const ProgressTab = ({ clientRosterId, clientUserId }: { clientRosterId: string;
     if (!commentText.trim()) return;
     addComment.mutate({ date: selectedDate, userId: clientUserId, content: commentText.trim() } as any, {
       onSuccess: () => { refetchComments(); setCommentText(''); },
-      onError: () => Alert.alert('Error', 'Failed to add comment'),
+      onError: () => showAlert({ title: 'Error', message: 'Failed to add comment' }),
     });
   };
 
@@ -220,13 +222,7 @@ const ProgressTab = ({ clientRosterId, clientUserId }: { clientRosterId: string;
 
           {showCreateGoal && (
             <View className="bg-secondary/50 rounded-lg p-3 gap-3 border border-border">
-              <View className="flex-row gap-2">
-                {(['TARGET', 'HABIT'] as const).map((t) => (
-                  <TouchableOpacity key={t} className={`flex-1 items-center py-2 rounded-lg border ${goalType === t ? 'border-teal bg-teal/10' : 'border-border'}`} onPress={() => setGoalType(t)}>
-                    <Text className={`text-xs font-medium ${goalType === t ? 'text-teal' : 'text-muted-foreground'}`}>{t}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <PillSelect options={['TARGET', 'HABIT']} value={goalType} onChange={setGoalType} />
               <Input label="Goal Name" value={goalName} onChangeText={setGoalName} placeholder="e.g. Lose 5kg" />
               <Input label="Description (optional)" value={goalDesc} onChangeText={setGoalDesc} placeholder="Details..." />
               {goalType === 'TARGET' && (
@@ -314,10 +310,10 @@ const ProgressTab = ({ clientRosterId, clientUserId }: { clientRosterId: string;
               <View className="flex-row items-center justify-between">
                 <Text className="text-xs text-muted-foreground">{comment.user?.name} · {formatMessageTime(String(comment.createdAt))}</Text>
                 <TouchableOpacity onPress={() => {
-                  Alert.alert('Delete', 'Delete this comment?', [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Delete', style: 'destructive', onPress: () => deleteComment.mutate({ commentId: comment.id } as any, { onSuccess: () => refetchComments() }) },
-                  ]);
+                  showAlert({ title: 'Delete', message: 'Delete this comment?', actions: [
+                    { label: 'Delete', variant: 'destructive', onPress: () => deleteComment.mutate({ commentId: comment.id } as any, { onSuccess: () => refetchComments() }) },
+                    { label: 'Cancel', variant: 'outline' },
+                  ]});
                 }}>
                   <Trash2 size={12} color={colors.destructive} />
                 </TouchableOpacity>
@@ -351,6 +347,7 @@ const ProgressTab = ({ clientRosterId, clientUserId }: { clientRosterId: string;
 
 // ===== NOTES TAB =====
 const NotesTab = ({ clientRosterId }: { clientRosterId: string }) => {
+  const { showAlert } = useAlert();
   const { data: notes, refetch } = trpc.clientRoster.getNotes.useQuery({ clientRosterId });
   const addNote = trpc.clientRoster.addNote.useMutation();
   const deleteNote = trpc.clientRoster.deleteNote.useMutation();
@@ -378,7 +375,7 @@ const NotesTab = ({ clientRosterId }: { clientRosterId: string }) => {
               if (!newNote.trim()) return;
               addNote.mutate({ clientRosterId, content: newNote.trim() } as any, {
                 onSuccess: () => { refetch(); setNewNote(''); },
-                onError: () => Alert.alert('Error', 'Failed to add note'),
+                onError: () => showAlert({ title: 'Error', message: 'Failed to add note' }),
               });
             }} disabled={!newNote.trim() || newNote.length > 2000} loading={addNote.isPending}>
               <View className="flex-row items-center gap-1">
@@ -402,10 +399,10 @@ const NotesTab = ({ clientRosterId }: { clientRosterId: string }) => {
                   {new Date(note.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </Text>
                 <TouchableOpacity onPress={() => {
-                  Alert.alert('Delete Note', 'Are you sure?', [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Delete', style: 'destructive', onPress: () => deleteNote.mutate({ noteId: note.id } as any, { onSuccess: () => refetch() }) },
-                  ]);
+                  showAlert({ title: 'Delete Note', message: 'Are you sure?', actions: [
+                    { label: 'Delete', variant: 'destructive', onPress: () => deleteNote.mutate({ noteId: note.id } as any, { onSuccess: () => refetch() }) },
+                    { label: 'Cancel', variant: 'outline' },
+                  ]});
                 }}>
                   <Trash2 size={14} color={colors.destructive} />
                 </TouchableOpacity>
@@ -420,6 +417,7 @@ const NotesTab = ({ clientRosterId }: { clientRosterId: string }) => {
 
 // ===== MAIN SCREEN =====
 const ClientDetailScreen = () => {
+  const { showAlert } = useAlert();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const [tab, setTab] = useState<Tab>('overview');
@@ -517,13 +515,7 @@ const ClientDetailScreen = () => {
               <Card>
                 <CardContent className="py-4 px-4 gap-3">
                   <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Status</Text>
-                  <View className="flex-row flex-wrap gap-2">
-                    {STATUSES.map((s) => (
-                      <TouchableOpacity key={s} className={`px-3 py-2 rounded-lg border-2 ${status === s ? 'border-teal bg-teal/10' : 'border-border'}`} onPress={() => handleStatusChange(s)}>
-                        <Text className={`text-xs font-medium ${status === s ? 'text-teal' : 'text-muted-foreground'}`}>{s.replace('_', ' ')}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  <PillSelect options={STATUSES} value={status} onChange={handleStatusChange} />
                 </CardContent>
               </Card>
             )}
@@ -550,10 +542,10 @@ const ClientDetailScreen = () => {
               )}
               {!isDisconnected && (
                 <Button variant="ghost" onPress={() => {
-                  Alert.alert('Disconnect Client', `Remove ${name} from your client list?`, [
-                    { text: 'Cancel', style: 'cancel' },
-                    { text: 'Disconnect', style: 'destructive', onPress: () => { handleStatusChange('DISCONNECTED'); router.back(); } },
-                  ]);
+                  showAlert({ title: 'Disconnect Client', message: `Remove ${name} from your client list?`, actions: [
+                    { label: 'Disconnect', variant: 'destructive', onPress: () => { handleStatusChange('DISCONNECTED'); router.back(); } },
+                    { label: 'Cancel', variant: 'outline' },
+                  ]});
                 }}>
                   <View className="flex-row items-center gap-2">
                     <UserMinus size={16} color={colors.destructive} />

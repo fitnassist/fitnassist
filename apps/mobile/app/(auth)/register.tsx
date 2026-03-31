@@ -4,7 +4,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -12,7 +11,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, Input } from '@/components/ui';
+import { Text, Button, Input, useAlert } from '@/components/ui';
 import { GradientBackground } from '@/components/GradientBackground';
 import { signUp } from '@/lib/auth';
 
@@ -32,6 +31,7 @@ const registerSchema = z
 type RegisterForm = z.infer<typeof registerSchema>;
 
 const RegisterScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -59,16 +59,16 @@ const RegisterScreen = () => {
       });
 
       if (result.error) {
-        Alert.alert('Registration Failed', result.error.message ?? 'Could not create account');
+        showAlert({ title: 'Registration Failed', message: result.error.message ?? 'Could not create account' });
       } else {
-        Alert.alert(
-          'Check Your Email',
-          'We sent you a verification link. Please verify your email to continue.',
-          [{ text: 'OK', onPress: () => router.replace('/(auth)/login') }],
-        );
+        showAlert({
+          title: 'Check Your Email',
+          message: 'We sent you a verification link. Please verify your email to continue.',
+          actions: [{ label: 'OK', onPress: () => router.replace('/(auth)/login') }],
+        });
       }
     } catch {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      showAlert({ title: 'Error', message: 'Something went wrong. Please try again.' });
     } finally {
       setLoading(false);
     }

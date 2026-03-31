@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { View, ScrollView, Alert, TouchableOpacity as RNTouchableOpacity } from 'react-native';
+import { View, ScrollView, TouchableOpacity as RNTouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ChevronDown, Check } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { Text, Button, Input, Card, CardContent, Skeleton } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, Skeleton, useAlert } from '@/components/ui';
 import { useClients } from '@/api/client';
 import { useAvailableSlots } from '@/api/availability';
 import { useMyTrainerProfile } from '@/api/trainer';
@@ -17,6 +17,7 @@ type Step = 'client' | 'date' | 'time' | 'details' | 'confirm';
 const today = new Date().toISOString().split('T')[0]!;
 
 const CreateBookingScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const { data: profile } = useMyTrainerProfile();
   const { data: clients, isLoading: clientsLoading } = useClients();
@@ -53,11 +54,13 @@ const CreateBookingScreen = () => {
       });
       utils.booking.upcoming.invalidate();
       utils.booking.listByDateRange.invalidate();
-      Alert.alert('Success', 'Booking created', [
-        { text: 'OK', onPress: () => router.back() },
-      ]);
+      showAlert({
+        title: 'Success',
+        message: 'Booking created',
+        actions: [{ label: 'OK', onPress: () => router.back() }],
+      });
     } catch (err: any) {
-      Alert.alert('Error', err.message ?? 'Failed to create booking');
+      showAlert({ title: 'Error', message: err.message ?? 'Failed to create booking' });
     }
   };
 

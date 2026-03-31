@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { View, Alert, ScrollView, TextInput as RNTextInput } from 'react-native';
+import { View, ScrollView, TextInput as RNTextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { Search } from 'lucide-react-native';
-import { Text, Input, Button, Skeleton } from '@/components/ui';
+import { Text, Input, Button, Skeleton, useAlert } from '@/components/ui';
 import { LoggerModal } from './LoggerModal';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
@@ -16,6 +16,7 @@ interface FoodLoggerProps {
 }
 
 export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
+  const { showAlert } = useAlert();
   const [mealType, setMealType] = useState<string>('BREAKFAST');
   const [query, setQuery] = useState('');
   const [name, setName] = useState('');
@@ -46,7 +47,7 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
 
   const handleSubmit = () => {
     if (!name.trim()) {
-      Alert.alert('Error', 'Please enter a food name');
+      showAlert({ title: 'Error', message: 'Please enter a food name' });
       return;
     }
     logFood.mutate(
@@ -74,7 +75,7 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
           setMode('search');
           onClose();
         },
-        onError: () => Alert.alert('Error', 'Failed to log food'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to log food' }),
       },
     );
   };

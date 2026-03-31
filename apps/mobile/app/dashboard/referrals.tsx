@@ -1,10 +1,10 @@
-import { View, ScrollView, RefreshControl, Share, Alert } from 'react-native';
+import { View, ScrollView, RefreshControl, Share } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Copy, Share2, Users, CheckCircle, Clock, Gift } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { Text, Button, Card, CardContent, Skeleton, Badge } from '@/components/ui';
+import { Text, Button, Card, CardContent, Skeleton, Badge, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
@@ -17,6 +17,7 @@ const StatCard = ({ label, value, icon: Icon }: { label: string; value: string |
 );
 
 const ReferralsScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const { data: stats, isLoading: statsLoading, refetch: refetchStats } = trpc.referral.getStats.useQuery();
   const { data: link } = trpc.referral.getReferralLink.useQuery();
@@ -27,7 +28,7 @@ const ReferralsScreen = () => {
   const handleCopy = async () => {
     if (!referralUrl) return;
     await Clipboard.setStringAsync(referralUrl);
-    Alert.alert('Copied', 'Referral link copied to clipboard');
+    showAlert({ title: 'Copied', message: 'Referral link copied to clipboard' });
   };
 
   const handleShare = async () => {

@@ -1,29 +1,26 @@
-import { useState, useEffect, useCallback } from 'react';
-import { View, ScrollView, Alert, Image, Switch, FlatList, TextInput } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, ScrollView, Image, Switch, FlatList, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Camera, Check, X, MapPin } from 'lucide-react-native';
+import { ArrowLeft, Camera, Check, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import { Calendar as RNCalendar } from 'react-native-calendars';
-import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, useAlert, Skeleton, DatePicker } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, type AddressResult, useAlert, Skeleton, DatePicker, PillSelect } from '@/components/ui';
 import { CheckCircle as CheckIcon, XCircle } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile, useUpdateTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile, useUpdateTraineeProfile } from '@/api/trainee';
 import { trpc } from '@/lib/trpc';
-import {
-  TRAINER_SERVICES as SERVICES_DATA,
-  TRAINER_QUALIFICATIONS as QUALS_DATA,
-} from '@fitnassist/schemas';
+import { TRAINER_SERVICES as SERVICES_DATA } from '@fitnassist/schemas/src/constants/services.constants';
+import { TRAINER_QUALIFICATIONS as QUALS_DATA } from '@fitnassist/schemas/src/constants/qualifications.constants';
 import { colors } from '@/constants/theme';
 
 type TrainerTab = 'basic' | 'location' | 'services' | 'media' | 'settings';
 type TraineeTab = 'personal' | 'body' | 'fitness' | 'nutrition' | 'privacy';
 
 const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:3001';
-const GOOGLE_API_KEY = Constants.expoConfig?.extra?.googleMapsApiKey ?? '';
 
 // Group services by category
 const SERVICE_GROUPS = [
@@ -57,28 +54,6 @@ const FITNESS_GOALS = [
   'sports-performance', 'rehabilitation', 'stress-relief', 'body-recomposition',
 ];
 
-const ChipSelect = ({ options, selected, onToggle }: {
-  options: string[];
-  selected: string[];
-  onToggle: (val: string) => void;
-}) => (
-  <View className="flex-row flex-wrap gap-2">
-    {options.map((opt) => {
-      const active = selected.includes(opt);
-      return (
-        <TouchableOpacity
-          key={opt}
-          className={`px-3 py-2 rounded-lg border ${active ? 'border-teal bg-teal/10' : 'border-border'}`}
-          onPress={() => onToggle(opt)}
-        >
-          <Text className={`text-xs font-medium ${active ? 'text-teal' : 'text-muted-foreground'}`}>
-            {opt.replace(/-/g, ' ').replace(/_/g, ' ')}
-          </Text>
-        </TouchableOpacity>
-      );
-    })}
-  </View>
-);
 
 const GroupedChipSelect = ({ groups, selected, onToggle }: {
   groups: { label: string; items: readonly { value: string; label: string }[] }[];
@@ -89,185 +64,22 @@ const GroupedChipSelect = ({ groups, selected, onToggle }: {
     {groups.map((group) => (
       <View key={group.label} className="gap-2">
         <Text className="text-xs font-medium text-muted-foreground">{group.label}</Text>
-        <View className="flex-row flex-wrap gap-2">
-          {group.items.map((item) => {
-            const active = selected.includes(item.value);
-            return (
-              <TouchableOpacity
-                key={item.value}
-                className={`px-3 py-2 rounded-lg border ${active ? 'border-teal bg-teal/10' : 'border-border'}`}
-                onPress={() => onToggle(item.value)}
-              >
-                <Text className={`text-xs font-medium ${active ? 'text-teal' : 'text-muted-foreground'}`}>
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+        <PillSelect
+          options={group.items.map((i) => ({ value: i.value, label: i.label }))}
+          value={selected}
+          onChange={(vals: string[]) => {
+            const added = vals.find((v: string) => !selected.includes(v));
+            const removed = selected.find((v) => !vals.includes(v));
+            if (added) onToggle(added);
+            if (removed) onToggle(removed);
+          }}
+          multiple
+        />
       </View>
     ))}
   </View>
 );
 
-// Address component matching web - autocomplete or manual entry toggle
-const AddressAutocomplete = ({ currentAddress, onSelect }: {
-  currentAddress: { addressLine1?: string; city?: string; county?: string; postcode?: string; country?: string };
-  onSelect: (address: { addressLine1: string; addressLine2?: string; city: string; county: string; postcode: string; country: string; latitude: number; longitude: number; placeId: string }) => void;
-}) => {
-  const [isManual, setIsManual] = useState(false);
-  const [query, setQuery] = useState('');
-  const [predictions, setPredictions] = useState<any[]>([]);
-  const [showPredictions, setShowPredictions] = useState(false);
-  const [manual, setManual] = useState({
-    addressLine1: currentAddress.addressLine1 ?? '',
-    addressLine2: '',
-    city: currentAddress.city ?? '',
-    county: currentAddress.county ?? '',
-    postcode: currentAddress.postcode ?? '',
-  });
-
-  const searchPlaces = useCallback(async (text: string) => {
-    if (text.length < 3) { setPredictions([]); return; }
-    try {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(text)}&components=country:gb&key=${GOOGLE_API_KEY}`
-      );
-      const data = await res.json();
-      setPredictions(data.predictions ?? []);
-      setShowPredictions(true);
-    } catch {
-      setPredictions([]);
-    }
-  }, []);
-
-  const selectPlace = async (placeId: string) => {
-    setShowPredictions(false);
-    setQuery('');
-    try {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,geometry&key=${GOOGLE_API_KEY}`
-      );
-      const data = await res.json();
-      const result = data.result;
-      if (!result) return;
-
-      const get = (type: string) => result.address_components?.find((c: any) => c.types.includes(type))?.long_name ?? '';
-
-      onSelect({
-        addressLine1: `${get('street_number')} ${get('route')}`.trim(),
-        city: get('postal_town') || get('locality'),
-        county: get('administrative_area_level_2'),
-        postcode: get('postal_code'),
-        country: get('country'),
-        latitude: result.geometry?.location?.lat ?? 0,
-        longitude: result.geometry?.location?.lng ?? 0,
-        placeId,
-      });
-    } catch {
-      Alert.alert('Error', 'Failed to get address details');
-    }
-  };
-
-  const handleManualConfirm = () => {
-    if (!manual.addressLine1 || !manual.city || !manual.postcode) {
-      Alert.alert('Error', 'Address line 1, city, and postcode are required');
-      return;
-    }
-    onSelect({
-      addressLine1: manual.addressLine1,
-      addressLine2: manual.addressLine2,
-      city: manual.city,
-      county: manual.county,
-      postcode: manual.postcode,
-      country: 'GB',
-      latitude: 0,
-      longitude: 0,
-      placeId: '',
-    });
-    setIsManual(false);
-  };
-
-  if (isManual) {
-    return (
-      <View className="gap-3">
-        <View className="flex-row items-center justify-between">
-          <Text className="text-sm font-medium text-foreground">Manual Entry</Text>
-          <TouchableOpacity onPress={() => setIsManual(false)}>
-            <Text className="text-sm text-teal">Use address lookup</Text>
-          </TouchableOpacity>
-        </View>
-        <Input label="Address Line 1 *" value={manual.addressLine1} onChangeText={(v) => setManual((m) => ({ ...m, addressLine1: v }))} placeholder="e.g. 123 High Street" />
-        <Input label="Address Line 2" value={manual.addressLine2} onChangeText={(v) => setManual((m) => ({ ...m, addressLine2: v }))} placeholder="e.g. Flat 4" />
-        <View className="flex-row gap-2">
-          <View className="flex-1">
-            <Input label="City *" value={manual.city} onChangeText={(v) => setManual((m) => ({ ...m, city: v }))} placeholder="e.g. London" />
-          </View>
-          <View className="flex-1">
-            <Input label="County" value={manual.county} onChangeText={(v) => setManual((m) => ({ ...m, county: v }))} placeholder="e.g. Greater London" />
-          </View>
-        </View>
-        <Input label="Postcode *" value={manual.postcode} onChangeText={(v) => setManual((m) => ({ ...m, postcode: v.toUpperCase() }))} placeholder="e.g. SW1A 1AA" />
-        <Button size="sm" variant="outline" onPress={handleManualConfirm}>Confirm Address</Button>
-      </View>
-    );
-  }
-
-  return (
-    <View className="gap-3">
-      <View className="flex-row items-center justify-between">
-        <Text className="text-sm font-medium text-foreground">Address</Text>
-        <TouchableOpacity onPress={() => setIsManual(true)}>
-          <Text className="text-sm text-teal">Enter manually</Text>
-        </TouchableOpacity>
-      </View>
-      <View className="flex-row items-center h-12 bg-card border border-border rounded-lg px-3">
-        <MapPin size={16} color={colors.mutedForeground} />
-        <TextInput
-          value={query}
-          onChangeText={(t) => { setQuery(t); searchPlaces(t); }}
-          placeholder="Start typing your address..."
-          placeholderTextColor="hsl(230, 10%, 55%)"
-          className="flex-1 text-foreground ml-2"
-          style={{ fontSize: 16, padding: 0, margin: 0 }}
-          autoCapitalize="none"
-        />
-        {query.length > 0 && (
-          <TouchableOpacity onPress={() => { setQuery(''); setPredictions([]); setShowPredictions(false); }}>
-            <X size={16} color={colors.mutedForeground} />
-          </TouchableOpacity>
-        )}
-      </View>
-      {showPredictions && predictions.length > 0 && (
-        <View className="bg-card border border-border rounded-lg max-h-48">
-          {predictions.map((p: any) => (
-            <TouchableOpacity
-              key={p.place_id}
-              className="px-3 py-2.5 border-b border-border"
-              onPress={() => selectPlace(p.place_id)}
-            >
-              <Text className="text-sm text-foreground" numberOfLines={1}>{p.description}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-
-      {/* Show confirmed address */}
-      {currentAddress.addressLine1 && !query && (
-        <View className="bg-secondary rounded-lg p-3 gap-0.5">
-          <Text className="text-sm font-medium text-foreground">{currentAddress.addressLine1}</Text>
-          <Text className="text-xs text-muted-foreground">
-            {[currentAddress.city, currentAddress.county, currentAddress.postcode].filter(Boolean).join(', ')}
-          </Text>
-        </View>
-      )}
-
-      <Text className="text-xs text-muted-foreground">
-        Your full address is private. Only your postcode area will be shown publicly on the map.
-      </Text>
-    </View>
-  );
-};
 
 // Gallery hooks
 const useGallery = (trainerId: string) => {
@@ -282,6 +94,7 @@ const useGallery = (trainerId: string) => {
 
 // Media Tab Component
 const MediaTab = ({ profile, fields, update, uploading, setUploading, handlePickImage, getUploadParams, updateProfile }: any) => {
+  const { showAlert } = useAlert();
   const gallery = useGallery(profile?.id ?? '');
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [coverUploading, setCoverUploading] = useState(false);
@@ -297,18 +110,18 @@ const MediaTab = ({ profile, fields, update, uploading, setUploading, handlePick
     });
     if (result.canceled || !result.assets[0]) return;
     setCoverUploading(true);
-    const url = await uploadImage(result.assets[0].uri, 'cover', getUploadParams);
+    const url = await uploadImage(result.assets[0].uri, 'cover', getUploadParams, showAlert);
     setCoverUploading(false);
     if (url) {
       update('coverImageUrl', url);
       await updateProfile.mutateAsync({ coverImageUrl: url });
-      Alert.alert('Success', 'Cover photo updated');
+      showAlert({ title: 'Success', message: 'Cover photo updated' });
     }
   };
 
   const handleGalleryAdd = async () => {
     if ((gallery.images as any[]).length >= 6) {
-      Alert.alert('Limit Reached', 'You can have up to 6 gallery images');
+      showAlert({ title: 'Limit Reached', message: 'You can have up to 6 gallery images' });
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -318,28 +131,25 @@ const MediaTab = ({ profile, fields, update, uploading, setUploading, handlePick
     });
     if (result.canceled || !result.assets[0]) return;
     setGalleryUploading(true);
-    const url = await uploadImage(result.assets[0].uri, 'gallery', getUploadParams);
+    const url = await uploadImage(result.assets[0].uri, 'gallery', getUploadParams, showAlert);
     setGalleryUploading(false);
     if (url) {
       gallery.add.mutate(
         { url } as any,
-        { onSuccess: () => gallery.invalidate(), onError: () => Alert.alert('Error', 'Failed to add gallery image') },
+        { onSuccess: () => gallery.invalidate(), onError: () => showAlert({ title: 'Error', message: 'Failed to add gallery image' }) },
       );
     }
   };
 
   const handleGalleryRemove = (imageId: string) => {
-    Alert.alert('Remove Image', 'Remove this image from your gallery?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: () => gallery.remove.mutate(
-          { id: imageId } as any,
-          { onSuccess: () => gallery.invalidate() },
-        ),
-      },
-    ]);
+    showAlert({
+      title: 'Remove Image',
+      message: 'Remove this image from your gallery?',
+      actions: [
+        { label: 'Remove', variant: 'destructive', onPress: () => gallery.remove.mutate({ id: imageId } as any, { onSuccess: () => gallery.invalidate() }) },
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   const handleVideoUpload = async () => {
@@ -366,12 +176,12 @@ const MediaTab = ({ profile, fields, update, uploading, setUploading, handlePick
       const data = await res.json();
       if (data.secure_url) {
         await updateProfile.mutateAsync({ videoIntroUrl: data.secure_url });
-        Alert.alert('Success', 'Video intro uploaded');
+        showAlert({ title: 'Success', message: 'Video intro uploaded' });
       } else {
-        Alert.alert('Error', 'Upload failed');
+        showAlert({ title: 'Error', message: 'Upload failed' });
       }
     } catch {
-      Alert.alert('Error', 'Failed to upload video');
+      showAlert({ title: 'Error', message: 'Failed to upload video' });
     } finally {
       setVideoUploading(false);
     }
@@ -380,21 +190,21 @@ const MediaTab = ({ profile, fields, update, uploading, setUploading, handlePick
   const handleVideoRemove = async () => {
     const url = (profile as any)?.videoIntroUrl;
     if (!url) return;
-    Alert.alert('Remove Video', 'Remove your video introduction?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: async () => {
+    showAlert({
+      title: 'Remove Video',
+      message: 'Remove your video introduction?',
+      actions: [
+        { label: 'Remove', variant: 'destructive', onPress: async () => {
           try {
             await deleteFile.mutateAsync({ url, resourceType: 'video' });
             await updateProfile.mutateAsync({ videoIntroUrl: null });
           } catch {
-            Alert.alert('Error', 'Failed to remove video');
+            showAlert({ title: 'Error', message: 'Failed to remove video' });
           }
-        },
-      },
-    ]);
+        }},
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   return (
@@ -507,7 +317,7 @@ const MediaTab = ({ profile, fields, update, uploading, setUploading, handlePick
 };
 
 // Upload helper
-const uploadImage = async (uri: string, type: string, getUploadParams: any) => {
+const uploadImage = async (uri: string, type: string, getUploadParams: any, showAlert?: (opts: any) => void) => {
   try {
     const params = await getUploadParams.mutateAsync({ type });
     const formData = new FormData();
@@ -525,7 +335,7 @@ const uploadImage = async (uri: string, type: string, getUploadParams: any) => {
     const data = await res.json();
     return data.secure_url as string;
   } catch (err: any) {
-    Alert.alert('Upload Failed', err.message ?? 'Failed to upload image');
+    showAlert?.({ title: 'Upload Failed', message: err.message ?? 'Failed to upload image' });
     return null;
   }
 };
@@ -583,13 +393,13 @@ const TrainerProfileEdit = () => {
     if (result.canceled || !result.assets[0]) return;
 
     setUploading(true);
-    const url = await uploadImage(result.assets[0].uri, 'profile', getUploadParams);
+    const url = await uploadImage(result.assets[0].uri, 'profile', getUploadParams, showAlert);
     setUploading(false);
 
     if (url) {
       update('profileImageUrl', url);
       await updateProfile.mutateAsync({ profileImageUrl: url });
-      Alert.alert('Success', 'Profile photo updated');
+      showAlert({ title: 'Success', message: 'Profile photo updated' });
     }
   };
 
@@ -802,7 +612,7 @@ const TrainerProfileEdit = () => {
                         }
                         trpcUtils.trainer.getMyProfile.invalidate();
                       } catch {
-                        Alert.alert('Error', v ? 'Failed to publish profile' : 'Failed to unpublish profile');
+                        showAlert({ title: 'Error', message: v ? 'Failed to publish profile' : 'Failed to unpublish profile' });
                       }
                     }}
                     trackColor={{ false: colors.muted, true: colors.teal }}
@@ -1097,13 +907,20 @@ const NutritionTabContent = ({ fields, update, profile }: { fields: Record<strin
 };
 
 const TraineeProfileEdit = () => {
+  const { showAlert } = useAlert();
   const { data: profile, isLoading } = useMyTraineeProfile();
   const updateProfile = useUpdateTraineeProfile();
+  const setHandle = trpc.trainee.setHandle.useMutation();
   const updatePrivacy = trpc.trainee.updatePrivacySettings.useMutation();
   const { data: privacyData } = trpc.trainee.getPrivacySettings.useQuery();
   const getUploadParams = trpc.upload.getUploadParams.useMutation();
   const [tab, setTab] = useState<TraineeTab>('personal');
   const [fields, setFields] = useState<Record<string, any>>({});
+  const [handleQuery, setHandleQuery] = useState('');
+  const { data: handleCheck, isLoading: checkingHandle } = trpc.trainee.checkHandleAvailability.useQuery(
+    { handle: handleQuery },
+    { enabled: handleQuery.length >= 3 && handleQuery !== (profile as any)?.handle },
+  );
   const [privacyLocal, setPrivacyLocal] = useState<Record<string, string>>({});
   const [privacyInitialized, setPrivacyInitialized] = useState(false);
 
@@ -1123,6 +940,7 @@ const TraineeProfileEdit = () => {
     if (profile) {
       setFields({
         avatarUrl: (profile as any).avatarUrl ?? null,
+        handle: (profile as any).handle ?? '',
         bio: (profile as any).bio ?? '',
         dateOfBirth: (profile as any).dateOfBirth
           ? (typeof (profile as any).dateOfBirth === 'string'
@@ -1130,6 +948,15 @@ const TraineeProfileEdit = () => {
             : new Date((profile as any).dateOfBirth).toISOString().split('T')[0])
           : '',
         gender: (profile as any).gender ?? '',
+        addressLine1: (profile as any).addressLine1 ?? '',
+        addressLine2: (profile as any).addressLine2 ?? '',
+        city: (profile as any).city ?? '',
+        county: (profile as any).county ?? '',
+        postcode: (profile as any).postcode ?? '',
+        country: (profile as any).country ?? 'GB',
+        placeId: (profile as any).placeId ?? '',
+        latitude: (profile as any).latitude ?? null,
+        longitude: (profile as any).longitude ?? null,
         heightCm: (profile as any).heightCm ?? '',
         startWeightKg: (profile as any).startWeightKg ?? '',
         goalWeightKg: (profile as any).goalWeightKg ?? '',
@@ -1149,6 +976,13 @@ const TraineeProfileEdit = () => {
   }, [profile]);
 
   const update = (key: string, value: any) => setFields((f) => ({ ...f, [key]: value }));
+
+  // Debounce handle availability check
+  useEffect(() => {
+    const t = setTimeout(() => setHandleQuery(fields.handle ?? ''), 500);
+    return () => clearTimeout(t);
+  }, [fields.handle]);
+
   const toggleGoal = (g: string) => {
     const current = fields.fitnessGoals ?? [];
     update('fitnessGoals', current.includes(g) ? current.filter((x: string) => x !== g) : [...current, g]);
@@ -1164,35 +998,38 @@ const TraineeProfileEdit = () => {
     if (result.canceled || !result.assets[0]) return;
 
     setUploading(true);
-    const url = await uploadImage(result.assets[0].uri, 'profile', getUploadParams);
+    const url = await uploadImage(result.assets[0].uri, 'profile', getUploadParams, showAlert);
     setUploading(false);
 
     if (url) {
       update('avatarUrl', url);
       await updateProfile.mutateAsync({ avatarUrl: url });
-      Alert.alert('Success', 'Avatar updated');
+      showAlert({ title: 'Success', message: 'Avatar updated' });
     }
   };
-
-  const { showAlert } = useAlert();
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const data: Record<string, any> = { ...fields };
+      const { handle, ...rest } = fields;
+      const data: Record<string, any> = { ...rest };
       for (const key of ['heightCm', 'startWeightKg', 'goalWeightKg', 'dailyCalorieTarget', 'dailyProteinTargetG', 'dailyCarbsTargetG', 'dailyFatTargetG', 'dailyWaterTargetMl']) {
         if (data[key] !== '' && data[key] != null) data[key] = parseFloat(data[key]);
         else delete data[key];
       }
-      // Save profile + privacy in parallel
       const promises: Promise<any>[] = [updateProfile.mutateAsync(data)];
+      // Handle is a separate endpoint
+      const originalHandle = (profile as any)?.handle ?? '';
+      if (handle && handle !== originalHandle) {
+        promises.push(setHandle.mutateAsync({ handle }));
+      }
       if (Object.keys(privacyLocal).length > 0) {
         promises.push(updatePrivacy.mutateAsync(privacyLocal as any));
       }
       await Promise.all(promises);
       showAlert({ title: 'Profile Updated', icon: <CheckIcon size={32} color={colors.teal} /> });
-    } catch {
-      showAlert({ title: 'Error', message: 'Failed to update profile', icon: <XCircle size={32} color={colors.destructive} /> });
+    } catch (err: any) {
+      showAlert({ title: 'Error', message: err?.message ?? 'Failed to update profile', icon: <XCircle size={32} color={colors.destructive} /> });
     } finally {
       setSaving(false);
     }
@@ -1215,6 +1052,7 @@ const TraineeProfileEdit = () => {
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">
         {tab === 'personal' && (
           <>
+            {/* Avatar */}
             <View className="items-center mb-2">
               <TouchableOpacity onPress={handlePickAvatar} disabled={uploading}>
                 <View className="relative">
@@ -1233,9 +1071,42 @@ const TraineeProfileEdit = () => {
               {uploading && <Text className="text-xs text-muted-foreground mt-2">Uploading...</Text>}
             </View>
 
+            {/* Handle */}
+            <Card>
+              <CardContent className="py-4 px-4 gap-2">
+                <Text className="text-sm font-medium text-primary uppercase" style={{ letterSpacing: 1 }}>Handle</Text>
+                <Text className="text-xs text-muted-foreground">Your unique public profile URL. Lowercase letters, numbers, hyphens and underscores only.</Text>
+                <View className="flex-row items-center h-12 bg-card border border-border rounded-lg px-3 gap-2">
+                  <Text className="text-sm text-muted-foreground">@</Text>
+                  <TextInput
+                    value={fields.handle ?? ''}
+                    onChangeText={(v) => update('handle', v.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                    placeholder="your-handle"
+                    placeholderTextColor={colors.mutedForeground}
+                    style={{ flex: 1, fontSize: 14, color: colors.foreground, padding: 0 }}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                  {(fields.handle?.length ?? 0) >= 3 && fields.handle !== (profile as any)?.handle && (
+                    checkingHandle ? null :
+                    (handleCheck as any)?.available
+                      ? <CheckIcon size={16} color={colors.teal} />
+                      : <XCircle size={16} color="#ef4444" />
+                  )}
+                </View>
+                {(handleCheck as any)?.available === false && fields.handle !== (profile as any)?.handle && (
+                  <Text className="text-xs text-destructive">{(handleCheck as any)?.reason ?? 'Handle not available'}</Text>
+                )}
+                {fields.handle && (handleCheck as any)?.available && (
+                  <Text className="text-xs text-muted-foreground">fitnassist.co/users/{fields.handle}</Text>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Personal info */}
             <Card>
               <CardContent className="py-4 px-4 gap-3">
-                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Personal Info</Text>
+                <Text className="text-sm font-medium text-primary uppercase" style={{ letterSpacing: 1 }}>Personal Info</Text>
                 <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={3} />
                 <DatePicker
                   label="Date of Birth"
@@ -1245,17 +1116,34 @@ const TraineeProfileEdit = () => {
                   placeholder="Select date of birth"
                 />
                 <Text className="text-sm font-medium text-foreground">Gender</Text>
-                <View className="flex-row flex-wrap gap-2">
-                  {GENDERS.map(({ value, label }) => (
-                    <TouchableOpacity
-                      key={value}
-                      className={`px-3 py-2 rounded-lg border ${fields.gender === value ? 'border-teal bg-teal/10' : 'border-border'}`}
-                      onPress={() => update('gender', value)}
-                    >
-                      <Text className={`text-xs font-medium ${fields.gender === value ? 'text-teal' : 'text-muted-foreground'}`}>{label}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                <PillSelect options={GENDERS} value={fields.gender ?? ''} onChange={(v: string) => update('gender', v)} />
+              </CardContent>
+            </Card>
+
+            {/* Address */}
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-primary uppercase" style={{ letterSpacing: 1 }}>Address</Text>
+                <AddressInput
+                  currentAddress={{
+                    addressLine1: fields.addressLine1,
+                    city: fields.city,
+                    county: fields.county,
+                    postcode: fields.postcode,
+                  }}
+                  onSelect={(addr: AddressResult) => {
+                    update('addressLine1', addr.addressLine1);
+                    update('addressLine2', addr.addressLine2 ?? '');
+                    update('city', addr.city);
+                    update('county', addr.county);
+                    update('postcode', addr.postcode);
+                    update('country', addr.country);
+                    update('latitude', addr.latitude);
+                    update('longitude', addr.longitude);
+                    update('placeId', addr.placeId);
+                  }}
+                />
+                <Text className="text-xs text-muted-foreground">Your full address is private. Only your postcode area is shown publicly.</Text>
               </CardContent>
             </Card>
           </>
@@ -1293,19 +1181,19 @@ const TraineeProfileEdit = () => {
           <Card>
             <CardContent className="py-4 px-4 gap-4">
               <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Experience Level</Text>
-              <ChipSelect
+              <PillSelect
                 options={EXPERIENCE_LEVELS}
-                selected={fields.experienceLevel ? [fields.experienceLevel] : []}
-                onToggle={(v) => update('experienceLevel', v)}
+                value={fields.experienceLevel ?? ''}
+                onChange={(v: string) => update('experienceLevel', v)}
               />
               <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Activity Level</Text>
-              <ChipSelect
+              <PillSelect
                 options={ACTIVITY_LEVELS}
-                selected={fields.activityLevel ? [fields.activityLevel] : []}
-                onToggle={(v) => update('activityLevel', v)}
+                value={fields.activityLevel ?? ''}
+                onChange={(v: string) => update('activityLevel', v)}
               />
               <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Fitness Goals</Text>
-              <ChipSelect options={FITNESS_GOALS} selected={fields.fitnessGoals ?? []} onToggle={toggleGoal} />
+              <PillSelect options={FITNESS_GOALS} value={fields.fitnessGoals ?? []} onChange={(v: string[]) => update('fitnessGoals', v)} multiple />
               <Input label="Goal Notes" value={fields.fitnessGoalNotes} onChangeText={(v) => update('fitnessGoalNotes', v)} multiline />
               <Input label="Medical Notes" value={fields.medicalNotes} onChangeText={(v) => update('medicalNotes', v)} multiline />
             </CardContent>

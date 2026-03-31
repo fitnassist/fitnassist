@@ -1,21 +1,22 @@
 import { useState } from 'react';
-import { View, ScrollView, RefreshControl, Alert, TouchableOpacity } from 'react-native';
+import { View, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Check, Crown, Zap, Star } from 'lucide-react-native';
 import * as WebBrowser from 'expo-web-browser';
-import { Text, Button, Card, CardContent, Skeleton, Badge } from '@/components/ui';
+import { Text, Button, Card, CardContent, Skeleton, Badge, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 import {
   TIER_INFO,
   FREE_TIER_INFO,
   formatPricePence,
-} from '@fitnassist/schemas';
+} from '@fitnassist/schemas/src/constants/subscription.constants';
 
 const TIER_ICONS: Record<string, any> = { FREE: Star, PRO: Zap, ELITE: Crown };
 
 const SubscriptionScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const [billingPeriod, setBillingPeriod] = useState<'MONTHLY' | 'ANNUAL'>('MONTHLY');
   const { data: current, isLoading, refetch } = trpc.subscription.getCurrent.useQuery();
@@ -32,7 +33,7 @@ const SubscriptionScreen = () => {
         refetch();
       }
     } catch {
-      Alert.alert('Error', 'Failed to start checkout');
+      showAlert({ title: 'Error', message: 'Failed to start checkout' });
     }
   };
 
@@ -44,7 +45,7 @@ const SubscriptionScreen = () => {
         refetch();
       }
     } catch {
-      Alert.alert('Error', 'Failed to open billing portal');
+      showAlert({ title: 'Error', message: 'Failed to open billing portal' });
     }
   };
 

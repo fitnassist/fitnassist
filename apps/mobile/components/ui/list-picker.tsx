@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { View, FlatList, TextInput, Modal } from 'react-native';
+import { View, FlatList, TextInput, Modal, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { Check, Search, X } from 'lucide-react-native';
 import { Text } from './text';
@@ -9,6 +9,7 @@ export interface ListPickerItem {
   id: string;
   label: string;
   description?: string;
+  avatarUrl?: string;
 }
 
 interface ListPickerProps {
@@ -94,13 +95,22 @@ export const ListPicker = ({
             const isSelected = selectedIds.includes(item.id);
             return (
               <TouchableOpacity
-                className={`flex-row items-center py-3.5 px-4 border-b border-border ${isSelected ? 'bg-teal/5' : ''}`}
+                className={`flex-row items-center py-3.5 px-4 border-b border-border gap-3 ${isSelected ? 'bg-teal/5' : ''}`}
                 onPress={() => {
                   onSelect(item);
                   if (!multi) handleClose();
                 }}
                 activeOpacity={0.6}
               >
+                {(item.avatarUrl !== undefined) && (
+                  item.avatarUrl ? (
+                    <Image source={{ uri: item.avatarUrl }} className="w-9 h-9 rounded-full" />
+                  ) : (
+                    <View className="w-9 h-9 rounded-full bg-secondary items-center justify-center">
+                      <Text className="text-sm font-semibold text-foreground">{item.label.charAt(0)}</Text>
+                    </View>
+                  )
+                )}
                 <View className="flex-1 gap-0.5">
                   <Text className="text-sm text-foreground">{item.label}</Text>
                   {item.description && (

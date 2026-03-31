@@ -9,3 +9,4 @@ export { ListPicker, type ListPickerItem } from './list-picker';
 export { AlertProvider, useAlert } from './styled-alert';
 export { AddressInput, type AddressResult } from './address-input';
 export { DatePicker } from './date-picker';
+export { PillSelect } from './pill-select';

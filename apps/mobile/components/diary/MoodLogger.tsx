@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { View, Alert } from 'react-native';
+import { View } from 'react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Input, Button } from '@/components/ui';
+import { Text, Input, Button, useAlert } from '@/components/ui';
 import { LoggerModal } from './LoggerModal';
 import { trpc } from '@/lib/trpc';
 
@@ -20,6 +20,7 @@ interface MoodLoggerProps {
 }
 
 export const MoodLogger = ({ visible, onClose, date }: MoodLoggerProps) => {
+  const { showAlert } = useAlert();
   const [mood, setMood] = useState('');
   const [notes, setNotes] = useState('');
   const logMood = trpc.diary.logMood.useMutation();
@@ -27,7 +28,7 @@ export const MoodLogger = ({ visible, onClose, date }: MoodLoggerProps) => {
 
   const handleSubmit = () => {
     if (!mood) {
-      Alert.alert('Error', 'Please select a mood');
+      showAlert({ title: 'Error', message: 'Please select a mood' });
       return;
     }
     logMood.mutate(
@@ -39,7 +40,7 @@ export const MoodLogger = ({ visible, onClose, date }: MoodLoggerProps) => {
           setNotes('');
           onClose();
         },
-        onError: () => Alert.alert('Error', 'Failed to log mood'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to log mood' }),
       },
     );
   };

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { View, FlatList, RefreshControl, Image, Alert, TextInput } from 'react-native';
+import { View, FlatList, RefreshControl, Image, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Star } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Card, CardContent, Skeleton } from '@/components/ui';
+import { Text, Button, Card, CardContent, Skeleton, useAlert } from '@/components/ui';
 import { useMyTrainerProfile } from '@/api/trainer';
 import { trpc } from '@/lib/trpc';
 import { formatDistanceToNow } from '@/lib/dates';
@@ -80,6 +80,7 @@ const ReviewCard = ({ review, onReply }: { review: any; onReply: (text: string) 
 };
 
 const ReviewsScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const { data: profile } = useMyTrainerProfile();
   const { data, isLoading, refetch, fetchNextPage, hasNextPage } = trpc.review.getForDashboard.useInfiniteQuery(
@@ -96,7 +97,7 @@ const ReviewsScreen = () => {
       { reviewId, replyText: text },
       {
         onSuccess: () => utils.review.getForDashboard.invalidate(),
-        onError: () => Alert.alert('Error', 'Failed to reply'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to reply' }),
       },
     );
   };

@@ -1,4 +1,4 @@
-import { View, ScrollView, RefreshControl } from 'react-native';
+import { View, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   Utensils,
@@ -66,9 +66,10 @@ export const TraineeDashboard = () => {
     >
       {/* Today Summary */}
       <View className="px-4 mb-6">
+        <TouchableOpacity onPress={() => router.push('/(tabs)/diary')} activeOpacity={0.8}>
         <Card>
           <CardContent className="py-4 px-4 gap-4">
-            <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+            <Text className="text-sm font-medium text-primary uppercase" style={{ letterSpacing: 1 }}>
               Today
             </Text>
 
@@ -87,7 +88,7 @@ export const TraineeDashboard = () => {
                 </View>
                 <View className="h-2 bg-secondary rounded-full overflow-hidden">
                   <View
-                    className="h-full bg-teal rounded-full"
+                    className="h-full bg-primary rounded-full"
                     style={{ width: `${calorieProgress * 100}%` }}
                   />
                 </View>
@@ -123,16 +124,25 @@ export const TraineeDashboard = () => {
                   const logged = loggedTypes.has(type);
                   return (
                     <View key={type} className="items-center gap-1">
-                      <View
-                        className={`w-9 h-9 rounded-full items-center justify-center ${
-                          logged ? '' : 'opacity-30'
-                        }`}
-                        style={{ backgroundColor: logged ? colors.teal : 'transparent', borderWidth: logged ? 0 : 1, borderColor: logged ? colors.teal : color }}
-                      >
-                        {logged ? (
-                          <CheckCircle size={16} color={colors.tealForeground} />
-                        ) : (
+                      <View className="relative">
+                        <View
+                          className="w-9 h-9 rounded-full items-center justify-center"
+                          style={{
+                            backgroundColor: color + '20',
+                            borderWidth: 1,
+                            borderColor: logged ? color : color + '40',
+                            opacity: logged ? 1 : 0.4,
+                          }}
+                        >
                           <Icon size={16} color={color} />
+                        </View>
+                        {logged && (
+                          <View
+                            className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full items-center justify-center"
+                            style={{ backgroundColor: colors.primary }}
+                          >
+                            <CheckCircle size={10} color="#fff" />
+                          </View>
                         )}
                       </View>
                       <Text className="text-[10px] text-muted-foreground">{label}</Text>
@@ -143,6 +153,7 @@ export const TraineeDashboard = () => {
             )}
           </CardContent>
         </Card>
+        </TouchableOpacity>
       </View>
 
       {/* Upcoming Bookings */}
@@ -150,7 +161,7 @@ export const TraineeDashboard = () => {
         <View className="px-4 mb-6">
           <Card>
             <CardContent className="py-4 px-4 gap-2">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+              <Text className="text-sm font-medium text-primary uppercase" style={{ letterSpacing: 1 }}>
                 Upcoming Bookings
               </Text>
               {bookings.slice(0, 3).map((booking: { id: string; startTime: string; trainer?: { displayName?: string } }) => (

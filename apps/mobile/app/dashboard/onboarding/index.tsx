@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, FlatList, RefreshControl, Alert, ScrollView, Modal, Switch } from 'react-native';
+import { View, FlatList, RefreshControl, ScrollView, Modal, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -7,7 +7,7 @@ import {
   X, FileText, Clock, CheckCircle, XCircle,
 } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar, PillSelect, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { formatDistanceToNow } from '@/lib/dates';
 import { colors } from '@/constants/theme';
@@ -27,6 +27,7 @@ const CHOICE_TYPES = new Set(['SINGLE_CHOICE', 'MULTIPLE_CHOICE']);
 
 // ===== TEMPLATE FORM =====
 const TemplateForm = ({ template, onClose }: { template?: any; onClose: () => void }) => {
+  const { showAlert } = useAlert();
   const isEdit = !!template;
   const createTemplate = trpc.onboarding.createTemplate.useMutation();
   const updateTemplate = trpc.onboarding.updateTemplate.useMutation();
@@ -85,8 +86,8 @@ const TemplateForm = ({ template, onClose }: { template?: any; onClose: () => vo
   };
 
   const handleSave = () => {
-    if (!name.trim()) { Alert.alert('Error', 'Template name is required'); return; }
-    if (questions.some((q: any) => !q.label.trim())) { Alert.alert('Error', 'All questions must have text'); return; }
+    if (!name.trim()) { showAlert({ title: 'Error', message: 'Template name is required' }); return; }
+    if (questions.some((q: any) => !q.label.trim())) { showAlert({ title: 'Error', message: 'All questions must have text' }); return; }
 
     const payload = {
       name: name.trim(),
@@ -108,7 +109,7 @@ const TemplateForm = ({ template, onClose }: { template?: any; onClose: () => vo
     mutation.then(() => {
       utils.onboarding.getTemplates.invalidate();
       onClose();
-    }).catch(() => Alert.alert('Error', `Failed to ${isEdit ? 'update' : 'create'} template`));
+    }).catch(() => showAlert({ title: 'Error', message: `Failed to ${isEdit ? 'update' : 'create'} template` }));
   };
 
   return (
@@ -144,17 +145,7 @@ const TemplateForm = ({ template, onClose }: { template?: any; onClose: () => vo
                 <Input label="Question text" value={q.label} onChangeText={(v) => updateQuestion(qi, 'label', v)} placeholder="Enter your question..." />
 
                 <Text className="text-xs font-medium text-foreground">Type</Text>
-                <View className="flex-row flex-wrap gap-1">
-                  {QUESTION_TYPES.map(({ value, label }) => (
-                    <TouchableOpacity
-                      key={value}
-                      className={`px-2.5 py-1.5 rounded-lg border ${q.type === value ? 'border-teal bg-teal/10' : 'border-border'}`}
-                      onPress={() => updateQuestion(qi, 'type', value)}
-                    >
-                      <Text className={`text-xs ${q.type === value ? 'text-teal' : 'text-muted-foreground'}`}>{label}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                <PillSelect options={QUESTION_TYPES} value={q.type} onChange={(v: string) => updateQuestion(qi, 'type', v)} />
 
                 {CHOICE_TYPES.has(q.type) && (
                   <View className="gap-2">
@@ -213,6 +204,7 @@ const TemplateForm = ({ template, onClose }: { template?: any; onClose: () => vo
 
 // ===== REVIEW MODAL =====
 const ReviewModal = ({ response, onClose }: { response: any; onClose: () => void }) => {
+  const { showAlert } = useAlert();
   const [notes, setNotes] = useState('');
   const reviewMutation = trpc.onboarding.reviewResponse.useMutation();
   const utils = trpc.useUtils();
@@ -227,7 +219,7 @@ const ReviewModal = ({ response, onClose }: { response: any; onClose: () => void
           utils.clientRoster.list.invalidate();
           onClose();
         },
-        onError: () => Alert.alert('Error', 'Failed to submit review'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to submit review' }),
       },
     );
   };
@@ -339,6 +331,7 @@ const STATUS_ICONS: Record<string, { icon: any; color: string; label: string }> 
 };
 
 const OnboardingScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const [tab, setTab] = useState<OnboardingTab>('templates');
   const [editTemplate, setEditTemplate] = useState<any>(null);
@@ -403,10 +396,14 @@ const OnboardingScreen = () => {
                       <Pencil size={16} color={colors.mutedForeground} />
                     </TouchableOpacity>
                     <TouchableOpacity className="w-8 h-8 items-center justify-center rounded-lg" onPress={() => {
-                      Alert.alert('Delete Template', `Delete "${item.name}"?`, [
-                        { text: 'Cancel', style: 'cancel' },
-                        { text: 'Delete', style: 'destructive', onPress: () => deleteTemplate.mutate({ id: item.id }, { onSuccess: () => { utils.onboarding.getTemplates.invalidate(); } }) },
-                      ]);
+                      showAlert({
+                        title: 'Delete Template',
+                        message: `Delete "${item.name}"?`,
+                        actions: [
+                          { label: 'Delete', variant: 'destructive', onPress: () => deleteTemplate.mutate({ id: item.id }, { onSuccess: () => { utils.onboarding.getTemplates.invalidate(); } }) },
+                          { label: 'Cancel', variant: 'outline' },
+                        ],
+                      });
                     }}>
                       <Trash2 size={16} color={colors.destructive} />
                     </TouchableOpacity>

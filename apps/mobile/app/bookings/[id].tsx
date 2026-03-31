@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, ScrollView, Alert, Linking, Modal } from 'react-native';
+import { View, ScrollView, Linking, Modal } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -14,7 +14,7 @@ import {
   AlertTriangle,
 } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Card, CardContent, Skeleton, Badge } from '@/components/ui';
+import { Text, Button, Card, CardContent, Skeleton, Badge, useAlert } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { Calendar as RNCalendar } from 'react-native-calendars';
 import {
@@ -42,6 +42,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const BookingDetailScreen = () => {
+  const { showAlert } = useAlert();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user, role } = useAuth();
@@ -102,24 +103,36 @@ const BookingDetailScreen = () => {
   const canNoShow = isConfirmed && isTrainer;
 
   const handleConfirm = () => {
-    Alert.alert('Confirm Booking', `Confirm this session with ${otherName}?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Confirm', onPress: () => confirmBooking.mutate({ id: booking.id }, { onSuccess: () => router.back() }) },
-    ]);
+    showAlert({
+      title: 'Confirm Booking',
+      message: `Confirm this session with ${otherName}?`,
+      actions: [
+        { label: 'Confirm', onPress: () => confirmBooking.mutate({ id: booking.id }, { onSuccess: () => router.back() }) },
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   const handleDecline = () => {
-    Alert.alert('Decline Booking', 'Are you sure you want to decline?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Decline', style: 'destructive', onPress: () => declineBooking.mutate({ id: booking.id }, { onSuccess: () => router.back() }) },
-    ]);
+    showAlert({
+      title: 'Decline Booking',
+      message: 'Are you sure you want to decline?',
+      actions: [
+        { label: 'Decline', variant: 'destructive', onPress: () => declineBooking.mutate({ id: booking.id }, { onSuccess: () => router.back() }) },
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   const handleCancel = () => {
-    Alert.alert('Cancel Booking', 'Are you sure you want to cancel?', [
-      { text: 'No', style: 'cancel' },
-      { text: 'Cancel Booking', style: 'destructive', onPress: () => cancelBooking.mutate({ id: booking.id }, { onSuccess: () => router.back() }) },
-    ]);
+    showAlert({
+      title: 'Cancel Booking',
+      message: 'Are you sure you want to cancel?',
+      actions: [
+        { label: 'Cancel Booking', variant: 'destructive', onPress: () => cancelBooking.mutate({ id: booking.id }, { onSuccess: () => router.back() }) },
+        { label: 'No', variant: 'outline' },
+      ],
+    });
   };
 
   const handleComplete = () => {
@@ -127,10 +140,14 @@ const BookingDetailScreen = () => {
   };
 
   const handleNoShow = () => {
-    Alert.alert('Mark No Show', 'Mark this client as a no-show?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'No Show', style: 'destructive', onPress: () => noShowBooking.mutate({ id: booking.id }, { onSuccess: () => router.back() }) },
-    ]);
+    showAlert({
+      title: 'Mark No Show',
+      message: 'Mark this client as a no-show?',
+      actions: [
+        { label: 'No Show', variant: 'destructive', onPress: () => noShowBooking.mutate({ id: booking.id }, { onSuccess: () => router.back() }) },
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   return (
@@ -295,7 +312,7 @@ const BookingDetailScreen = () => {
                       className={`px-4 py-3 rounded-lg border ${rescheduleSlot?.startTime === slot.startTime ? 'border-teal bg-teal/10' : 'border-border bg-card'}`}
                       onPress={() => setRescheduleSlot(slot)}
                     >
-                      <Text className={`text-sm ${rescheduleSlot?.startTime === slot.startTime ? 'text-primary font-semibold' : 'text-foreground'}`}>
+                      <Text className={`text-sm ${rescheduleSlot?.startTime === slot.startTime ? 'text-teal font-semibold' : 'text-foreground'}`}>
                         {slot.startTime} - {slot.endTime}
                       </Text>
                     </TouchableOpacity>

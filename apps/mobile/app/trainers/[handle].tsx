@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, ScrollView, Image, Alert, Linking, Modal, Dimensions } from 'react-native';
+import { View, ScrollView, Image, Linking, Modal, Dimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -8,11 +8,12 @@ import {
   Phone, Home, Car, ArrowLeftRight, ShoppingBag, BookOpen, X,
 } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Input, Card, CardContent, Skeleton, Badge } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, Skeleton, Badge, useAlert } from '@/components/ui';
 import { useTrainerByHandle } from '@/api/trainer';
 import { useAuth } from '@/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
-import { TRAINER_SERVICES, TRAINER_QUALIFICATIONS } from '@fitnassist/schemas';
+import { TRAINER_SERVICES } from '@fitnassist/schemas/src/constants/services.constants';
+import { TRAINER_QUALIFICATIONS } from '@fitnassist/schemas/src/constants/qualifications.constants';
 import Constants from 'expo-constants';
 import { colors } from '@/constants/theme';
 import { GradientBackground } from '@/components/GradientBackground';
@@ -40,6 +41,7 @@ const TRAVEL_INFO: Record<string, { icon: any; label: string; desc: string }> = 
 };
 
 const TrainerProfileScreen = () => {
+  const { showAlert } = useAlert();
   const { handle } = useLocalSearchParams<{ handle: string }>();
   const router = useRouter();
   const { user, role } = useAuth();
@@ -113,18 +115,18 @@ const TrainerProfileScreen = () => {
   };
 
   const handleConnect = () => {
-    if (!connectMsg.trim()) { Alert.alert('Error', 'Please enter a message'); return; }
+    if (!connectMsg.trim()) { showAlert({ title: 'Error', message: 'Please enter a message' }); return; }
     submitConnect.mutate({ trainerId: t?.id, message: connectMsg } as any, {
-      onSuccess: () => { setShowConnect(false); setConnectMsg(''); Alert.alert('Sent', 'Connection request sent!'); pendingCheck.refetch(); },
-      onError: () => Alert.alert('Error', 'Failed to send request'),
+      onSuccess: () => { setShowConnect(false); setConnectMsg(''); showAlert({ title: 'Sent', message: 'Connection request sent!' }); pendingCheck.refetch(); },
+      onError: () => showAlert({ title: 'Error', message: 'Failed to send request' }),
     });
   };
 
   const handleCallback = () => {
-    if (!callbackPhone.trim()) { Alert.alert('Error', 'Please enter your phone number'); return; }
+    if (!callbackPhone.trim()) { showAlert({ title: 'Error', message: 'Please enter your phone number' }); return; }
     submitCallback.mutate({ trainerId: t?.id, phone: callbackPhone, message: callbackMsg || undefined } as any, {
-      onSuccess: () => { setShowCallback(false); setCallbackPhone(''); setCallbackMsg(''); Alert.alert('Sent', 'Callback request sent!'); pendingCheck.refetch(); },
-      onError: () => Alert.alert('Error', 'Failed to send request'),
+      onSuccess: () => { setShowCallback(false); setCallbackPhone(''); setCallbackMsg(''); showAlert({ title: 'Sent', message: 'Callback request sent!' }); pendingCheck.refetch(); },
+      onError: () => showAlert({ title: 'Error', message: 'Failed to send request' }),
     });
   };
 
@@ -429,12 +431,20 @@ const TrainerProfileScreen = () => {
       {user && role === 'TRAINEE' && t.userId !== user.id && (
         <View className="absolute bottom-0 left-0 right-0 bg-background border-t border-border px-4 pt-3 pb-6">
           {isConnected ? (
-            <Button onPress={() => connectionId && router.push(`/messages/${connectionId}`)}>
-              <View className="flex-row items-center gap-2">
-                <MessageCircle size={16} color="#fff" />
-                <Text className="text-white font-semibold">Send Message</Text>
-              </View>
-            </Button>
+            <View className="flex-row gap-2">
+              <Button variant="outline" className="flex-1" onPress={() => connectionId && router.push(`/messages/${connectionId}`)}>
+                <View className="flex-row items-center gap-1">
+                  <MessageCircle size={14} color={colors.foreground} />
+                  <Text className="text-foreground font-semibold">Message</Text>
+                </View>
+              </Button>
+              <Button className="flex-1" onPress={() => t?.id && router.push(`/bookings/book/${t.id}`)}>
+                <View className="flex-row items-center gap-1">
+                  <BookOpen size={14} color="#fff" />
+                  <Text className="text-white font-semibold">Book Session</Text>
+                </View>
+              </Button>
+            </View>
           ) : isPending ? (
             <Button disabled variant="outline">Request Pending</Button>
           ) : (

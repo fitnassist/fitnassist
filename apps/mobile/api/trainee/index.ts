@@ -16,3 +16,11 @@ export const useUpdateTraineeProfile = () => {
 export const useNutritionTargets = () => {
   return trpc.trainee.getNutritionTargets.useQuery();
 };
+
+export const useTraineeByHandle = (handle: string) => {
+  return trpc.trainee.getByHandle.useQuery({ handle }, { enabled: !!handle });
+};
+
+export const usePublicProfileData = (handle: string) => {
+  return trpc.trainee.getPublicProfileData.useQuery({ handle }, { enabled: !!handle });
+};

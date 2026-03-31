@@ -4,14 +4,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, Button, Input } from '@/components/ui';
+import { Text, Button, Input, useAlert } from '@/components/ui';
 import { GradientBackground } from '@/components/GradientBackground';
 import { authClient } from '@/lib/auth';
 
@@ -22,6 +21,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPasswordScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -38,13 +38,13 @@ const ForgotPasswordScreen = () => {
         redirectTo: 'fitnassist://reset-password',
       } as never);
 
-      Alert.alert(
-        'Check Your Email',
-        'If an account exists with that email, we sent a password reset link.',
-        [{ text: 'OK', onPress: () => router.back() }],
-      );
+      showAlert({
+        title: 'Check Your Email',
+        message: 'If an account exists with that email, we sent a password reset link.',
+        actions: [{ label: 'OK', onPress: () => router.back() }],
+      });
     } catch {
-      Alert.alert('Error', 'Something went wrong. Please try again.');
+      showAlert({ title: 'Error', message: 'Something went wrong. Please try again.' });
     } finally {
       setLoading(false);
     }

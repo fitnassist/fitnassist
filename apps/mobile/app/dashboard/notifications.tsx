@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { View, ScrollView, Switch, Alert } from 'react-native';
+import { View, ScrollView, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Input, Card, CardContent, Skeleton } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, Skeleton, useAlert } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
@@ -34,12 +34,13 @@ const ToggleRow = ({ label, description, value, onToggle }: ToggleRowProps) => (
 const Divider = () => <View className="border-b border-border" />;
 
 const NotificationsScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const { role } = useAuth();
   const isTrainer = role === 'TRAINER';
   const { data: prefs, isLoading } = trpc.user.getNotificationPreferences.useQuery();
   const update = trpc.user.updateNotificationPreferences.useMutation({
-    onError: () => Alert.alert('Error', 'Failed to update preferences'),
+    onError: () => showAlert({ title: 'Error', message: 'Failed to update preferences' }),
   });
   const updatePhone = trpc.user.updatePhoneNumber.useMutation();
   const utils = trpc.useUtils();
@@ -125,10 +126,10 @@ const NotificationsScreen = () => {
             <View className="py-3 gap-2">
               <Input label="Phone Number" value={phone} onChangeText={setPhone} placeholder="+447123456789" keyboardType="phone-pad" />
               <Button size="sm" variant="outline" onPress={() => {
-                if (!phone.match(/^\+[1-9]\d{6,14}$/)) { Alert.alert('Error', 'Enter a valid phone number in E.164 format (e.g. +447123456789)'); return; }
+                if (!phone.match(/^\+[1-9]\d{6,14}$/)) { showAlert({ title: 'Error', message: 'Enter a valid phone number in E.164 format (e.g. +447123456789)' }); return; }
                 updatePhone.mutate({ phoneNumber: phone }, {
-                  onSuccess: () => Alert.alert('Success', 'Phone number updated'),
-                  onError: () => Alert.alert('Error', 'Failed to update phone number'),
+                  onSuccess: () => showAlert({ title: 'Success', message: 'Phone number updated' }),
+                  onError: () => showAlert({ title: 'Error', message: 'Failed to update phone number' }),
                 });
               }} loading={updatePhone.isPending}>Save Phone Number</Button>
             </View>

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { View, FlatList, RefreshControl, Image, Alert, TextInput } from 'react-native';
+import { View, FlatList, RefreshControl, Image, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Heart, MessageCircle, Send } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Skeleton } from '@/components/ui';
+import { Text, Button, Skeleton, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { formatDistanceToNow } from '@/lib/dates';
 import { colors } from '@/constants/theme';
@@ -50,6 +50,7 @@ const PostCard = ({ post, onLike, onUnlike }: { post: any; onLike: () => void; o
 };
 
 const FeedScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const { data, isLoading, refetch, fetchNextPage, hasNextPage } = trpc.post.getFeed.useInfiniteQuery(
     { limit: 20 },
@@ -70,7 +71,7 @@ const FeedScreen = () => {
           setPostText('');
           utils.post.getFeed.invalidate();
         },
-        onError: () => Alert.alert('Error', 'Failed to create post'),
+        onError: () => showAlert({ title: 'Error', message: 'Failed to create post' }),
       },
     );
   };

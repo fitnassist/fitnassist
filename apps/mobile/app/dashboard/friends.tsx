@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { View, FlatList, RefreshControl, Image, Alert, ScrollView } from 'react-native';
+import { View, FlatList, RefreshControl, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, UserPlus, UserMinus, Check, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Skeleton, Card, CardContent, TabBar } from '@/components/ui';
+import { Text, Skeleton, TabBar, useAlert } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/hooks/useAuth';
 import { colors } from '@/constants/theme';
@@ -12,6 +12,7 @@ import { colors } from '@/constants/theme';
 type Tab = 'friends' | 'requests' | 'sent' | 'following' | 'blocked';
 
 const FriendsScreen = () => {
+  const { showAlert } = useAlert();
   const router = useRouter();
   const { user } = useAuth();
   const [tab, setTab] = useState<Tab>('friends');
@@ -50,10 +51,14 @@ const FriendsScreen = () => {
   };
 
   const handleRemove = (id: string) => {
-    Alert.alert('Remove Friend', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Remove', style: 'destructive', onPress: () => removeFriend.mutate({ friendshipId: id }, { onSuccess: invalidate }) },
-    ]);
+    showAlert({
+      title: 'Remove Friend',
+      message: 'Are you sure?',
+      actions: [
+        { label: 'Remove', variant: 'destructive', onPress: () => removeFriend.mutate({ friendshipId: id }, { onSuccess: invalidate }) },
+        { label: 'Cancel', variant: 'outline' },
+      ],
+    });
   };
 
   const friendsList = Array.isArray(friends) ? friends : (friends as any)?.friends ?? [];
@@ -78,52 +83,61 @@ const FriendsScreen = () => {
       : tab === 'sent' ? item.receiver
       : tab === 'following' ? item.following
       : item.blockedUser ?? item;
-    const name = person?.name ?? 'Unknown';
-    const image = person?.traineeProfile?.avatarUrl ?? person?.image ?? null;
+    const name = person?.trainerProfile?.displayName ?? person?.name ?? 'Unknown';
+    const image = person?.trainerProfile?.profileImageUrl ?? person?.traineeProfile?.avatarUrl ?? person?.image ?? null;
+    const trainerHandle = person?.trainerProfile?.handle;
+    const traineeHandle = person?.traineeProfile?.handle;
+    const profilePath = trainerHandle
+      ? `/trainers/${trainerHandle}`
+      : traineeHandle
+      ? `/users/${traineeHandle}`
+      : null;
 
     return (
-      <Card className="mx-4 mb-2">
-        <CardContent className="py-3 px-4 flex-row items-center gap-3">
-          {image ? (
-            <Image source={{ uri: image }} className="w-10 h-10 rounded-full" />
-          ) : (
-            <View className="w-10 h-10 rounded-full bg-secondary items-center justify-center">
-              <Text className="text-sm font-semibold text-foreground">{name.charAt(0).toUpperCase()}</Text>
-            </View>
-          )}
-          <Text className="flex-1 text-base font-medium text-foreground">{name}</Text>
+      <TouchableOpacity
+        className="flex-row items-center px-4 py-3 border-b border-border gap-3"
+        activeOpacity={profilePath ? 0.6 : 1}
+        onPress={() => profilePath && router.push(profilePath as any)}
+      >
+        {image ? (
+          <Image source={{ uri: image }} className="w-10 h-10 rounded-full" />
+        ) : (
+          <View className="w-10 h-10 rounded-full bg-secondary items-center justify-center">
+            <Text className="text-sm font-semibold text-foreground">{name.charAt(0).toUpperCase()}</Text>
+          </View>
+        )}
+        <Text className="flex-1 text-sm font-medium text-foreground">{name}</Text>
 
-          {tab === 'friends' && (
-            <TouchableOpacity onPress={() => handleRemove(item.id)}>
-              <UserMinus size={18} color={colors.mutedForeground} />
+        {tab === 'friends' && (
+          <TouchableOpacity hitSlop={8} onPress={() => handleRemove(item.id)}>
+            <UserMinus size={18} color={colors.mutedForeground} />
+          </TouchableOpacity>
+        )}
+        {tab === 'following' && (
+          <TouchableOpacity
+            className="px-3 py-1.5 rounded-full border border-border bg-card"
+            hitSlop={8}
+            onPress={() => unfollowUser.mutate({ followingId: person?.id }, { onSuccess: invalidate })}
+          >
+            <Text className="text-xs text-muted-foreground">Unfollow</Text>
+          </TouchableOpacity>
+        )}
+        {tab === 'blocked' && (
+          <TouchableOpacity hitSlop={8} onPress={() => unblockUser.mutate({ userId: person?.id } as any, { onSuccess: invalidate })}>
+            <Text className="text-xs text-teal">Unblock</Text>
+          </TouchableOpacity>
+        )}
+        {tab === 'requests' && (
+          <View className="flex-row gap-2">
+            <TouchableOpacity className="bg-primary rounded-full w-8 h-8 items-center justify-center" onPress={() => handleAccept(item.id)}>
+              <Check size={16} color="#fff" />
             </TouchableOpacity>
-          )}
-          {tab === 'following' && (
-            <TouchableOpacity onPress={() => {
-              unfollowUser.mutate({ userId: person?.id } as any, { onSuccess: invalidate });
-            }}>
-              <Text className="text-xs text-muted-foreground">Unfollow</Text>
+            <TouchableOpacity className="bg-secondary rounded-full w-8 h-8 items-center justify-center" onPress={() => handleDecline(item.id)}>
+              <X size={16} color={colors.mutedForeground} />
             </TouchableOpacity>
-          )}
-          {tab === 'blocked' && (
-            <TouchableOpacity onPress={() => {
-              unblockUser.mutate({ userId: person?.id } as any, { onSuccess: invalidate });
-            }}>
-              <Text className="text-xs text-teal">Unblock</Text>
-            </TouchableOpacity>
-          )}
-          {tab === 'requests' && (
-            <View className="flex-row gap-2">
-              <TouchableOpacity className="bg-primary rounded-full w-8 h-8 items-center justify-center" onPress={() => handleAccept(item.id)}>
-                <Check size={16} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity className="bg-secondary rounded-full w-8 h-8 items-center justify-center" onPress={() => handleDecline(item.id)}>
-                <X size={16} color={colors.mutedForeground} />
-              </TouchableOpacity>
-            </View>
-          )}
-        </CardContent>
-      </Card>
+          </View>
+        )}
+      </TouchableOpacity>
     );
   };
 
