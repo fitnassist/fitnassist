@@ -10,9 +10,12 @@ import { formatDistanceToNow } from '@/lib/dates';
 import { colors } from '@/constants/theme';
 
 const PostCard = ({ post, onLike, onUnlike }: { post: any; onLike: () => void; onUnlike: () => void }) => {
-  const isLiked = post.isLiked ?? false;
-  const authorName = post.author?.name ?? 'Unknown';
-  const authorImage = post.author?.traineeProfile?.avatarUrl ?? post.author?.image ?? null;
+  const isLiked = post.hasLiked ?? false;
+  const user = post.user;
+  const authorName = user?.name ?? 'Unknown';
+  const authorImage = user?.role === 'TRAINER'
+    ? (user?.trainerProfile?.profileImageUrl ?? user?.image)
+    : (user?.traineeProfile?.avatarUrl ?? user?.image) ?? null;
 
   return (
     <View className="px-4 py-4 border-b border-border">
@@ -75,11 +78,11 @@ const FeedScreen = () => {
   const posts = data?.pages.flatMap((p: any) => p.items ?? p) ?? [];
 
   const handleLike = (postId: string) => {
-    likeMutation.mutate({ postId }, { onSuccess: () => utils.post.getFeed.invalidate() });
+    likeMutation.mutate({ postId }, { onSuccess: () => { utils.post.getFeed.invalidate(); utils.post.getFeed.refetch(); } });
   };
 
   const handleUnlike = (postId: string) => {
-    unlikeMutation.mutate({ postId }, { onSuccess: () => utils.post.getFeed.invalidate() });
+    unlikeMutation.mutate({ postId }, { onSuccess: () => { utils.post.getFeed.invalidate(); utils.post.getFeed.refetch(); } });
   };
 
   return (
