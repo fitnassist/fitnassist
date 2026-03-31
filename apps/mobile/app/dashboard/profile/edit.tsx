@@ -934,35 +934,8 @@ const PrivacyRow = ({ label, desc, value, onChange }: { label: string; desc?: st
   </View>
 );
 
-const PrivacyTabContent = () => {
-  const { data: settings, isLoading } = trpc.trainee.getPrivacySettings.useQuery();
-  const updatePrivacy = trpc.trainee.updatePrivacySettings.useMutation();
-  const { showAlert } = useAlert();
-  const utils = trpc.useUtils();
-  const [local, setLocal] = useState<Record<string, string>>({});
-  const [initialized, setInitialized] = useState(false);
-
-  // Init local state from fetched settings
-  if (settings && !initialized) {
-    const s: Record<string, string> = {};
-    for (const key of [...PROFILE_SETTINGS, ...TREND_SETTINGS].map((x) => x.key)) {
-      s[key] = (settings as any)?.[key] ?? 'ONLY_ME';
-    }
-    setLocal(s);
-    setInitialized(true);
-  }
-
-  const handleSave = () => {
-    updatePrivacy.mutate(local as any, {
-      onSuccess: () => {
-        utils.trainee.getPrivacySettings.invalidate();
-        showAlert({ title: 'Saved', message: 'Privacy settings updated', icon: <CheckIcon size={32} color={colors.teal} /> });
-      },
-      onError: () => showAlert({ title: 'Error', message: 'Failed to save privacy settings', icon: <XCircle size={32} color={colors.destructive} /> }),
-    });
-  };
-
-  if (isLoading) return <Skeleton className="h-40 rounded-lg" />;
+const PrivacyTabContent = ({ privacySettings, onChangePrivacy }: { privacySettings: Record<string, string>; onChangePrivacy: (s: Record<string, string>) => void }) => {
+  const setVal = (key: string, value: string) => onChangePrivacy({ ...privacySettings, [key]: value });
 
   return (
     <>
@@ -971,7 +944,7 @@ const PrivacyTabContent = () => {
           <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Sections</Text>
           <Text className="text-xs text-muted-foreground mb-1">Control who can see different parts of your profile.</Text>
           {PROFILE_SETTINGS.map(({ key, label, desc }) => (
-            <PrivacyRow key={key} label={label} desc={desc} value={local[key] ?? 'ONLY_ME'} onChange={(v) => setLocal((s) => ({ ...s, [key]: v }))} />
+            <PrivacyRow key={key} label={label} desc={desc} value={privacySettings[key] ?? 'ONLY_ME'} onChange={(v) => setVal(key, v)} />
           ))}
         </CardContent>
       </Card>
@@ -981,7 +954,7 @@ const PrivacyTabContent = () => {
           <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Trend Charts</Text>
           <Text className="text-xs text-muted-foreground mb-1">Control who can see each type of trend data on your profile.</Text>
           {TREND_SETTINGS.map(({ key, label }) => (
-            <PrivacyRow key={key} label={label} value={local[key] ?? 'ONLY_ME'} onChange={(v) => setLocal((s) => ({ ...s, [key]: v }))} />
+            <PrivacyRow key={key} label={label} value={privacySettings[key] ?? 'ONLY_ME'} onChange={(v) => setVal(key, v)} />
           ))}
         </CardContent>
       </Card>
@@ -993,8 +966,6 @@ const PrivacyTabContent = () => {
           </Text>
         </CardContent>
       </Card>
-
-      <Button onPress={handleSave} loading={updatePrivacy.isPending}>Save Privacy Settings</Button>
     </>
   );
 };
@@ -1128,9 +1099,23 @@ const NutritionTabContent = ({ fields, update, profile }: { fields: Record<strin
 const TraineeProfileEdit = () => {
   const { data: profile, isLoading } = useMyTraineeProfile();
   const updateProfile = useUpdateTraineeProfile();
+  const updatePrivacy = trpc.trainee.updatePrivacySettings.useMutation();
+  const { data: privacyData } = trpc.trainee.getPrivacySettings.useQuery();
   const getUploadParams = trpc.upload.getUploadParams.useMutation();
   const [tab, setTab] = useState<TraineeTab>('personal');
   const [fields, setFields] = useState<Record<string, any>>({});
+  const [privacyLocal, setPrivacyLocal] = useState<Record<string, string>>({});
+  const [privacyInitialized, setPrivacyInitialized] = useState(false);
+
+  // Init privacy from fetched data
+  if (privacyData && !privacyInitialized) {
+    const s: Record<string, string> = {};
+    for (const key of [...PROFILE_SETTINGS, ...TREND_SETTINGS].map((x) => x.key)) {
+      s[key] = (privacyData as any)?.[key] ?? 'ONLY_ME';
+    }
+    setPrivacyLocal(s);
+    setPrivacyInitialized(true);
+  }
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -1185,6 +1170,8 @@ const TraineeProfileEdit = () => {
     }
   };
 
+  const { showAlert } = useAlert();
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -1193,10 +1180,15 @@ const TraineeProfileEdit = () => {
         if (data[key] !== '' && data[key] != null) data[key] = parseFloat(data[key]);
         else delete data[key];
       }
-      await updateProfile.mutateAsync(data);
-      Alert.alert('Success', 'Profile updated');
+      // Save profile + privacy in parallel
+      const promises: Promise<any>[] = [updateProfile.mutateAsync(data)];
+      if (Object.keys(privacyLocal).length > 0) {
+        promises.push(updatePrivacy.mutateAsync(privacyLocal as any));
+      }
+      await Promise.all(promises);
+      showAlert({ title: 'Profile Updated', icon: <CheckIcon size={32} color={colors.teal} /> });
     } catch {
-      Alert.alert('Error', 'Failed to update profile');
+      showAlert({ title: 'Error', message: 'Failed to update profile', icon: <XCircle size={32} color={colors.destructive} /> });
     } finally {
       setSaving(false);
     }
@@ -1340,7 +1332,7 @@ const TraineeProfileEdit = () => {
           <NutritionTabContent fields={fields} update={update} profile={profile} />
         )}
 
-        {tab === 'privacy' && <PrivacyTabContent />}
+        {tab === 'privacy' && <PrivacyTabContent privacySettings={privacyLocal} onChangePrivacy={setPrivacyLocal} />}
 
         <Button onPress={handleSave} loading={saving}>Save Changes</Button>
       </ScrollView>
