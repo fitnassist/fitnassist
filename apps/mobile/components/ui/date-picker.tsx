@@ -18,10 +18,19 @@ interface DatePickerProps {
 
 export const DatePicker = ({ value, onChange, placeholder = 'Select date', label, minDate, maxDate }: DatePickerProps) => {
   const [show, setShow] = useState(false);
-  const [tempDate, setTempDate] = useState<Date>(value ? new Date(value + 'T12:00:00') : new Date());
+
+  const parseDate = (v: string): Date => {
+    if (!v) return new Date();
+    // Handle YYYY-MM-DD, full ISO strings, or Date objects stringified
+    const dateStr = v.includes('T') ? v.split('T')[0]! : v;
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y!, (m ?? 1) - 1, d ?? 1, 12, 0, 0);
+  };
+
+  const [tempDate, setTempDate] = useState<Date>(parseDate(value));
 
   const displayText = value
-    ? new Date(value + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? parseDate(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
     : placeholder;
 
   const handleChange = (_event: any, selected?: Date) => {

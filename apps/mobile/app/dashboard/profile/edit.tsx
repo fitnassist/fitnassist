@@ -1124,7 +1124,11 @@ const TraineeProfileEdit = () => {
       setFields({
         avatarUrl: (profile as any).avatarUrl ?? null,
         bio: (profile as any).bio ?? '',
-        dateOfBirth: (profile as any).dateOfBirth ?? '',
+        dateOfBirth: (profile as any).dateOfBirth
+          ? (typeof (profile as any).dateOfBirth === 'string'
+            ? (profile as any).dateOfBirth.split('T')[0]
+            : new Date((profile as any).dateOfBirth).toISOString().split('T')[0])
+          : '',
         gender: (profile as any).gender ?? '',
         heightCm: (profile as any).heightCm ?? '',
         startWeightKg: (profile as any).startWeightKg ?? '',
