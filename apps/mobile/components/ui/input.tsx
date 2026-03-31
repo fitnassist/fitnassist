@@ -7,7 +7,7 @@ export type InputProps = TextInputProps & {
   variant?: 'default' | 'dark';
 };
 
-export const Input = ({ label, error, variant = 'default', className, ...props }: InputProps) => {
+export const Input = ({ label, error, variant = 'default', className, multiline, style, ...props }: InputProps) => {
   const isDark = variant === 'dark';
 
   return (
@@ -18,7 +18,7 @@ export const Input = ({ label, error, variant = 'default', className, ...props }
         </Text>
       )}
       <View
-        className={`h-12 rounded-lg border justify-center ${
+        className={`rounded-lg border ${multiline ? 'py-3' : 'h-12 justify-center'} ${
           isDark
             ? 'border-white/20 bg-white/10'
             : 'border-border bg-background'
@@ -26,9 +26,10 @@ export const Input = ({ label, error, variant = 'default', className, ...props }
       >
         <TextInput
           className={`px-4 ${isDark ? 'text-white' : 'text-foreground'} ${className ?? ''}`}
-          style={{ fontSize: 16, margin: 0, padding: 0 }}
+          style={[{ fontSize: 16, margin: 0, padding: 0 }, multiline && { textAlignVertical: 'top' as const }, style]}
           placeholderTextColor={isDark ? 'rgba(255,255,255,0.4)' : 'hsl(230, 10%, 55%)'}
           autoCapitalize="none"
+          multiline={multiline}
           {...props}
         />
       </View>

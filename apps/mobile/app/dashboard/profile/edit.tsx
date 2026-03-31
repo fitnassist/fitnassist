@@ -664,7 +664,7 @@ const TrainerProfileEdit = () => {
                   </View>
                 )}
                 <Input label="Display Name" value={fields.displayName} onChangeText={(v) => update('displayName', v)} />
-                <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={6} />
+                <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={6} style={{ minHeight: 120, textAlignVertical: 'top' }} />
                 <Text className="text-xs text-muted-foreground">{(fields.bio ?? '').length}/2000 characters</Text>
               </CardContent>
             </Card>
