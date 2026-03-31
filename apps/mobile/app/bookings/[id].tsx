@@ -292,7 +292,7 @@ const BookingDetailScreen = () => {
                   {(rescheduleSlots as any[]).map((slot: any) => (
                     <TouchableOpacity
                       key={slot.startTime}
-                      className={`px-4 py-3 rounded-lg border ${rescheduleSlot?.startTime === slot.startTime ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                      className={`px-4 py-3 rounded-lg border ${rescheduleSlot?.startTime === slot.startTime ? 'border-teal bg-teal/10' : 'border-border bg-card'}`}
                       onPress={() => setRescheduleSlot(slot)}
                     >
                       <Text className={`text-sm ${rescheduleSlot?.startTime === slot.startTime ? 'text-primary font-semibold' : 'text-foreground'}`}>

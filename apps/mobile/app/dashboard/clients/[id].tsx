@@ -138,11 +138,11 @@ const ClientDetailScreen = () => {
                     <TouchableOpacity
                       key={s}
                       className={`px-3 py-2 rounded-lg border-2 ${
-                        status === s ? 'border-primary bg-primary/10' : 'border-border'
+                        status === s ? 'border-teal bg-teal/10' : 'border-border'
                       }`}
                       onPress={() => handleStatusChange(s)}
                     >
-                      <Text className={`text-xs font-medium ${status === s ? 'text-primary' : 'text-muted-foreground'}`}>
+                      <Text className={`text-xs font-medium ${status === s ? 'text-teal' : 'text-muted-foreground'}`}>
                         {s.replace('_', ' ')}
                       </Text>
                     </TouchableOpacity>

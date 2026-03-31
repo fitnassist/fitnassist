@@ -58,7 +58,7 @@ export const ActivityLogger = ({ visible, onClose, date }: ActivityLoggerProps) 
         {ACTIVITY_TYPES.map((type) => (
           <TouchableOpacity
             key={type}
-            className={`px-3 py-2 rounded-lg border ${activityType === type ? 'border-primary bg-primary/10' : 'border-border'}`}
+            className={`px-3 py-2 rounded-lg border ${activityType === type ? 'border-teal bg-teal/10' : 'border-border'}`}
             onPress={() => setActivityType(type)}
           >
             <Text className={`text-xs font-medium ${activityType === type ? 'text-primary' : 'text-muted-foreground'}`}>

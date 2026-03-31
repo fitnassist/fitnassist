@@ -126,10 +126,10 @@ const GoalsScreen = () => {
                 {(['TARGET', 'HABIT'] as const).map((t) => (
                   <TouchableOpacity
                     key={t}
-                    className={`flex-1 items-center py-3 rounded-lg border-2 ${newGoal.type === t ? 'border-primary bg-primary/10' : 'border-border'}`}
+                    className={`flex-1 items-center py-3 rounded-lg border-2 ${newGoal.type === t ? 'border-teal bg-teal/10' : 'border-border'}`}
                     onPress={() => setNewGoal((g) => ({ ...g, type: t }))}
                   >
-                    <Text className={`text-sm font-medium ${newGoal.type === t ? 'text-primary' : 'text-muted-foreground'}`}>{t}</Text>
+                    <Text className={`text-sm font-medium ${newGoal.type === t ? 'text-teal' : 'text-muted-foreground'}`}>{t}</Text>
                   </TouchableOpacity>
                 ))}
               </View>

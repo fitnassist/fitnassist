@@ -104,14 +104,14 @@ const CreateBookingScreen = () => {
                     <RNTouchableOpacity
                       key={client.id}
                       className={`flex-row items-center justify-between p-4 rounded-lg border ${
-                        selected ? 'border-primary bg-primary/10' : 'border-border bg-card'
+                        selected ? 'border-teal bg-teal/10' : 'border-border bg-card'
                       }`}
                       onPress={() => {
                         setClientRosterId(client.id);
                         setClientName(name);
                       }}
                     >
-                      <Text className={`text-base ${selected ? 'text-primary font-semibold' : 'text-foreground'}`}>
+                      <Text className={`text-base ${selected ? 'text-teal font-semibold' : 'text-foreground'}`}>
                         {name}
                       </Text>
                       {selected && <Check size={18} color={colors.primary} />}
@@ -187,11 +187,11 @@ const CreateBookingScreen = () => {
                     <RNTouchableOpacity
                       key={slot.startTime}
                       className={`px-4 py-3 rounded-lg border ${
-                        selected ? 'border-primary bg-primary/10' : 'border-border bg-card'
+                        selected ? 'border-teal bg-teal/10' : 'border-border bg-card'
                       }`}
                       onPress={() => setSelectedSlot(slot)}
                     >
-                      <Text className={`text-sm ${selected ? 'text-primary font-semibold' : 'text-foreground'}`}>
+                      <Text className={`text-sm ${selected ? 'text-teal font-semibold' : 'text-foreground'}`}>
                         {slot.startTime} - {slot.endTime}
                       </Text>
                     </RNTouchableOpacity>
@@ -216,21 +216,21 @@ const CreateBookingScreen = () => {
             <View className="flex-row gap-2">
               <RNTouchableOpacity
                 className={`flex-1 items-center py-3 rounded-lg border-2 ${
-                  sessionType === 'IN_PERSON' ? 'border-primary bg-primary/10' : 'border-border'
+                  sessionType === 'IN_PERSON' ? 'border-teal bg-teal/10' : 'border-border'
                 }`}
                 onPress={() => setSessionType('IN_PERSON')}
               >
-                <Text className={`text-sm font-medium ${sessionType === 'IN_PERSON' ? 'text-primary' : 'text-muted-foreground'}`}>
+                <Text className={`text-sm font-medium ${sessionType === 'IN_PERSON' ? 'text-teal' : 'text-muted-foreground'}`}>
                   In Person
                 </Text>
               </RNTouchableOpacity>
               <RNTouchableOpacity
                 className={`flex-1 items-center py-3 rounded-lg border-2 ${
-                  sessionType === 'VIDEO_CALL' ? 'border-primary bg-primary/10' : 'border-border'
+                  sessionType === 'VIDEO_CALL' ? 'border-teal bg-teal/10' : 'border-border'
                 }`}
                 onPress={() => setSessionType('VIDEO_CALL')}
               >
-                <Text className={`text-sm font-medium ${sessionType === 'VIDEO_CALL' ? 'text-primary' : 'text-muted-foreground'}`}>
+                <Text className={`text-sm font-medium ${sessionType === 'VIDEO_CALL' ? 'text-teal' : 'text-muted-foreground'}`}>
                   Video Call
                 </Text>
               </RNTouchableOpacity>

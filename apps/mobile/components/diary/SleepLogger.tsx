@@ -61,7 +61,7 @@ export const SleepLogger = ({ visible, onClose, date }: SleepLoggerProps) => {
           <TouchableOpacity
             key={value}
             className={`flex-1 items-center py-2 rounded-lg border ${
-              quality === value ? 'border-primary bg-primary/10' : 'border-border'
+              quality === value ? 'border-teal bg-teal/10' : 'border-border'
             }`}
             onPress={() => setQuality(value)}
           >

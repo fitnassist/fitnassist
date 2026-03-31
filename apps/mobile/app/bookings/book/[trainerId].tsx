@@ -122,10 +122,10 @@ const BookSessionScreen = () => {
                   return (
                     <TouchableOpacity
                       key={slot.startTime}
-                      className={`px-4 py-3 rounded-lg border ${selected ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}
+                      className={`px-4 py-3 rounded-lg border ${selected ? 'border-teal bg-teal/10' : 'border-border bg-card'}`}
                       onPress={() => setSelectedSlot(slot)}
                     >
-                      <Text className={`text-sm ${selected ? 'text-primary font-semibold' : 'text-foreground'}`}>
+                      <Text className={`text-sm ${selected ? 'text-teal font-semibold' : 'text-foreground'}`}>
                         {slot.startTime} - {slot.endTime}
                       </Text>
                     </TouchableOpacity>
@@ -145,10 +145,10 @@ const BookSessionScreen = () => {
               {(['IN_PERSON', 'VIDEO_CALL'] as const).map((type) => (
                 <TouchableOpacity
                   key={type}
-                  className={`flex-1 items-center py-3 rounded-lg border-2 ${sessionType === type ? 'border-primary bg-primary/10' : 'border-border'}`}
+                  className={`flex-1 items-center py-3 rounded-lg border-2 ${sessionType === type ? 'border-teal bg-teal/10' : 'border-border'}`}
                   onPress={() => setSessionType(type)}
                 >
-                  <Text className={`text-sm font-medium ${sessionType === type ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <Text className={`text-sm font-medium ${sessionType === type ? 'text-teal' : 'text-muted-foreground'}`}>
                     {type === 'VIDEO_CALL' ? 'Video Call' : 'In Person'}
                   </Text>
                 </TouchableOpacity>

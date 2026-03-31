@@ -1,24 +1,35 @@
-import { useState, useEffect } from 'react';
-import { View, ScrollView, Alert, Image, Switch } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { View, ScrollView, Alert, Image, Switch, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Camera, Check } from 'lucide-react-native';
+import { ArrowLeft, Camera, Check, X, MapPin } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Text, Button, Input, Card, CardContent, Skeleton } from '@/components/ui';
+import Constants from 'expo-constants';
+import { Text, Button, Input, Card, CardContent } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile, useUpdateTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile, useUpdateTraineeProfile } from '@/api/trainee';
+import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
 type TrainerTab = 'basic' | 'location' | 'services' | 'media' | 'settings';
 type TraineeTab = 'personal' | 'body' | 'fitness' | 'nutrition' | 'privacy';
+
+const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:3001';
+const GOOGLE_API_KEY = '***REDACTED***';
 
 const TRAINER_SERVICES = [
   'personal-training', 'strength-conditioning', 'weight-loss', 'bodybuilding',
   'sports-performance', 'group-fitness', 'hiit', 'crossfit', 'nutrition-coaching',
   'rehabilitation', 'mobility-flexibility', 'pre-postnatal', 'senior-fitness',
   'stress-management', 'yoga', 'pilates',
+];
+
+const TRAINER_QUALIFICATIONS = [
+  'level-2-gym', 'level-3-pt', 'level-4-specialist', 'cimspa', 'reps',
+  'first-aid', 'sports-massage', 'level-3-nutrition', 'nasm-cpt', 'ace-cpt',
+  'acsm', 'nsca-cscs', 'issa', 'crossfit-l1', 'crossfit-l2', 'precision-nutrition',
 ];
 
 const TRAVEL_OPTIONS = [
@@ -41,11 +52,10 @@ const FITNESS_GOALS = [
   'sports-performance', 'rehabilitation', 'stress-relief', 'body-recomposition',
 ];
 
-const ChipSelect = ({ options, selected, onToggle, multi = true }: {
+const ChipSelect = ({ options, selected, onToggle }: {
   options: string[];
   selected: string[];
   onToggle: (val: string) => void;
-  multi?: boolean;
 }) => (
   <View className="flex-row flex-wrap gap-2">
     {options.map((opt) => {
@@ -53,10 +63,10 @@ const ChipSelect = ({ options, selected, onToggle, multi = true }: {
       return (
         <TouchableOpacity
           key={opt}
-          className={`px-3 py-2 rounded-lg border ${active ? 'border-primary bg-primary/10' : 'border-border'}`}
+          className={`px-3 py-2 rounded-lg border ${active ? 'border-teal bg-teal/10' : 'border-border'}`}
           onPress={() => onToggle(opt)}
         >
-          <Text className={`text-xs font-medium ${active ? 'text-primary' : 'text-muted-foreground'}`}>
+          <Text className={`text-xs font-medium ${active ? 'text-teal' : 'text-muted-foreground'}`}>
             {opt.replace(/-/g, ' ').replace(/_/g, ' ')}
           </Text>
         </TouchableOpacity>
@@ -65,12 +75,124 @@ const ChipSelect = ({ options, selected, onToggle, multi = true }: {
   </View>
 );
 
+// Google Places Autocomplete
+const AddressAutocomplete = ({ value, onSelect }: {
+  value: string;
+  onSelect: (address: { addressLine1: string; city: string; county: string; postcode: string; country: string; latitude: number; longitude: number; placeId: string }) => void;
+}) => {
+  const [query, setQuery] = useState(value);
+  const [predictions, setPredictions] = useState<any[]>([]);
+  const [showPredictions, setShowPredictions] = useState(false);
+
+  const searchPlaces = useCallback(async (text: string) => {
+    if (text.length < 3) { setPredictions([]); return; }
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(text)}&components=country:gb&key=${GOOGLE_API_KEY}`
+      );
+      const data = await res.json();
+      setPredictions(data.predictions ?? []);
+      setShowPredictions(true);
+    } catch {
+      setPredictions([]);
+    }
+  }, []);
+
+  const selectPlace = async (placeId: string, description: string) => {
+    setShowPredictions(false);
+    setQuery(description);
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,geometry&key=${GOOGLE_API_KEY}`
+      );
+      const data = await res.json();
+      const result = data.result;
+      if (!result) return;
+
+      const get = (type: string) => result.address_components?.find((c: any) => c.types.includes(type))?.long_name ?? '';
+
+      onSelect({
+        addressLine1: `${get('street_number')} ${get('route')}`.trim(),
+        city: get('postal_town') || get('locality'),
+        county: get('administrative_area_level_2'),
+        postcode: get('postal_code'),
+        country: get('country'),
+        latitude: result.geometry?.location?.lat ?? 0,
+        longitude: result.geometry?.location?.lng ?? 0,
+        placeId,
+      });
+    } catch {
+      Alert.alert('Error', 'Failed to get address details');
+    }
+  };
+
+  return (
+    <View>
+      <View className="flex-row items-center bg-card border border-border rounded-lg px-3">
+        <MapPin size={16} color={colors.mutedForeground} />
+        <View className="flex-1">
+          <Input
+            value={query}
+            onChangeText={(t) => { setQuery(t); searchPlaces(t); }}
+            placeholder="Search address..."
+            className="border-0"
+          />
+        </View>
+        {query.length > 0 && (
+          <TouchableOpacity onPress={() => { setQuery(''); setPredictions([]); }}>
+            <X size={16} color={colors.mutedForeground} />
+          </TouchableOpacity>
+        )}
+      </View>
+      {showPredictions && predictions.length > 0 && (
+        <View className="bg-card border border-border rounded-lg mt-1 max-h-48">
+          {predictions.map((p: any) => (
+            <TouchableOpacity
+              key={p.place_id}
+              className="px-3 py-2.5 border-b border-border"
+              onPress={() => selectPlace(p.place_id, p.description)}
+            >
+              <Text className="text-sm text-foreground" numberOfLines={1}>{p.description}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+};
+
+// Upload helper
+const uploadImage = async (uri: string, type: string, getUploadParams: any) => {
+  try {
+    const params = await getUploadParams.mutateAsync({ type });
+    const formData = new FormData();
+    formData.append('file', { uri, type: 'image/jpeg', name: 'upload.jpg' } as any);
+    formData.append('api_key', params.apiKey);
+    formData.append('timestamp', String(params.timestamp));
+    formData.append('signature', params.signature);
+    formData.append('folder', params.folder);
+    if (params.transformation) formData.append('transformation', params.transformation);
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${params.cloudName}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await res.json();
+    return data.secure_url as string;
+  } catch (err: any) {
+    Alert.alert('Upload Failed', err.message ?? 'Failed to upload image');
+    return null;
+  }
+};
+
 const TrainerProfileEdit = () => {
   const { data: profile, isLoading } = useMyTrainerProfile();
   const updateProfile = useUpdateTrainerProfile();
+  const getUploadParams = trpc.upload.getUploadParams.useMutation();
   const [tab, setTab] = useState<TrainerTab>('basic');
   const [fields, setFields] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (profile) {
@@ -82,20 +204,44 @@ const TrainerProfileEdit = () => {
         addressLine1: (profile as any).addressLine1 ?? '',
         county: (profile as any).county ?? '',
         country: (profile as any).country ?? '',
+        latitude: (profile as any).latitude ?? 0,
+        longitude: (profile as any).longitude ?? 0,
+        placeId: (profile as any).placeId ?? '',
         travelOption: (profile as any).travelOption ?? 'CLIENT_TRAVELS',
         services: (profile as any).services ?? [],
+        qualifications: (profile as any).qualifications ?? [],
         hourlyRateMin: ((profile as any).hourlyRateMin ?? 0) / 100,
         hourlyRateMax: ((profile as any).hourlyRateMax ?? 0) / 100,
         acceptingClients: (profile as any).acceptingClients ?? true,
-        isPublished: (profile as any).isPublished ?? false,
+        profileImageUrl: profile.profileImageUrl ?? null,
       });
     }
   }, [profile]);
 
   const update = (key: string, value: any) => setFields((f) => ({ ...f, [key]: value }));
-  const toggleService = (s: string) => {
-    const current = fields.services ?? [];
-    update('services', current.includes(s) ? current.filter((x: string) => x !== s) : [...current, s]);
+  const toggleArrayItem = (key: string, item: string) => {
+    const current = fields[key] ?? [];
+    update(key, current.includes(item) ? current.filter((x: string) => x !== item) : [...current, item]);
+  };
+
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets[0]) return;
+
+    setUploading(true);
+    const url = await uploadImage(result.assets[0].uri, 'profile', getUploadParams);
+    setUploading(false);
+
+    if (url) {
+      update('profileImageUrl', url);
+      await updateProfile.mutateAsync({ profileImageUrl: url });
+      Alert.alert('Success', 'Profile photo updated');
+    }
   };
 
   const handleSave = async () => {
@@ -140,24 +286,60 @@ const TrainerProfileEdit = () => {
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">
         {tab === 'basic' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Basic Info</Text>
-              {profile?.handle && (
-                <View className="bg-secondary rounded-lg px-3 py-2">
-                  <Text className="text-xs text-muted-foreground">fitnassist.co/trainers/{profile.handle}</Text>
+          <>
+            {/* Avatar */}
+            <View className="items-center mb-2">
+              <TouchableOpacity onPress={handlePickImage} disabled={uploading}>
+                <View className="relative">
+                  {fields.profileImageUrl ? (
+                    <Image source={{ uri: fields.profileImageUrl }} className="w-24 h-24 rounded-full" />
+                  ) : (
+                    <View className="w-24 h-24 rounded-full bg-secondary items-center justify-center">
+                      <Text className="text-2xl font-bold text-foreground">
+                        {(fields.displayName ?? '?').charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                  )}
+                  <View className="absolute bottom-0 right-0 bg-primary w-8 h-8 rounded-full items-center justify-center">
+                    <Camera size={16} color="#fff" />
+                  </View>
                 </View>
-              )}
-              <Input label="Display Name" value={fields.displayName} onChangeText={(v) => update('displayName', v)} />
-              <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={4} />
-            </CardContent>
-          </Card>
+              </TouchableOpacity>
+              {uploading && <Text className="text-xs text-muted-foreground mt-2">Uploading...</Text>}
+            </View>
+
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Basic Info</Text>
+                {profile?.handle && (
+                  <View className="bg-secondary rounded-lg px-3 py-2">
+                    <Text className="text-xs text-muted-foreground">fitnassist.co/trainers/{profile.handle}</Text>
+                  </View>
+                )}
+                <Input label="Display Name" value={fields.displayName} onChangeText={(v) => update('displayName', v)} />
+                <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={4} />
+              </CardContent>
+            </Card>
+          </>
         )}
 
         {tab === 'location' && (
           <Card>
             <CardContent className="py-4 px-4 gap-3">
               <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Location</Text>
+              <AddressAutocomplete
+                value={[fields.addressLine1, fields.city, fields.postcode].filter(Boolean).join(', ')}
+                onSelect={(addr) => {
+                  update('addressLine1', addr.addressLine1);
+                  update('city', addr.city);
+                  update('county', addr.county);
+                  update('postcode', addr.postcode);
+                  update('country', addr.country);
+                  update('latitude', addr.latitude);
+                  update('longitude', addr.longitude);
+                  update('placeId', addr.placeId);
+                }}
+              />
               <Input label="Address" value={fields.addressLine1} onChangeText={(v) => update('addressLine1', v)} />
               <Input label="City" value={fields.city} onChangeText={(v) => update('city', v)} />
               <Input label="County" value={fields.county} onChangeText={(v) => update('county', v)} />
@@ -167,10 +349,10 @@ const TrainerProfileEdit = () => {
               {TRAVEL_OPTIONS.map(({ value, label }) => (
                 <TouchableOpacity
                   key={value}
-                  className={`px-3 py-3 rounded-lg border ${fields.travelOption === value ? 'border-primary bg-primary/10' : 'border-border'}`}
+                  className={`px-3 py-3 rounded-lg border ${fields.travelOption === value ? 'border-teal bg-teal/10' : 'border-border'}`}
                   onPress={() => update('travelOption', value)}
                 >
-                  <Text className={`text-sm ${fields.travelOption === value ? 'text-primary font-medium' : 'text-foreground'}`}>{label}</Text>
+                  <Text className={`text-sm ${fields.travelOption === value ? 'text-teal font-medium' : 'text-foreground'}`}>{label}</Text>
                 </TouchableOpacity>
               ))}
             </CardContent>
@@ -179,10 +361,55 @@ const TrainerProfileEdit = () => {
 
         {tab === 'services' && (
           <Card>
-            <CardContent className="py-4 px-4 gap-3">
+            <CardContent className="py-4 px-4 gap-4">
               <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Services Offered</Text>
-              <ChipSelect options={TRAINER_SERVICES} selected={fields.services ?? []} onToggle={toggleService} />
-              <Text className="text-sm font-medium text-teal uppercase mt-4" style={{ letterSpacing: 1 }}>Hourly Rate</Text>
+              <ChipSelect options={TRAINER_SERVICES} selected={fields.services ?? []} onToggle={(s) => toggleArrayItem('services', s)} />
+
+              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Qualifications</Text>
+              <ChipSelect options={TRAINER_QUALIFICATIONS} selected={fields.qualifications ?? []} onToggle={(q) => toggleArrayItem('qualifications', q)} />
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'media' && (
+          <Card>
+            <CardContent className="py-4 px-4 gap-3">
+              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Photo</Text>
+              <TouchableOpacity onPress={handlePickImage} disabled={uploading}>
+                {fields.profileImageUrl ? (
+                  <Image source={{ uri: fields.profileImageUrl }} className="w-full h-48 rounded-lg" resizeMode="cover" />
+                ) : (
+                  <View className="w-full h-48 rounded-lg bg-secondary items-center justify-center">
+                    <Camera size={32} color={colors.mutedForeground} />
+                    <Text className="text-sm text-muted-foreground mt-2">Tap to upload</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              {uploading && <Text className="text-sm text-teal text-center">Uploading...</Text>}
+
+              <Text className="text-sm font-medium text-teal uppercase mt-4" style={{ letterSpacing: 1 }}>Gallery & Video</Text>
+              <Text className="text-sm text-muted-foreground">
+                Gallery images, cover photo, and video intro can be managed from the web app for now.
+              </Text>
+            </CardContent>
+          </Card>
+        )}
+
+        {tab === 'settings' && (
+          <Card>
+            <CardContent className="py-4 px-4 gap-3">
+              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Settings</Text>
+              <View className="flex-row items-center justify-between py-2">
+                <Text className="text-sm text-foreground">Accepting New Clients</Text>
+                <Switch
+                  value={fields.acceptingClients}
+                  onValueChange={(v) => update('acceptingClients', v)}
+                  trackColor={{ false: colors.muted, true: colors.teal }}
+                  thumbColor="#fff"
+                />
+              </View>
+
+              <Text className="text-sm font-medium text-teal uppercase mt-2" style={{ letterSpacing: 1 }}>Hourly Rate</Text>
               <View className="flex-row gap-3">
                 <View className="flex-1">
                   <Input
@@ -205,43 +432,6 @@ const TrainerProfileEdit = () => {
           </Card>
         )}
 
-        {tab === 'media' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Media</Text>
-              <Text className="text-sm text-muted-foreground">
-                Photo and video uploads require the web app for now. Open your browser to manage gallery images and video intro.
-              </Text>
-            </CardContent>
-          </Card>
-        )}
-
-        {tab === 'settings' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Settings</Text>
-              <View className="flex-row items-center justify-between py-2">
-                <Text className="text-sm text-foreground">Published</Text>
-                <Switch
-                  value={fields.isPublished}
-                  onValueChange={(v) => update('isPublished', v)}
-                  trackColor={{ false: colors.muted, true: colors.teal }}
-                  thumbColor="#fff"
-                />
-              </View>
-              <View className="flex-row items-center justify-between py-2">
-                <Text className="text-sm text-foreground">Accepting New Clients</Text>
-                <Switch
-                  value={fields.acceptingClients}
-                  onValueChange={(v) => update('acceptingClients', v)}
-                  trackColor={{ false: colors.muted, true: colors.teal }}
-                  thumbColor="#fff"
-                />
-              </View>
-            </CardContent>
-          </Card>
-        )}
-
         <Button onPress={handleSave} loading={saving}>Save Changes</Button>
       </ScrollView>
     </>
@@ -251,13 +441,16 @@ const TrainerProfileEdit = () => {
 const TraineeProfileEdit = () => {
   const { data: profile, isLoading } = useMyTraineeProfile();
   const updateProfile = useUpdateTraineeProfile();
+  const getUploadParams = trpc.upload.getUploadParams.useMutation();
   const [tab, setTab] = useState<TraineeTab>('personal');
   const [fields, setFields] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (profile) {
       setFields({
+        avatarUrl: (profile as any).avatarUrl ?? null,
         bio: (profile as any).bio ?? '',
         dateOfBirth: (profile as any).dateOfBirth ?? '',
         gender: (profile as any).gender ?? '',
@@ -285,11 +478,30 @@ const TraineeProfileEdit = () => {
     update('fitnessGoals', current.includes(g) ? current.filter((x: string) => x !== g) : [...current, g]);
   };
 
+  const handlePickAvatar = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+    if (result.canceled || !result.assets[0]) return;
+
+    setUploading(true);
+    const url = await uploadImage(result.assets[0].uri, 'profile', getUploadParams);
+    setUploading(false);
+
+    if (url) {
+      update('avatarUrl', url);
+      await updateProfile.mutateAsync({ avatarUrl: url });
+      Alert.alert('Success', 'Avatar updated');
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
       const data: Record<string, any> = { ...fields };
-      // Convert numeric strings
       for (const key of ['heightCm', 'startWeightKg', 'goalWeightKg', 'dailyCalorieTarget', 'dailyProteinTargetG', 'dailyCarbsTargetG', 'dailyFatTargetG', 'dailyWaterTargetMl']) {
         if (data[key] !== '' && data[key] != null) data[key] = parseFloat(data[key]);
         else delete data[key];
@@ -329,25 +541,45 @@ const TraineeProfileEdit = () => {
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">
         {tab === 'personal' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Personal Info</Text>
-              <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={3} />
-              <Input label="Date of Birth" value={fields.dateOfBirth} onChangeText={(v) => update('dateOfBirth', v)} placeholder="YYYY-MM-DD" />
-              <Text className="text-sm font-medium text-foreground">Gender</Text>
-              <View className="flex-row flex-wrap gap-2">
-                {GENDERS.map(({ value, label }) => (
-                  <TouchableOpacity
-                    key={value}
-                    className={`px-3 py-2 rounded-lg border ${fields.gender === value ? 'border-primary bg-primary/10' : 'border-border'}`}
-                    onPress={() => update('gender', value)}
-                  >
-                    <Text className={`text-xs font-medium ${fields.gender === value ? 'text-primary' : 'text-muted-foreground'}`}>{label}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </CardContent>
-          </Card>
+          <>
+            <View className="items-center mb-2">
+              <TouchableOpacity onPress={handlePickAvatar} disabled={uploading}>
+                <View className="relative">
+                  {fields.avatarUrl ? (
+                    <Image source={{ uri: fields.avatarUrl }} className="w-24 h-24 rounded-full" />
+                  ) : (
+                    <View className="w-24 h-24 rounded-full bg-secondary items-center justify-center">
+                      <Camera size={24} color={colors.mutedForeground} />
+                    </View>
+                  )}
+                  <View className="absolute bottom-0 right-0 bg-primary w-8 h-8 rounded-full items-center justify-center">
+                    <Camera size={16} color="#fff" />
+                  </View>
+                </View>
+              </TouchableOpacity>
+              {uploading && <Text className="text-xs text-muted-foreground mt-2">Uploading...</Text>}
+            </View>
+
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Personal Info</Text>
+                <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={3} />
+                <Input label="Date of Birth" value={fields.dateOfBirth} onChangeText={(v) => update('dateOfBirth', v)} placeholder="YYYY-MM-DD" />
+                <Text className="text-sm font-medium text-foreground">Gender</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {GENDERS.map(({ value, label }) => (
+                    <TouchableOpacity
+                      key={value}
+                      className={`px-3 py-2 rounded-lg border ${fields.gender === value ? 'border-teal bg-teal/10' : 'border-border'}`}
+                      onPress={() => update('gender', value)}
+                    >
+                      <Text className={`text-xs font-medium ${fields.gender === value ? 'text-teal' : 'text-muted-foreground'}`}>{label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </CardContent>
+            </Card>
+          </>
         )}
 
         {tab === 'body' && (
@@ -358,59 +590,42 @@ const TraineeProfileEdit = () => {
                 <Text className="text-sm text-foreground">Unit Preference</Text>
                 <View className="flex-row gap-1 bg-card border border-border rounded-lg p-1">
                   <TouchableOpacity
-                    className={`px-3 py-1 rounded-md ${fields.unitPreference === 'METRIC' ? 'bg-primary' : ''}`}
+                    className={`px-3 py-1 rounded-md ${fields.unitPreference === 'METRIC' ? 'bg-teal' : ''}`}
                     onPress={() => update('unitPreference', 'METRIC')}
                   >
-                    <Text className={`text-xs ${fields.unitPreference === 'METRIC' ? 'text-white' : 'text-muted-foreground'}`}>Metric</Text>
+                    <Text className={`text-xs ${fields.unitPreference === 'METRIC' ? 'text-teal-foreground' : 'text-muted-foreground'}`}>Metric</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className={`px-3 py-1 rounded-md ${fields.unitPreference === 'IMPERIAL' ? 'bg-primary' : ''}`}
+                    className={`px-3 py-1 rounded-md ${fields.unitPreference === 'IMPERIAL' ? 'bg-teal' : ''}`}
                     onPress={() => update('unitPreference', 'IMPERIAL')}
                   >
-                    <Text className={`text-xs ${fields.unitPreference === 'IMPERIAL' ? 'text-white' : 'text-muted-foreground'}`}>Imperial</Text>
+                    <Text className={`text-xs ${fields.unitPreference === 'IMPERIAL' ? 'text-teal-foreground' : 'text-muted-foreground'}`}>Imperial</Text>
                   </TouchableOpacity>
                 </View>
               </View>
-              <Input
-                label={fields.unitPreference === 'METRIC' ? 'Height (cm)' : 'Height (inches)'}
-                value={String(fields.heightCm ?? '')}
-                onChangeText={(v) => update('heightCm', v)}
-                keyboardType="numeric"
-              />
-              <Input
-                label={fields.unitPreference === 'METRIC' ? 'Start Weight (kg)' : 'Start Weight (lbs)'}
-                value={String(fields.startWeightKg ?? '')}
-                onChangeText={(v) => update('startWeightKg', v)}
-                keyboardType="numeric"
-              />
-              <Input
-                label={fields.unitPreference === 'METRIC' ? 'Goal Weight (kg)' : 'Goal Weight (lbs)'}
-                value={String(fields.goalWeightKg ?? '')}
-                onChangeText={(v) => update('goalWeightKg', v)}
-                keyboardType="numeric"
-              />
+              <Input label={fields.unitPreference === 'METRIC' ? 'Height (cm)' : 'Height (inches)'} value={String(fields.heightCm ?? '')} onChangeText={(v) => update('heightCm', v)} keyboardType="numeric" />
+              <Input label={fields.unitPreference === 'METRIC' ? 'Start Weight (kg)' : 'Start Weight (lbs)'} value={String(fields.startWeightKg ?? '')} onChangeText={(v) => update('startWeightKg', v)} keyboardType="numeric" />
+              <Input label={fields.unitPreference === 'METRIC' ? 'Goal Weight (kg)' : 'Goal Weight (lbs)'} value={String(fields.goalWeightKg ?? '')} onChangeText={(v) => update('goalWeightKg', v)} keyboardType="numeric" />
             </CardContent>
           </Card>
         )}
 
         {tab === 'fitness' && (
           <Card>
-            <CardContent className="py-4 px-4 gap-3">
+            <CardContent className="py-4 px-4 gap-4">
               <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Experience Level</Text>
               <ChipSelect
                 options={EXPERIENCE_LEVELS}
                 selected={fields.experienceLevel ? [fields.experienceLevel] : []}
                 onToggle={(v) => update('experienceLevel', v)}
-                multi={false}
               />
-              <Text className="text-sm font-medium text-teal uppercase mt-2" style={{ letterSpacing: 1 }}>Activity Level</Text>
+              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Activity Level</Text>
               <ChipSelect
                 options={ACTIVITY_LEVELS}
                 selected={fields.activityLevel ? [fields.activityLevel] : []}
                 onToggle={(v) => update('activityLevel', v)}
-                multi={false}
               />
-              <Text className="text-sm font-medium text-teal uppercase mt-2" style={{ letterSpacing: 1 }}>Fitness Goals</Text>
+              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Fitness Goals</Text>
               <ChipSelect options={FITNESS_GOALS} selected={fields.fitnessGoals ?? []} onToggle={toggleGoal} />
               <Input label="Goal Notes" value={fields.fitnessGoalNotes} onChangeText={(v) => update('fitnessGoalNotes', v)} multiline />
               <Input label="Medical Notes" value={fields.medicalNotes} onChangeText={(v) => update('medicalNotes', v)} multiline />
@@ -435,10 +650,10 @@ const TraineeProfileEdit = () => {
           <Card>
             <CardContent className="py-4 px-4 gap-3">
               <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
-                Privacy settings are managed in the web app for now
+                Privacy
               </Text>
               <Text className="text-sm text-muted-foreground">
-                Control who can see your bio, metrics, goals, progress photos, trends and more from the web dashboard settings.
+                Privacy settings control who can see your profile sections, metrics, goals, and trends. Manage these from the web dashboard for full control over each visibility level (Only Me, My PT, PT & Friends, Everyone).
               </Text>
             </CardContent>
           </Card>

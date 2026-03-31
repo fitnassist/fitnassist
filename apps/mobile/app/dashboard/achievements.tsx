@@ -112,11 +112,11 @@ const AchievementsScreen = () => {
               return (
                 <TouchableOpacity
                   key={badge.id}
-                  className={`flex-row items-center gap-3 p-3 rounded-lg border ${selected ? 'border-primary bg-primary/10' : 'border-border'}`}
+                  className={`flex-row items-center gap-3 p-3 rounded-lg border ${selected ? 'border-teal bg-teal/10' : 'border-border'}`}
                   onPress={() => toggleShowcase(badge.id)}
                 >
                   <Award size={20} color={selected ? colors.primary : colors.teal} />
-                  <Text className={`flex-1 text-sm ${selected ? 'text-primary font-medium' : 'text-foreground'}`}>{badge.name}</Text>
+                  <Text className={`flex-1 text-sm ${selected ? 'text-teal font-medium' : 'text-foreground'}`}>{badge.name}</Text>
                   {selected && <Lock size={14} color={colors.primary} />}
                 </TouchableOpacity>
               );
