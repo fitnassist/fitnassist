@@ -108,14 +108,22 @@ const GroupedChipSelect = ({ groups, selected, onToggle }: {
   </View>
 );
 
-// Google Places Autocomplete
-const AddressAutocomplete = ({ value, onSelect }: {
-  value: string;
-  onSelect: (address: { addressLine1: string; city: string; county: string; postcode: string; country: string; latitude: number; longitude: number; placeId: string }) => void;
+// Address component matching web - autocomplete or manual entry toggle
+const AddressAutocomplete = ({ currentAddress, onSelect }: {
+  currentAddress: { addressLine1?: string; city?: string; county?: string; postcode?: string; country?: string };
+  onSelect: (address: { addressLine1: string; addressLine2?: string; city: string; county: string; postcode: string; country: string; latitude: number; longitude: number; placeId: string }) => void;
 }) => {
-  const [query, setQuery] = useState(value);
+  const [isManual, setIsManual] = useState(false);
+  const [query, setQuery] = useState('');
   const [predictions, setPredictions] = useState<any[]>([]);
   const [showPredictions, setShowPredictions] = useState(false);
+  const [manual, setManual] = useState({
+    addressLine1: currentAddress.addressLine1 ?? '',
+    addressLine2: '',
+    city: currentAddress.city ?? '',
+    county: currentAddress.county ?? '',
+    postcode: currentAddress.postcode ?? '',
+  });
 
   const searchPlaces = useCallback(async (text: string) => {
     if (text.length < 3) { setPredictions([]); return; }
@@ -131,9 +139,9 @@ const AddressAutocomplete = ({ value, onSelect }: {
     }
   }, []);
 
-  const selectPlace = async (placeId: string, description: string) => {
+  const selectPlace = async (placeId: string) => {
     setShowPredictions(false);
-    setQuery(description);
+    setQuery('');
     try {
       const res = await fetch(
         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,geometry&key=${GOOGLE_API_KEY}`
@@ -159,37 +167,101 @@ const AddressAutocomplete = ({ value, onSelect }: {
     }
   };
 
+  const handleManualConfirm = () => {
+    if (!manual.addressLine1 || !manual.city || !manual.postcode) {
+      Alert.alert('Error', 'Address line 1, city, and postcode are required');
+      return;
+    }
+    onSelect({
+      addressLine1: manual.addressLine1,
+      addressLine2: manual.addressLine2,
+      city: manual.city,
+      county: manual.county,
+      postcode: manual.postcode,
+      country: 'GB',
+      latitude: 0,
+      longitude: 0,
+      placeId: '',
+    });
+    setIsManual(false);
+  };
+
+  if (isManual) {
+    return (
+      <View className="gap-3">
+        <View className="flex-row items-center justify-between">
+          <Text className="text-sm font-medium text-foreground">Manual Entry</Text>
+          <TouchableOpacity onPress={() => setIsManual(false)}>
+            <Text className="text-sm text-teal">Use address lookup</Text>
+          </TouchableOpacity>
+        </View>
+        <Input label="Address Line 1 *" value={manual.addressLine1} onChangeText={(v) => setManual((m) => ({ ...m, addressLine1: v }))} placeholder="e.g. 123 High Street" />
+        <Input label="Address Line 2" value={manual.addressLine2} onChangeText={(v) => setManual((m) => ({ ...m, addressLine2: v }))} placeholder="e.g. Flat 4" />
+        <View className="flex-row gap-2">
+          <View className="flex-1">
+            <Input label="City *" value={manual.city} onChangeText={(v) => setManual((m) => ({ ...m, city: v }))} placeholder="e.g. London" />
+          </View>
+          <View className="flex-1">
+            <Input label="County" value={manual.county} onChangeText={(v) => setManual((m) => ({ ...m, county: v }))} placeholder="e.g. Greater London" />
+          </View>
+        </View>
+        <Input label="Postcode *" value={manual.postcode} onChangeText={(v) => setManual((m) => ({ ...m, postcode: v.toUpperCase() }))} placeholder="e.g. SW1A 1AA" />
+        <Button size="sm" variant="outline" onPress={handleManualConfirm}>Confirm Address</Button>
+      </View>
+    );
+  }
+
   return (
-    <View>
+    <View className="gap-3">
+      <View className="flex-row items-center justify-between">
+        <Text className="text-sm font-medium text-foreground">Address</Text>
+        <TouchableOpacity onPress={() => setIsManual(true)}>
+          <Text className="text-sm text-teal">Enter manually</Text>
+        </TouchableOpacity>
+      </View>
       <View className="flex-row items-center bg-card border border-border rounded-lg px-3">
         <MapPin size={16} color={colors.mutedForeground} />
         <View className="flex-1">
           <Input
             value={query}
             onChangeText={(t) => { setQuery(t); searchPlaces(t); }}
-            placeholder="Search address..."
+            placeholder="Start typing your address..."
             className="border-0"
           />
         </View>
         {query.length > 0 && (
-          <TouchableOpacity onPress={() => { setQuery(''); setPredictions([]); }}>
+          <TouchableOpacity onPress={() => { setQuery(''); setPredictions([]); setShowPredictions(false); }}>
             <X size={16} color={colors.mutedForeground} />
           </TouchableOpacity>
         )}
       </View>
       {showPredictions && predictions.length > 0 && (
-        <View className="bg-card border border-border rounded-lg mt-1 max-h-48">
+        <View className="bg-card border border-border rounded-lg max-h-48">
           {predictions.map((p: any) => (
             <TouchableOpacity
               key={p.place_id}
               className="px-3 py-2.5 border-b border-border"
-              onPress={() => selectPlace(p.place_id, p.description)}
+              onPress={() => selectPlace(p.place_id)}
             >
               <Text className="text-sm text-foreground" numberOfLines={1}>{p.description}</Text>
             </TouchableOpacity>
           ))}
         </View>
       )}
+
+      {/* Show confirmed address */}
+      {currentAddress.addressLine1 && !query && (
+        <View className="bg-secondary rounded-lg p-3 gap-0.5">
+          <Text className="text-sm font-medium text-foreground">{currentAddress.addressLine1}</Text>
+          <Text className="text-xs text-muted-foreground">
+            {[currentAddress.city, currentAddress.county, currentAddress.postcode].filter(Boolean).join(', ')}
+          </Text>
+        </View>
+      )}
+
+      <Text className="text-xs text-muted-foreground">
+        Your full address is private. Only your postcode area will be shown publicly on the map.
+      </Text>
     </View>
   );
 };
@@ -597,39 +669,47 @@ const TrainerProfileEdit = () => {
         )}
 
         {tab === 'location' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Location</Text>
-              <AddressAutocomplete
-                value={[fields.addressLine1, fields.city, fields.postcode].filter(Boolean).join(', ')}
-                onSelect={(addr) => {
-                  update('addressLine1', addr.addressLine1);
-                  update('city', addr.city);
-                  update('county', addr.county);
-                  update('postcode', addr.postcode);
-                  update('country', addr.country);
-                  update('latitude', addr.latitude);
-                  update('longitude', addr.longitude);
-                  update('placeId', addr.placeId);
-                }}
-              />
-              <Input label="Address" value={fields.addressLine1} onChangeText={(v) => update('addressLine1', v)} />
-              <Input label="City" value={fields.city} onChangeText={(v) => update('city', v)} />
-              <Input label="County" value={fields.county} onChangeText={(v) => update('county', v)} />
-              <Input label="Postcode" value={fields.postcode} onChangeText={(v) => update('postcode', v)} />
-              <Input label="Country" value={fields.country} onChangeText={(v) => update('country', v)} />
-              <Text className="text-sm font-medium text-foreground mt-2">Travel Option</Text>
-              {TRAVEL_OPTIONS.map(({ value, label }) => (
-                <TouchableOpacity
-                  key={value}
-                  className={`px-3 py-3 rounded-lg border ${fields.travelOption === value ? 'border-teal bg-teal/10' : 'border-border'}`}
-                  onPress={() => update('travelOption', value)}
-                >
-                  <Text className={`text-sm ${fields.travelOption === value ? 'text-teal font-medium' : 'text-foreground'}`}>{label}</Text>
-                </TouchableOpacity>
-              ))}
-            </CardContent>
-          </Card>
+          <>
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Location</Text>
+                <AddressAutocomplete
+                  currentAddress={{
+                    addressLine1: fields.addressLine1,
+                    city: fields.city,
+                    county: fields.county,
+                    postcode: fields.postcode,
+                    country: fields.country,
+                  }}
+                  onSelect={(addr) => {
+                    update('addressLine1', addr.addressLine1);
+                    update('city', addr.city);
+                    update('county', addr.county);
+                    update('postcode', addr.postcode);
+                    update('country', addr.country);
+                    update('latitude', addr.latitude);
+                    update('longitude', addr.longitude);
+                    update('placeId', addr.placeId);
+                  }}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Training Location Preference</Text>
+                {TRAVEL_OPTIONS.map(({ value, label }) => (
+                  <TouchableOpacity
+                    key={value}
+                    className={`px-3 py-3 rounded-lg border ${fields.travelOption === value ? 'border-teal bg-teal/10' : 'border-border'}`}
+                    onPress={() => update('travelOption', value)}
+                  >
+                    <Text className={`text-sm ${fields.travelOption === value ? 'text-teal font-medium' : 'text-foreground'}`}>{label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </CardContent>
+            </Card>
+          </>
         )}
 
         {tab === 'services' && (
