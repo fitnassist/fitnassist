@@ -4,11 +4,12 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ArrowLeft, Dumbbell, ChefHat, ClipboardList, UtensilsCrossed,
-  Plus, Trash2, X, Search,
+  Plus, Trash2, Pencil, X, Search,
 } from 'lucide-react-native';
 import { TouchableOpacity, TextInput } from 'react-native';
 import { Text, Button, Input, Card, CardContent, Skeleton, Badge, TabBar, ListPicker, type ListPickerItem } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
+import { formatDistanceToNow } from '@/lib/dates';
 import { colors } from '@/constants/theme';
 
 type Tab = 'exercises' | 'recipes' | 'workouts' | 'meals';
@@ -389,20 +390,102 @@ const ResourcesScreen = () => {
         <FlatList data={current.items} keyExtractor={(item: any) => item.id}
           renderItem={({ item }) => (
             <Card className="mx-4 mb-2">
-              <CardContent className="py-3 px-4 gap-1">
-                <Text className="text-sm font-semibold text-foreground">{item.name}</Text>
-                {item.description && <Text className="text-xs text-muted-foreground" numberOfLines={1}>{item.description}</Text>}
-                {tab === 'exercises' && item.difficulty && <Badge variant="secondary">{item.difficulty}</Badge>}
-                {tab === 'recipes' && item.calories && <Text className="text-xs text-teal">{item.calories} kcal</Text>}
-                {tab === 'workouts' && <Text className="text-xs text-muted-foreground">{item._count?.exercises ?? 0} exercises</Text>}
-                {tab === 'meals' && <Text className="text-xs text-muted-foreground">{item._count?.recipes ?? 0} recipes</Text>}
-                <View className="flex-row gap-2 mt-1">
-                  <TouchableOpacity className="bg-secondary rounded-lg px-3 py-1.5" onPress={() => setEditItem(item)}>
-                    <Text className="text-xs text-foreground">Edit</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity className="bg-secondary rounded-lg px-3 py-1.5" onPress={() => handleDelete(item.id, item.name)}>
-                    <Text className="text-xs text-destructive">Delete</Text>
-                  </TouchableOpacity>
+              <CardContent className="py-3 px-4">
+                <View className="flex-row items-start gap-3">
+                  {/* Icon */}
+                  <View className={`w-10 h-10 rounded-lg items-center justify-center mt-0.5 ${
+                    tab === 'exercises' ? 'bg-primary/10' : tab === 'recipes' ? 'bg-teal/10' : tab === 'workouts' ? 'bg-primary/10' : 'bg-teal/10'
+                  }`}>
+                    {tab === 'exercises' && <Dumbbell size={18} color={colors.primary} />}
+                    {tab === 'recipes' && <ChefHat size={18} color={colors.teal} />}
+                    {tab === 'workouts' && <ClipboardList size={18} color={colors.primary} />}
+                    {tab === 'meals' && <UtensilsCrossed size={18} color={colors.teal} />}
+                  </View>
+
+                  {/* Content */}
+                  <View className="flex-1 gap-1">
+                    <Text className="text-sm font-semibold text-foreground">{item.name}</Text>
+                    {item.description && <Text className="text-xs text-muted-foreground" numberOfLines={1}>{item.description}</Text>}
+
+                    {/* Exercise-specific */}
+                    {tab === 'exercises' && (
+                      <View className="flex-row flex-wrap gap-1 mt-0.5">
+                        {item.difficulty && (
+                          <Badge variant={item.difficulty === 'BEGINNER' ? 'default' : item.difficulty === 'ADVANCED' ? 'destructive' : 'secondary'}>
+                            {item.difficulty}
+                          </Badge>
+                        )}
+                        {(item.muscleGroups ?? []).slice(0, 3).map((mg: string) => (
+                          <View key={mg} className="bg-secondary rounded px-1.5 py-0.5">
+                            <Text className="text-[10px] text-muted-foreground">{mg.replace(/_/g, ' ')}</Text>
+                          </View>
+                        ))}
+                        {(item.muscleGroups ?? []).length > 3 && (
+                          <View className="bg-secondary rounded px-1.5 py-0.5">
+                            <Text className="text-[10px] text-muted-foreground">+{item.muscleGroups.length - 3}</Text>
+                          </View>
+                        )}
+                      </View>
+                    )}
+
+                    {/* Recipe-specific */}
+                    {tab === 'recipes' && (
+                      <View className="gap-0.5 mt-0.5">
+                        <View className="flex-row items-center gap-3">
+                          {item.calories != null && <Text className="text-xs text-teal">{item.calories} kcal</Text>}
+                          {(item.prepTimeMin || item.cookTimeMin) && (
+                            <Text className="text-xs text-muted-foreground">{(item.prepTimeMin ?? 0) + (item.cookTimeMin ?? 0)} min</Text>
+                          )}
+                          {item.servings && <Text className="text-xs text-muted-foreground">{item.servings} servings</Text>}
+                        </View>
+                        <View className="flex-row items-center gap-2">
+                          {item.proteinG != null && <Text className="text-xs text-blue-400">P: {item.proteinG}g</Text>}
+                          {item.carbsG != null && <Text className="text-xs text-amber-400">C: {item.carbsG}g</Text>}
+                          {item.fatG != null && <Text className="text-xs text-red-400">F: {item.fatG}g</Text>}
+                        </View>
+                        {(item.tags ?? []).length > 0 && (
+                          <View className="flex-row flex-wrap gap-1">
+                            {item.tags.slice(0, 4).map((t: string) => (
+                              <View key={t} className="bg-secondary rounded px-1.5 py-0.5">
+                                <Text className="text-[10px] text-muted-foreground">{t}</Text>
+                              </View>
+                            ))}
+                            {item.tags.length > 4 && (
+                              <View className="bg-secondary rounded px-1.5 py-0.5">
+                                <Text className="text-[10px] text-muted-foreground">+{item.tags.length - 4}</Text>
+                              </View>
+                            )}
+                          </View>
+                        )}
+                      </View>
+                    )}
+
+                    {/* Plan-specific */}
+                    {tab === 'workouts' && (
+                      <View className="flex-row items-center gap-2 mt-0.5">
+                        <Dumbbell size={12} color={colors.mutedForeground} />
+                        <Text className="text-xs text-muted-foreground">{item._count?.exercises ?? 0} exercises</Text>
+                        {item.updatedAt && <Text className="text-xs text-muted-foreground">· Updated {formatDistanceToNow(String(item.updatedAt))} ago</Text>}
+                      </View>
+                    )}
+                    {tab === 'meals' && (
+                      <View className="flex-row items-center gap-2 mt-0.5">
+                        <UtensilsCrossed size={12} color={colors.mutedForeground} />
+                        <Text className="text-xs text-muted-foreground">{item._count?.recipes ?? 0} recipes</Text>
+                        {item.updatedAt && <Text className="text-xs text-muted-foreground">· Updated {formatDistanceToNow(String(item.updatedAt))} ago</Text>}
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Actions */}
+                  <View className="flex-row items-center gap-1">
+                    <TouchableOpacity className="w-8 h-8 items-center justify-center rounded-lg" onPress={() => setEditItem(item)}>
+                      <Pencil size={16} color={colors.mutedForeground} />
+                    </TouchableOpacity>
+                    <TouchableOpacity className="w-8 h-8 items-center justify-center rounded-lg" onPress={() => handleDelete(item.id, item.name)}>
+                      <Trash2 size={16} color={colors.destructive} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </CardContent>
             </Card>

@@ -3,7 +3,7 @@ import { View, FlatList, RefreshControl, Alert, ScrollView, Modal, Switch } from
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  ArrowLeft, ClipboardCheck, Plus, Trash2, Circle,
+  ArrowLeft, ClipboardCheck, Plus, Trash2, Pencil, Circle,
   X, FileText, Clock, CheckCircle, XCircle,
 } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
@@ -398,17 +398,17 @@ const OnboardingScreen = () => {
                   <Text className="text-xs text-muted-foreground">
                     {item.questions?.length ?? 0} questions{item.waiverText ? ' + waiver' : ''}{item._count?.responses ? ` · ${item._count.responses} responses` : ''}
                   </Text>
-                  <View className="flex-row gap-2 mt-1">
-                    <TouchableOpacity className="bg-secondary rounded-lg px-3 py-1.5" onPress={() => setEditTemplate(item)}>
-                      <Text className="text-xs text-foreground">Edit</Text>
+                  <View className="flex-row gap-1 mt-1">
+                    <TouchableOpacity className="w-8 h-8 items-center justify-center rounded-lg" onPress={() => setEditTemplate(item)}>
+                      <Pencil size={16} color={colors.mutedForeground} />
                     </TouchableOpacity>
-                    <TouchableOpacity className="bg-secondary rounded-lg px-3 py-1.5" onPress={() => {
+                    <TouchableOpacity className="w-8 h-8 items-center justify-center rounded-lg" onPress={() => {
                       Alert.alert('Delete Template', `Delete "${item.name}"?`, [
                         { text: 'Cancel', style: 'cancel' },
                         { text: 'Delete', style: 'destructive', onPress: () => deleteTemplate.mutate({ id: item.id }, { onSuccess: () => { utils.onboarding.getTemplates.invalidate(); } }) },
                       ]);
                     }}>
-                      <Text className="text-xs text-destructive">Delete</Text>
+                      <Trash2 size={16} color={colors.destructive} />
                     </TouchableOpacity>
                   </View>
                 </CardContent>
