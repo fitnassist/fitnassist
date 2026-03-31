@@ -89,7 +89,7 @@ const ReviewsScreen = () => {
   const replyMutation = trpc.review.reply.useMutation();
   const utils = trpc.useUtils();
 
-  const reviews = data?.pages.flatMap((p: any) => p.items ?? p) ?? [];
+  const reviews = data?.pages.flatMap((p: any) => p.reviews ?? []) ?? [];
 
   const handleReply = (reviewId: string, text: string) => {
     replyMutation.mutate(
