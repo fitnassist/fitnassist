@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Alert, FlatList } from 'react-native';
+import { View, Alert, FlatList, TextInput as RNTextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { Search } from 'lucide-react-native';
 import { Text, Input, Button, Skeleton } from '@/components/ui';
@@ -98,16 +98,17 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
       {mode === 'search' ? (
         <>
           {/* Search */}
-          <View className="flex-row items-center bg-card border border-border rounded-lg px-3">
+          <View className="flex-row items-center h-12 bg-card border border-border rounded-lg px-3">
             <Search size={18} color={colors.mutedForeground} />
-            <View className="flex-1">
-              <Input
-                value={query}
-                onChangeText={setQuery}
-                placeholder="Search foods..."
-                className="border-0"
-              />
-            </View>
+            <RNTextInput
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search foods..."
+              placeholderTextColor="hsl(230, 10%, 55%)"
+              className="flex-1 text-foreground ml-2"
+              style={{ fontSize: 16, padding: 0, margin: 0 }}
+              autoCapitalize="none"
+            />
           </View>
 
           {searching && <Skeleton className="h-20 rounded-lg" />}
