@@ -92,7 +92,7 @@ const LeaderboardsScreen = () => {
                 )}
               </View>
               <View className="flex-1">
-                <Text className="text-sm font-medium text-foreground">{item.userName ?? 'User'}</Text>
+                <Text className="text-sm font-medium text-foreground">{item.name ?? 'User'}</Text>
               </View>
               <Text className="text-sm font-bold text-teal">{item.value ?? 0}</Text>
             </View>
