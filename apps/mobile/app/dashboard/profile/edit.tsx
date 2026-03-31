@@ -7,7 +7,7 @@ import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import { Calendar as RNCalendar } from 'react-native-calendars';
-import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, useAlert } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, useAlert, Skeleton } from '@/components/ui';
 import { CheckCircle as CheckIcon, XCircle } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile, useUpdateTrainerProfile } from '@/api/trainer';
@@ -883,6 +883,122 @@ const TrainerProfileEdit = () => {
   );
 };
 
+// ===== PRIVACY TAB =====
+const VISIBILITY_OPTIONS = [
+  { value: 'ONLY_ME', label: 'Only Me' },
+  { value: 'MY_PT', label: 'My PT' },
+  { value: 'PT_AND_FRIENDS', label: 'PT & Friends' },
+  { value: 'EVERYONE', label: 'Everyone' },
+];
+
+const PROFILE_SETTINGS = [
+  { key: 'privacyBio', label: 'Bio & About', desc: 'Your bio, fitness goals, experience level' },
+  { key: 'privacyLocation', label: 'Location', desc: 'Your city and general area' },
+  { key: 'privacyBodyMetrics', label: 'Body Metrics', desc: 'Height, start weight, goal weight' },
+  { key: 'privacyGoals', label: 'Goals', desc: 'Active and completed goals' },
+  { key: 'privacyPersonalBests', label: 'Personal Bests', desc: 'Your personal best achievements' },
+  { key: 'privacyProgressPhotos', label: 'Progress Photos', desc: 'Your progress photos' },
+  { key: 'privacyStats', label: 'Stats', desc: 'Goal and personal best counts' },
+  { key: 'privacyBadges', label: 'Badges', desc: 'Showcase badges on your profile' },
+  { key: 'privacyFriendCount', label: 'Friend Count', desc: 'Whether others see your friend count' },
+];
+
+const TREND_SETTINGS = [
+  { key: 'privacyTrendWeight', label: 'Weight' },
+  { key: 'privacyTrendMeasurements', label: 'Measurements' },
+  { key: 'privacyTrendNutrition', label: 'Nutrition' },
+  { key: 'privacyTrendWater', label: 'Water' },
+  { key: 'privacyTrendMood', label: 'Mood' },
+  { key: 'privacyTrendSleep', label: 'Sleep' },
+  { key: 'privacyTrendActivity', label: 'Activity' },
+  { key: 'privacyTrendSteps', label: 'Steps' },
+];
+
+const PrivacyRow = ({ label, desc, value, onChange }: { label: string; desc?: string; value: string; onChange: (v: string) => void }) => (
+  <View className="py-3 border-b border-border gap-2">
+    <View className="gap-0.5">
+      <Text className="text-sm text-foreground">{label}</Text>
+      {desc && <Text className="text-xs text-muted-foreground">{desc}</Text>}
+    </View>
+    <View className="flex-row gap-1">
+      {VISIBILITY_OPTIONS.map(({ value: v, label: l }) => (
+        <TouchableOpacity
+          key={v}
+          className={`flex-1 items-center py-1.5 rounded-lg border ${value === v ? 'border-teal bg-teal/10' : 'border-border'}`}
+          onPress={() => onChange(v)}
+        >
+          <Text className={`text-[10px] ${value === v ? 'text-teal' : 'text-muted-foreground'}`}>{l}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  </View>
+);
+
+const PrivacyTabContent = () => {
+  const { data: settings, isLoading } = trpc.trainee.getPrivacySettings.useQuery();
+  const updatePrivacy = trpc.trainee.updatePrivacySettings.useMutation();
+  const { showAlert } = useAlert();
+  const utils = trpc.useUtils();
+  const [local, setLocal] = useState<Record<string, string>>({});
+  const [initialized, setInitialized] = useState(false);
+
+  // Init local state from fetched settings
+  if (settings && !initialized) {
+    const s: Record<string, string> = {};
+    for (const key of [...PROFILE_SETTINGS, ...TREND_SETTINGS].map((x) => x.key)) {
+      s[key] = (settings as any)?.[key] ?? 'ONLY_ME';
+    }
+    setLocal(s);
+    setInitialized(true);
+  }
+
+  const handleSave = () => {
+    updatePrivacy.mutate(local as any, {
+      onSuccess: () => {
+        utils.trainee.getPrivacySettings.invalidate();
+        showAlert({ title: 'Saved', message: 'Privacy settings updated', icon: <CheckIcon size={32} color={colors.teal} /> });
+      },
+      onError: () => showAlert({ title: 'Error', message: 'Failed to save privacy settings', icon: <XCircle size={32} color={colors.destructive} /> }),
+    });
+  };
+
+  if (isLoading) return <Skeleton className="h-40 rounded-lg" />;
+
+  return (
+    <>
+      <Card>
+        <CardContent className="py-4 px-4 gap-1">
+          <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Sections</Text>
+          <Text className="text-xs text-muted-foreground mb-1">Control who can see different parts of your profile.</Text>
+          {PROFILE_SETTINGS.map(({ key, label, desc }) => (
+            <PrivacyRow key={key} label={label} desc={desc} value={local[key] ?? 'ONLY_ME'} onChange={(v) => setLocal((s) => ({ ...s, [key]: v }))} />
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="py-4 px-4 gap-1">
+          <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Trend Charts</Text>
+          <Text className="text-xs text-muted-foreground mb-1">Control who can see each type of trend data on your profile.</Text>
+          {TREND_SETTINGS.map(({ key, label }) => (
+            <PrivacyRow key={key} label={label} value={local[key] ?? 'ONLY_ME'} onChange={(v) => setLocal((s) => ({ ...s, [key]: v }))} />
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="py-4 px-4">
+          <Text className="text-xs text-muted-foreground">
+            Medical Notes are only visible to your connected personal trainer and are never shown publicly.
+          </Text>
+        </CardContent>
+      </Card>
+
+      <Button onPress={handleSave} loading={updatePrivacy.isPending}>Save Privacy Settings</Button>
+    </>
+  );
+};
+
 // ===== NUTRITION TAB =====
 const NutritionTabContent = ({ fields, update, profile }: { fields: Record<string, any>; update: (k: string, v: any) => void; profile: any }) => {
   const [useManual, setUseManual] = useState(fields.dailyCalorieTarget != null && fields.dailyCalorieTarget !== '');
@@ -1224,18 +1340,7 @@ const TraineeProfileEdit = () => {
           <NutritionTabContent fields={fields} update={update} profile={profile} />
         )}
 
-        {tab === 'privacy' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
-                Privacy
-              </Text>
-              <Text className="text-sm text-muted-foreground">
-                Privacy settings control who can see your profile sections, metrics, goals, and trends. Manage these from the web dashboard for full control over each visibility level (Only Me, My PT, PT & Friends, Everyone).
-              </Text>
-            </CardContent>
-          </Card>
-        )}
+        {tab === 'privacy' && <PrivacyTabContent />}
 
         <Button onPress={handleSave} loading={saving}>Save Changes</Button>
       </ScrollView>
