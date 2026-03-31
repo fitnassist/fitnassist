@@ -9,7 +9,7 @@ import { colors } from '@/constants/theme';
 
 const ContactsScreen = () => {
   const router = useRouter();
-  const { data: requests, isLoading, refetch } = trpc.contact.getMyRequests.useQuery();
+  const { data: requests, isLoading, refetch } = trpc.contact.getSentRequests.useQuery();
 
   const accepted = (requests ?? []).filter((r: any) => r.status === 'ACCEPTED');
 
