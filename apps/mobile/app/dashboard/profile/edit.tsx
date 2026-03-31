@@ -656,14 +656,16 @@ const TrainerProfileEdit = () => {
 
             <Card>
               <CardContent className="py-4 px-4 gap-3">
-                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Basic Info</Text>
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Basic Information</Text>
+                <Text className="text-xs text-muted-foreground">Update your display name and bio. Your handle cannot be changed.</Text>
                 {profile?.handle && (
                   <View className="bg-secondary rounded-lg px-3 py-2">
                     <Text className="text-xs text-muted-foreground">fitnassist.co/trainers/{profile.handle}</Text>
                   </View>
                 )}
                 <Input label="Display Name" value={fields.displayName} onChangeText={(v) => update('displayName', v)} />
-                <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={4} />
+                <Input label="Bio" value={fields.bio} onChangeText={(v) => update('bio', v)} multiline numberOfLines={6} />
+                <Text className="text-xs text-muted-foreground">{(fields.bio ?? '').length}/2000 characters</Text>
               </CardContent>
             </Card>
           </>
