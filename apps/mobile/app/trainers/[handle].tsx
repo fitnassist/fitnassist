@@ -100,14 +100,15 @@ const TrainerProfileScreen = () => {
   const t = trainer as any;
 
   const handleFollow = () => {
+    const userId = t?.userId;
+    const onSuccess = () => {
+      followUtils.follow.isFollowing.invalidate({ followingId: userId });
+      followUtils.follow.getFollowCounts.invalidate({ userId });
+    };
     if (isFollowing) {
-      unfollowMut.mutate({ followingId: t?.userId }, {
-        onSuccess: () => { followUtils.follow.isFollowing.invalidate(); followUtils.follow.getFollowCounts.invalidate(); },
-      });
+      unfollowMut.mutate({ followingId: userId }, { onSuccess });
     } else {
-      followMut.mutate({ followingId: t?.userId }, {
-        onSuccess: () => { followUtils.follow.isFollowing.invalidate(); followUtils.follow.getFollowCounts.invalidate(); },
-      });
+      followMut.mutate({ followingId: userId }, { onSuccess });
     }
   };
 
