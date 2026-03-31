@@ -883,6 +883,132 @@ const TrainerProfileEdit = () => {
   );
 };
 
+// ===== NUTRITION TAB =====
+const NutritionTabContent = ({ fields, update, profile }: { fields: Record<string, any>; update: (k: string, v: any) => void; profile: any }) => {
+  const [useManual, setUseManual] = useState(fields.dailyCalorieTarget != null && fields.dailyCalorieTarget !== '');
+
+  const missingFields = !profile?.startWeightKg || !profile?.heightCm || !profile?.dateOfBirth || !profile?.gender || !profile?.activityLevel;
+
+  let calculated: { calories: number; proteinG: number; carbsG: number; fatG: number } | null = null;
+  if (!missingFields) {
+    try {
+      const { calculateNutritionTargets } = require('@fitnassist/utils');
+      calculated = calculateNutritionTargets({
+        ...profile,
+        currentWeightKg: profile.startWeightKg,
+      });
+    } catch {}
+  }
+
+  return (
+    <>
+      <Card>
+        <CardContent className="py-4 px-4 gap-3">
+          <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Nutrition Targets</Text>
+          <Text className="text-xs text-muted-foreground">
+            Set your weekly weight goal and daily nutrition targets. Targets are auto-calculated from your profile, or you can set them manually.
+          </Text>
+
+          {/* Weekly Weight Goal */}
+          <Text className="text-xs font-medium text-foreground">Weekly Weight Goal</Text>
+          <View className="flex-row flex-wrap gap-1">
+            {[
+              { value: -1.0, label: 'Lose 1kg' },
+              { value: -0.5, label: 'Lose 0.5kg' },
+              { value: -0.25, label: 'Lose 0.25kg' },
+              { value: 0, label: 'Maintain' },
+              { value: 0.25, label: 'Gain 0.25kg' },
+              { value: 0.5, label: 'Gain 0.5kg' },
+            ].map(({ value, label }) => (
+              <TouchableOpacity
+                key={value}
+                className={`px-3 py-2 rounded-lg border ${fields.weeklyWeightGoalKg === value ? 'border-teal bg-teal/10' : 'border-border'}`}
+                onPress={() => update('weeklyWeightGoalKg', value)}
+              >
+                <Text className={`text-xs ${fields.weeklyWeightGoalKg === value ? 'text-teal' : 'text-muted-foreground'}`}>{label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </CardContent>
+      </Card>
+
+      {/* Calculated targets */}
+      {missingFields ? (
+        <Card>
+          <CardContent className="py-4 px-4">
+            <Text className="text-sm text-muted-foreground text-center">
+              Fill in your weight, height, date of birth, gender, and activity level in the Body and Personal tabs to auto-calculate your targets.
+            </Text>
+          </CardContent>
+        </Card>
+      ) : calculated ? (
+        <Card>
+          <CardContent className="py-4 px-4 gap-2">
+            <Text className="text-xs font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Calculated Daily Targets</Text>
+            <View className="flex-row justify-between">
+              <View className="items-center">
+                <Text className="text-lg font-bold text-foreground">{calculated.calories}</Text>
+                <Text className="text-xs text-muted-foreground">kcal</Text>
+              </View>
+              <View className="items-center">
+                <Text className="text-lg font-bold text-foreground">{calculated.proteinG}g</Text>
+                <Text className="text-xs text-muted-foreground">Protein</Text>
+              </View>
+              <View className="items-center">
+                <Text className="text-lg font-bold text-foreground">{calculated.carbsG}g</Text>
+                <Text className="text-xs text-muted-foreground">Carbs</Text>
+              </View>
+              <View className="items-center">
+                <Text className="text-lg font-bold text-foreground">{calculated.fatG}g</Text>
+                <Text className="text-xs text-muted-foreground">Fat</Text>
+              </View>
+            </View>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {/* Manual override */}
+      <Card>
+        <CardContent className="py-4 px-4 gap-3">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-sm text-foreground">Set custom targets manually</Text>
+            <Switch value={useManual} onValueChange={setUseManual} trackColor={{ false: colors.muted, true: colors.teal }} thumbColor="#fff" />
+          </View>
+
+          {useManual && (
+            <View className="gap-3">
+              <View className="flex-row gap-2">
+                <View className="flex-1">
+                  <Input label="Calories (kcal)" value={String(fields.dailyCalorieTarget ?? '')} onChangeText={(v) => update('dailyCalorieTarget', v)} keyboardType="numeric" placeholder={calculated ? String(calculated.calories) : '2000'} />
+                </View>
+                <View className="flex-1">
+                  <Input label="Protein (g)" value={String(fields.dailyProteinTargetG ?? '')} onChangeText={(v) => update('dailyProteinTargetG', v)} keyboardType="numeric" placeholder={calculated ? String(calculated.proteinG) : '150'} />
+                </View>
+              </View>
+              <View className="flex-row gap-2">
+                <View className="flex-1">
+                  <Input label="Carbs (g)" value={String(fields.dailyCarbsTargetG ?? '')} onChangeText={(v) => update('dailyCarbsTargetG', v)} keyboardType="numeric" placeholder={calculated ? String(calculated.carbsG) : '200'} />
+                </View>
+                <View className="flex-1">
+                  <Input label="Fat (g)" value={String(fields.dailyFatTargetG ?? '')} onChangeText={(v) => update('dailyFatTargetG', v)} keyboardType="numeric" placeholder={calculated ? String(calculated.fatG) : '65'} />
+                </View>
+              </View>
+            </View>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Water */}
+      <Card>
+        <CardContent className="py-4 px-4 gap-3">
+          <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Daily Water Target</Text>
+          <Input label="Water (ml)" value={String(fields.dailyWaterTargetMl ?? '')} onChangeText={(v) => update('dailyWaterTargetMl', v)} keyboardType="numeric" placeholder="2500" />
+        </CardContent>
+      </Card>
+    </>
+  );
+};
+
 const TraineeProfileEdit = () => {
   const { data: profile, isLoading } = useMyTraineeProfile();
   const updateProfile = useUpdateTraineeProfile();
@@ -1095,16 +1221,7 @@ const TraineeProfileEdit = () => {
         )}
 
         {tab === 'nutrition' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Daily Targets</Text>
-              <Input label="Calories (kcal)" value={String(fields.dailyCalorieTarget ?? '')} onChangeText={(v) => update('dailyCalorieTarget', v)} keyboardType="numeric" />
-              <Input label="Protein (g)" value={String(fields.dailyProteinTargetG ?? '')} onChangeText={(v) => update('dailyProteinTargetG', v)} keyboardType="numeric" />
-              <Input label="Carbs (g)" value={String(fields.dailyCarbsTargetG ?? '')} onChangeText={(v) => update('dailyCarbsTargetG', v)} keyboardType="numeric" />
-              <Input label="Fat (g)" value={String(fields.dailyFatTargetG ?? '')} onChangeText={(v) => update('dailyFatTargetG', v)} keyboardType="numeric" />
-              <Input label="Water (ml)" value={String(fields.dailyWaterTargetMl ?? '')} onChangeText={(v) => update('dailyWaterTargetMl', v)} keyboardType="numeric" />
-            </CardContent>
-          </Card>
+          <NutritionTabContent fields={fields} update={update} profile={profile} />
         )}
 
         {tab === 'privacy' && (
