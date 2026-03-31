@@ -6,7 +6,7 @@ import { ArrowLeft, Plus, Trash2, MapPin, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import Constants from 'expo-constants';
-import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, DatePicker } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, DatePicker, Badge, useAlert } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { authClient } from '@/lib/auth';
@@ -511,52 +511,129 @@ const PaymentsTab = () => {
 };
 
 // ===== INTEGRATIONS TAB =====
+const PROVIDER_META: Record<string, { name: string; description: string; color: string; dataTypes: string[]; authPath: string }> = {
+  STRAVA: { name: 'Strava', description: 'Sync runs, rides, swims and other activities', color: '#FC4C02', dataTypes: ['Activities', 'GPS Routes', 'Heart Rate'], authPath: '/api/integrations/strava/auth' },
+  GOOGLE_FIT: { name: 'Google Fit', description: 'Sync steps, sleep, weight and activities', color: '#4285F4', dataTypes: ['Steps', 'Sleep', 'Weight', 'Activities'], authPath: '/api/integrations/google-fit/auth' },
+  FITBIT: { name: 'Fitbit', description: 'Sync steps, sleep, heart rate, water and weight', color: '#00B0B9', dataTypes: ['Steps', 'Sleep', 'Heart Rate', 'Water', 'Weight'], authPath: '/api/integrations/fitbit/auth' },
+  GARMIN: { name: 'Garmin', description: 'Sync activities, steps, sleep and body data', color: '#007CC3', dataTypes: ['Activities', 'Steps', 'Sleep', 'Weight'], authPath: '/api/integrations/garmin/auth' },
+};
+
+const SYNC_PREF_LABELS: Record<string, string> = { activities: 'Activities', steps: 'Steps', sleep: 'Sleep', weight: 'Weight', water: 'Water' };
+
+const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:3001';
+
 const IntegrationsTab = () => {
   const { data: providers } = trpc.integration.availableProviders.useQuery();
   const { data: connections, refetch } = trpc.integration.list.useQuery();
-  const disconnect = trpc.integration.disconnect.useMutation();
+  const disconnectMut = trpc.integration.disconnect.useMutation();
+  const updatePrefsMut = trpc.integration.updatePreferences.useMutation();
+  const { showAlert } = useAlert();
 
-  const providerList = (providers ?? []) as any[];
-  const connectionMap = new Map((connections ?? [] as any[]).map((c: any) => [c.provider, c]));
+  const availableProviders = (providers ?? []) as string[];
+  const connectionMap = new Map(((connections ?? []) as any[]).map((c: any) => [c.provider, c]));
+
+  if (availableProviders.length === 0) {
+    return (
+      <View className="items-center justify-center py-12 gap-2">
+        <Text className="text-base text-muted-foreground">No integrations available yet.</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="gap-4">
       <Card>
-        <CardContent className="py-4 px-4 gap-3">
+        <CardContent className="py-4 px-4 gap-1">
           <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Connected Apps</Text>
-          <Text className="text-xs text-muted-foreground">Sync your fitness data from other apps.</Text>
-
-          {providerList.length === 0 ? (
-            <Text className="text-sm text-muted-foreground">No integrations available.</Text>
-          ) : (
-            providerList.map((provider: any) => {
-              const connection = connectionMap.get(provider.id ?? provider.name);
-              const isConnected = !!connection;
-
-              return (
-                <View key={provider.id ?? provider.name} className="flex-row items-center justify-between py-3 border-b border-border">
-                  <View className="flex-1">
-                    <Text className="text-sm font-medium text-foreground">{provider.name}</Text>
-                    <Text className="text-xs text-muted-foreground">
-                      {isConnected ? `Connected · Last sync: ${connection.lastSyncAt ? new Date(connection.lastSyncAt).toLocaleDateString() : 'Never'}` : 'Not connected'}
-                    </Text>
-                  </View>
-                  {isConnected ? (
-                    <Button size="sm" variant="outline" onPress={() => {
-                      Alert.alert('Disconnect', `Disconnect ${provider.name}?`, [
-                        { text: 'Cancel', style: 'cancel' },
-                        { text: 'Disconnect', style: 'destructive', onPress: () => disconnect.mutate({ provider: provider.id ?? provider.name } as any, { onSuccess: () => refetch() }) },
-                      ]);
-                    }}>Disconnect</Button>
-                  ) : (
-                    <Button size="sm" variant="outline" onPress={() => Alert.alert('Connect', 'Integration setup coming soon')}>Connect</Button>
-                  )}
-                </View>
-              );
-            })
-          )}
+          <Text className="text-xs text-muted-foreground mb-2">Connect your fitness apps to automatically sync activities, steps, sleep and more.</Text>
         </CardContent>
       </Card>
+
+      {availableProviders.map((providerKey) => {
+        const meta = PROVIDER_META[providerKey];
+        if (!meta) return null;
+        const connection = connectionMap.get(providerKey) as any;
+        const isConnected = connection && connection.status !== 'DISCONNECTED';
+        const prefs = (connection?.syncPreferences ?? { activities: true, steps: true, sleep: true, weight: true, water: true }) as Record<string, boolean>;
+
+        return (
+          <Card key={providerKey}>
+            <CardContent className="py-4 px-4 gap-3">
+              <View className="flex-row items-start gap-3">
+                <View className="w-10 h-10 rounded-lg items-center justify-center" style={{ backgroundColor: meta.color }}>
+                  <Text className="text-white font-bold text-sm">{meta.name.charAt(0)}</Text>
+                </View>
+                <View className="flex-1 gap-0.5">
+                  <View className="flex-row items-center gap-2">
+                    <Text className="text-sm font-semibold text-foreground">{meta.name}</Text>
+                    {isConnected && (
+                      <Badge variant={connection.status === 'ERROR' ? 'destructive' : 'default'}>
+                        {connection.status === 'SYNCING' ? 'Syncing...' : connection.status === 'ERROR' ? 'Error' : 'Connected'}
+                      </Badge>
+                    )}
+                  </View>
+                  <Text className="text-xs text-muted-foreground">{meta.description}</Text>
+                  {isConnected && connection.lastSyncAt && (
+                    <Text className="text-xs text-muted-foreground">Last synced: {new Date(connection.lastSyncAt).toLocaleDateString()}</Text>
+                  )}
+                  {isConnected && connection.lastSyncError && (
+                    <Text className="text-xs text-destructive">{connection.lastSyncError}</Text>
+                  )}
+                  {isConnected && !connection.initialImportComplete && (
+                    <Text className="text-xs text-muted-foreground">Importing history...</Text>
+                  )}
+                </View>
+                {isConnected ? (
+                  <Button size="sm" variant="outline" onPress={() => {
+                    showAlert({
+                      title: `Disconnect ${meta.name}?`,
+                      message: `This will stop syncing data from ${meta.name}. Your existing diary entries will not be deleted.`,
+                      actions: [
+                        { label: 'Disconnect', variant: 'destructive', onPress: () => disconnectMut.mutate({ provider: providerKey } as any, { onSuccess: () => refetch() }) },
+                        { label: 'Cancel', variant: 'outline' },
+                      ],
+                    });
+                  }}>Disconnect</Button>
+                ) : (
+                  <Button size="sm" onPress={async () => {
+                    await WebBrowser.openBrowserAsync(`${apiUrl}${meta.authPath}`);
+                    refetch();
+                  }}>Connect</Button>
+                )}
+              </View>
+
+              {/* Sync preferences */}
+              {isConnected && (
+                <View className="mt-2 pt-3 border-t border-border gap-2">
+                  <Text className="text-xs font-medium text-foreground">Sync preferences</Text>
+                  {Object.entries(SYNC_PREF_LABELS).map(([key, label]) => (
+                    <View key={key} className="flex-row items-center justify-between py-1">
+                      <Text className="text-sm text-foreground">{label}</Text>
+                      <Switch
+                        value={prefs[key] ?? true}
+                        onValueChange={(v) => updatePrefsMut.mutate({ provider: providerKey, preferences: { ...prefs, [key]: v } } as any, { onSuccess: () => refetch() })}
+                        trackColor={{ false: colors.muted, true: colors.teal }}
+                        thumbColor="#fff"
+                      />
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* Data types when not connected */}
+              {!isConnected && (
+                <View className="flex-row flex-wrap gap-1 mt-1">
+                  {meta.dataTypes.map((type) => (
+                    <View key={type} className="bg-secondary rounded px-2 py-0.5">
+                      <Text className="text-xs text-muted-foreground">{type}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
     </View>
   );
 };
