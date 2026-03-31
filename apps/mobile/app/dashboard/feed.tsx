@@ -41,10 +41,6 @@ const PostCard = ({ post, onLike, onUnlike }: { post: any; onLike: () => void; o
           <Heart size={18} color={isLiked ? colors.primary : colors.mutedForeground} fill={isLiked ? colors.primary : 'transparent'} />
           <Text className="text-sm text-muted-foreground">{post.likeCount ?? 0}</Text>
         </TouchableOpacity>
-        <View className="flex-row items-center gap-1">
-          <MessageCircle size={18} color={colors.mutedForeground} />
-          <Text className="text-sm text-muted-foreground">{post.commentCount ?? 0}</Text>
-        </View>
       </View>
     </View>
   );
