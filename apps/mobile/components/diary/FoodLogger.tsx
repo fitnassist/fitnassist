@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Alert, FlatList, TextInput as RNTextInput } from 'react-native';
+import { View, Alert, ScrollView, TextInput as RNTextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { Search } from 'lucide-react-native';
 import { Text, Input, Button, Skeleton } from '@/components/ui';
@@ -115,11 +115,11 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
           {searching && <Skeleton className="h-20 rounded-lg" />}
 
           {searchResults && (searchResults as any)?.products?.length > 0 && (
-            <View className="gap-1 max-h-48">
-              {(searchResults as any).products.slice(0, 8).map((food: any, i: number) => (
+            <ScrollView className="max-h-64 bg-card border border-border rounded-lg" keyboardShouldPersistTaps="handled">
+              {(searchResults as any).products.slice(0, 15).map((food: any, i: number) => (
                 <TouchableOpacity
                   key={i}
-                  className="bg-card border border-border rounded-lg px-3 py-2"
+                  className="px-4 py-3 border-b border-border"
                   onPress={() => handleSelectFood(food)}
                 >
                   <Text className="text-sm text-foreground" numberOfLines={1}>{food.food_name}{food.brand_name ? ` (${food.brand_name})` : ''}</Text>
@@ -128,7 +128,7 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
                   </Text>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
           )}
 
           <Button variant="outline" onPress={() => setMode('manual')}>

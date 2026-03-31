@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { View, FlatList, TextInput as RNTextInput } from 'react-native';
+import { View, ScrollView, TextInput as RNTextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { MapPin, X } from 'lucide-react-native';
 import Constants from 'expo-constants';
@@ -154,17 +154,17 @@ export const AddressInput = ({ currentAddress, onSelect }: AddressInputProps) =>
       </View>
 
       {predictions.length > 0 && (
-        <View className="bg-card border border-border rounded-lg max-h-48 overflow-hidden">
+        <ScrollView className="max-h-64 bg-card border border-border rounded-lg" keyboardShouldPersistTaps="handled">
           {predictions.map((p) => (
             <TouchableOpacity
               key={p.placeId}
-              className="px-3 py-3 border-b border-border"
+              className="px-4 py-3 border-b border-border"
               onPress={() => selectPlace(p.placeId)}
             >
               <Text className="text-sm text-foreground" numberOfLines={1}>{p.description}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       )}
 
       {displayAddress?.addressLine1 && !query && (
