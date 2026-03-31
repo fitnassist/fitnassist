@@ -425,7 +425,10 @@ const uploadImage = async (uri: string, type: string, getUploadParams: any) => {
 const TrainerProfileEdit = () => {
   const { data: profile, isLoading } = useMyTrainerProfile();
   const updateProfile = useUpdateTrainerProfile();
+  const publishProfile = trpc.trainer.publish.useMutation();
+  const unpublishProfile = trpc.trainer.unpublish.useMutation();
   const getUploadParams = trpc.upload.getUploadParams.useMutation();
+  const trpcUtils = trpc.useUtils();
   const [tab, setTab] = useState<TrainerTab>('basic');
   const [fields, setFields] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
@@ -622,40 +625,106 @@ const TrainerProfileEdit = () => {
         )}
 
         {tab === 'settings' && (
-          <Card>
-            <CardContent className="py-4 px-4 gap-3">
-              <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Settings</Text>
-              <View className="flex-row items-center justify-between py-2">
-                <Text className="text-sm text-foreground">Accepting New Clients</Text>
-                <Switch
-                  value={fields.acceptingClients}
-                  onValueChange={(v) => update('acceptingClients', v)}
-                  trackColor={{ false: colors.muted, true: colors.teal }}
-                  thumbColor="#fff"
-                />
-              </View>
+          <>
+            {/* Profile Visibility */}
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile Visibility</Text>
+                <View className="flex-row items-center justify-between py-2">
+                  <View className="flex-1 gap-1">
+                    <Text className="text-sm font-medium text-foreground">
+                      {(profile as any)?.isPublished ? 'Published' : 'Unpublished'}
+                    </Text>
+                    <Text className="text-xs text-muted-foreground">
+                      {(profile as any)?.isPublished
+                        ? 'Your profile is visible to potential clients in search results'
+                        : 'Your profile is hidden from search results. Publish it when ready.'}
+                    </Text>
+                  </View>
+                  <Switch
+                    value={(profile as any)?.isPublished ?? false}
+                    onValueChange={async (v) => {
+                      try {
+                        if (v) {
+                          await publishProfile.mutateAsync();
+                        } else {
+                          await unpublishProfile.mutateAsync();
+                        }
+                        trpcUtils.trainer.getMyProfile.invalidate();
+                      } catch {
+                        Alert.alert('Error', v ? 'Failed to publish profile' : 'Failed to unpublish profile');
+                      }
+                    }}
+                    trackColor={{ false: colors.muted, true: colors.teal }}
+                    thumbColor="#fff"
+                  />
+                </View>
+              </CardContent>
+            </Card>
 
-              <Text className="text-sm font-medium text-teal uppercase mt-2" style={{ letterSpacing: 1 }}>Hourly Rate</Text>
-              <View className="flex-row gap-3">
-                <View className="flex-1">
-                  <Input
-                    label="Min (£)"
-                    value={String(fields.hourlyRateMin ?? '')}
-                    onChangeText={(v) => update('hourlyRateMin', parseFloat(v) || 0)}
-                    keyboardType="numeric"
+            {/* Client Availability */}
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Client Availability</Text>
+                <View className="flex-row items-center justify-between py-2">
+                  <View className="flex-1 gap-1">
+                    <Text className="text-sm font-medium text-foreground">
+                      {fields.acceptingClients ? 'Accepting Clients' : 'Not Accepting Clients'}
+                    </Text>
+                    <Text className="text-xs text-muted-foreground">
+                      {fields.acceptingClients
+                        ? 'New clients can send you connection requests'
+                        : 'Your profile shows you are not currently accepting new clients'}
+                    </Text>
+                  </View>
+                  <Switch
+                    value={fields.acceptingClients}
+                    onValueChange={(v) => update('acceptingClients', v)}
+                    trackColor={{ false: colors.muted, true: colors.teal }}
+                    thumbColor="#fff"
                   />
                 </View>
-                <View className="flex-1">
-                  <Input
-                    label="Max (£)"
-                    value={String(fields.hourlyRateMax ?? '')}
-                    onChangeText={(v) => update('hourlyRateMax', parseFloat(v) || 0)}
-                    keyboardType="numeric"
-                  />
+              </CardContent>
+            </Card>
+
+            {/* Hourly Rate */}
+            <Card>
+              <CardContent className="py-4 px-4 gap-3">
+                <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Hourly Rate</Text>
+                <View className="flex-row gap-3">
+                  <View className="flex-1">
+                    <Input
+                      label="Min (£)"
+                      value={String(fields.hourlyRateMin ?? '')}
+                      onChangeText={(v) => update('hourlyRateMin', parseFloat(v) || 0)}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <Input
+                      label="Max (£)"
+                      value={String(fields.hourlyRateMax ?? '')}
+                      onChangeText={(v) => update('hourlyRateMax', parseFloat(v) || 0)}
+                      keyboardType="numeric"
+                    />
+                  </View>
                 </View>
-              </View>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Profile URL */}
+            {profile?.handle && (
+              <Card>
+                <CardContent className="py-4 px-4 gap-2">
+                  <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>Profile URL</Text>
+                  <View className="bg-secondary rounded-lg px-3 py-2.5">
+                    <Text className="text-sm text-foreground" selectable>fitnassist.co/trainers/{profile.handle}</Text>
+                  </View>
+                  <Text className="text-xs text-muted-foreground">Share this link with potential clients</Text>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
 
         <Button onPress={handleSave} loading={saving}>Save Changes</Button>
