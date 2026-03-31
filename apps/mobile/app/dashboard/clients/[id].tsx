@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, MessageCircle, UserMinus, ClipboardList, Target, FileText, TrendingUp } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Card, CardContent, Skeleton, Badge } from '@/components/ui';
+import { Text, Button, Card, CardContent, Skeleton, Badge, TabBar } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
@@ -83,23 +83,16 @@ const ClientDetailScreen = () => {
         <Text className="text-base font-semibold text-foreground">{name}</Text>
       </View>
 
-      {/* Tabs */}
-      <View className="flex-row px-4 py-3 gap-1">
-        {([
+      <TabBar
+        tabs={[
           { key: 'overview' as Tab, label: 'Overview' },
           { key: 'plans' as Tab, label: 'Plans' },
           { key: 'progress' as Tab, label: 'Progress' },
           { key: 'notes' as Tab, label: 'Notes' },
-        ]).map(({ key, label }) => (
-          <TouchableOpacity
-            key={key}
-            className={`flex-1 items-center py-2 rounded-lg ${tab === key ? 'bg-primary' : 'bg-card border border-border'}`}
-            onPress={() => setTab(key)}
-          >
-            <Text className={`text-xs font-medium ${tab === key ? 'text-white' : 'text-muted-foreground'}`}>{label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        ]}
+        active={tab}
+        onChange={setTab}
+      />
 
       <ScrollView
         className="flex-1"

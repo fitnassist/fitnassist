@@ -6,7 +6,7 @@ import { ArrowLeft, Camera, Check, X, MapPin } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
-import { Text, Button, Input, Card, CardContent } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar } from '@/components/ui';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile, useUpdateTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile, useUpdateTraineeProfile } from '@/api/trainee';
@@ -618,17 +618,7 @@ const TrainerProfileEdit = () => {
 
   return (
     <>
-      <View className="flex-row px-4 pt-4 pb-2 gap-1">
-        {TABS.map(({ key, label }) => (
-          <TouchableOpacity
-            key={key}
-            className={`flex-1 items-center py-2 rounded-lg ${tab === key ? 'bg-primary' : 'bg-card border border-border'}`}
-            onPress={() => setTab(key)}
-          >
-            <Text className={`text-xs font-medium ${tab === key ? 'text-white' : 'text-muted-foreground'}`}>{label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">
         {tab === 'basic' && (
@@ -962,17 +952,7 @@ const TraineeProfileEdit = () => {
 
   return (
     <>
-      <View className="flex-row px-4 pt-4 pb-2 gap-1">
-        {TABS.map(({ key, label }) => (
-          <TouchableOpacity
-            key={key}
-            className={`flex-1 items-center py-2 rounded-lg ${tab === key ? 'bg-primary' : 'bg-card border border-border'}`}
-            onPress={() => setTab(key)}
-          >
-            <Text className={`text-xs font-medium ${tab === key ? 'text-white' : 'text-muted-foreground'}`}>{label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
       <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">
         {tab === 'personal' && (

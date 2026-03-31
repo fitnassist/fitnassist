@@ -4,3 +4,4 @@ export { Button, type ButtonProps } from './button';
 export { Input, type InputProps } from './input';
 export { Card, CardHeader, CardTitle, CardContent } from './card';
 export { Skeleton, type SkeletonProps } from './skeleton';
+export { TabBar } from './tab-bar';

@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Dumbbell, ChefHat, ClipboardList, UtensilsCrossed } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Card, CardContent, Skeleton } from '@/components/ui';
+import { Text, Card, CardContent, Skeleton, TabBar } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
@@ -52,23 +52,7 @@ const ResourcesScreen = () => {
         <Text className="text-base font-semibold text-foreground">Resources</Text>
       </View>
 
-      {/* Tabs */}
-      <View className="flex-row px-4 pt-4 pb-2 gap-2">
-        {TABS.map(({ key, label, icon: Icon }) => (
-          <TouchableOpacity
-            key={key}
-            className={`flex-1 flex-row items-center justify-center gap-1.5 py-2 rounded-lg ${
-              tab === key ? 'bg-primary' : 'bg-card border border-border'
-            }`}
-            onPress={() => setTab(key)}
-          >
-            <Icon size={14} color={tab === key ? '#fff' : colors.mutedForeground} />
-            <Text className={`text-xs font-medium ${tab === key ? 'text-white' : 'text-muted-foreground'}`}>
-              {label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <TabBar tabs={TABS} active={tab} onChange={setTab} />
 
       {current.isLoading ? (
         <View className="px-4 gap-2">

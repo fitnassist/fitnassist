@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Trophy, Medal } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Skeleton } from '@/components/ui';
+import { Text, Skeleton, TabBar } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
@@ -51,18 +51,7 @@ const LeaderboardsScreen = () => {
         <Text className="text-base font-semibold text-foreground">Leaderboards</Text>
       </View>
 
-      {/* Category tabs */}
-      <View className="flex-row px-4 pt-3 gap-1">
-        {CATEGORIES.map(({ key, label }) => (
-          <TouchableOpacity
-            key={key}
-            className={`flex-1 items-center py-2 rounded-lg ${category === key ? 'bg-primary' : 'bg-card border border-border'}`}
-            onPress={() => setCategory(key)}
-          >
-            <Text className={`text-xs font-medium ${category === key ? 'text-white' : 'text-muted-foreground'}`}>{label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <TabBar tabs={CATEGORIES} active={category} onChange={setCategory} />
 
       {/* Period + scope */}
       <View className="flex-row px-4 pt-2 pb-3 gap-2">

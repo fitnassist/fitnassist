@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, UserPlus, UserMinus, Check, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Button, Skeleton, Card, CardContent } from '@/components/ui';
+import { Text, Button, Skeleton, Card, CardContent, TabBar } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/hooks/useAuth';
 import { colors } from '@/constants/theme';
@@ -136,25 +136,17 @@ const FriendsScreen = () => {
         <Text className="text-base font-semibold text-foreground">Friends</Text>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="px-4 py-3">
-        <View className="flex-row gap-2">
-        {([
+      <TabBar
+        tabs={[
           { key: 'friends' as Tab, label: 'Friends' },
           { key: 'requests' as Tab, label: `Requests${pendingList.length ? ` (${pendingList.length})` : ''}` },
           { key: 'sent' as Tab, label: 'Sent' },
           { key: 'following' as Tab, label: 'Following' },
           { key: 'blocked' as Tab, label: 'Blocked' },
-        ]).map(({ key, label }) => (
-          <TouchableOpacity
-            key={key}
-            className={`flex-1 items-center py-2 rounded-lg ${tab === key ? 'bg-primary' : 'bg-card border border-border'}`}
-            onPress={() => setTab(key)}
-          >
-            <Text className={`text-sm font-medium ${tab === key ? 'text-white' : 'text-muted-foreground'}`}>{label}</Text>
-          </TouchableOpacity>
-        ))}
-        </View>
-      </ScrollView>
+        ]}
+        active={tab}
+        onChange={setTab}
+      />
 
       {isLoading ? (
         <View className="px-4 gap-2">

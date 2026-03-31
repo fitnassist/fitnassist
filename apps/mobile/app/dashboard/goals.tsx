@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Target, CheckCircle, Trophy, Plus, X } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { Text, Card, CardContent, Skeleton, Badge, Button, Input } from '@/components/ui';
+import { Text, Card, CardContent, Skeleton, Badge, Button, Input, TabBar } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { colors } from '@/constants/theme';
 
@@ -167,17 +167,7 @@ const GoalsScreen = () => {
         </View>
       </Modal>
 
-      <View className="flex-row px-4 pt-4 pb-2 gap-2">
-        {FILTERS.map(({ key, label }) => (
-          <TouchableOpacity
-            key={key}
-            className={`flex-1 items-center py-2 rounded-lg ${filter === key ? 'bg-primary' : 'bg-card border border-border'}`}
-            onPress={() => setFilter(key)}
-          >
-            <Text className={`text-sm font-medium ${filter === key ? 'text-white' : 'text-muted-foreground'}`}>{label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <TabBar tabs={FILTERS} active={filter} onChange={setFilter} />
 
       {isLoading ? (
         <View className="px-4 gap-2">
