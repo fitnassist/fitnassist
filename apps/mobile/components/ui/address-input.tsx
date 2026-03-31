@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { View } from 'react-native';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { useState, useCallback } from 'react';
+import { View, FlatList, TextInput as RNTextInput } from 'react-native';
 import { TouchableOpacity } from 'react-native';
+import { MapPin, X } from 'lucide-react-native';
 import Constants from 'expo-constants';
 import { Text } from './text';
 import { Input } from './input';
@@ -28,6 +28,9 @@ interface AddressInputProps {
 
 export const AddressInput = ({ currentAddress, onSelect }: AddressInputProps) => {
   const [isManual, setIsManual] = useState(false);
+  const [query, setQuery] = useState('');
+  const [predictions, setPredictions] = useState<{ placeId: string; description: string }[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<AddressResult | null>(null);
   const [manual, setManual] = useState({
     addressLine1: currentAddress?.addressLine1 ?? '',
     addressLine2: '',
@@ -35,6 +38,46 @@ export const AddressInput = ({ currentAddress, onSelect }: AddressInputProps) =>
     county: currentAddress?.county ?? '',
     postcode: currentAddress?.postcode ?? '',
   });
+
+  const search = useCallback(async (text: string) => {
+    setQuery(text);
+    if (text.length < 3 || !GOOGLE_API_KEY) { setPredictions([]); return; }
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(text)}&components=country:gb&key=${GOOGLE_API_KEY}`
+      );
+      const data = await res.json();
+      setPredictions((data.predictions ?? []).map((p: any) => ({ placeId: p.place_id, description: p.description })));
+    } catch {
+      setPredictions([]);
+    }
+  }, []);
+
+  const selectPlace = useCallback(async (placeId: string) => {
+    setPredictions([]);
+    setQuery('');
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,geometry&key=${GOOGLE_API_KEY}`
+      );
+      const data = await res.json();
+      const result = data.result;
+      if (!result) return;
+      const get = (type: string) => result.address_components?.find((c: any) => c.types.includes(type))?.long_name ?? '';
+      const addr: AddressResult = {
+        addressLine1: `${get('street_number')} ${get('route')}`.trim(),
+        city: get('postal_town') || get('locality'),
+        county: get('administrative_area_level_2'),
+        postcode: get('postal_code'),
+        country: get('country'),
+        latitude: result.geometry?.location?.lat ?? 0,
+        longitude: result.geometry?.location?.lng ?? 0,
+        placeId,
+      };
+      setSelectedAddress(addr);
+      onSelect(addr);
+    } catch {}
+  }, [onSelect]);
 
   if (isManual) {
     return (
@@ -57,10 +100,10 @@ export const AddressInput = ({ currentAddress, onSelect }: AddressInputProps) =>
         </View>
         <Input label="Postcode *" value={manual.postcode} onChangeText={(v) => setManual((m) => ({ ...m, postcode: v.toUpperCase() }))} placeholder="e.g. SW1A 1AA" />
         <TouchableOpacity
-          className="bg-teal/10 border border-teal rounded-lg py-2 items-center"
+          className="bg-teal/10 border border-teal rounded-lg py-2.5 items-center"
           onPress={() => {
             if (!manual.addressLine1 || !manual.city || !manual.postcode) return;
-            onSelect({
+            const addr: AddressResult = {
               addressLine1: manual.addressLine1,
               addressLine2: manual.addressLine2,
               city: manual.city,
@@ -70,7 +113,9 @@ export const AddressInput = ({ currentAddress, onSelect }: AddressInputProps) =>
               latitude: 0,
               longitude: 0,
               placeId: '',
-            });
+            };
+            setSelectedAddress(addr);
+            onSelect(addr);
             setIsManual(false);
           }}
         >
@@ -80,8 +125,10 @@ export const AddressInput = ({ currentAddress, onSelect }: AddressInputProps) =>
     );
   }
 
+  const displayAddress = selectedAddress ?? (currentAddress?.addressLine1 ? currentAddress as any : null);
+
   return (
-    <View className="gap-3">
+    <View className="gap-2" style={{ zIndex: 10 }}>
       <View className="flex-row items-center justify-between">
         <Text className="text-sm font-medium text-foreground">Address</Text>
         <TouchableOpacity onPress={() => setIsManual(true)}>
@@ -89,78 +136,42 @@ export const AddressInput = ({ currentAddress, onSelect }: AddressInputProps) =>
         </TouchableOpacity>
       </View>
 
-      <GooglePlacesAutocomplete
-        placeholder="Start typing your address..."
-        onPress={(_data, details) => {
-          if (!details) return;
-          const get = (type: string) => details.address_components?.find((c: any) => c.types.includes(type))?.long_name ?? '';
-          onSelect({
-            addressLine1: `${get('street_number')} ${get('route')}`.trim(),
-            city: get('postal_town') || get('locality'),
-            county: get('administrative_area_level_2'),
-            postcode: get('postal_code'),
-            country: get('country'),
-            latitude: details.geometry?.location?.lat ?? 0,
-            longitude: details.geometry?.location?.lng ?? 0,
-            placeId: details.place_id ?? '',
-          });
-        }}
-        query={{
-          key: GOOGLE_API_KEY,
-          language: 'en',
-          components: 'country:gb',
-        }}
-        fetchDetails
-        enablePoweredByContainer={false}
-        styles={{
-          container: { flex: 0, zIndex: 10 },
-          textInputContainer: {
-            backgroundColor: 'transparent',
-          },
-          textInput: {
-            height: 48,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: 'hsl(230, 15%, 22%)',
-            backgroundColor: 'hsl(230, 20%, 10%)',
-            color: 'hsl(0, 0%, 95%)',
-            fontSize: 16,
-            paddingHorizontal: 16,
-          },
-          predefinedPlacesDescription: { color: colors.teal },
-          listView: {
-            backgroundColor: 'hsl(230, 18%, 14%)',
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: 'hsl(230, 15%, 22%)',
-            marginTop: 4,
-          },
-          row: {
-            backgroundColor: 'transparent',
-            paddingVertical: 12,
-            paddingHorizontal: 16,
-          },
-          separator: {
-            backgroundColor: 'hsl(230, 15%, 22%)',
-            height: 1,
-          },
-          description: {
-            color: 'hsl(0, 0%, 95%)',
-            fontSize: 14,
-          },
-          poweredContainer: { display: 'none' },
-        }}
-        textInputProps={{
-          placeholderTextColor: 'hsl(230, 10%, 55%)',
-          autoCapitalize: 'none',
-        }}
-      />
+      <View className="flex-row items-center h-12 bg-background border border-border rounded-lg px-3">
+        <MapPin size={16} color={colors.mutedForeground} />
+        <RNTextInput
+          value={query}
+          onChangeText={search}
+          placeholder="Start typing your address..."
+          placeholderTextColor="hsl(230, 10%, 55%)"
+          style={{ flex: 1, fontSize: 16, color: 'hsl(0, 0%, 95%)', marginLeft: 8, padding: 0, margin: 0 }}
+          autoCapitalize="none"
+        />
+        {query.length > 0 && (
+          <TouchableOpacity onPress={() => { setQuery(''); setPredictions([]); }}>
+            <X size={16} color={colors.mutedForeground} />
+          </TouchableOpacity>
+        )}
+      </View>
 
-      {currentAddress?.addressLine1 && (
+      {predictions.length > 0 && (
+        <View className="bg-card border border-border rounded-lg max-h-48 overflow-hidden">
+          {predictions.map((p) => (
+            <TouchableOpacity
+              key={p.placeId}
+              className="px-3 py-3 border-b border-border"
+              onPress={() => selectPlace(p.placeId)}
+            >
+              <Text className="text-sm text-foreground" numberOfLines={1}>{p.description}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {displayAddress?.addressLine1 && !query && (
         <View className="bg-secondary rounded-lg p-3 gap-0.5">
-          <Text className="text-sm font-medium text-foreground">{currentAddress.addressLine1}</Text>
+          <Text className="text-sm font-medium text-foreground">{displayAddress.addressLine1}</Text>
           <Text className="text-xs text-muted-foreground">
-            {[currentAddress.city, currentAddress.county, currentAddress.postcode].filter(Boolean).join(', ')}
+            {[displayAddress.city, displayAddress.county, displayAddress.postcode].filter(Boolean).join(', ')}
           </Text>
         </View>
       )}

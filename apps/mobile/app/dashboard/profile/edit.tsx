@@ -7,7 +7,8 @@ import { TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import { Calendar as RNCalendar } from 'react-native-calendars';
-import { Text, Button, Input, Card, CardContent, TabBar, AddressInput } from '@/components/ui';
+import { Text, Button, Input, Card, CardContent, TabBar, AddressInput, useAlert } from '@/components/ui';
+import { CheckCircle as CheckIcon, XCircle } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { useMyTrainerProfile, useUpdateTrainerProfile } from '@/api/trainer';
 import { useMyTraineeProfile, useUpdateTraineeProfile } from '@/api/trainee';
@@ -530,6 +531,7 @@ const uploadImage = async (uri: string, type: string, getUploadParams: any) => {
 };
 
 const TrainerProfileEdit = () => {
+  const { showAlert } = useAlert();
   const { data: profile, isLoading } = useMyTrainerProfile();
   const updateProfile = useUpdateTrainerProfile();
   const publishProfile = trpc.trainer.publish.useMutation();
@@ -599,9 +601,9 @@ const TrainerProfileEdit = () => {
         hourlyRateMin: Math.round((fields.hourlyRateMin ?? 0) * 100),
         hourlyRateMax: Math.round((fields.hourlyRateMax ?? 0) * 100),
       });
-      Alert.alert('Success', 'Profile updated');
+      showAlert({ title: 'Profile Updated', icon: <CheckIcon size={32} color={colors.teal} /> });
     } catch {
-      Alert.alert('Error', 'Failed to update profile');
+      showAlert({ title: 'Error', message: 'Failed to update profile', icon: <XCircle size={32} color={colors.destructive} /> });
     } finally {
       setSaving(false);
     }
