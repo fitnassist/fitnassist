@@ -77,12 +77,31 @@ const FeedScreen = () => {
 
   const posts = data?.pages.flatMap((p: any) => p.items ?? p) ?? [];
 
+  const optimisticToggle = (postId: string, liked: boolean) => {
+    utils.post.getFeed.setInfiniteData({ limit: 20 }, (old: any) => {
+      if (!old) return old;
+      return {
+        ...old,
+        pages: old.pages.map((page: any) => ({
+          ...page,
+          items: (page.items ?? []).map((item: any) =>
+            item.id === postId
+              ? { ...item, hasLiked: liked, likeCount: (item.likeCount ?? 0) + (liked ? 1 : -1) }
+              : item,
+          ),
+        })),
+      };
+    });
+  };
+
   const handleLike = (postId: string) => {
-    likeMutation.mutate({ postId }, { onSuccess: () => { utils.post.getFeed.invalidate(); utils.post.getFeed.refetch(); } });
+    optimisticToggle(postId, true);
+    likeMutation.mutate({ postId }, { onError: () => optimisticToggle(postId, false) });
   };
 
   const handleUnlike = (postId: string) => {
-    unlikeMutation.mutate({ postId }, { onSuccess: () => { utils.post.getFeed.invalidate(); utils.post.getFeed.refetch(); } });
+    optimisticToggle(postId, false);
+    unlikeMutation.mutate({ postId }, { onError: () => optimisticToggle(postId, true) });
   };
 
   return (

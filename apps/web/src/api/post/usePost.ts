@@ -20,12 +20,33 @@ export const useDeletePost = () => {
   });
 };
 
+const toggleLikeOptimistic = (utils: ReturnType<typeof trpc.useUtils>, postId: string, liked: boolean) => {
+  const updatePages = (old: any) => {
+    if (!old) return old;
+    return {
+      ...old,
+      pages: old.pages.map((page: any) => ({
+        ...page,
+        items: (page.items ?? []).map((item: any) =>
+          item.id === postId
+            ? { ...item, hasLiked: liked, likeCount: Math.max(0, (item.likeCount ?? 0) + (liked ? 1 : -1)) }
+            : item,
+        ),
+      })),
+    };
+  };
+  utils.post.getFeed.setInfiniteData({ limit: 20 }, updatePages);
+  utils.post.getUserPosts.setInfiniteData({ userId: '', limit: 20 }, updatePages);
+};
+
 export const useLikePost = () => {
   const utils = trpc.useUtils();
   return trpc.post.like.useMutation({
-    onSuccess: () => {
-      utils.post.getFeed.invalidate();
-      utils.post.getUserPosts.invalidate();
+    onMutate: async ({ postId }) => {
+      toggleLikeOptimistic(utils, postId, true);
+    },
+    onError: (_err, { postId }) => {
+      toggleLikeOptimistic(utils, postId, false);
     },
   });
 };
@@ -33,9 +54,11 @@ export const useLikePost = () => {
 export const useUnlikePost = () => {
   const utils = trpc.useUtils();
   return trpc.post.unlike.useMutation({
-    onSuccess: () => {
-      utils.post.getFeed.invalidate();
-      utils.post.getUserPosts.invalidate();
+    onMutate: async ({ postId }) => {
+      toggleLikeOptimistic(utils, postId, false);
+    },
+    onError: (_err, { postId }) => {
+      toggleLikeOptimistic(utils, postId, true);
     },
   });
 };
