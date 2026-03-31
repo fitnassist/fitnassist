@@ -26,12 +26,16 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const [splashHidden, setSplashHidden] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
 
-    // Auth check complete - hide splash screen
-    SplashScreen.hideAsync();
+    // Hide splash only once on initial load
+    if (!splashHidden) {
+      SplashScreen.hideAsync().catch(() => {});
+      setSplashHidden(true);
+    }
 
     const inAuthGroup = segments[0] === '(auth)';
 
