@@ -44,6 +44,7 @@ module.exports = {
     plugins: ['expo-router', 'expo-secure-store'],
     extra: {
       apiUrl: process.env.API_URL ?? `http://${localIp}:3001`,
+      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY ?? '',
       router: {
         origin: false,
       },

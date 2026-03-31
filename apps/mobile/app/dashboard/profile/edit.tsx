@@ -21,7 +21,7 @@ type TrainerTab = 'basic' | 'location' | 'services' | 'media' | 'settings';
 type TraineeTab = 'personal' | 'body' | 'fitness' | 'nutrition' | 'privacy';
 
 const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:3001';
-const GOOGLE_API_KEY = '***REDACTED***';
+const GOOGLE_API_KEY = Constants.expoConfig?.extra?.googleMapsApiKey ?? '';
 
 // Group services by category
 const SERVICE_GROUPS = [
