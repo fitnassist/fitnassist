@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, ScrollView, Alert, Image, Switch, FlatList } from 'react-native';
+import { View, ScrollView, Alert, Image, Switch, FlatList, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Camera, Check, X, MapPin } from 'lucide-react-native';
@@ -219,16 +219,17 @@ const AddressAutocomplete = ({ currentAddress, onSelect }: {
           <Text className="text-sm text-teal">Enter manually</Text>
         </TouchableOpacity>
       </View>
-      <View className="flex-row items-center bg-card border border-border rounded-lg px-3">
+      <View className="flex-row items-center h-12 bg-card border border-border rounded-lg px-3">
         <MapPin size={16} color={colors.mutedForeground} />
-        <View className="flex-1">
-          <Input
-            value={query}
-            onChangeText={(t) => { setQuery(t); searchPlaces(t); }}
-            placeholder="Start typing your address..."
-            className="border-0"
-          />
-        </View>
+        <TextInput
+          value={query}
+          onChangeText={(t) => { setQuery(t); searchPlaces(t); }}
+          placeholder="Start typing your address..."
+          placeholderTextColor="hsl(230, 10%, 55%)"
+          className="flex-1 text-foreground ml-2"
+          style={{ fontSize: 16, padding: 0, margin: 0 }}
+          autoCapitalize="none"
+        />
         {query.length > 0 && (
           <TouchableOpacity onPress={() => { setQuery(''); setPredictions([]); setShowPredictions(false); }}>
             <X size={16} color={colors.mutedForeground} />
