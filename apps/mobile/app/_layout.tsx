@@ -1,8 +1,8 @@
 import '../global.css';
-import { useEffect, useState, useRef } from 'react';
-import { Animated, View } from 'react-native';
+import { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -12,6 +12,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { AlertProvider } from '@/components/ui';
 import { useSse } from '@/lib/sse';
 import { useNotifications } from '@/hooks/useNotifications';
+
+// Keep splash screen visible until we're ready
+SplashScreen.preventAutoHideAsync();
 
 const AuthenticatedProviders = ({ children }: { children: React.ReactNode }) => {
   useSse();
@@ -26,6 +29,9 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (isLoading) return;
+
+    // Auth check complete - hide splash screen
+    SplashScreen.hideAsync();
 
     const inAuthGroup = segments[0] === '(auth)';
 
