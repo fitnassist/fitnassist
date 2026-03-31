@@ -596,11 +596,29 @@ const TrainerProfileEdit = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await updateProfile.mutateAsync({
-        ...fields,
-        hourlyRateMin: Math.round((fields.hourlyRateMin ?? 0) * 100),
-        hourlyRateMax: Math.round((fields.hourlyRateMax ?? 0) * 100),
-      });
+      // Only send schema-valid fields
+      const payload: Record<string, any> = {
+        displayName: fields.displayName || undefined,
+        bio: fields.bio || undefined,
+        addressLine1: fields.addressLine1 || undefined,
+        city: fields.city || undefined,
+        county: fields.county || undefined,
+        postcode: fields.postcode || undefined,
+        country: fields.country ? fields.country.substring(0, 2).toUpperCase() : undefined,
+        placeId: fields.placeId || undefined,
+        latitude: fields.latitude || undefined,
+        longitude: fields.longitude || undefined,
+        travelOption: fields.travelOption || undefined,
+        services: fields.services,
+        qualifications: fields.qualifications,
+        acceptingClients: fields.acceptingClients,
+        hourlyRateMin: Math.round((fields.hourlyRateMin ?? 0) * 100) || undefined,
+        hourlyRateMax: Math.round((fields.hourlyRateMax ?? 0) * 100) || undefined,
+        profileImageUrl: fields.profileImageUrl || undefined,
+      };
+      // Remove undefined values
+      Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k]);
+      await updateProfile.mutateAsync(payload);
       showAlert({ title: 'Profile Updated', icon: <CheckIcon size={32} color={colors.teal} /> });
     } catch {
       showAlert({ title: 'Error', message: 'Failed to update profile', icon: <XCircle size={32} color={colors.destructive} /> });
