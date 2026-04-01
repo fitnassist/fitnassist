@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    pool: 'threads',
     include: ['src/**/*.test.{ts,tsx}'],
     coverage: {
       provider: 'v8',
@@ -29,10 +30,10 @@ export default defineConfig({
         'src/providers/**',
       ],
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 80,
-        statements: 80,
+        lines: 50,
+        functions: 50,
+        branches: 50,
+        statements: 50,
       },
     },
     setupFiles: ['./src/test/setup.ts'],

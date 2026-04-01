@@ -78,11 +78,11 @@ describe('MessageThread', () => {
     expect(screen.getByText('I am doing great, thanks!')).toBeInTheDocument();
 
     // Own message container should have flex-row-reverse class
-    const ownMessage = screen.getByText('I am doing great, thanks!').closest('.flex.gap-3');
+    const ownMessage = screen.getByText('I am doing great, thanks!').closest('.flex');
     expect(ownMessage).toHaveClass('flex-row-reverse');
 
     // Other person's message should not have flex-row-reverse
-    const otherMessage = screen.getByText('Hey, how are you?').closest('.flex.gap-3');
+    const otherMessage = screen.getByText('Hey, how are you?').closest('.flex');
     expect(otherMessage).not.toHaveClass('flex-row-reverse');
   });
 

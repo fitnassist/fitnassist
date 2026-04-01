@@ -10,6 +10,17 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }));
 
+// Mock tRPC to avoid needing the full provider
+vi.mock('@/lib/trpc', () => ({
+  trpc: {
+    referral: {
+      claimReferral: {
+        useMutation: () => ({ mutate: vi.fn() }),
+      },
+    },
+  },
+}));
+
 import { signUp } from '@/lib/auth-client';
 
 describe('RegisterForm', () => {
@@ -28,7 +39,7 @@ describe('RegisterForm', () => {
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
     expect(screen.getByText(/trainee/i)).toBeInTheDocument();
     expect(screen.getByText(/personal trainer/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
   });
 
   it('should render link to sign in page', () => {
@@ -49,7 +60,7 @@ describe('RegisterForm', () => {
   it('should show validation errors for empty form submission', async () => {
     render(<RegisterForm />);
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -70,7 +81,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'TestPass123');
     await user.type(confirmPasswordInput, 'TestPass123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     // When email is empty, Zod shows email validation error
@@ -85,7 +96,7 @@ describe('RegisterForm', () => {
     const passwordInput = screen.getByLabelText(/^password$/i);
     await user.type(passwordInput, 'short');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -99,7 +110,7 @@ describe('RegisterForm', () => {
     const passwordInput = screen.getByLabelText(/^password$/i);
     await user.type(passwordInput, 'lowercase123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -120,7 +131,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'TestPass123');
     await user.type(confirmPasswordInput, 'DifferentPass123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -144,7 +155,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'TestPass123');
     await user.type(confirmPasswordInput, 'TestPass123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -176,7 +187,7 @@ describe('RegisterForm', () => {
     await user.type(confirmPasswordInput, 'TestPass123');
     await user.click(trainerRadio);
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -206,7 +217,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'TestPass123');
     await user.type(confirmPasswordInput, 'TestPass123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -232,7 +243,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'TestPass123');
     await user.type(confirmPasswordInput, 'TestPass123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -259,7 +270,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'TestPass123');
     await user.type(confirmPasswordInput, 'TestPass123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -285,7 +296,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'TestPass123');
     await user.type(confirmPasswordInput, 'TestPass123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     expect(screen.getByRole('button', { name: /creating account/i })).toBeInTheDocument();
@@ -309,7 +320,7 @@ describe('RegisterForm', () => {
     await user.type(passwordInput, 'TestPass123');
     await user.type(confirmPasswordInput, 'TestPass123');
 
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const submitButton = screen.getByRole('button', { name: /sign up/i });
     await user.click(submitButton);
 
     expect(nameInput).toBeDisabled();

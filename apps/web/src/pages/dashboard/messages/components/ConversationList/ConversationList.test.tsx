@@ -124,9 +124,9 @@ describe('ConversationList', () => {
       />
     );
 
-    // The parent div has bg-muted class when active
+    // The parent div has border-r-primary class when active
     const row = screen.getByText('Mike Trainer').closest('.group')!;
-    expect(row).toHaveClass('bg-muted');
+    expect(row).toHaveClass('border-r-primary');
   });
 
   it('should show unread badge when there are unread messages', () => {
