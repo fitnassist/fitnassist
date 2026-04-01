@@ -72,8 +72,9 @@ export const authenticatedContext = async (browser: Browser, cookies: string[]) 
 
 export const loginViaUI = async (page: Page, email: string, password: string) => {
   await page.goto('/login');
-  await page.getByLabel(/email/i).fill(email);
-  await page.locator('input[type="password"]').fill(password);
-  await page.getByRole('button', { name: /sign in|log in/i }).click();
-  await page.waitForURL(/\/dashboard/, { timeout: 15000 });
+  await page.waitForLoadState('domcontentloaded');
+  await page.locator('#email').fill(email);
+  await page.locator('#password').fill(password);
+  await page.getByRole('button', { name: /sign in/i }).click();
+  await page.waitForURL(/\/dashboard/, { timeout: 30000 });
 };

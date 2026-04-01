@@ -14,9 +14,9 @@ test.describe('Authentication', () => {
 
   test('login with invalid credentials shows error', async ({ page }) => {
     await page.goto('/login');
-    await page.getByLabel(/email/i).fill('nonexistent@test.com');
-    await page.locator('input[type="password"]').fill('WrongPassword1!');
-    await page.getByRole('button', { name: /sign in|log in/i }).click();
+    await page.locator('#email').fill('nonexistent@test.com');
+    await page.locator('#password').fill('WrongPassword1!');
+    await page.getByRole('button', { name: /sign in/i }).click();
 
     await expect(page.getByText(/invalid|incorrect|error/i)).toBeVisible({ timeout: 5000 });
   });
