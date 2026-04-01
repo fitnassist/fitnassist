@@ -243,7 +243,9 @@ export const SearchBar = ({
 
               {/* Travel Option */}
               <div>
-                <Label className="mb-2 block" htmlFor="travel-option">Training location</Label>
+                <Label className="mb-2 block" htmlFor="travel-option">
+                  Training location
+                </Label>
                 <Select
                   inputId="travel-option"
                   aria-label="Training location"

@@ -19,8 +19,7 @@ test.describe('Accessibility - Public Pages', () => {
       await page.goto(pg.path, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(2000);
 
-      const builder = new AxeBuilder({ page })
-        .disableRules(['color-contrast']);
+      const builder = new AxeBuilder({ page }).disableRules(['color-contrast']);
 
       // react-select generates inputs without proper label association
       if (pg.path === '/trainers') {
@@ -57,9 +56,7 @@ test.describe('Accessibility - Authenticated Pages', () => {
       await page.goto(dp.path, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(2000);
 
-      const results = await new AxeBuilder({ page })
-        .disableRules(['color-contrast'])
-        .analyze();
+      const results = await new AxeBuilder({ page }).disableRules(['color-contrast']).analyze();
 
       expect(results.violations).toEqual([]);
 

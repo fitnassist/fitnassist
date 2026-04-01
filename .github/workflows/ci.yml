@@ -83,6 +83,8 @@ jobs:
           sleep 5
           npm run db:seed
           kill $API_PID || true
+          sleep 2
+          lsof -ti:3001 | xargs kill -9 2>/dev/null || true
         env:
           DATABASE_URL: ${{ steps.neon.outputs.db_url_pooled }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
