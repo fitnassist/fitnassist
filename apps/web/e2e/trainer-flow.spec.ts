@@ -22,11 +22,11 @@ test.describe('Trainer Flow', () => {
     await expect(page.locator('h1')).toBeVisible();
   });
 
-  test('trainer can view requests page', async ({ page }) => {
-    // Register and login
+  test('trainer can navigate dashboard sections', async ({ page }) => {
+    // Register as trainer
     await page.goto('/register');
-    await page.getByLabel(/name/i).fill('Requests Trainer');
-    await page.getByLabel(/email/i).fill(`requests-trainer-${timestamp}@test.com`);
+    await page.getByLabel(/name/i).fill('Nav Trainer');
+    await page.getByLabel(/email/i).fill(`nav-trainer-${timestamp}@test.com`);
     await page.getByLabel(/^password$/i).fill('Test1234!');
     await page.getByLabel(/confirm/i).fill('Test1234!');
 
@@ -35,8 +35,17 @@ test.describe('Trainer Flow', () => {
     await page.getByRole('button', { name: /sign up|register|create/i }).click();
     await page.waitForURL(/\/(dashboard|trainer)/, { timeout: 10000 });
 
-    // Navigate to requests
-    await page.goto('/dashboard/requests');
-    await expect(page.locator('h1')).toBeVisible({ timeout: 10000 });
+    // Navigate to each section and verify it loads
+    const sections = [
+      '/dashboard/requests',
+      '/dashboard/messages',
+      '/dashboard/bookings',
+      '/dashboard/settings',
+    ];
+
+    for (const section of sections) {
+      await page.goto(section);
+      await expect(page.locator('h1').first()).toBeVisible({ timeout: 10000 });
+    }
   });
 });

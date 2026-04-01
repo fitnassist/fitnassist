@@ -69,4 +69,14 @@ test.describe('Authentication', () => {
 
     await expect(page.getByText(/invalid|incorrect|error/i)).toBeVisible({ timeout: 5000 });
   });
+
+  test('protected route redirects to login when unauthenticated', async ({ page }) => {
+    await page.goto('/dashboard');
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
+  });
+
+  test('protected route /dashboard/messages redirects to login', async ({ page }) => {
+    await page.goto('/dashboard/messages');
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
+  });
 });
