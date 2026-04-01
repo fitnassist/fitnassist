@@ -1,6 +1,7 @@
 import type { NotificationType, Prisma } from '@fitnassist/database';
 import { notificationRepository } from '../repositories/notification.repository';
 import { webPushService } from './web-push.service';
+import { expoPushService } from './expo-push.service';
 import { sseManager } from '../lib/sse';
 
 interface NotifyParams {
@@ -42,13 +43,18 @@ export const inAppNotificationService = {
       },
     });
 
-    // Send browser push notification (fire and forget)
-    webPushService.sendPushNotification(params.userId, params.type, {
+    const pushPayload = {
       title: params.title,
       body: params.body,
       link: params.link,
       type: params.type,
-    }).catch(() => {});
+    };
+
+    // Send browser push notification (fire and forget)
+    webPushService.sendPushNotification(params.userId, params.type, pushPayload).catch(() => {});
+
+    // Send Expo mobile push notification (fire and forget)
+    expoPushService.sendPushNotification(params.userId, params.type, pushPayload).catch(() => {});
 
     return notification;
   },

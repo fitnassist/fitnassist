@@ -2,8 +2,8 @@ import { z } from 'zod';
 import { router, protectedProcedure } from '../lib/trpc';
 import { notificationRepository } from '../repositories/notification.repository';
 import { pushSubscriptionRepository } from '../repositories/push-subscription.repository';
+import { expoPushTokenRepository } from '../repositories/expo-push-token.repository';
 import { webPushService } from '../services/web-push.service';
-import { prisma } from '../lib/prisma';
 
 export const notificationRouter = router({
   list: protectedProcedure
@@ -80,17 +80,10 @@ export const notificationRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await prisma.expoPushToken.upsert({
-        where: { token: input.token },
-        update: {
-          userId: ctx.user.id,
-          platform: input.platform,
-        },
-        create: {
-          userId: ctx.user.id,
-          token: input.token,
-          platform: input.platform,
-        },
+      await expoPushTokenRepository.upsert({
+        userId: ctx.user.id,
+        token: input.token,
+        platform: input.platform,
       });
       return { success: true };
     }),

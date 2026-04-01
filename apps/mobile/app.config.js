@@ -46,6 +46,9 @@ module.exports = {
     extra: {
       apiUrl: process.env.API_URL ?? `http://${localIp}:3001`,
       googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY ?? '',
+      eas: {
+        projectId: '4b531d57-b46f-4b2e-99f0-eea3800ba1b5',
+      },
       router: {
         origin: false,
       },
