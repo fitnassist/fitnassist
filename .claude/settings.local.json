@@ -39,7 +39,10 @@
       "Bash(git add:*)",
       "Bash(git push:*)",
       "Bash(vercel --prod 2>&1)",
-      "Bash(ls -la /Users/simon.sturgess/Code/fitnassist/apps/api/src/routers/*.router.ts)"
+      "Bash(ls -la /Users/simon.sturgess/Code/fitnassist/apps/api/src/routers/*.router.ts)",
+      "Bash(git commit:*)",
+      "Bash(npx expo:*)",
+      "Bash(find /Users/dahliacreative/Code/fitnassist -name .env* -o -name *.example)"
     ]
   }
 }
