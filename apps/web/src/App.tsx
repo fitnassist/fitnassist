@@ -16,6 +16,7 @@ import { RegisterPage } from '@/pages/auth/register';
 import { LoginPage } from '@/pages/auth/login';
 import { ForgotPasswordPage } from '@/pages/auth/forgot-password';
 import { ResetPasswordPage } from '@/pages/auth/reset-password';
+import { SelectRolePage } from '@/pages/auth/select-role';
 import { DashboardPage } from '@/pages/dashboard/index';
 import { RequestsPage } from '@/pages/dashboard/requests';
 import { MessagesPage } from '@/pages/dashboard/messages';
@@ -89,6 +90,7 @@ function App() {
                 <Route element={<AuthLayout />}>
                   <Route path={routes.register} element={<RegisterPage />} />
                   <Route path={routes.login} element={<LoginPage />} />
+                  <Route path="/select-role" element={<SelectRolePage />} />
                   <Route path={routes.forgotPassword} element={<ForgotPasswordPage />} />
                   <Route path={routes.resetPassword} element={<ResetPasswordPage />} />
                 </Route>

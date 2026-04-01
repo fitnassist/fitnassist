@@ -7,6 +7,7 @@ import { loginFormSchema, type LoginFormInput } from '@fitnassist/schemas';
 import { Button, Input } from '@/components/ui';
 import { signIn } from '@/lib/auth-client';
 import { routes } from '@/config/routes';
+import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 import type { LoginFormProps } from './LoginForm.types';
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
@@ -52,6 +53,8 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <SocialAuthButtons callbackURL="/dashboard" disabled={isLoading} />
+
       {error && <div className="bg-red-500/20 text-red-200 text-sm p-3 rounded-md">{error}</div>}
 
       <div>

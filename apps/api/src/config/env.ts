@@ -9,6 +9,15 @@ const envSchema = z.object({
   BETTER_AUTH_SECRET: z.string(),
   BETTER_AUTH_URL: z.string().default('http://localhost:3001'),
 
+  // OAuth
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  APPLE_CLIENT_ID: z.string().optional(),
+  APPLE_CLIENT_SECRET: z.string().optional(),
+  APPLE_TEAM_ID: z.string().optional(),
+  APPLE_KEY_ID: z.string().optional(),
+  APPLE_APP_BUNDLE_ID: z.string().optional(),
+
   // Email (Resend)
   RESEND_API_KEY: z.string().optional(),
   FROM_EMAIL: z.string().default('onboarding@resend.dev'),

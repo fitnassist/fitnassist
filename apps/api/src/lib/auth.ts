@@ -26,6 +26,36 @@ export const auth = betterAuth({
     } : undefined,
   },
 
+  socialProviders: {
+    ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? {
+          google: {
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
+          },
+        }
+      : {}),
+    ...(env.APPLE_CLIENT_ID && env.APPLE_CLIENT_SECRET
+      ? {
+          apple: {
+            clientId: env.APPLE_CLIENT_ID,
+            clientSecret: env.APPLE_CLIENT_SECRET,
+            ...(env.APPLE_TEAM_ID && env.APPLE_KEY_ID
+              ? { teamId: env.APPLE_TEAM_ID, keyId: env.APPLE_KEY_ID }
+              : {}),
+            ...(env.APPLE_APP_BUNDLE_ID
+              ? { appBundleIdentifier: env.APPLE_APP_BUNDLE_ID }
+              : {}),
+          },
+        }
+      : {}),
+  },
+
+  accountLinking: {
+    enabled: true,
+    trustedProviders: ['google', 'apple'],
+  },
+
   user: {
     additionalFields: {
       role: {
