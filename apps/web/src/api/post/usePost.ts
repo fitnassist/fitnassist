@@ -21,13 +21,14 @@ export const useDeletePost = () => {
 };
 
 const toggleLikeOptimistic = (utils: ReturnType<typeof trpc.useUtils>, postId: string, liked: boolean) => {
-  const updatePages = (old: any) => {
+  const updatePages = (old: Record<string, unknown> | undefined) => {
     if (!old) return old;
+    const pages = old.pages as Array<Record<string, unknown>>;
     return {
       ...old,
-      pages: old.pages.map((page: any) => ({
+      pages: pages.map((page) => ({
         ...page,
-        items: (page.items ?? []).map((item: any) =>
+        items: ((page.items ?? []) as Array<Record<string, unknown>>).map((item) =>
           item.id === postId
             ? { ...item, hasLiked: liked, likeCount: Math.max(0, (item.likeCount ?? 0) + (liked ? 1 : -1)) }
             : item,

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { getInitials, getOtherPerson, getSenderAvatarUrl } from './messages.utils';
+import type { ConnectionBase, Message } from './messages.types';
 
 describe('getInitials', () => {
   it('returns two initials for two-word name', () => {
@@ -28,7 +29,7 @@ describe('getOtherPerson', () => {
       },
     },
     name: 'Jane Doe',
-  } as any;
+  } as unknown as ConnectionBase;
 
   it('returns trainer info when user is the trainee (sender)', () => {
     const result = getOtherPerson(mockConnection, 'trainee-user-id');
@@ -57,7 +58,7 @@ describe('getSenderAvatarUrl', () => {
       trainerProfile: { profileImageUrl: 'https://example.com/trainer.jpg' },
       traineeProfile: null,
       image: null,
-    } as any;
+    } as unknown as Message['sender'];
     expect(getSenderAvatarUrl(sender)).toBe('https://example.com/trainer.jpg');
   });
 
@@ -66,7 +67,7 @@ describe('getSenderAvatarUrl', () => {
       trainerProfile: null,
       traineeProfile: { avatarUrl: 'https://example.com/trainee.jpg' },
       image: null,
-    } as any;
+    } as unknown as Message['sender'];
     expect(getSenderAvatarUrl(sender)).toBe('https://example.com/trainee.jpg');
   });
 
@@ -75,7 +76,7 @@ describe('getSenderAvatarUrl', () => {
       trainerProfile: null,
       traineeProfile: null,
       image: 'https://example.com/user.jpg',
-    } as any;
+    } as unknown as Message['sender'];
     expect(getSenderAvatarUrl(sender)).toBe('https://example.com/user.jpg');
   });
 
@@ -84,7 +85,7 @@ describe('getSenderAvatarUrl', () => {
       trainerProfile: null,
       traineeProfile: null,
       image: null,
-    } as any;
+    } as unknown as Message['sender'];
     expect(getSenderAvatarUrl(sender)).toBeNull();
   });
 });

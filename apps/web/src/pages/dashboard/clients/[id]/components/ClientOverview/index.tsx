@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, User, Unlink, Calendar } from 'lucide-react';
+import { MessageCircle, Unlink, Calendar } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,

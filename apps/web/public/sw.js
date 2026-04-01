@@ -1,5 +1,3 @@
-/* eslint-disable no-restricted-globals */
-
 // Service Worker for Web Push Notifications
 
 self.addEventListener('push', (event) => {

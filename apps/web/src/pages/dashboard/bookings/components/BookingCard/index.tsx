@@ -241,7 +241,6 @@ export const BookingCard = ({
               )}
             </div>
 
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
               {/* Join Call button for confirmed video calls (hide if session ended) */}
               {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && !isSessionExpired && (

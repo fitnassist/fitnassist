@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { render, screen } from '@/test/utils';
 import userEvent from '@testing-library/user-event';
 import { MessageThread } from './index';
-import type { OtherPerson } from '../../messages.types';
+import type { Message, OtherPerson } from '../../messages.types';
 
 // Mock scrollIntoView which is not available in jsdom
 beforeAll(() => {
@@ -54,7 +54,7 @@ const mockMessages = [
       traineeProfile: null,
     },
   },
-] as any;
+] as Message[];
 
 const defaultProps = {
   messages: mockMessages,

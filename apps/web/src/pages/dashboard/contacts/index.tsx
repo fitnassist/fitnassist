@@ -8,10 +8,6 @@ import { EmptyContacts, ContactsTabs } from './components';
 
 export const ContactsPage = () => {
   const { isTrainer } = useAuth();
-
-  if (isTrainer) {
-    return <Navigate to={routes.dashboardClients} replace />;
-  }
   const {
     isLoading,
     hasAnyContacts,
@@ -21,6 +17,10 @@ export const ContactsPage = () => {
     counts,
     userType,
   } = useContacts();
+
+  if (isTrainer) {
+    return <Navigate to={routes.dashboardClients} replace />;
+  }
 
   if (isLoading) {
     return (
