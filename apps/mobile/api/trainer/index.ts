@@ -22,6 +22,10 @@ export const useTrainerSearch = (params: {
   longitude?: number;
   radiusMiles?: number;
   services?: string[];
+  qualifications?: string[];
+  travelOption?: 'CLIENT_TRAVELS' | 'TRAINER_TRAVELS' | 'BOTH';
+  minRate?: number;
+  maxRate?: number;
   acceptingClients?: boolean;
   sortBy?: 'distance' | 'recently_active' | 'newest' | 'price_low' | 'price_high';
   page?: number;
