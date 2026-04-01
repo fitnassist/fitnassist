@@ -11,7 +11,13 @@ interface DatePickerProps {
   onMonthChange: (month: Date) => void;
 }
 
-export const DatePicker = ({ availableDates, selectedDate, onSelect, month, onMonthChange }: DatePickerProps) => {
+export const DatePicker = ({
+  availableDates,
+  selectedDate,
+  onSelect,
+  month,
+  onMonthChange,
+}: DatePickerProps) => {
   const availableSet = useMemo(() => new Set(availableDates), [availableDates]);
 
   const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
@@ -49,7 +55,9 @@ export const DatePicker = ({ availableDates, selectedDate, onSelect, month, onMo
 
       <div className="grid grid-cols-7 gap-1 text-center">
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
-          <div key={d} className="text-xs font-medium text-muted-foreground py-1">{d}</div>
+          <div key={d} className="text-xs font-medium text-muted-foreground py-1">
+            {d}
+          </div>
         ))}
 
         {Array.from({ length: startOffset }).map((_, i) => (
@@ -75,7 +83,7 @@ export const DatePicker = ({ availableDates, selectedDate, onSelect, month, onMo
                   ? 'bg-primary text-primary-foreground'
                   : isAvailable && !isPast
                     ? 'hover:bg-primary/10 text-foreground font-medium'
-                    : 'text-muted-foreground/40 cursor-not-allowed'
+                    : 'text-muted-foreground/40 cursor-not-allowed',
               )}
             >
               {day}

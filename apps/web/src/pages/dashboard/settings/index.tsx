@@ -2,7 +2,15 @@ import { Settings } from 'lucide-react';
 import { ResponsiveTabs, TabsContent } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { useTabParam, useAuth } from '@/hooks';
-import { AccountTab, NotificationsTab, DangerZoneTab, SubscriptionTab, SchedulingTab, PaymentsTab, IntegrationsTab } from './components';
+import {
+  AccountTab,
+  NotificationsTab,
+  DangerZoneTab,
+  SubscriptionTab,
+  SchedulingTab,
+  PaymentsTab,
+  IntegrationsTab,
+} from './components';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 

@@ -36,13 +36,16 @@ export const WeeklyScheduleBuilder = () => {
         startTime: a.startTime,
         endTime: a.endTime,
         sessionDurationMin: a.sessionDurationMin,
-      }))
+      })),
     );
     setInitialized(true);
   }
 
   const addSlot = (day: DayOfWeek) => {
-    setSlots([...slots, { dayOfWeek: day, startTime: '09:00', endTime: '17:00', sessionDurationMin: 60 }]);
+    setSlots([
+      ...slots,
+      { dayOfWeek: day, startTime: '09:00', endTime: '17:00', sessionDurationMin: 60 },
+    ]);
   };
 
   const removeSlot = (index: number) => {
@@ -56,16 +59,11 @@ export const WeeklyScheduleBuilder = () => {
   };
 
   const handleSave = () => {
-    setWeekly.mutate(
-      { slots },
-      { onSuccess: () => toast.success('Schedule saved') }
-    );
+    setWeekly.mutate({ slots }, { onSuccess: () => toast.success('Schedule saved') });
   };
 
   const getSlotsForDay = (day: DayOfWeek) => {
-    return slots
-      .map((s, i) => ({ ...s, index: i }))
-      .filter((s) => s.dayOfWeek === day);
+    return slots.map((s, i) => ({ ...s, index: i })).filter((s) => s.dayOfWeek === day);
   };
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Loading schedule...</div>;
@@ -116,7 +114,9 @@ export const WeeklyScheduleBuilder = () => {
                   <Input
                     type="number"
                     value={slot.sessionDurationMin}
-                    onChange={(e) => updateSlot(slot.index, 'sessionDurationMin', Number(e.target.value))}
+                    onChange={(e) =>
+                      updateSlot(slot.index, 'sessionDurationMin', Number(e.target.value))
+                    }
                     className="w-20 h-8 text-sm"
                     min={15}
                     max={180}

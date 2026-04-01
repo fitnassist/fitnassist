@@ -35,11 +35,7 @@ export const ProfileGallery = ({ images }: ProfileGalleryProps) => {
                 onClick={() => setSelectedImage(image.url)}
                 className="aspect-square rounded-lg overflow-hidden hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <img
-                  src={image.url}
-                  alt=""
-                  className="h-full w-full object-cover"
-                />
+                <img src={image.url} alt="" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>
@@ -49,11 +45,7 @@ export const ProfileGallery = ({ images }: ProfileGalleryProps) => {
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-3xl p-0 overflow-hidden bg-black border-none">
           {selectedImage && (
-            <img
-              src={selectedImage}
-              alt=""
-              className="w-full h-auto max-h-[80vh] object-contain"
-            />
+            <img src={selectedImage} alt="" className="w-full h-auto max-h-[80vh] object-contain" />
           )}
         </DialogContent>
       </Dialog>

@@ -35,7 +35,7 @@ export const ServicesSection = ({ section, trainer }: ServicesSectionProps) => {
   const services =
     content.sourceType === 'profile'
       ? parseProfileServices(trainer.services)
-      : content.items ?? [];
+      : (content.items ?? []);
 
   return (
     <section id={`section-${section.id}`} className="bg-[hsl(var(--muted))] py-16 sm:py-20">
@@ -68,9 +68,7 @@ export const ServicesSection = ({ section, trainer }: ServicesSectionProps) => {
                   </p>
                 )}
                 {service.price && (
-                  <p className="text-lg font-bold text-[hsl(var(--primary))]">
-                    {service.price}
-                  </p>
+                  <p className="text-lg font-bold text-[hsl(var(--primary))]">{service.price}</p>
                 )}
               </CardContent>
             </Card>
@@ -78,9 +76,7 @@ export const ServicesSection = ({ section, trainer }: ServicesSectionProps) => {
         </div>
 
         {services.length === 0 && (
-          <p className="text-center text-[hsl(var(--muted-foreground))]">
-            No services to display.
-          </p>
+          <p className="text-center text-[hsl(var(--muted-foreground))]">No services to display.</p>
         )}
       </div>
     </section>

@@ -1,12 +1,7 @@
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Plus, Pencil, Trash2, CheckCircle, Circle } from 'lucide-react';
-import {
-  Button,
-  Card,
-  CardContent,
-  Badge,
-} from '@/components/ui';
+import { Button, Card, CardContent, Badge } from '@/components/ui';
 import { routes } from '@/config/routes';
 import { useOnboardingTemplates, useDeleteOnboardingTemplate } from '@/api/onboarding';
 
@@ -70,9 +65,7 @@ export const TemplateList = () => {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium truncate">{template.name}</h3>
-                        {template.isActive && (
-                          <Badge variant="success">Active</Badge>
-                        )}
+                        {template.isActive && <Badge variant="success">Active</Badge>}
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {(template.questions as unknown[]).length} questions
@@ -80,7 +73,8 @@ export const TemplateList = () => {
                         {' · '}
                         {template._count.responses} responses
                         {' · '}
-                        Updated {formatDistanceToNow(new Date(template.updatedAt), { addSuffix: true })}
+                        Updated{' '}
+                        {formatDistanceToNow(new Date(template.updatedAt), { addSuffix: true })}
                       </p>
                     </div>
                   </div>

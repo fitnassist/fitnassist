@@ -21,16 +21,18 @@ export function ProfileLocation({
   const postcodeArea = getPostcodeArea(postcode);
   const travelDisplay = getTravelOptionDisplay(travelOption);
 
-  const TravelIcon = {
-    CLIENT_TRAVELS: Home,
-    TRAINER_TRAVELS: Car,
-    BOTH: ArrowLeftRight,
-  }[travelOption] || MapPin;
+  const TravelIcon =
+    {
+      CLIENT_TRAVELS: Home,
+      TRAINER_TRAVELS: Car,
+      BOTH: ArrowLeftRight,
+    }[travelOption] || MapPin;
 
   // Generate static map URL (showing general area, not exact location)
-  const mapUrl = latitude && longitude
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=12&size=400x200&scale=2&maptype=roadmap&key=${env.GOOGLE_MAPS_API_KEY}`
-    : null;
+  const mapUrl =
+    latitude && longitude
+      ? `https://maps.googleapis.com/maps/api/staticmap?center=${latitude},${longitude}&zoom=12&size=400x200&scale=2&maptype=roadmap&key=${env.GOOGLE_MAPS_API_KEY}`
+      : null;
 
   return (
     <Card>
@@ -44,24 +46,14 @@ export function ProfileLocation({
         {/* Map */}
         {mapUrl && (
           <div className="overflow-hidden rounded-lg border">
-            <img
-              src={mapUrl}
-              alt={`Map showing ${postcodeArea} area`}
-              className="w-full h-auto"
-            />
+            <img src={mapUrl} alt={`Map showing ${postcodeArea} area`} className="w-full h-auto" />
           </div>
         )}
 
         {/* Location Text */}
         <div className="space-y-1">
-          {city && (
-            <p className="font-medium">{city}</p>
-          )}
-          {postcodeArea && (
-            <p className="text-sm text-muted-foreground">
-              {postcodeArea} area
-            </p>
-          )}
+          {city && <p className="font-medium">{city}</p>}
+          {postcodeArea && <p className="text-sm text-muted-foreground">{postcodeArea} area</p>}
         </div>
 
         {/* Travel Option */}

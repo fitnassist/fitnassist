@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom';
 import { MapPin, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback, Badge, Select, StarRating, type SelectOption } from '@/components/ui';
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  Badge,
+  Select,
+  StarRating,
+  type SelectOption,
+} from '@/components/ui';
 import { routes } from '@/config/routes';
 import { getServiceLabel } from '@/pages/trainer/public/public.utils';
 
@@ -70,7 +78,7 @@ export const TrainerList = ({
   // Filter sort options — "Distance" only available with location
   const availableSortOptions = hasLocation
     ? SORT_OPTIONS
-    : SORT_OPTIONS.filter(o => o.value !== 'distance');
+    : SORT_OPTIONS.filter((o) => o.value !== 'distance');
 
   if (isLoading) {
     return (
@@ -103,7 +111,7 @@ export const TrainerList = ({
     return (
       <div className="p-8 text-center">
         <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="font-medium text-lg mb-2">No trainers found</h3>
+        <h2 className="font-medium text-lg mb-2">No trainers found</h2>
         <p className="text-muted-foreground">
           Try adjusting your search location or filters to find trainers in your area.
         </p>
@@ -120,13 +128,16 @@ export const TrainerList = ({
           {total === 1 ? 'trainer' : 'trainers'} found
         </p>
         <div className="w-48">
+          <label htmlFor="sort-by-select" className="sr-only">
+            Sort by
+          </label>
           <Select
-            value={availableSortOptions.find(o => o.value === sortBy) || availableSortOptions[0]}
+            value={availableSortOptions.find((o) => o.value === sortBy) || availableSortOptions[0]}
             onChange={(opt) => onSortByChange((opt?.value as SortBy) || 'newest')}
             options={availableSortOptions}
             isClearable={false}
-            isSearchable={false}
             placeholder="Sort by..."
+            inputId="sort-by-select"
           />
         </div>
       </div>
@@ -185,15 +196,13 @@ const TrainerCard = ({ trainer, isSelected, onSelect }: TrainerCardProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h3 className="font-medium truncate">{trainer.displayName}</h3>
+              <h2 className="font-medium truncate">{trainer.displayName}</h2>
               {(trainer.city || trainer.postcode) && (
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
                   {[trainer.city, trainer.postcode].filter(Boolean).join(', ')}
                   {trainer.distance !== undefined && (
-                    <span className="ml-1">
-                      ({trainer.distance.toFixed(1)} miles)
-                    </span>
+                    <span className="ml-1">({trainer.distance.toFixed(1)} miles)</span>
                   )}
                 </p>
               )}
@@ -220,24 +229,16 @@ const TrainerCard = ({ trainer, isSelected, onSelect }: TrainerCardProps) => {
 
           {/* Bio preview */}
           {trainer.bio && (
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {trainer.bio}
-            </p>
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{trainer.bio}</p>
           )}
 
           {/* Services tags */}
           {displayedServices.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {displayedServices.map((service) => (
-                <Badge key={service}>
-                  {getServiceLabel(service)}
-                </Badge>
+                <Badge key={service}>{getServiceLabel(service)}</Badge>
               ))}
-              {moreServices > 0 && (
-                <Badge variant="secondary">
-                  +{moreServices} more
-                </Badge>
-              )}
+              {moreServices > 0 && <Badge variant="secondary">+{moreServices} more</Badge>}
             </div>
           )}
         </div>

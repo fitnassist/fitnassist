@@ -1,14 +1,7 @@
 import { useState } from 'react';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { ShoppingBag, Loader2, CheckCircle, LogIn } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Button,
-  Input,
-} from '@/components/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Button, Input } from '@/components/ui';
 import { stripePromise } from '@/lib/stripe';
 import { useSession } from '@/lib/auth-client';
 import { trpc } from '@/lib/trpc';
@@ -78,11 +71,7 @@ const PaymentForm = ({
         <PaymentElement />
       </div>
 
-      {error && (
-        <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">
-          {error}
-        </div>
-      )}
+      {error && <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{error}</div>}
 
       <Button
         onClick={handleSubmit}
@@ -103,7 +92,13 @@ const PaymentForm = ({
   );
 };
 
-export const CheckoutDialog = ({ open, onOpenChange, items, trainerId, onSuccess }: CheckoutDialogProps) => {
+export const CheckoutDialog = ({
+  open,
+  onOpenChange,
+  items,
+  trainerId,
+  onSuccess,
+}: CheckoutDialogProps) => {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
 
@@ -190,7 +185,8 @@ export const CheckoutDialog = ({ open, onOpenChange, items, trainerId, onSuccess
           </DialogHeader>
           <div className="space-y-4 py-2">
             <p className="text-sm text-[hsl(var(--muted-foreground))]">
-              You need a Fitnassist account to make purchases. It's free and takes less than a minute.
+              You need a Fitnassist account to make purchases. It's free and takes less than a
+              minute.
             </p>
             <div className="flex gap-3">
               <Button asChild variant="outline" className="flex-1">
@@ -219,7 +215,9 @@ export const CheckoutDialog = ({ open, onOpenChange, items, trainerId, onSuccess
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-[hsl(var(--foreground))]">Order confirmed!</h2>
+              <h2 className="text-xl font-semibold text-[hsl(var(--foreground))]">
+                Order confirmed!
+              </h2>
               <p className="mt-1 text-sm text-[hsl(var(--muted-foreground))]">
                 {state.hasDigital && !hasPhysical
                   ? 'Your downloads will be available in your purchases.'
@@ -335,7 +333,9 @@ export const CheckoutDialog = ({ open, onOpenChange, items, trainerId, onSuccess
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[hsl(var(--foreground))] truncate">{item.name}</p>
+                  <p className="text-sm font-medium text-[hsl(var(--foreground))] truncate">
+                    {item.name}
+                  </p>
                   <p className="text-xs text-[hsl(var(--muted-foreground))]">
                     {formatPrice(item.pricePence)} x {item.quantity}
                   </p>
@@ -395,9 +395,7 @@ export const CheckoutDialog = ({ open, onOpenChange, items, trainerId, onSuccess
           </div>
 
           {createError && (
-            <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">
-              {createError}
-            </div>
+            <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-md">{createError}</div>
           )}
 
           <Button

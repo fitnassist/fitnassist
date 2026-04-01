@@ -1,11 +1,7 @@
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { ClipboardCheck } from 'lucide-react';
-import {
-  Button,
-  Card,
-  CardContent,
-} from '@/components/ui';
+import { Button, Card, CardContent } from '@/components/ui';
 import { routes } from '@/config/routes';
 import { useSubmittedResponses } from '@/api/onboarding';
 
@@ -48,7 +44,10 @@ export const PendingReviewList = () => {
                   <p className="text-sm text-muted-foreground">
                     Template: {response.template.name}
                     {' · '}
-                    Submitted {response.completedAt ? formatDistanceToNow(new Date(response.completedAt), { addSuffix: true }) : ''}
+                    Submitted{' '}
+                    {response.completedAt
+                      ? formatDistanceToNow(new Date(response.completedAt), { addSuffix: true })
+                      : ''}
                   </p>
                 </div>
                 <Link to={`${routes.dashboardClientDetail(clientRosterId)}?tab=onboarding`}>

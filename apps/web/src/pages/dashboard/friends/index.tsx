@@ -10,12 +10,20 @@ export const FriendsPage = () => {
   const [tab, setTab] = useTabParam('friends');
   const { data: pendingCount } = usePendingFriendCount();
 
-  const tabOptions = useMemo(() => [
-    { value: 'friends', label: 'Friends', icon: <Users className="h-4 w-4" /> },
-    { value: 'requests', label: 'Requests', icon: <UserPlus className="h-4 w-4" />, badge: pendingCount || undefined },
-    { value: 'following', label: 'Following', icon: <Heart className="h-4 w-4" /> },
-    { value: 'blocked', label: 'Blocked', icon: <ShieldOff className="h-4 w-4" /> },
-  ], [pendingCount]);
+  const tabOptions = useMemo(
+    () => [
+      { value: 'friends', label: 'Friends', icon: <Users className="h-4 w-4" /> },
+      {
+        value: 'requests',
+        label: 'Requests',
+        icon: <UserPlus className="h-4 w-4" />,
+        badge: pendingCount || undefined,
+      },
+      { value: 'following', label: 'Following', icon: <Heart className="h-4 w-4" /> },
+      { value: 'blocked', label: 'Blocked', icon: <ShieldOff className="h-4 w-4" /> },
+    ],
+    [pendingCount],
+  );
 
   return (
     <PageLayout>

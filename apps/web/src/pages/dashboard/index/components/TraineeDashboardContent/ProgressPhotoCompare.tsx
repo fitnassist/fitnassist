@@ -7,12 +7,14 @@ export const ProgressPhotoCompare = () => {
   const { data: entries } = useProgressPhotos();
 
   const photos = (entries ?? []).flatMap((entry) =>
-    (entry.progressPhotos ?? []).map((p: { id: string; imageUrl: string; category: string | null }) => ({
-      id: p.id,
-      imageUrl: p.imageUrl,
-      category: p.category,
-      date: typeof entry.date === 'string' ? entry.date : new Date(entry.date).toISOString(),
-    }))
+    (entry.progressPhotos ?? []).map(
+      (p: { id: string; imageUrl: string; category: string | null }) => ({
+        id: p.id,
+        imageUrl: p.imageUrl,
+        category: p.category,
+        date: typeof entry.date === 'string' ? entry.date : new Date(entry.date).toISOString(),
+      }),
+    ),
   );
 
   return (

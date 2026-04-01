@@ -1,14 +1,6 @@
 import { useState } from 'react';
 import { CheckCircle, XCircle, Clock, FileText } from 'lucide-react';
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Label,
-  Textarea,
-} from '@/components/ui';
+import { Button, Card, CardContent, CardHeader, CardTitle, Label, Textarea } from '@/components/ui';
 import { useOnboardingResponses, useOnboardingReview } from '@/api/onboarding';
 import type { Question, Answer } from '@fitnassist/schemas';
 import type { OnboardingStatus } from '@fitnassist/database';
@@ -17,10 +9,17 @@ interface ClientOnboardingProps {
   clientRosterId: string;
 }
 
-const STATUS_DISPLAY: Record<OnboardingStatus, { label: string; icon: typeof Clock; className: string }> = {
+const STATUS_DISPLAY: Record<
+  OnboardingStatus,
+  { label: string; icon: typeof Clock; className: string }
+> = {
   PENDING: { label: 'Pending', icon: Clock, className: 'text-amber-600' },
   SUBMITTED: { label: 'Awaiting Review', icon: FileText, className: 'text-blue-600' },
-  APPROVED: { label: 'Approved', icon: CheckCircle, className: 'text-green-600 dark:text-green-400' },
+  APPROVED: {
+    label: 'Approved',
+    icon: CheckCircle,
+    className: 'text-green-600 dark:text-green-400',
+  },
   REJECTED: { label: 'Rejected', icon: XCircle, className: 'text-red-600' },
 };
 
@@ -53,7 +52,7 @@ const ResponseCard = ({ response }: ResponseCardProps) => {
 
   const questions = response.template.questions as Question[];
   const answers = (response.answers as Answer[]) || [];
-  const answersMap = new Map(answers.map(a => [a.questionId, a.answer]));
+  const answersMap = new Map(answers.map((a) => [a.questionId, a.answer]));
   const statusInfo = STATUS_DISPLAY[response.status];
   const StatusIcon = statusInfo.icon;
 
@@ -72,7 +71,9 @@ const ResponseCard = ({ response }: ResponseCardProps) => {
           <CardTitle className="text-base">{response.template.name}</CardTitle>
           <div className="flex items-center gap-2">
             <StatusIcon className={`h-4 w-4 ${statusInfo.className}`} />
-            <span className={`text-sm font-medium ${statusInfo.className}`}>{statusInfo.label}</span>
+            <span className={`text-sm font-medium ${statusInfo.className}`}>
+              {statusInfo.label}
+            </span>
           </div>
         </div>
       </CardHeader>
@@ -146,10 +147,7 @@ const ResponseCard = ({ response }: ResponseCardProps) => {
               />
             </div>
             <div className="flex gap-3">
-              <Button
-                onClick={() => handleReview('APPROVED')}
-                disabled={reviewMutation.isPending}
-              >
+              <Button onClick={() => handleReview('APPROVED')} disabled={reviewMutation.isPending}>
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Approve
               </Button>

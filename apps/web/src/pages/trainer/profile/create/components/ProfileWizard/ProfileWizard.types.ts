@@ -52,10 +52,7 @@ export interface WizardFormData {
 
 export interface WizardStepProps {
   data: WizardFormData;
-  onUpdate: <K extends keyof WizardFormData>(
-    step: K,
-    data: WizardFormData[K]
-  ) => void;
+  onUpdate: <K extends keyof WizardFormData>(step: K, data: WizardFormData[K]) => void;
   onNext: () => void;
   onBack: () => void;
   isFirstStep: boolean;

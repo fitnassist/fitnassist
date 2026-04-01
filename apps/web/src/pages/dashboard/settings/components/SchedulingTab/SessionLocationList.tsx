@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import { MapPin, Plus, Trash2, Star } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardContent, Input, Label, AddressAutocomplete, type AddressDetails, Badge } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Input,
+  Label,
+  AddressAutocomplete,
+  type AddressDetails,
+  Badge,
+} from '@/components/ui';
 import { ConfirmDialog } from '@/components/ui';
 import { env } from '@/config/env';
 import {
@@ -38,7 +49,7 @@ export const SessionLocationList = () => {
           setName('');
           setAddressDetails(null);
         },
-      }
+      },
     );
   };
 
@@ -48,10 +59,7 @@ export const SessionLocationList = () => {
 
   const handleDelete = () => {
     if (!deleteId) return;
-    deleteMutation.mutate(
-      { id: deleteId },
-      { onSuccess: () => setDeleteId(null) }
-    );
+    deleteMutation.mutate({ id: deleteId }, { onSuccess: () => setDeleteId(null) });
   };
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Loading locations...</div>;
@@ -76,7 +84,11 @@ export const SessionLocationList = () => {
             <div className="space-y-3 p-3 border rounded-lg bg-muted/50">
               <div>
                 <Label className="text-xs">Name</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Home Gym" />
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g., Home Gym"
+                />
               </div>
               <AddressAutocomplete
                 apiKey={env.GOOGLE_MAPS_API_KEY}
@@ -88,7 +100,9 @@ export const SessionLocationList = () => {
                 <Button onClick={handleCreate} disabled={!name || createMutation.isPending}>
                   {createMutation.isPending ? 'Adding...' : 'Add Location'}
                 </Button>
-                <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+                <Button variant="ghost" onClick={() => setShowForm(false)}>
+                  Cancel
+                </Button>
               </div>
             </div>
           )}
@@ -102,12 +116,8 @@ export const SessionLocationList = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-sm">{loc.name}</span>
-                  {loc.isDefault && (
-                    <Badge>Default</Badge>
-                  )}
-                  {!loc.isActive && (
-                    <Badge variant="secondary">Inactive</Badge>
-                  )}
+                  {loc.isDefault && <Badge>Default</Badge>}
+                  {!loc.isActive && <Badge variant="secondary">Inactive</Badge>}
                 </div>
                 {(loc.addressLine1 || loc.city || loc.postcode) && (
                   <p className="text-xs text-muted-foreground mt-0.5">

@@ -1,10 +1,22 @@
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, Avatar, AvatarImage, AvatarFallback } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+} from '@/components/ui';
 import { useClientAdherence } from '@/api/analytics';
 import { routes } from '@/config/routes';
 
 const getAdherenceStatus = (entries: number) => {
-  if (entries >= 5) return { label: 'Good', className: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' };
+  if (entries >= 5)
+    return {
+      label: 'Good',
+      className: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+    };
   if (entries >= 3) return { label: 'Fair', className: 'bg-amber-100 text-amber-700' };
   return { label: 'Low', className: 'bg-red-100 text-red-700' };
 };
@@ -61,7 +73,9 @@ export const ClientAdherence = () => {
                       </td>
                       <td className="py-3 text-center text-sm">{client.entriesThisWeek}</td>
                       <td className="py-3 text-right">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${status.className}`}
+                        >
                           {status.label}
                         </span>
                       </td>

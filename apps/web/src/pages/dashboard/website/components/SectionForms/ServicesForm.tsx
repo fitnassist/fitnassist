@@ -25,17 +25,13 @@ const createEmptyItem = (): ServiceItem => ({
 
 export const ServicesForm = ({ sectionId, content }: ServicesFormProps) => {
   const updateSection = useUpdateSection();
-  const initialItems = Array.isArray(content.items)
-    ? (content.items as ServiceItem[])
-    : [];
+  const initialItems = Array.isArray(content.items) ? (content.items as ServiceItem[]) : [];
   const [items, setItems] = useState<ServiceItem[]>(
-    initialItems.length > 0 ? initialItems : [createEmptyItem()]
+    initialItems.length > 0 ? initialItems : [createEmptyItem()],
   );
 
   const handleUpdate = (index: number, field: keyof ServiceItem, value: string) => {
-    setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
   const handleAdd = () => {
@@ -88,10 +84,7 @@ export const ServicesForm = ({ sectionId, content }: ServicesFormProps) => {
             </div>
           </div>
 
-          <IconPicker
-            value={item.icon}
-            onChange={(v) => handleUpdate(index, 'icon', v)}
-          />
+          <IconPicker value={item.icon} onChange={(v) => handleUpdate(index, 'icon', v)} />
 
           <div className="space-y-1">
             <Label className="text-xs">Description</Label>

@@ -26,9 +26,7 @@ export const PhotoCompare = ({ photos }: PhotoCompareProps) => {
     return (
       <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-muted-foreground/25 p-8 text-center">
         <ImageIcon className="h-8 w-8 text-muted-foreground/50" />
-        <p className="text-sm text-muted-foreground">
-          Upload at least 2 photos to compare
-        </p>
+        <p className="text-sm text-muted-foreground">Upload at least 2 photos to compare</p>
       </div>
     );
   }
@@ -55,7 +53,7 @@ export const PhotoCompare = ({ photos }: PhotoCompareProps) => {
                 'relative flex-shrink-0 h-16 w-16 overflow-hidden rounded-md border-2 transition-all',
                 beforeId === photo.id
                   ? 'border-primary ring-1 ring-primary'
-                  : 'border-transparent opacity-70 hover:opacity-100'
+                  : 'border-transparent opacity-70 hover:opacity-100',
               )}
             >
               <img
@@ -86,7 +84,7 @@ export const PhotoCompare = ({ photos }: PhotoCompareProps) => {
                 'relative flex-shrink-0 h-16 w-16 overflow-hidden rounded-md border-2 transition-all',
                 afterId === photo.id
                   ? 'border-primary ring-1 ring-primary'
-                  : 'border-transparent opacity-70 hover:opacity-100'
+                  : 'border-transparent opacity-70 hover:opacity-100',
               )}
             >
               <img

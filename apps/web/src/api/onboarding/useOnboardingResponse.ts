@@ -3,7 +3,7 @@ import { trpc } from '@/lib/trpc';
 export const useOnboardingResponses = (clientRosterId: string) => {
   return trpc.onboarding.getResponsesForClient.useQuery(
     { clientRosterId },
-    { enabled: !!clientRosterId }
+    { enabled: !!clientRosterId },
   );
 };
 

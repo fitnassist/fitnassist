@@ -66,19 +66,22 @@ export const ReportDialog = ({ reviewId, open, onClose }: ReportDialogProps) => 
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Report Review</DialogTitle>
-          <DialogDescription>
-            Please select a reason for reporting this review.
-          </DialogDescription>
+          <DialogDescription>Please select a reason for reporting this review.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label className="mb-2 block">Reason</Label>
+            <Label className="mb-2 block" htmlFor="report-reason">
+              Reason
+            </Label>
             <Select
+              inputId="report-reason"
               value={REASON_OPTIONS.find((o) => o.value === reason) || null}
               onChange={(opt) => {
                 if (opt) {
-                  setValue('reason', opt.value as ReportReviewInput['reason'], { shouldValidate: true });
+                  setValue('reason', opt.value as ReportReviewInput['reason'], {
+                    shouldValidate: true,
+                  });
                 }
               }}
               options={REASON_OPTIONS}
@@ -107,10 +110,19 @@ export const ReportDialog = ({ reviewId, open, onClose }: ReportDialogProps) => 
           </div>
 
           <div className="flex items-center gap-2 justify-end">
-            <Button type="button" variant="outline" onClick={onClose} disabled={reportReview.isPending}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={reportReview.isPending}
+            >
               Cancel
             </Button>
-            <Button type="submit" variant="destructive" disabled={reportReview.isPending || !reason}>
+            <Button
+              type="submit"
+              variant="destructive"
+              disabled={reportReview.isPending || !reason}
+            >
               {reportReview.isPending && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
               Submit Report
             </Button>

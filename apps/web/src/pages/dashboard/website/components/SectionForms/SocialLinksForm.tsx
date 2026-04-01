@@ -17,17 +17,13 @@ const createEmptyItem = (): SocialLinkItem => ({ platform: '', url: '' });
 
 export const SocialLinksForm = ({ sectionId, content }: SocialLinksFormProps) => {
   const updateSection = useUpdateSection();
-  const initialItems = Array.isArray(content.items)
-    ? (content.items as SocialLinkItem[])
-    : [];
+  const initialItems = Array.isArray(content.items) ? (content.items as SocialLinkItem[]) : [];
   const [items, setItems] = useState<SocialLinkItem[]>(
-    initialItems.length > 0 ? initialItems : [createEmptyItem()]
+    initialItems.length > 0 ? initialItems : [createEmptyItem()],
   );
 
   const handleUpdate = (index: number, field: keyof SocialLinkItem, value: string) => {
-    setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
   const handleAdd = () => {

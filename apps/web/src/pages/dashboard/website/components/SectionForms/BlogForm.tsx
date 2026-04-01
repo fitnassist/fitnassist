@@ -45,12 +45,13 @@ export const BlogForm = ({ sectionId, content }: BlogFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label>Layout</Label>
+        <Label htmlFor="blog-layout">Layout</Label>
         <Controller
           name="layout"
           control={control}
           render={({ field }) => (
             <Select
+              inputId="blog-layout"
               options={LAYOUT_OPTIONS}
               value={LAYOUT_OPTIONS.find((o) => o.value === field.value) || null}
               onChange={(option) => field.onChange(option?.value || 'grid')}

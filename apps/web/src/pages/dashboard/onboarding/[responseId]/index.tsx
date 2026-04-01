@@ -73,9 +73,7 @@ export const OnboardingCompletePage = () => {
               <>
                 <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-4" />
                 <h3 className="font-medium text-lg mb-2">Onboarding Complete</h3>
-                <p className="text-muted-foreground">
-                  Your onboarding has been approved.
-                </p>
+                <p className="text-muted-foreground">Your onboarding has been approved.</p>
               </>
             ) : (
               <>
@@ -95,21 +93,21 @@ export const OnboardingCompletePage = () => {
   const hasWaiver = !!response.template.waiverText;
 
   const setAnswer = (questionId: string, value: Answer['answer']) => {
-    setAnswers(prev => ({ ...prev, [questionId]: value }));
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
   };
 
   const handleMultiChoiceToggle = (questionId: string, option: string) => {
-    setAnswers(prev => {
+    setAnswers((prev) => {
       const current = (prev[questionId] as string[]) || [];
       const updated = current.includes(option)
-        ? current.filter(o => o !== option)
+        ? current.filter((o) => o !== option)
         : [...current, option];
       return { ...prev, [questionId]: updated };
     });
   };
 
   const handleSubmit = async () => {
-    const answerArray: Answer[] = questions.map(q => ({
+    const answerArray: Answer[] = questions.map((q) => ({
       questionId: q.id,
       answer: answers[q.id] ?? '',
     }));
@@ -265,10 +263,7 @@ export const OnboardingCompletePage = () => {
 
         {/* Submit */}
         <div className="flex justify-end">
-          <Button
-            onClick={handleSubmit}
-            disabled={submitOnboarding.isPending}
-          >
+          <Button onClick={handleSubmit} disabled={submitOnboarding.isPending}>
             {submitOnboarding.isPending ? 'Submitting...' : 'Submit Onboarding'}
           </Button>
         </div>

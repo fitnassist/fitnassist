@@ -10,9 +10,7 @@ export const IntegrationsTab = () => {
 
   const isLoading = connectionsLoading || providersLoading;
 
-  const visibleProviders = PROVIDERS.filter(
-    (meta) => availableProviders?.includes(meta.provider)
-  );
+  const visibleProviders = PROVIDERS.filter((meta) => availableProviders?.includes(meta.provider));
 
   if (isLoading) {
     return (

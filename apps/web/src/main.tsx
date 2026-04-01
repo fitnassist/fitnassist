@@ -33,7 +33,7 @@ const SiteApp = ({ handle }: { handle: string }) => {
             refetchOnWindowFocus: false,
           },
         },
-      })
+      }),
   );
 
   return (
@@ -46,7 +46,5 @@ const SiteApp = ({ handle }: { handle: string }) => {
 };
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    {finalHandle ? <SiteApp handle={finalHandle} /> : <App />}
-  </React.StrictMode>
+  <React.StrictMode>{finalHandle ? <SiteApp handle={finalHandle} /> : <App />}</React.StrictMode>,
 );

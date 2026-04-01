@@ -84,7 +84,7 @@ export const WorkoutPlanList = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => p - 1)}
+                onClick={() => setPage((p) => p - 1)}
                 disabled={page === 1}
               >
                 Previous
@@ -95,7 +95,7 @@ export const WorkoutPlanList = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPage(p => p + 1)}
+                onClick={() => setPage((p) => p + 1)}
                 disabled={!data.hasMore}
               >
                 Next

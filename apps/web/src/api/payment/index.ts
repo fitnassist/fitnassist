@@ -49,10 +49,7 @@ export const useGetDashboardLink = () => {
 };
 
 export const useTrainerPricing = (trainerId: string) => {
-  return trpc.payment.getTrainerPricing.useQuery(
-    { trainerId },
-    { enabled: !!trainerId }
-  );
+  return trpc.payment.getTrainerPricing.useQuery({ trainerId }, { enabled: !!trainerId });
 };
 
 export const useCreatePaymentIntent = () => {
@@ -60,15 +57,16 @@ export const useCreatePaymentIntent = () => {
 };
 
 export const usePaymentStatus = (bookingId: string) => {
-  return trpc.payment.getPaymentStatus.useQuery(
-    { bookingId },
-    { enabled: !!bookingId }
-  );
+  return trpc.payment.getPaymentStatus.useQuery({ bookingId }, { enabled: !!bookingId });
 };
 
-export const usePaymentRequirement = (trainerId: string, clientRosterId: string, sessionType?: string) => {
+export const usePaymentRequirement = (
+  trainerId: string,
+  clientRosterId: string,
+  sessionType?: string,
+) => {
   return trpc.payment.getPaymentRequirement.useQuery(
     { trainerId, clientRosterId, sessionType },
-    { enabled: !!trainerId && !!clientRosterId }
+    { enabled: !!trainerId && !!clientRosterId },
   );
 };

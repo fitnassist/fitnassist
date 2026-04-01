@@ -5,39 +5,40 @@ import { ConversationList } from './index';
 import type { Connection } from '../../messages.types';
 
 // Mock connection data
-const createMockConnection = (overrides: Partial<Connection> = {}): Connection => ({
-  id: 'conn-1',
-  senderId: 'trainee-123',
-  name: 'John Trainee',
-  email: 'john@example.com',
-  phone: null,
-  message: null,
-  type: 'CONNECTION_REQUEST',
-  status: 'ACCEPTED',
-  trainerId: 'trainer-1',
-  respondedAt: null,
-  createdAt: new Date(),
-  trainer: {
-    id: 'trainer-1',
-    userId: 'user-trainer-1',
-    displayName: 'Mike Trainer',
-    profileImageUrl: 'https://example.com/mike.jpg',
-    user: {
-      id: 'user-trainer-1',
-      name: 'Mike Trainer',
-      image: null,
-    },
-  },
-  sender: {
-    id: 'trainee-123',
+const createMockConnection = (overrides: Partial<Connection> = {}): Connection =>
+  ({
+    id: 'conn-1',
+    senderId: 'trainee-123',
     name: 'John Trainee',
-    image: 'https://example.com/john.jpg',
-  },
-  messages: [],
-  unreadCount: 0,
-  conversationPreferences: [],
-  ...overrides,
-} as unknown as Connection);
+    email: 'john@example.com',
+    phone: null,
+    message: null,
+    type: 'CONNECTION_REQUEST',
+    status: 'ACCEPTED',
+    trainerId: 'trainer-1',
+    respondedAt: null,
+    createdAt: new Date(),
+    trainer: {
+      id: 'trainer-1',
+      userId: 'user-trainer-1',
+      displayName: 'Mike Trainer',
+      profileImageUrl: 'https://example.com/mike.jpg',
+      user: {
+        id: 'user-trainer-1',
+        name: 'Mike Trainer',
+        image: null,
+      },
+    },
+    sender: {
+      id: 'trainee-123',
+      name: 'John Trainee',
+      image: 'https://example.com/john.jpg',
+    },
+    messages: [],
+    unreadCount: 0,
+    conversationPreferences: [],
+    ...overrides,
+  }) as unknown as Connection;
 
 const defaultProps = {
   archivedConnections: [] as Connection[],
@@ -51,16 +52,13 @@ describe('ConversationList', () => {
 
   it('should render empty state when no connections', () => {
     render(
-      <ConversationList
-        connections={[]}
-        userId="user-123"
-        onSelect={vi.fn()}
-        {...defaultProps}
-      />
+      <ConversationList connections={[]} userId="user-123" onSelect={vi.fn()} {...defaultProps} />,
     );
 
     expect(screen.getByText(/no conversations yet/i)).toBeInTheDocument();
-    expect(screen.getByText(/connect with trainers or trainees to start messaging/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/connect with trainers or trainees to start messaging/i),
+    ).toBeInTheDocument();
   });
 
   it('should render list of connections', () => {
@@ -84,7 +82,7 @@ describe('ConversationList', () => {
         userId="trainee-123"
         onSelect={vi.fn()}
         {...defaultProps}
-      />
+      />,
     );
 
     expect(screen.getByText('Mike Trainer')).toBeInTheDocument();
@@ -101,7 +99,7 @@ describe('ConversationList', () => {
         userId="trainee-123"
         onSelect={onSelect}
         {...defaultProps}
-      />
+      />,
     );
 
     const buttons = screen.getAllByRole('button');
@@ -121,7 +119,7 @@ describe('ConversationList', () => {
         userId="trainee-123"
         onSelect={vi.fn()}
         {...defaultProps}
-      />
+      />,
     );
 
     // The parent div has border-r-primary class when active
@@ -138,7 +136,7 @@ describe('ConversationList', () => {
         userId="trainee-123"
         onSelect={vi.fn()}
         {...defaultProps}
-      />
+      />,
     );
 
     expect(screen.getByText('5')).toBeInTheDocument();
@@ -153,7 +151,7 @@ describe('ConversationList', () => {
         userId="trainee-123"
         onSelect={vi.fn()}
         {...defaultProps}
-      />
+      />,
     );
 
     // Looking for the badge text, not the badge itself
@@ -179,7 +177,7 @@ describe('ConversationList', () => {
         userId="trainee-123"
         onSelect={vi.fn()}
         {...defaultProps}
-      />
+      />,
     );
 
     expect(screen.getByText(/you: hey, how are you\?/i)).toBeInTheDocument();
@@ -194,7 +192,7 @@ describe('ConversationList', () => {
         userId="trainee-123"
         onSelect={vi.fn()}
         {...defaultProps}
-      />
+      />,
     );
 
     expect(screen.getByText(/no messages yet/i)).toBeInTheDocument();
@@ -217,7 +215,7 @@ describe('ConversationList', () => {
         userId="trainee-123"
         onSelect={vi.fn()}
         {...defaultProps}
-      />
+      />,
     );
 
     expect(screen.getByText('MT')).toBeInTheDocument();

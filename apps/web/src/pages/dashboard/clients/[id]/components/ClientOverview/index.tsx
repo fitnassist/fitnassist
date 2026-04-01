@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageCircle, User, Unlink, Calendar } from 'lucide-react';
+import { MessageCircle, Unlink, Calendar } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -71,7 +71,13 @@ interface ClientOverviewProps {
   isDisconnecting?: boolean;
 }
 
-export const ClientOverview = ({ client, onStatusChange, isUpdating, onDisconnect, isDisconnecting }: ClientOverviewProps) => {
+export const ClientOverview = ({
+  client,
+  onStatusChange,
+  isUpdating,
+  onDisconnect,
+  isDisconnecting,
+}: ClientOverviewProps) => {
   const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
   const { connection } = client;
   const sender = connection.sender;
@@ -81,7 +87,12 @@ export const ClientOverview = ({ client, onStatusChange, isUpdating, onDisconnec
   const isDisconnected = client.status === 'DISCONNECTED';
 
   const getInitials = (name: string) =>
-    name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
 
   return (
     <div className="space-y-6">
@@ -101,23 +112,25 @@ export const ClientOverview = ({ client, onStatusChange, isUpdating, onDisconnec
               </div>
 
               {isDisconnected ? (
-                <Badge variant="destructive">
-                  Disconnected
-                </Badge>
+                <Badge variant="destructive">Disconnected</Badge>
               ) : (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <div className="w-40">
+                    <label htmlFor="client-status" className="sr-only">
+                      Client status
+                    </label>
                     <Select
-                      value={STATUS_OPTIONS.find(o => o.value === client.status)}
+                      inputId="client-status"
+                      value={STATUS_OPTIONS.find((o) => o.value === client.status)}
                       onChange={(opt) => onStatusChange(opt?.value as ActiveClientStatus)}
                       options={STATUS_OPTIONS}
                       isClearable={false}
-                      isSearchable={false}
                       isDisabled={isUpdating}
                     />
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    Client since {formatDistanceToNow(new Date(client.createdAt), { addSuffix: true })}
+                    Client since{' '}
+                    {formatDistanceToNow(new Date(client.createdAt), { addSuffix: true })}
                   </span>
                 </div>
               )}
@@ -185,9 +198,13 @@ export const ClientOverview = ({ client, onStatusChange, isUpdating, onDisconnec
                 </div>
               </div>
             )}
-            {!profile.experienceLevel && !profile.activityLevel && profile.fitnessGoals.length === 0 && (
-              <p className="text-sm text-muted-foreground">No fitness profile details shared yet.</p>
-            )}
+            {!profile.experienceLevel &&
+              !profile.activityLevel &&
+              profile.fitnessGoals.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No fitness profile details shared yet.
+                </p>
+              )}
           </CardContent>
         </Card>
       )}

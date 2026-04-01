@@ -33,7 +33,11 @@ export const DashboardLayout = () => {
   const { isConnected: sseConnected } = useSse();
 
   // Prompt for push notification permission on first login
-  const { isSupported: pushSupported, permission: pushPermission, requestPermission } = usePushNotifications();
+  const {
+    isSupported: pushSupported,
+    permission: pushPermission,
+    requestPermission,
+  } = usePushNotifications();
   useEffect(() => {
     if (isAuthenticated && pushSupported && pushPermission === 'default') {
       requestPermission();

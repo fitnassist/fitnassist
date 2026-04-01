@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Scale, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog, SourceBadge } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  ConfirmDialog,
+  SourceBadge,
+} from '@/components/ui';
 import { useLogWeight, useDeleteDiaryEntry } from '@/api/diary';
 import { formatWeight } from '../../diary.utils';
 
@@ -30,7 +39,7 @@ export const WeightLogger = ({ date, entry, unitPreference }: WeightLoggerProps)
     const weightKg = isImperial ? numValue / 2.20462 : numValue;
     logWeight.mutate(
       { date, weightKg: Math.round(weightKg * 10) / 10 },
-      { onSuccess: () => setValue('') }
+      { onSuccess: () => setValue('') },
     );
   };
 
@@ -81,10 +90,7 @@ export const WeightLogger = ({ date, entry, unitPreference }: WeightLoggerProps)
             onChange={(e) => setValue(e.target.value)}
             className="flex-1"
           />
-          <Button
-            type="submit"
-            disabled={!value || logWeight.isPending}
-          >
+          <Button type="submit" disabled={!value || logWeight.isPending}>
             {currentWeight ? 'Update' : 'Log'}
           </Button>
         </form>

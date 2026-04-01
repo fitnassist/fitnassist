@@ -101,7 +101,7 @@ describe('LoginForm', () => {
         expect.objectContaining({
           onSuccess: expect.any(Function),
           onError: expect.any(Function),
-        })
+        }),
       );
     });
   });
@@ -182,9 +182,12 @@ describe('LoginForm', () => {
   it('should show loading state during submission', async () => {
     const mockSignIn = vi.mocked(signIn.email);
     mockSignIn.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => {
-        resolve({ data: { user: { id: '1' } }, error: null });
-      }, 100))
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => {
+            resolve({ data: { user: { id: '1' } }, error: null });
+          }, 100),
+        ),
     );
 
     render(<LoginForm />);
@@ -204,9 +207,12 @@ describe('LoginForm', () => {
   it('should disable form fields during loading', async () => {
     const mockSignIn = vi.mocked(signIn.email);
     mockSignIn.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => {
-        resolve({ data: { user: { id: '1' } }, error: null });
-      }, 100))
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => {
+            resolve({ data: { user: { id: '1' } }, error: null });
+          }, 100),
+        ),
     );
 
     render(<LoginForm />);

@@ -3,9 +3,10 @@ import { trpc } from '@/lib/trpc';
 
 export const usePushNotifications = () => {
   const [permission, setPermission] = useState<NotificationPermission>(
-    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+    typeof Notification !== 'undefined' ? Notification.permission : 'default',
   );
-  const isSupported = typeof Notification !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
+  const isSupported =
+    typeof Notification !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
 
   const { data: vapidData } = trpc.notification.getVapidPublicKey.useQuery(undefined, {
     enabled: isSupported,

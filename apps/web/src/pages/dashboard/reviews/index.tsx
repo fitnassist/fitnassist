@@ -75,7 +75,8 @@ export const ReviewsPage = () => {
                   <Star className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                   <h3 className="font-medium text-lg mb-2">No reviews yet</h3>
                   <p className="text-muted-foreground text-sm">
-                    Reviews from your clients will appear here after they complete sessions with you.
+                    Reviews from your clients will appear here after they complete sessions with
+                    you.
                   </p>
                 </div>
               ) : (

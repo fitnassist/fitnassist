@@ -4,7 +4,7 @@ test.describe('Public Browsing', () => {
   test('home page loads with hero and CTAs', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.getByRole('link', { name: /find.*trainer/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /find.*trainer/i }).first()).toBeVisible();
   });
 
   test('navigate to trainers search page', async ({ page }) => {
@@ -49,11 +49,16 @@ test.describe('Public Browsing', () => {
     await page.goto('/trainers');
 
     // Open filters
-    const filterButton = page.getByRole('button').filter({ has: page.locator('svg') }).first();
+    const filterButton = page
+      .getByRole('button')
+      .filter({ has: page.locator('svg') })
+      .first();
     if (await filterButton.isVisible()) {
       await filterButton.click();
       // Check that filter options appear
-      await expect(page.getByText(/search radius|services|training location/i).first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText(/search radius|services|training location/i).first()).toBeVisible(
+        { timeout: 5000 },
+      );
     }
   });
 });

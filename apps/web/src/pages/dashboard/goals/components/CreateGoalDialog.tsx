@@ -17,10 +17,7 @@ export const CreateGoalDialog = () => {
           <DialogHeader>
             <DialogTitle>Create Goal</DialogTitle>
           </DialogHeader>
-          <CreateGoalForm
-            onSuccess={() => setOpen(false)}
-            onCancel={() => setOpen(false)}
-          />
+          <CreateGoalForm onSuccess={() => setOpen(false)} onCancel={() => setOpen(false)} />
         </DialogContent>
       </Dialog>
     </>

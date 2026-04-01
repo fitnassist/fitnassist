@@ -5,10 +5,10 @@ import { format, addDays, subDays } from 'date-fns';
 // =============================================================================
 
 export const kgToLbs = (kg: number) => Math.round(kg * 2.20462 * 10) / 10;
-export const lbsToKg = (lbs: number) => Math.round(lbs / 2.20462 * 10) / 10;
-export const cmToInches = (cm: number) => Math.round(cm / 2.54 * 10) / 10;
+export const lbsToKg = (lbs: number) => Math.round((lbs / 2.20462) * 10) / 10;
+export const cmToInches = (cm: number) => Math.round((cm / 2.54) * 10) / 10;
 export const inchesToCm = (inches: number) => Math.round(inches * 2.54 * 10) / 10;
-export const mlToFlOz = (ml: number) => Math.round(ml / 29.5735 * 10) / 10;
+export const mlToFlOz = (ml: number) => Math.round((ml / 29.5735) * 10) / 10;
 export const flOzToMl = (flOz: number) => Math.round(flOz * 29.5735);
 
 export const formatWeight = (kg: number, unit: 'METRIC' | 'IMPERIAL') => {
@@ -41,7 +41,8 @@ export const today = () => toDateString(new Date());
 export const nextDay = (dateStr: string) => toDateString(addDays(new Date(dateStr), 1));
 export const prevDay = (dateStr: string) => toDateString(subDays(new Date(dateStr), 1));
 export const isToday = (dateStr: string) => dateStr === today();
-export const formatDisplayDate = (dateStr: string) => format(new Date(dateStr), 'EEEE, d MMMM yyyy');
+export const formatDisplayDate = (dateStr: string) =>
+  format(new Date(dateStr), 'EEEE, d MMMM yyyy');
 
 // =============================================================================
 // MOOD HELPERS
@@ -56,10 +57,10 @@ export const MOOD_OPTIONS = [
 ] as const;
 
 export const getMoodEmoji = (level: string) =>
-  MOOD_OPTIONS.find(m => m.value === level)?.emoji ?? '😐';
+  MOOD_OPTIONS.find((m) => m.value === level)?.emoji ?? '😐';
 
 export const getMoodLabel = (level: string) =>
-  MOOD_OPTIONS.find(m => m.value === level)?.label ?? level;
+  MOOD_OPTIONS.find((m) => m.value === level)?.label ?? level;
 
 // =============================================================================
 // SLEEP QUALITY HELPERS
@@ -157,7 +158,8 @@ export const formatPBValue = (value: number, unit: string) => {
       const hrs = Math.floor(value / 3600);
       const mins = Math.floor((value % 3600) / 60);
       const secs = Math.round(value % 60);
-      if (hrs > 0) return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      if (hrs > 0)
+        return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
       return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
     case 'km':

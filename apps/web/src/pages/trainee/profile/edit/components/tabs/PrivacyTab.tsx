@@ -29,30 +29,37 @@ const SettingRow = ({
   description,
   value,
   onChange,
+  settingKey,
 }: {
   label: string;
   description: string;
   value: VisibilityLevel;
   onChange: (value: VisibilityLevel) => void;
-}) => (
-  <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
-    <div className="space-y-0.5">
-      <Label className="text-sm font-medium">{label}</Label>
-      <p className="text-xs text-muted-foreground">{description}</p>
+  settingKey: string;
+}) => {
+  const selectId = `privacy-${settingKey}`;
+  return (
+    <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="space-y-0.5">
+        <Label className="text-sm font-medium" htmlFor={selectId}>
+          {label}
+        </Label>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <div className="w-full sm:w-48">
+        <Select
+          inputId={selectId}
+          options={visibilitySelectOptions}
+          value={visibilitySelectOptions.find((opt) => opt.value === value)}
+          onChange={(opt) => {
+            if (opt) onChange(opt.value as VisibilityLevel);
+          }}
+          menuPlacement="auto"
+        />
+      </div>
     </div>
-    <div className="w-full sm:w-48">
-      <Select
-        options={visibilitySelectOptions}
-        value={visibilitySelectOptions.find((opt) => opt.value === value)}
-        onChange={(opt) => {
-          if (opt) onChange(opt.value as VisibilityLevel);
-        }}
-        isSearchable={false}
-        menuPlacement="auto"
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 export const PrivacyTab = () => {
   const { data: settings, isLoading } = usePrivacySettings();
@@ -67,20 +74,19 @@ export const PrivacyTab = () => {
     }
   }, [settings, localSettings]);
 
-  const handleChange = useCallback(
-    (key: string, value: VisibilityLevel) => {
-      setLocalSettings((prev) => {
-        if (!prev) return prev;
-        return { ...prev, [key]: value };
-      });
-      setHasChanges(true);
-    },
-    [],
-  );
+  const handleChange = useCallback((key: string, value: VisibilityLevel) => {
+    setLocalSettings((prev) => {
+      if (!prev) return prev;
+      return { ...prev, [key]: value };
+    });
+    setHasChanges(true);
+  }, []);
 
   const handleSave = async () => {
     if (!localSettings) return;
-    await updateMutation.mutateAsync(localSettings as Parameters<typeof updateMutation.mutateAsync>[0]);
+    await updateMutation.mutateAsync(
+      localSettings as Parameters<typeof updateMutation.mutateAsync>[0],
+    );
     setHasChanges(false);
     toast.success('Privacy settings saved');
   };
@@ -115,15 +121,14 @@ export const PrivacyTab = () => {
             <Shield className="h-5 w-5 text-muted-foreground" />
             <CardTitle>Profile Sections</CardTitle>
           </div>
-          <CardDescription>
-            Control who can see different parts of your profile.
-          </CardDescription>
+          <CardDescription>Control who can see different parts of your profile.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-1">
           <div className="divide-y">
             {SECTION_PRIVACY_SETTINGS.map((setting) => (
               <SettingRow
                 key={setting.key}
+                settingKey={setting.key}
                 label={setting.label}
                 description={setting.description}
                 value={localSettings[setting.key] as VisibilityLevel}
@@ -150,6 +155,7 @@ export const PrivacyTab = () => {
             {TREND_PRIVACY_SETTINGS.map((setting) => (
               <SettingRow
                 key={setting.key}
+                settingKey={setting.key}
                 label={setting.label}
                 description={setting.description}
                 value={localSettings[setting.key] as VisibilityLevel}
@@ -164,7 +170,8 @@ export const PrivacyTab = () => {
       <Card>
         <CardContent className="py-4">
           <p className="text-sm text-muted-foreground">
-            <strong>Medical Notes</strong> are only visible to your connected personal trainer and are never shown publicly.
+            <strong>Medical Notes</strong> are only visible to your connected personal trainer and
+            are never shown publicly.
           </p>
         </CardContent>
       </Card>
@@ -174,10 +181,7 @@ export const PrivacyTab = () => {
         {updateMutation.error && (
           <p className="text-sm text-destructive">{updateMutation.error.message}</p>
         )}
-        <Button
-          onClick={handleSave}
-          disabled={!hasChanges || updateMutation.isPending}
-        >
+        <Button onClick={handleSave} disabled={!hasChanges || updateMutation.isPending}>
           {updateMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

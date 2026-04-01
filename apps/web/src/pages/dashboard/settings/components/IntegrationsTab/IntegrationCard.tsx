@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { ExternalLink, RefreshCw, Unlink, Activity, Footprints, Moon, Scale, Droplets } from 'lucide-react';
+import {
+  ExternalLink,
+  RefreshCw,
+  Unlink,
+  Activity,
+  Footprints,
+  Moon,
+  Scale,
+  Droplets,
+} from 'lucide-react';
 import { Button, Badge, Switch, Card, ConfirmDialog } from '@/components/ui';
 import { useDisconnectIntegration, useUpdateSyncPreferences } from '@/api/integration';
 import type { ProviderMeta } from './integrations.constants';
@@ -29,7 +38,10 @@ const SYNC_ICONS: Record<string, typeof Activity> = {
   water: Droplets,
 };
 
-const STATUS_BADGE: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
+const STATUS_BADGE: Record<
+  string,
+  { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }
+> = {
   CONNECTED: { variant: 'default', label: 'Connected' },
   SYNCING: { variant: 'secondary', label: 'Syncing...' },
   ERROR: { variant: 'destructive', label: 'Error' },
@@ -55,7 +67,10 @@ export const IntegrationCard = ({ meta, connection }: IntegrationCardProps) => {
   const updatePrefsMutation = useUpdateSyncPreferences();
 
   const isConnected = connection && connection.status !== 'DISCONNECTED';
-  const statusInfo = (STATUS_BADGE[connection?.status ?? ''] ?? STATUS_BADGE.DISCONNECTED) as { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string };
+  const statusInfo = (STATUS_BADGE[connection?.status ?? ''] ?? STATUS_BADGE.DISCONNECTED) as {
+    variant: 'default' | 'secondary' | 'destructive' | 'outline';
+    label: string;
+  };
   const prefs = (connection?.syncPreferences ?? {
     activities: true,
     steps: true,
@@ -72,7 +87,7 @@ export const IntegrationCard = ({ meta, connection }: IntegrationCardProps) => {
   const handleDisconnect = () => {
     disconnectMutation.mutate(
       { provider: meta.provider },
-      { onSettled: () => setShowDisconnect(false) }
+      { onSettled: () => setShowDisconnect(false) },
     );
   };
 
@@ -88,15 +103,15 @@ export const IntegrationCard = ({ meta, connection }: IntegrationCardProps) => {
       <Card className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3 min-w-0">
-            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${meta.bgColor} text-white font-bold text-sm`}>
+            <div
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${meta.bgColor} text-white font-bold text-sm`}
+            >
               {meta.name.charAt(0)}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold">{meta.name}</h3>
-                {isConnected && (
-                  <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
-                )}
+                <h2 className="font-semibold">{meta.name}</h2>
+                {isConnected && <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>}
               </div>
               <p className="text-sm text-muted-foreground mt-0.5">{meta.description}</p>
               {isConnected && connection.lastSyncAt && (
@@ -105,9 +120,7 @@ export const IntegrationCard = ({ meta, connection }: IntegrationCardProps) => {
                 </p>
               )}
               {isConnected && connection.lastSyncError && (
-                <p className="text-xs text-destructive mt-1">
-                  {connection.lastSyncError}
-                </p>
+                <p className="text-xs text-destructive mt-1">{connection.lastSyncError}</p>
               )}
               {isConnected && !connection.initialImportComplete && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
@@ -120,11 +133,7 @@ export const IntegrationCard = ({ meta, connection }: IntegrationCardProps) => {
 
           <div className="shrink-0">
             {isConnected ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowDisconnect(true)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setShowDisconnect(true)}>
                 <Unlink className="h-4 w-4 mr-1.5" />
                 Disconnect
               </Button>

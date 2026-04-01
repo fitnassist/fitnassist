@@ -81,7 +81,7 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
     formData.append('folder', params.folder);
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${params.cloudName}/image/upload`,
-      { method: 'POST', body: formData }
+      { method: 'POST', body: formData },
     );
     const result = await response.json();
     return result.secure_url;
@@ -155,9 +155,7 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
     <Card>
       <CardHeader>
         <CardTitle>Personal Information</CardTitle>
-        <CardDescription>
-          Update your personal details and profile photo.
-        </CardDescription>
+        <CardDescription>Update your personal details and profile photo.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -179,10 +177,13 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
           <div>
             <Label htmlFor="handle">Handle</Label>
             <p className="text-xs text-muted-foreground mb-1.5">
-              Your unique public profile URL. Only lowercase letters, numbers, hyphens, and underscores.
+              Your unique public profile URL. Only lowercase letters, numbers, hyphens, and
+              underscores.
             </p>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">@</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                @
+              </span>
               <Input
                 id="handle"
                 placeholder="your-handle"
@@ -203,9 +204,7 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
                 </span>
               )}
             </div>
-            {errors.handle && (
-              <p className="text-sm text-destructive">{errors.handle.message}</p>
-            )}
+            {errors.handle && <p className="text-sm text-destructive">{errors.handle.message}</p>}
             {isHandleChanged && handleCheck && !handleCheck.available && (
               <p className="text-sm text-destructive">{handleCheck.reason}</p>
             )}
@@ -224,28 +223,23 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
               {...register('bio')}
               rows={4}
             />
-            {errors.bio && (
-              <p className="text-sm text-destructive">{errors.bio.message}</p>
-            )}
+            {errors.bio && <p className="text-sm text-destructive">{errors.bio.message}</p>}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="dateOfBirth">Date of Birth</Label>
-              <Input
-                id="dateOfBirth"
-                type="date"
-                {...register('dateOfBirth')}
-              />
+              <Input id="dateOfBirth" type="date" {...register('dateOfBirth')} />
             </div>
 
             <div>
-              <Label>Gender</Label>
+              <Label htmlFor="edit-gender">Gender</Label>
               <Controller
                 name="gender"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="edit-gender"
                     options={genderOptions}
                     value={genderOptions.find((o) => o.value === field.value) || null}
                     onChange={(opt: SelectOption | null) => field.onChange(opt?.value || undefined)}
@@ -295,9 +289,7 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
             }}
           />
 
-          {mutation.error && (
-            <p className="text-sm text-destructive">{mutation.error.message}</p>
-          )}
+          {mutation.error && <p className="text-sm text-destructive">{mutation.error.message}</p>}
 
           <div className="flex justify-end">
             <Button type="submit" disabled={isSaving || !isDirty}>

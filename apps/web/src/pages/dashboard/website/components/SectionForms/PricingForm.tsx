@@ -26,17 +26,13 @@ const createEmptyItem = (): PricingItem => ({
 
 export const PricingForm = ({ sectionId, content }: PricingFormProps) => {
   const updateSection = useUpdateSection();
-  const initialItems = Array.isArray(content.items)
-    ? (content.items as PricingItem[])
-    : [];
+  const initialItems = Array.isArray(content.items) ? (content.items as PricingItem[]) : [];
   const [items, setItems] = useState<PricingItem[]>(
-    initialItems.length > 0 ? initialItems : [createEmptyItem()]
+    initialItems.length > 0 ? initialItems : [createEmptyItem()],
   );
 
   const handleUpdate = (index: number, field: keyof PricingItem, value: string) => {
-    setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
   const handleAdd = () => {

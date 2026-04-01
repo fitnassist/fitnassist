@@ -15,9 +15,7 @@ export const TrialBanner = () => {
 
   const daysLeft = Math.max(
     0,
-    Math.ceil(
-      (new Date(subscription.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-    )
+    Math.ceil((new Date(subscription.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
   );
 
   return (
@@ -26,7 +24,10 @@ export const TrialBanner = () => {
         <div className="flex items-center gap-2 text-sm">
           <Clock className="h-4 w-4 text-primary shrink-0" />
           <span>
-            <strong>{daysLeft} day{daysLeft !== 1 ? 's' : ''}</strong> left on your Pro trial.{' '}
+            <strong>
+              {daysLeft} day{daysLeft !== 1 ? 's' : ''}
+            </strong>{' '}
+            left on your Pro trial.{' '}
             <Link to={routes.pricing} className="font-medium text-primary hover:underline">
               Subscribe now
             </Link>{' '}

@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { Users } from 'lucide-react';
-import {
-  Badge,
-  Card,
-  CardContent,
-  SkeletonHeader,
-  SkeletonCardList,
-} from '@/components/ui';
+import { Badge, Card, CardContent, SkeletonHeader, SkeletonCardList } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { useClients, useClientStats, useUpdateClientStatus } from '@/api/client-roster';
 import { useDebounce } from '@/hooks';
@@ -36,16 +30,10 @@ export const ClientsPage = () => {
 
   const statsBadges = stats ? (
     <div className="flex items-center gap-2 text-sm flex-wrap">
-      {stats.onboarding > 0 && (
-        <Badge variant="info">{stats.onboarding} onboarding</Badge>
-      )}
+      {stats.onboarding > 0 && <Badge variant="info">{stats.onboarding} onboarding</Badge>}
       <Badge variant="success">{stats.active} active</Badge>
-      {stats.onHold > 0 && (
-        <Badge variant="warning">{stats.onHold} on hold</Badge>
-      )}
-      {stats.inactive > 0 && (
-        <Badge variant="secondary">{stats.inactive} inactive</Badge>
-      )}
+      {stats.onHold > 0 && <Badge variant="warning">{stats.onHold} on hold</Badge>}
+      {stats.inactive > 0 && <Badge variant="secondary">{stats.inactive} inactive</Badge>}
     </div>
   ) : null;
 
@@ -108,11 +96,7 @@ export const ClientsPage = () => {
         ) : (
           <div className="space-y-3">
             {data.clients.map((client) => (
-              <ClientCard
-                key={client.id}
-                client={client}
-                onStatusChange={handleStatusChange}
-              />
+              <ClientCard key={client.id} client={client} onStatusChange={handleStatusChange} />
             ))}
           </div>
         )}

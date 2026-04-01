@@ -1,10 +1,7 @@
 import { trpc } from '@/lib/trpc';
 
 export const useClientNotes = (clientRosterId: string) => {
-  return trpc.clientRoster.getNotes.useQuery(
-    { clientRosterId },
-    { enabled: !!clientRosterId }
-  );
+  return trpc.clientRoster.getNotes.useQuery({ clientRosterId }, { enabled: !!clientRosterId });
 };
 
 export const useAddClientNote = () => {

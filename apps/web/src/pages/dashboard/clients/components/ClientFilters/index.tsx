@@ -1,14 +1,14 @@
-import { Search } from "lucide-react";
-import { Select, type SelectOption, Switch, Label } from "@/components/ui";
+import { Search } from 'lucide-react';
+import { Select, type SelectOption, Switch, Label } from '@/components/ui';
 
-type ActiveClientStatus = "ONBOARDING" | "ACTIVE" | "INACTIVE" | "ON_HOLD";
+type ActiveClientStatus = 'ONBOARDING' | 'ACTIVE' | 'INACTIVE' | 'ON_HOLD';
 
 const STATUS_OPTIONS: SelectOption[] = [
-  { value: "", label: "All Statuses" },
-  { value: "ONBOARDING", label: "Onboarding" },
-  { value: "ACTIVE", label: "Active" },
-  { value: "ON_HOLD", label: "On Hold" },
-  { value: "INACTIVE", label: "Inactive" },
+  { value: '', label: 'All Statuses' },
+  { value: 'ONBOARDING', label: 'Onboarding' },
+  { value: 'ACTIVE', label: 'Active' },
+  { value: 'ON_HOLD', label: 'On Hold' },
+  { value: 'INACTIVE', label: 'Inactive' },
 ];
 
 interface ClientFiltersProps {
@@ -41,17 +41,15 @@ export const ClientFilters = ({
         />
       </div>
       <div className="w-full sm:w-48">
+        <label htmlFor="client-status-filter" className="sr-only">
+          Client status
+        </label>
         <Select
-          value={
-            STATUS_OPTIONS.find((o) => o.value === (status || "")) ||
-            STATUS_OPTIONS[0]
-          }
-          onChange={(opt) =>
-            onStatusChange((opt?.value as ActiveClientStatus) || undefined)
-          }
+          inputId="client-status-filter"
+          value={STATUS_OPTIONS.find((o) => o.value === (status || '')) || STATUS_OPTIONS[0]}
+          onChange={(opt) => onStatusChange((opt?.value as ActiveClientStatus) || undefined)}
           options={STATUS_OPTIONS}
           isClearable={false}
-          isSearchable={false}
         />
       </div>
       <div className="flex items-center gap-2">

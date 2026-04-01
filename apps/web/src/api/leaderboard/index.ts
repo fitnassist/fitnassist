@@ -1,5 +1,1 @@
-export {
-  useLeaderboard,
-  useLeaderboardOptIn,
-  useSetLeaderboardOptIn,
-} from './useLeaderboard';
+export { useLeaderboard, useLeaderboardOptIn, useSetLeaderboardOptIn } from './useLeaderboard';

@@ -87,9 +87,9 @@ export const HomePage = () => {
       {/* Hero Section */}
       <HeroBanner title="Welcome to Fitness" imageUrl="/images/hero-home.jpg">
         <p className="mx-auto mt-6 max-w-2xl text-lg text-white/70">
-          Your all-in-one fitness platform. Track nutrition, workouts, and wellness — or
-          find a personal trainer to guide your journey. For trainers, manage clients and
-          grow your business from one dashboard.
+          Your all-in-one fitness platform. Track nutrition, workouts, and wellness — or find a
+          personal trainer to guide your journey. For trainers, manage clients and grow your
+          business from one dashboard.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link to={routes.trainers}>
@@ -98,7 +98,11 @@ export const HomePage = () => {
             </Button>
           </Link>
           <Link to={routes.register}>
-            <Button variant="outline" size="lg" className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white uppercase tracking-wider font-semibold">
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white uppercase tracking-wider font-semibold"
+            >
               I'm a Trainer
             </Button>
           </Link>
@@ -261,7 +265,8 @@ export const HomePage = () => {
                 </div>
                 <h3 className="mt-4 text-lg font-semibold">Resources Library</h3>
                 <p className="mt-2 text-muted-foreground">
-                  Create exercises with videos, recipes, workout plans, and meal plans. Assign to clients in bulk.
+                  Create exercises with videos, recipes, workout plans, and meal plans. Assign to
+                  clients in bulk.
                 </p>
               </CardContent>
             </Card>

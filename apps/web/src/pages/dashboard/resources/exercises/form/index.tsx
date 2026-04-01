@@ -92,7 +92,10 @@ export const ExerciseFormPage = () => {
   const videoUploadUrl = watch('videoUploadUrl');
   const thumbnailUrl = watch('thumbnailUrl');
 
-  const uploadToCloudinary = async (file: File, type: 'exercise-video' | 'exercise-thumbnail'): Promise<string> => {
+  const uploadToCloudinary = async (
+    file: File,
+    type: 'exercise-video' | 'exercise-thumbnail',
+  ): Promise<string> => {
     const params = await getUploadParams.mutateAsync({ type });
     const formData = new FormData();
     formData.append('file', file);
@@ -103,7 +106,7 @@ export const ExerciseFormPage = () => {
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${params.cloudName}/${params.resourceType}/upload`,
-      { method: 'POST', body: formData }
+      { method: 'POST', body: formData },
     );
 
     if (!response.ok) throw new Error('Failed to upload file');
@@ -136,7 +139,10 @@ export const ExerciseFormPage = () => {
   const toggleMuscleGroup = (mg: MuscleGroup) => {
     const current = muscleGroups;
     if (current.includes(mg)) {
-      setValue('muscleGroups', current.filter(m => m !== mg));
+      setValue(
+        'muscleGroups',
+        current.filter((m) => m !== mg),
+      );
     } else {
       setValue('muscleGroups', [...current, mg]);
     }
@@ -145,7 +151,10 @@ export const ExerciseFormPage = () => {
   const toggleEquipment = (eq: string) => {
     const current = equipment;
     if (current.includes(eq)) {
-      setValue('equipment', current.filter(e => e !== eq));
+      setValue(
+        'equipment',
+        current.filter((e) => e !== eq),
+      );
     } else {
       setValue('equipment', [...current, eq]);
     }
@@ -202,12 +211,10 @@ export const ExerciseFormPage = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                {...register('name')}
-                placeholder="e.g. Barbell Bench Press"
-              />
-              {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+              <Input id="name" {...register('name')} placeholder="e.g. Barbell Bench Press" />
+              {errors.name && (
+                <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
+              )}
             </div>
             <div>
               <Label htmlFor="description">Description</Label>
@@ -217,7 +224,9 @@ export const ExerciseFormPage = () => {
                 placeholder="Brief description of the exercise"
                 rows={3}
               />
-              {errors.description && <p className="text-sm text-destructive mt-1">{errors.description.message}</p>}
+              {errors.description && (
+                <p className="text-sm text-destructive mt-1">{errors.description.message}</p>
+              )}
             </div>
             <div>
               <Label htmlFor="instructions">Instructions</Label>
@@ -240,7 +249,9 @@ export const ExerciseFormPage = () => {
         {/* Video */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Video <span className="text-sm font-normal text-muted-foreground">(optional)</span></CardTitle>
+            <CardTitle className="text-base">
+              Video <span className="text-sm font-normal text-muted-foreground">(optional)</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-2">
@@ -270,7 +281,9 @@ export const ExerciseFormPage = () => {
                   {...register('videoUrl')}
                   placeholder="https://youtube.com/watch?v=..."
                 />
-                {errors.videoUrl && <p className="text-sm text-destructive mt-1">{errors.videoUrl.message}</p>}
+                {errors.videoUrl && (
+                  <p className="text-sm text-destructive mt-1">{errors.videoUrl.message}</p>
+                )}
               </div>
             ) : (
               <VideoUpload
@@ -321,7 +334,14 @@ export const ExerciseFormPage = () => {
                     type="button"
                     variant={difficulty === opt.value ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setValue('difficulty', difficulty === opt.value ? null : opt.value as CreateExerciseInput['difficulty'])}
+                    onClick={() =>
+                      setValue(
+                        'difficulty',
+                        difficulty === opt.value
+                          ? null
+                          : (opt.value as CreateExerciseInput['difficulty']),
+                      )
+                    }
                   >
                     {opt.label}
                   </Button>

@@ -14,7 +14,7 @@ export function Sidebar({ navItems, user, onSignOut, currentPath }: SidebarProps
       <aside
         className={cn(
           'border-r bg-background hidden lg:flex lg:flex-col transition-[width] duration-300',
-          isCollapsed ? 'w-16' : 'w-64'
+          isCollapsed ? 'w-16' : 'w-64',
         )}
       >
         {/* Collapse toggle */}

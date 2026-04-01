@@ -76,7 +76,7 @@ export const LocationPicker = ({
                   'w-full text-left p-3 rounded-lg border transition-colors',
                   selectedLocationId === loc.id
                     ? 'bg-primary/5 border-primary'
-                    : 'hover:bg-muted/50'
+                    : 'hover:bg-muted/50',
                 )}
               >
                 <div className="flex items-center gap-2">
@@ -109,7 +109,8 @@ export const LocationPicker = ({
               onClick={handleUseMyAddress}
             >
               <Home className="h-4 w-4 mr-2" />
-              Use my address ({[traineeAddress?.addressLine1, traineeAddress?.postcode].filter(Boolean).join(', ')})
+              Use my address (
+              {[traineeAddress?.addressLine1, traineeAddress?.postcode].filter(Boolean).join(', ')})
             </Button>
           )}
 

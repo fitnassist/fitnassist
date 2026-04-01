@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, ChevronDown } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import type { NavItem } from './Sidebar.types';
 
@@ -43,10 +39,10 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
   };
 
   const renderItem = (item: NavItem) => {
-    const isActive = !item.disabled && (
-      currentPath === item.href ||
-      (item.href !== '/dashboard' && currentPath.startsWith(item.href))
-    );
+    const isActive =
+      !item.disabled &&
+      (currentPath === item.href ||
+        (item.href !== '/dashboard' && currentPath.startsWith(item.href)));
     const hasBadge = !item.disabled && item.badge !== undefined && item.badge > 0;
 
     const content = item.disabled ? (
@@ -55,9 +51,7 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
           'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-50 overflow-hidden',
         )}
       >
-        <span className="relative shrink-0">
-          {item.icon}
-        </span>
+        <span className="relative shrink-0">{item.icon}</span>
         <span className="flex-1 whitespace-nowrap overflow-hidden">{item.label}</span>
         <Lock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       </div>
@@ -66,9 +60,7 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
         to={item.href}
         className={cn(
           'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors overflow-hidden',
-          isActive
-            ? 'text-coral'
-            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+          isActive ? 'text-coral' : 'text-muted-foreground hover:bg-muted hover:text-foreground',
         )}
       >
         <span className="relative shrink-0">
@@ -86,13 +78,9 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
     if (isCollapsed || item.disabled) {
       return (
         <Tooltip key={item.href} delayDuration={0}>
-          <TooltipTrigger asChild>
-            {content}
-          </TooltipTrigger>
+          <TooltipTrigger asChild>{content}</TooltipTrigger>
           <TooltipContent side="right" className="flex items-center gap-2">
-            {item.disabled
-              ? item.disabledTooltip ?? `${item.label} (locked)`
-              : item.label}
+            {item.disabled ? (item.disabledTooltip ?? `${item.label} (locked)`) : item.label}
             {hasBadge && (
               <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-coral px-1 text-[10px] font-medium text-white">
                 {item.badge! > 9 ? '9+' : item.badge}
@@ -143,17 +131,10 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
                 <span className="h-1.5 w-1.5 rounded-full bg-coral mr-1.5" />
               )}
               <ChevronDown
-                className={cn(
-                  'h-3.5 w-3.5 transition-transform',
-                  isGroupCollapsed && '-rotate-90',
-                )}
+                className={cn('h-3.5 w-3.5 transition-transform', isGroupCollapsed && '-rotate-90')}
               />
             </button>
-            {!isGroupCollapsed && (
-              <div className="space-y-1">
-                {group.items.map(renderItem)}
-              </div>
-            )}
+            {!isGroupCollapsed && <div className="space-y-1">{group.items.map(renderItem)}</div>}
           </div>
         );
       })}

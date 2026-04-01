@@ -29,6 +29,11 @@ pnpm-debug.log*
 # Testing
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
+**/test-results/
+**/playwright-report/
+**/e2e/screenshots/
 
 # Prisma
 packages/database/prisma/*.db

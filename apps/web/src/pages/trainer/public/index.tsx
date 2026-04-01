@@ -41,9 +41,7 @@ export function TrainerPublicProfilePage() {
           {/* Main content */}
           <div className="lg:col-span-2 space-y-8">
             <ProfileBio bio={trainer.bio} />
-            {trainer.videoIntroUrl && (
-              <ProfileVideoIntro videoUrl={trainer.videoIntroUrl} />
-            )}
+            {trainer.videoIntroUrl && <ProfileVideoIntro videoUrl={trainer.videoIntroUrl} />}
             {trainer.galleryImages && trainer.galleryImages.length > 0 && (
               <ProfileGallery images={trainer.galleryImages} />
             )}
@@ -74,10 +72,7 @@ export function TrainerPublicProfilePage() {
               longitude={trainer.longitude}
               travelOption={trainer.travelOption}
             />
-            <ProfileContact
-              trainerId={trainer.id}
-              trainerName={trainer.displayName}
-            />
+            <ProfileContact trainerId={trainer.id} trainerName={trainer.displayName} />
           </div>
         </div>
       </div>

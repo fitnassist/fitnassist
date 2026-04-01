@@ -19,10 +19,17 @@ const TEST_TRAINEE = {
 const signUp = async (data: { name: string; email: string; password: string; role: string }) => {
   const res = await fetch(`${API_URL}/api/auth/sign-up/email`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      Origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    },
     body: JSON.stringify(data),
   });
-  return res.json();
+  const json = await res.json();
+  if (!res.ok) {
+    console.error('Sign-up failed:', json);
+  }
+  return json;
 };
 
 async function main() {
@@ -101,7 +108,6 @@ async function main() {
       fitnessGoals: ['WEIGHT_LOSS', 'BUILD_MUSCLE', 'IMPROVE_FITNESS'],
       fitnessGoalNotes: 'Want to lose some weight and build lean muscle. Aiming to be more consistent.',
       location: 'London, UK',
-      isPublic: true,
     },
   });
   console.log('Created trainee profile');

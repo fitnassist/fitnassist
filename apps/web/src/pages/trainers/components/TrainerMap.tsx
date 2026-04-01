@@ -80,7 +80,9 @@ export function TrainerMap({
 
     async function initMap() {
       try {
-        const { Map, InfoWindow } = await google.maps.importLibrary('maps') as google.maps.MapsLibrary;
+        const { Map, InfoWindow } = (await google.maps.importLibrary(
+          'maps',
+        )) as google.maps.MapsLibrary;
 
         if (!isMounted || !mapRef.current) return;
 
@@ -138,7 +140,7 @@ export function TrainerMap({
     let isMounted = true;
 
     async function updateMarkers() {
-      const { Marker } = await google.maps.importLibrary('marker') as google.maps.MarkerLibrary;
+      const { Marker } = (await google.maps.importLibrary('marker')) as google.maps.MarkerLibrary;
 
       if (!isMounted || !googleMapRef.current) return;
 
@@ -157,7 +159,7 @@ export function TrainerMap({
         // Round coordinates for privacy (postcode-level precision)
         const position = {
           lat: roundCoordinate(trainer.latitude),
-          lng: roundCoordinate(trainer.longitude)
+          lng: roundCoordinate(trainer.longitude),
         };
         bounds.extend(position);
 
@@ -232,7 +234,7 @@ export function TrainerMap({
 
     markersRef.current.forEach((marker, index) => {
       const trainersWithCoords = trainers.filter(
-        (t) => t.latitude !== null && t.longitude !== null
+        (t) => t.latitude !== null && t.longitude !== null,
       );
       const currentTrainer = trainersWithCoords[index];
       if (!currentTrainer) return;
@@ -256,9 +258,7 @@ export function TrainerMap({
       <div ref={mapRef} className="h-full w-full" />
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-muted">
-          <div className="animate-pulse text-muted-foreground">
-            Loading map...
-          </div>
+          <div className="animate-pulse text-muted-foreground">Loading map...</div>
         </div>
       )}
     </div>

@@ -1,9 +1,9 @@
-import { BookHeart, UtensilsCrossed, Ruler, Activity } from "lucide-react";
-import { PageLayout } from "@/components/layouts";
-import { ResponsiveTabs, TabsContent } from "@/components/ui";
-import { trpc } from "@/lib/trpc";
-import { useTabParam } from "@/hooks";
-import { useDiaryPage } from "./hooks";
+import { BookHeart, UtensilsCrossed, Ruler, Activity } from 'lucide-react';
+import { PageLayout } from '@/components/layouts';
+import { ResponsiveTabs, TabsContent } from '@/components/ui';
+import { trpc } from '@/lib/trpc';
+import { useTabParam } from '@/hooks';
+import { useDiaryPage } from './hooks';
 import {
   DiaryDatePicker,
   WeightLogger,
@@ -18,18 +18,18 @@ import {
   ActivityLogger,
   PersonalBests,
   DiaryComments,
-} from "./components";
+} from './components';
 
 const TAB_OPTIONS = [
-  { value: "body", label: "Body", icon: <Ruler className="h-4 w-4" /> },
+  { value: 'body', label: 'Body', icon: <Ruler className="h-4 w-4" /> },
   {
-    value: "nutrition",
-    label: "Nutrition",
+    value: 'nutrition',
+    label: 'Nutrition',
     icon: <UtensilsCrossed className="h-4 w-4" />,
   },
   {
-    value: "activity",
-    label: "Activity",
+    value: 'activity',
+    label: 'Activity',
     icon: <Activity className="h-4 w-4" />,
   },
 ];
@@ -52,15 +52,12 @@ export const DiaryPage = () => {
     progressPhotoEntries,
   } = useDiaryPage();
   const { data: traineeProfile } = trpc.trainee.getMyProfile.useQuery();
-  const unitPreference = traineeProfile?.unitPreference ?? "METRIC";
-  const [activeTab, setActiveTab] = useTabParam("body");
+  const unitPreference = traineeProfile?.unitPreference ?? 'METRIC';
+  const [activeTab, setActiveTab] = useTabParam('body');
 
   return (
     <PageLayout maxWidth="6xl">
-      <PageLayout.Header
-        title="Diary"
-        icon={<BookHeart className="h-6 w-6 sm:h-8 sm:w-8" />}
-      />
+      <PageLayout.Header title="Diary" icon={<BookHeart className="h-6 w-6 sm:h-8 sm:w-8" />} />
 
       <div className="mb-6">
         <DiaryDatePicker date={selectedDate} onChange={setSelectedDate} />
@@ -96,10 +93,7 @@ export const DiaryPage = () => {
                 <StepsTracker date={selectedDate} entry={stepsEntry} />
               </div>
               <div className="mt-4">
-                <ProgressPhotos
-                  date={selectedDate}
-                  entries={progressPhotoEntries}
-                />
+                <ProgressPhotos date={selectedDate} entries={progressPhotoEntries} />
               </div>
             </TabsContent>
 

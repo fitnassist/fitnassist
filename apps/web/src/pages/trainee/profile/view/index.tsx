@@ -1,13 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/hooks';
-import {
-  Card,
-  CardContent,
-  SkeletonAvatar,
-  SkeletonText,
-  SkeletonCard,
-} from '@/components/ui';
+import { Card, CardContent, SkeletonAvatar, SkeletonText, SkeletonCard } from '@/components/ui';
 import { routes } from '@/config/routes';
 import { trpc } from '@/lib/trpc';
 import {
@@ -24,10 +18,11 @@ export const TraineeProfileViewPage = () => {
   const { isTrainer } = useAuth();
   const backTo = isTrainer ? routes.dashboardClients : routes.dashboardContacts;
   const backLabel = isTrainer ? 'Back to Clients' : 'Back to Contacts';
-  const { data: profile, isLoading, error } = trpc.trainee.getProfile.useQuery(
-    { userId: userId! },
-    { enabled: !!userId }
-  );
+  const {
+    data: profile,
+    isLoading,
+    error,
+  } = trpc.trainee.getProfile.useQuery({ userId: userId! }, { enabled: !!userId });
 
   if (isLoading) {
     return (
@@ -59,9 +54,7 @@ export const TraineeProfileViewPage = () => {
         </Link>
         <Card>
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">
-              {error?.message || 'Profile not found'}
-            </p>
+            <p className="text-muted-foreground">{error?.message || 'Profile not found'}</p>
           </CardContent>
         </Card>
       </div>

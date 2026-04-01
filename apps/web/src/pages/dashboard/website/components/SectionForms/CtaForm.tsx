@@ -28,7 +28,7 @@ export const CtaForm = ({ sectionId, content }: CtaFormProps) => {
   const updateSection = useUpdateSection();
   const { uploadImage, deleteFile } = useWebsiteUpload();
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string>(
-    (content.backgroundImageUrl as string) || ''
+    (content.backgroundImageUrl as string) || '',
   );
 
   const { register, handleSubmit, control } = useForm<CtaContent>({
@@ -86,12 +86,13 @@ export const CtaForm = ({ sectionId, content }: CtaFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label>Style</Label>
+        <Label htmlFor="cta-style">Style</Label>
         <Controller
           name="style"
           control={control}
           render={({ field }) => (
             <Select
+              inputId="cta-style"
               options={STYLE_OPTIONS}
               value={STYLE_OPTIONS.find((o) => o.value === field.value) || null}
               onChange={(option) => field.onChange(option?.value || 'accent')}

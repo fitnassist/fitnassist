@@ -16,7 +16,7 @@ export const useWebsiteUpload = () => {
 
     const uploadResponse = await fetch(
       `https://api.cloudinary.com/v1_1/${params.cloudName}/${params.resourceType}/upload`,
-      { method: 'POST', body: formData }
+      { method: 'POST', body: formData },
     );
 
     if (!uploadResponse.ok) {
@@ -41,7 +41,7 @@ export const useWebsiteUpload = () => {
 
     const uploadResponse = await fetch(
       `https://api.cloudinary.com/v1_1/${params.cloudName}/${params.resourceType}/upload`,
-      { method: 'POST', body: formData }
+      { method: 'POST', body: formData },
     );
 
     if (!uploadResponse.ok) {

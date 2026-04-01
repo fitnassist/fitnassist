@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { ClipboardList, Dumbbell, Salad, UtensilsCrossed, Play, Clock, Flame, ChevronRight } from 'lucide-react';
+import {
+  ClipboardList,
+  Dumbbell,
+  Salad,
+  UtensilsCrossed,
+  Play,
+  Clock,
+  Flame,
+  ChevronRight,
+} from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -87,13 +96,29 @@ interface Ingredient {
   unit?: string;
 }
 
-const ExerciseContent = ({ exercise, sets, reps, restSeconds, notes }: { exercise: ExerciseDetail; sets?: number | null; reps?: string | null; restSeconds?: number | null; notes?: string | null }) => {
+const ExerciseContent = ({
+  exercise,
+  sets,
+  reps,
+  restSeconds,
+  notes,
+}: {
+  exercise: ExerciseDetail;
+  sets?: number | null;
+  reps?: string | null;
+  restSeconds?: number | null;
+  notes?: string | null;
+}) => {
   const videoUrl = exercise.videoUrl || exercise.videoUploadUrl;
 
   return (
     <div className="space-y-4">
       {exercise.thumbnailUrl && (
-        <img src={exercise.thumbnailUrl} alt={exercise.name} className="w-full rounded-lg object-cover max-h-48" />
+        <img
+          src={exercise.thumbnailUrl}
+          alt={exercise.name}
+          className="w-full rounded-lg object-cover max-h-48"
+        />
       )}
 
       {(sets || reps || restSeconds) && (
@@ -121,7 +146,9 @@ const ExerciseContent = ({ exercise, sets, reps, restSeconds, notes }: { exercis
       {exercise.instructions && (
         <div>
           <p className="text-sm font-medium mb-1">Instructions</p>
-          <p className="text-sm text-muted-foreground whitespace-pre-line">{exercise.instructions}</p>
+          <p className="text-sm text-muted-foreground whitespace-pre-line">
+            {exercise.instructions}
+          </p>
         </div>
       )}
 
@@ -141,8 +168,10 @@ const ExerciseContent = ({ exercise, sets, reps, restSeconds, notes }: { exercis
         <div>
           <p className="text-sm font-medium mb-1">Muscle Groups</p>
           <div className="flex flex-wrap gap-1.5">
-            {exercise.muscleGroups.map(mg => (
-              <Badge key={mg} variant="outline">{MUSCLE_GROUP_LABELS[mg] ?? mg}</Badge>
+            {exercise.muscleGroups.map((mg) => (
+              <Badge key={mg} variant="outline">
+                {MUSCLE_GROUP_LABELS[mg] ?? mg}
+              </Badge>
             ))}
           </div>
         </div>
@@ -152,8 +181,10 @@ const ExerciseContent = ({ exercise, sets, reps, restSeconds, notes }: { exercis
         <div>
           <p className="text-sm font-medium mb-1">Equipment</p>
           <div className="flex flex-wrap gap-1.5">
-            {exercise.equipment.map(eq => (
-              <Badge key={eq} variant="outline">{eq}</Badge>
+            {exercise.equipment.map((eq) => (
+              <Badge key={eq} variant="outline">
+                {eq}
+              </Badge>
             ))}
           </div>
         </div>
@@ -169,12 +200,14 @@ const RecipeContent = ({ recipe }: { recipe: RecipeDetail }) => {
   return (
     <div className="space-y-4">
       {recipe.imageUrl && (
-        <img src={recipe.imageUrl} alt={recipe.name} className="w-full rounded-lg object-cover max-h-48" />
+        <img
+          src={recipe.imageUrl}
+          alt={recipe.name}
+          className="w-full rounded-lg object-cover max-h-48"
+        />
       )}
 
-      {recipe.description && (
-        <p className="text-sm text-muted-foreground">{recipe.description}</p>
-      )}
+      {recipe.description && <p className="text-sm text-muted-foreground">{recipe.description}</p>}
 
       <div className="flex flex-wrap gap-3">
         {recipe.calories && (
@@ -190,7 +223,9 @@ const RecipeContent = ({ recipe }: { recipe: RecipeDetail }) => {
           </Badge>
         )}
         {recipe.servings && (
-          <Badge variant="secondary">{recipe.servings} serving{recipe.servings !== 1 ? 's' : ''}</Badge>
+          <Badge variant="secondary">
+            {recipe.servings} serving{recipe.servings !== 1 ? 's' : ''}
+          </Badge>
         )}
       </div>
 
@@ -251,7 +286,10 @@ const RecipeContent = ({ recipe }: { recipe: RecipeDetail }) => {
 export const MyPlansPage = () => {
   const [activeTab, setActiveTab] = useTabParam('workout');
   const { data: assignments, isLoading } = useMyAssignments();
-  const [selectedExercise, setSelectedExercise] = useState<{ exercise: ExerciseDetail; we: WorkoutExercise } | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<{
+    exercise: ExerciseDetail;
+    we: WorkoutExercise;
+  } | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeDetail | null>(null);
 
   if (isLoading) {
@@ -265,18 +303,18 @@ export const MyPlansPage = () => {
     );
   }
 
-  const workoutPlans = (assignments ?? []).flatMap(a =>
-    (a.workoutPlanAssignments ?? []).map(wpa => ({
+  const workoutPlans = (assignments ?? []).flatMap((a) =>
+    (a.workoutPlanAssignments ?? []).map((wpa) => ({
       plan: wpa.workoutPlan,
       trainerName: a.trainer.user.name,
-    }))
+    })),
   );
 
-  const mealPlans = (assignments ?? []).flatMap(a =>
-    (a.mealPlanAssignments ?? []).map(mpa => ({
+  const mealPlans = (assignments ?? []).flatMap((a) =>
+    (a.mealPlanAssignments ?? []).map((mpa) => ({
       plan: mpa.mealPlan,
       trainerName: a.trainer.user.name,
-    }))
+    })),
   );
 
   return (
@@ -316,9 +354,7 @@ export const MyPlansPage = () => {
                         <Dumbbell className="h-5 w-5 text-primary" />
                         {plan.name}
                       </CardTitle>
-                      <span className="text-xs text-muted-foreground">
-                        From {trainerName}
-                      </span>
+                      <span className="text-xs text-muted-foreground">From {trainerName}</span>
                     </div>
                     {plan.description && (
                       <p className="text-sm text-muted-foreground">{plan.description}</p>
@@ -380,9 +416,7 @@ export const MyPlansPage = () => {
                         <Salad className="h-5 w-5 text-green-600 dark:text-green-400" />
                         {plan.name}
                       </CardTitle>
-                      <span className="text-xs text-muted-foreground">
-                        From {trainerName}
-                      </span>
+                      <span className="text-xs text-muted-foreground">From {trainerName}</span>
                     </div>
                     {plan.description && (
                       <p className="text-sm text-muted-foreground">{plan.description}</p>
@@ -406,15 +440,11 @@ export const MyPlansPage = () => {
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm">{mr.recipe.name}</p>
                               <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-xs text-muted-foreground">
-                                {mr.dayOfWeek != null && (
-                                  <span>{DAYS[mr.dayOfWeek]}</span>
-                                )}
+                                {mr.dayOfWeek != null && <span>{DAYS[mr.dayOfWeek]}</span>}
                                 {mr.mealType && (
                                   <span>{MEAL_TYPE_LABELS[mr.mealType] ?? mr.mealType}</span>
                                 )}
-                                {mr.recipe.calories && (
-                                  <span>{mr.recipe.calories} cal</span>
-                                )}
+                                {mr.recipe.calories && <span>{mr.recipe.calories} cal</span>}
                               </div>
                             </div>
                             <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />

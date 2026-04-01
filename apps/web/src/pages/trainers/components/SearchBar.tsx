@@ -16,11 +16,7 @@ interface SearchBarProps {
     latitude?: number;
     longitude?: number;
   };
-  onLocationChange: (location: {
-    query: string;
-    latitude?: number;
-    longitude?: number;
-  }) => void;
+  onLocationChange: (location: { query: string; latitude?: number; longitude?: number }) => void;
   services: string[];
   onServicesChange: (services: string[]) => void;
   qualifications: string[];
@@ -74,7 +70,9 @@ export const SearchBar = ({
     let isMounted = true;
 
     async function initAutocomplete() {
-      const { Autocomplete } = await google.maps.importLibrary('places') as google.maps.PlacesLibrary;
+      const { Autocomplete } = (await google.maps.importLibrary(
+        'places',
+      )) as google.maps.PlacesLibrary;
 
       if (!isMounted || !inputRef.current) return;
 
@@ -108,7 +106,6 @@ export const SearchBar = ({
     };
   }, []);
 
-
   const handleClearLocation = useCallback(() => {
     onLocationChange({ query: '', latitude: undefined, longitude: undefined });
     if (inputRef.current) {
@@ -116,21 +113,27 @@ export const SearchBar = ({
     }
   }, [onLocationChange]);
 
-  const handleServiceToggle = useCallback((serviceValue: string) => {
-    if (services.includes(serviceValue)) {
-      onServicesChange(services.filter(s => s !== serviceValue));
-    } else {
-      onServicesChange([...services, serviceValue]);
-    }
-  }, [services, onServicesChange]);
+  const handleServiceToggle = useCallback(
+    (serviceValue: string) => {
+      if (services.includes(serviceValue)) {
+        onServicesChange(services.filter((s) => s !== serviceValue));
+      } else {
+        onServicesChange([...services, serviceValue]);
+      }
+    },
+    [services, onServicesChange],
+  );
 
-  const handleQualificationToggle = useCallback((qualValue: string) => {
-    if (qualifications.includes(qualValue)) {
-      onQualificationsChange(qualifications.filter(q => q !== qualValue));
-    } else {
-      onQualificationsChange([...qualifications, qualValue]);
-    }
-  }, [qualifications, onQualificationsChange]);
+  const handleQualificationToggle = useCallback(
+    (qualValue: string) => {
+      if (qualifications.includes(qualValue)) {
+        onQualificationsChange(qualifications.filter((q) => q !== qualValue));
+      } else {
+        onQualificationsChange([...qualifications, qualValue]);
+      }
+    },
+    [qualifications, onQualificationsChange],
+  );
 
   const handleClearFilters = useCallback(() => {
     onServicesChange([]);
@@ -140,7 +143,15 @@ export const SearchBar = ({
     onMinRateChange(undefined);
     onMaxRateChange(undefined);
     onAcceptingClientsChange(false);
-  }, [onServicesChange, onQualificationsChange, onRadiusChange, onTravelOptionChange, onMinRateChange, onMaxRateChange, onAcceptingClientsChange]);
+  }, [
+    onServicesChange,
+    onQualificationsChange,
+    onRadiusChange,
+    onTravelOptionChange,
+    onMinRateChange,
+    onMaxRateChange,
+    onAcceptingClientsChange,
+  ]);
 
   const activeFilterCount =
     services.length +
@@ -151,8 +162,8 @@ export const SearchBar = ({
     (maxRate !== undefined ? 1 : 0) +
     (acceptingClients ? 1 : 0);
 
-  const ukQualifications = TRAINER_QUALIFICATIONS.filter(q => q.region === 'uk');
-  const intlQualifications = TRAINER_QUALIFICATIONS.filter(q => q.region === 'international');
+  const ukQualifications = TRAINER_QUALIFICATIONS.filter((q) => q.region === 'uk');
+  const intlQualifications = TRAINER_QUALIFICATIONS.filter((q) => q.region === 'international');
 
   return (
     <div className="border-b bg-background">
@@ -232,13 +243,16 @@ export const SearchBar = ({
 
               {/* Travel Option */}
               <div>
-                <Label className="mb-2 block">Training location</Label>
+                <Label className="mb-2 block" htmlFor="travel-option">
+                  Training location
+                </Label>
                 <Select
-                  value={TRAVEL_OPTIONS.find(o => o.value === travelOption) || TRAVEL_OPTIONS[0]}
+                  inputId="travel-option"
+                  aria-label="Training location"
+                  value={TRAVEL_OPTIONS.find((o) => o.value === travelOption) || TRAVEL_OPTIONS[0]}
                   onChange={(opt) => onTravelOptionChange(opt?.value || '')}
                   options={TRAVEL_OPTIONS}
                   isClearable={false}
-                  isSearchable={false}
                 />
               </div>
 
@@ -247,7 +261,9 @@ export const SearchBar = ({
                 <Label className="mb-2 block">Price range (per hour)</Label>
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">£</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                      £
+                    </span>
                     <input
                       type="number"
                       min={0}
@@ -262,7 +278,9 @@ export const SearchBar = ({
                   </div>
                   <span className="text-muted-foreground">-</span>
                   <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">£</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                      £
+                    </span>
                     <input
                       type="number"
                       min={0}
@@ -282,10 +300,7 @@ export const SearchBar = ({
               <div>
                 <Label className="mb-2 block">Availability</Label>
                 <label className="flex items-center gap-2 h-10 cursor-pointer">
-                  <Switch
-                    checked={acceptingClients}
-                    onCheckedChange={onAcceptingClientsChange}
-                  />
+                  <Switch checked={acceptingClients} onCheckedChange={onAcceptingClientsChange} />
                   <span className="text-sm">Accepting new clients</span>
                 </label>
               </div>
@@ -296,10 +311,7 @@ export const SearchBar = ({
               <Label className="mb-2 block">Services</Label>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {TRAINER_SERVICES.map((service) => (
-                  <label
-                    key={service.value}
-                    className="flex items-center gap-2 cursor-pointer"
-                  >
+                  <label key={service.value} className="flex items-center gap-2 cursor-pointer">
                     <Checkbox
                       checked={services.includes(service.value)}
                       onCheckedChange={() => handleServiceToggle(service.value)}
@@ -318,10 +330,7 @@ export const SearchBar = ({
                   <p className="text-xs text-muted-foreground mb-1">UK</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                     {ukQualifications.map((qual) => (
-                      <label
-                        key={qual.value}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
+                      <label key={qual.value} className="flex items-center gap-2 cursor-pointer">
                         <Checkbox
                           checked={qualifications.includes(qual.value)}
                           onCheckedChange={() => handleQualificationToggle(qual.value)}
@@ -335,10 +344,7 @@ export const SearchBar = ({
                   <p className="text-xs text-muted-foreground mb-1">International</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                     {intlQualifications.map((qual) => (
-                      <label
-                        key={qual.value}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
+                      <label key={qual.value} className="flex items-center gap-2 cursor-pointer">
                         <Checkbox
                           checked={qualifications.includes(qual.value)}
                           onCheckedChange={() => handleQualificationToggle(qual.value)}

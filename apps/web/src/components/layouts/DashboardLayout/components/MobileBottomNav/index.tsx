@@ -61,7 +61,9 @@ export const MobileBottomNav = ({
   const moreItems = navItems.filter((item) => !item.mobileBottom);
 
   const isActive = (href: string) =>
-    !href ? false : currentPath === href || (href !== routes.dashboard && currentPath.startsWith(href));
+    !href
+      ? false
+      : currentPath === href || (href !== routes.dashboard && currentPath.startsWith(href));
 
   const renderNavLink = (item: NavItem, variant: 'bottom' | 'sheet') => {
     const active = isActive(item.href);
@@ -106,7 +108,7 @@ export const MobileBottomNav = ({
           to={item.href}
           className={cn(
             'flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors',
-            active ? 'text-primary' : 'text-muted-foreground'
+            active ? 'text-primary' : 'text-muted-foreground',
           )}
         >
           <span className="relative">
@@ -130,9 +132,7 @@ export const MobileBottomNav = ({
         onClick={() => setSheetOpen(false)}
         className={cn(
           'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors',
-          active
-            ? 'text-coral bg-coral-50 dark:bg-coral-950/20'
-            : 'text-foreground hover:bg-muted'
+          active ? 'text-coral bg-coral-50 dark:bg-coral-950/20' : 'text-foreground hover:bg-muted',
         )}
       >
         <span className="relative">
@@ -170,7 +170,7 @@ export const MobileBottomNav = ({
             onClick={() => setSheetOpen(true)}
             className={cn(
               'flex flex-col items-center justify-center flex-1 h-full gap-1 transition-colors text-muted-foreground',
-              sheetOpen && 'text-primary'
+              sheetOpen && 'text-primary',
             )}
           >
             <span className="relative">
@@ -204,7 +204,9 @@ export const MobileBottomNav = ({
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={() => navigate(isTrainee ? routes.traineeProfileEdit : routes.trainerProfileEdit)}
+                  onClick={() =>
+                    navigate(isTrainee ? routes.traineeProfileEdit : routes.trainerProfileEdit)
+                  }
                   className="cursor-pointer"
                 >
                   <UserCircle className="mr-2 h-4 w-4" />

@@ -8,9 +8,9 @@ import { EmptyGoals } from './components/EmptyGoals';
 export const GoalsPage = () => {
   const { data: goals, isLoading } = useGoals();
 
-  const activeGoals = goals?.filter(g => g.status === 'ACTIVE') ?? [];
-  const completedGoals = goals?.filter(g => g.status === 'COMPLETED') ?? [];
-  const abandonedGoals = goals?.filter(g => g.status === 'ABANDONED') ?? [];
+  const activeGoals = goals?.filter((g) => g.status === 'ACTIVE') ?? [];
+  const completedGoals = goals?.filter((g) => g.status === 'COMPLETED') ?? [];
+  const abandonedGoals = goals?.filter((g) => g.status === 'ABANDONED') ?? [];
 
   return (
     <PageLayout>
@@ -37,7 +37,7 @@ export const GoalsPage = () => {
                 Active ({activeGoals.length})
               </h2>
               <div className="space-y-3">
-                {activeGoals.map(goal => (
+                {activeGoals.map((goal) => (
                   <GoalCard key={goal.id} goal={goal} />
                 ))}
               </div>
@@ -51,7 +51,7 @@ export const GoalsPage = () => {
                 Completed ({completedGoals.length})
               </h2>
               <div className="space-y-3">
-                {completedGoals.map(goal => (
+                {completedGoals.map((goal) => (
                   <GoalCard key={goal.id} goal={goal} />
                 ))}
               </div>
@@ -65,7 +65,7 @@ export const GoalsPage = () => {
                 Abandoned ({abandonedGoals.length})
               </h2>
               <div className="space-y-3">
-                {abandonedGoals.map(goal => (
+                {abandonedGoals.map((goal) => (
                   <GoalCard key={goal.id} goal={goal} />
                 ))}
               </div>

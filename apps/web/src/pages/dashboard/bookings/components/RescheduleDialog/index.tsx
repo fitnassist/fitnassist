@@ -1,7 +1,12 @@
 import { useState, useMemo } from 'react';
 import { CalendarClock } from 'lucide-react';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
   Button,
 } from '@/components/ui';
 import { useAvailableDates, useAvailableSlots } from '@/api/availability';
@@ -18,7 +23,11 @@ interface RescheduleDialogProps {
 }
 
 export const RescheduleDialog = ({
-  open, onOpenChange, bookingId, trainerId, durationMin,
+  open,
+  onOpenChange,
+  bookingId,
+  trainerId,
+  durationMin,
 }: RescheduleDialogProps) => {
   const rescheduleMutation = useRescheduleBooking();
 
@@ -39,7 +48,7 @@ export const RescheduleDialog = ({
   const { data: slots, isLoading: slotsLoading } = useAvailableSlots(
     trainerId,
     selectedDate ?? '',
-    durationMin
+    durationMin,
   );
 
   const selectedSlotObj = slots?.find((s) => s.startTime === selectedSlot);
@@ -59,7 +68,7 @@ export const RescheduleDialog = ({
           setSelectedSlot(null);
           onOpenChange(false);
         },
-      }
+      },
     );
   };
 
@@ -101,10 +110,19 @@ export const RescheduleDialog = ({
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-sm font-medium">
                   {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-GB', {
-                    weekday: 'long', day: 'numeric', month: 'long',
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
                   })}
                 </h4>
-                <Button variant="ghost" size="sm" onClick={() => { setSelectedDate(null); setSelectedSlot(null); }}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedDate(null);
+                    setSelectedSlot(null);
+                  }}
+                >
                   Change date
                 </Button>
               </div>
@@ -122,7 +140,9 @@ export const RescheduleDialog = ({
           <div className="bg-muted rounded-lg px-3 py-2 text-sm">
             New time:{' '}
             {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-GB', {
-              weekday: 'short', day: 'numeric', month: 'short',
+              weekday: 'short',
+              day: 'numeric',
+              month: 'short',
             })}{' '}
             at {selectedSlot}
           </div>

@@ -1,26 +1,32 @@
 import { trpc } from '@/lib/trpc';
 import { useAuth } from '@/hooks/useAuth';
-import type { Contact, ContactCounts, UserType, TraineeContact, TrainerContact } from '../contacts.types';
+import type {
+  Contact,
+  ContactCounts,
+  UserType,
+  TraineeContact,
+  TrainerContact,
+} from '../contacts.types';
 
 export const useContacts = () => {
   const { isTrainer } = useAuth();
   const userType: UserType = isTrainer ? 'trainer' : 'trainee';
 
   // Trainee: fetch sent requests (contacts they initiated)
-  const {
-    data: traineeData,
-    isLoading: traineeLoading,
-  } = trpc.contact.getSentRequests.useQuery(undefined, {
-    enabled: !isTrainer,
-  });
+  const { data: traineeData, isLoading: traineeLoading } = trpc.contact.getSentRequests.useQuery(
+    undefined,
+    {
+      enabled: !isTrainer,
+    },
+  );
 
   // Trainer: fetch their requests (only accepted connection requests)
-  const {
-    data: trainerData,
-    isLoading: trainerLoading,
-  } = trpc.contact.getMyRequests.useQuery(undefined, {
-    enabled: isTrainer,
-  });
+  const { data: trainerData, isLoading: trainerLoading } = trpc.contact.getMyRequests.useQuery(
+    undefined,
+    {
+      enabled: isTrainer,
+    },
+  );
 
   const isLoading = isTrainer ? trainerLoading : traineeLoading;
 
@@ -31,8 +37,9 @@ export const useContacts = () => {
   const traineeDeclined = traineeContacts.filter((r) => r.status === 'DECLINED');
 
   // Process trainer contacts (only accepted connection requests)
-  const trainerContacts = ((trainerData || []) as TrainerContact[])
-    .filter((r) => r.status === 'ACCEPTED');
+  const trainerContacts = ((trainerData || []) as TrainerContact[]).filter(
+    (r) => r.status === 'ACCEPTED',
+  );
 
   // Select the right data based on user type
   const pendingContacts: Contact[] = isTrainer ? [] : traineePending;
@@ -45,9 +52,8 @@ export const useContacts = () => {
     declined: declinedContacts.length,
   };
 
-  const hasAnyContacts = acceptedContacts.length > 0 ||
-    pendingContacts.length > 0 ||
-    declinedContacts.length > 0;
+  const hasAnyContacts =
+    acceptedContacts.length > 0 || pendingContacts.length > 0 || declinedContacts.length > 0;
 
   return {
     isLoading,

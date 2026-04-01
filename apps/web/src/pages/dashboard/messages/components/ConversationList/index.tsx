@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { formatDistanceToNow } from "date-fns";
+import { useState } from 'react';
+import { formatDistanceToNow } from 'date-fns';
 import {
   MessageCircle,
   MoreVertical,
@@ -8,7 +8,7 @@ import {
   Trash2,
   ChevronDown,
   ChevronUp,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -19,10 +19,10 @@ import {
   DropdownMenuItem,
   ConfirmDialog,
   Button,
-} from "@/components/ui";
-import { cn } from "@/lib/utils";
-import { getInitials, getOtherPerson } from "../../messages.utils";
-import type { Connection } from "../../messages.types";
+} from '@/components/ui';
+import { cn } from '@/lib/utils';
+import { getInitials, getOtherPerson } from '../../messages.utils';
+import type { Connection } from '../../messages.types';
 
 interface ConversationListProps {
   connections: Connection[];
@@ -58,14 +58,14 @@ const ConversationRow = ({
   const otherPerson = getOtherPerson(connection, userId);
   const initials = getInitials(otherPerson.name);
   const lastMessage = connection.messages?.[0];
-  const isDisconnected = connection.status === "CLOSED";
+  const isDisconnected = connection.status === 'CLOSED';
 
   return (
     <>
       <div
         className={cn(
-          "w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left border-b group",
-          isActive && "border-r-2 border-r-primary",
+          'w-full p-4 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left border-b group',
+          isActive && 'border-r-2 border-r-primary',
         )}
       >
         <button
@@ -74,9 +74,7 @@ const ConversationRow = ({
         >
           <div className="relative flex-shrink-0">
             <Avatar>
-              {otherPerson.image && (
-                <AvatarImage src={otherPerson.image} alt={otherPerson.name} />
-              )}
+              {otherPerson.image && <AvatarImage src={otherPerson.image} alt={otherPerson.name} />}
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
             {connection.unreadCount > 0 && (
@@ -87,12 +85,7 @@ const ConversationRow = ({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
-              <p
-                className={cn(
-                  "font-medium truncate",
-                  isDisconnected && "text-muted-foreground",
-                )}
-              >
+              <p className={cn('font-medium truncate', isDisconnected && 'text-muted-foreground')}>
                 {otherPerson.name}
               </p>
               {lastMessage && (
@@ -105,13 +98,11 @@ const ConversationRow = ({
             </div>
             {lastMessage ? (
               <p className="text-sm text-muted-foreground truncate text-left">
-                {lastMessage.senderId === userId ? "You: " : ""}
+                {lastMessage.senderId === userId ? 'You: ' : ''}
                 {lastMessage.content}
               </p>
             ) : (
-              <p className="text-sm text-muted-foreground italic">
-                No messages yet
-              </p>
+              <p className="text-sm text-muted-foreground italic">No messages yet</p>
             )}
           </div>
         </button>
@@ -125,6 +116,7 @@ const ConversationRow = ({
               onClick={(e) => e.stopPropagation()}
             >
               <MoreVertical className="h-4 w-4" />
+              <span className="sr-only">More options</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -214,11 +206,7 @@ export const ConversationList = ({
               <Archive className="h-4 w-4" />
               Archived Chats ({archivedConnections.length})
             </span>
-            {showArchived ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+            {showArchived ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
 
           {showArchived &&

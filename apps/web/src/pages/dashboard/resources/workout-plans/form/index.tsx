@@ -62,14 +62,9 @@ const SortableExerciseRow = ({
   onUpdate: (tempId: string, field: keyof PlanExercise, value: string | number | null) => void;
   onRemove: (tempId: string) => void;
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: exercise.tempId });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: exercise.tempId,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -110,7 +105,13 @@ const SortableExerciseRow = ({
                 type="number"
                 min={1}
                 value={exercise.sets ?? ''}
-                onChange={(e) => onUpdate(exercise.tempId, 'sets', e.target.value ? parseInt(e.target.value) : null)}
+                onChange={(e) =>
+                  onUpdate(
+                    exercise.tempId,
+                    'sets',
+                    e.target.value ? parseInt(e.target.value) : null,
+                  )
+                }
                 placeholder="3"
                 className="h-8 text-sm"
               />
@@ -130,7 +131,13 @@ const SortableExerciseRow = ({
                 type="number"
                 min={0}
                 value={exercise.restSeconds ?? ''}
-                onChange={(e) => onUpdate(exercise.tempId, 'restSeconds', e.target.value ? parseInt(e.target.value) : null)}
+                onChange={(e) =>
+                  onUpdate(
+                    exercise.tempId,
+                    'restSeconds',
+                    e.target.value ? parseInt(e.target.value) : null,
+                  )
+                }
                 placeholder="60"
                 className="h-8 text-sm"
               />
@@ -196,29 +203,29 @@ export const WorkoutPlanFormPage = () => {
           reps: we.reps ?? '',
           restSeconds: we.restSeconds,
           notes: we.notes ?? '',
-        }))
+        })),
       );
     }
   }, [existing, reset]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      setPlanExercises(prev => {
-        const oldIndex = prev.findIndex(e => e.tempId === String(active.id));
-        const newIndex = prev.findIndex(e => e.tempId === String(over.id));
+      setPlanExercises((prev) => {
+        const oldIndex = prev.findIndex((e) => e.tempId === String(active.id));
+        const newIndex = prev.findIndex((e) => e.tempId === String(over.id));
         return arrayMove(prev, oldIndex, newIndex);
       });
     }
   }, []);
 
   const addExercise = (exercise: { id: string; name: string }) => {
-    setPlanExercises(prev => [
+    setPlanExercises((prev) => [
       ...prev,
       {
         tempId: `new-${Date.now()}-${Math.random()}`,
@@ -234,14 +241,18 @@ export const WorkoutPlanFormPage = () => {
     setExerciseSearch('');
   };
 
-  const updateExercise = (tempId: string, field: keyof PlanExercise, value: string | number | null) => {
-    setPlanExercises(prev =>
-      prev.map(e => e.tempId === tempId ? { ...e, [field]: value } : e)
+  const updateExercise = (
+    tempId: string,
+    field: keyof PlanExercise,
+    value: string | number | null,
+  ) => {
+    setPlanExercises((prev) =>
+      prev.map((e) => (e.tempId === tempId ? { ...e, [field]: value } : e)),
     );
   };
 
   const removeExercise = (tempId: string) => {
-    setPlanExercises(prev => prev.filter(e => e.tempId !== tempId));
+    setPlanExercises((prev) => prev.filter((e) => e.tempId !== tempId));
   };
 
   const onSubmit = async (data: CreateWorkoutPlanInput) => {
@@ -292,8 +303,8 @@ export const WorkoutPlanFormPage = () => {
   }
 
   // Filter out exercises already in the plan
-  const addedIds = new Set(planExercises.map(e => e.exerciseId));
-  const availableExercises = exerciseData?.exercises.filter(e => !addedIds.has(e.id)) ?? [];
+  const addedIds = new Set(planExercises.map((e) => e.exerciseId));
+  const availableExercises = exerciseData?.exercises.filter((e) => !addedIds.has(e.id)) ?? [];
 
   return (
     <PageLayout>
@@ -311,12 +322,10 @@ export const WorkoutPlanFormPage = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                {...register('name')}
-                placeholder="e.g. Upper Body Strength"
-              />
-              {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+              <Input id="name" {...register('name')} placeholder="e.g. Upper Body Strength" />
+              {errors.name && (
+                <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
+              )}
             </div>
             <div>
               <Label htmlFor="description">Description</Label>
@@ -400,7 +409,7 @@ export const WorkoutPlanFormPage = () => {
                 onDragEnd={handleDragEnd}
               >
                 <SortableContext
-                  items={planExercises.map(e => e.tempId)}
+                  items={planExercises.map((e) => e.tempId)}
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="space-y-2">

@@ -37,7 +37,11 @@ export const ProfileViewsChart = () => {
             <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
               <XAxis dataKey="label" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-              <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />
+              <YAxis
+                tick={{ fontSize: 11 }}
+                className="text-muted-foreground"
+                allowDecimals={false}
+              />
               <Tooltip
                 contentStyle={{ fontSize: 12, borderRadius: 8 }}
                 formatter={(value) => [`${value}`, 'Views']}

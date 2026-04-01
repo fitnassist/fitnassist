@@ -2,10 +2,21 @@ import { useState, useMemo, lazy, Suspense } from 'react';
 import { Bike, Plus, Trash2, Clock, MapPin, Flame, TrendingUp, Heart } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog, SourceBadge } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  ConfirmDialog,
+  SourceBadge,
+} from '@/components/ui';
 import { Select } from '@/components/ui';
 
-const ActivityMap = lazy(() => import('@/components/ActivityMap').then(m => ({ default: m.ActivityMap })));
+const ActivityMap = lazy(() =>
+  import('@/components/ActivityMap').then((m) => ({ default: m.ActivityMap })),
+);
 import { useLogActivity, useDeleteDiaryEntry } from '@/api/diary';
 import { logActivitySchema, type LogActivityInput } from '@fitnassist/schemas';
 import {
@@ -41,7 +52,10 @@ interface ActivityLoggerProps {
   }>;
 }
 
-const activityTypeSelectOptions = ACTIVITY_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label }));
+const activityTypeSelectOptions = ACTIVITY_TYPE_OPTIONS.map((o) => ({
+  value: o.value,
+  label: o.label,
+}));
 
 export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
   const [showForm, setShowForm] = useState(false);
@@ -49,7 +63,15 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
   const logActivity = useLogActivity();
   const deleteEntry = useDeleteDiaryEntry();
 
-  const { register, handleSubmit, control, reset, watch, setValue, formState: { errors } } = useForm<LogActivityInput>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<LogActivityInput>({
     resolver: zodResolver(logActivitySchema),
     defaultValues: { date, durationSeconds: 1800, activityType: 'RUN' },
   });
@@ -111,11 +133,16 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
               const act = entry.activityEntry;
               if (!act) return null;
               return (
-                <div key={entry.id} className="flex items-center justify-between rounded-lg border p-2.5">
+                <div
+                  key={entry.id}
+                  className="flex items-center justify-between rounded-lg border p-2.5"
+                >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate text-sm font-medium">
-                        {act.activityName || ACTIVITY_TYPE_LABELS[act.activityType] || act.activityType}
+                        {act.activityName ||
+                          ACTIVITY_TYPE_LABELS[act.activityType] ||
+                          act.activityType}
                       </p>
                       <SourceBadge source={act.source ?? ''} />
                     </div>
@@ -145,7 +172,8 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
                       {act.avgHeartRate != null && act.avgHeartRate > 0 && (
                         <span className="flex items-center gap-1">
                           <Heart className="h-3 w-3" />
-                          {act.avgHeartRate} bpm{act.maxHeartRate ? ` (max ${act.maxHeartRate})` : ''}
+                          {act.avgHeartRate} bpm
+                          {act.maxHeartRate ? ` (max ${act.maxHeartRate})` : ''}
                         </span>
                       )}
                     </div>
@@ -153,7 +181,11 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
                       <p className="mt-1 truncate text-xs text-muted-foreground">{act.notes}</p>
                     )}
                     {act.routePolyline && (
-                      <Suspense fallback={<div className="mt-2 h-[240px] rounded-lg bg-muted animate-pulse" />}>
+                      <Suspense
+                        fallback={
+                          <div className="mt-2 h-[240px] rounded-lg bg-muted animate-pulse" />
+                        }
+                      >
                         <ActivityMap
                           routePolyline={act.routePolyline}
                           startLatitude={act.startLatitude}
@@ -185,21 +217,21 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
 
         {/* Log activity form */}
         {showForm && (
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-3"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <input type="hidden" {...register('date')} value={date} />
 
             <div>
-              <label className="mb-1 block text-xs font-medium">Activity Type</label>
+              <label htmlFor="activity-type" className="mb-1 block text-xs font-medium">
+                Activity Type
+              </label>
               <Controller
                 name="activityType"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="activity-type"
                     options={activityTypeSelectOptions}
-                    value={activityTypeSelectOptions.find(o => o.value === field.value) ?? null}
+                    value={activityTypeSelectOptions.find((o) => o.value === field.value) ?? null}
                     onChange={(opt) => field.onChange(opt?.value ?? 'RUN')}
                     placeholder="Select type..."
                   />
@@ -209,10 +241,7 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
 
             <div>
               <label className="mb-1 block text-xs font-medium">Name (optional)</label>
-              <Input
-                placeholder="e.g. Morning jog"
-                {...register('activityName')}
-              />
+              <Input placeholder="e.g. Morning jog" {...register('activityName')} />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -223,7 +252,9 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
                   min={0}
                   step="0.01"
                   placeholder="Optional"
-                  {...register('distanceKm', { setValueAs: v => v === '' ? undefined : Number(v) })}
+                  {...register('distanceKm', {
+                    setValueAs: (v) => (v === '' ? undefined : Number(v)),
+                  })}
                 />
               </div>
               <div>
@@ -253,16 +284,14 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
                   />
                 </div>
                 {errors.durationSeconds && (
-                  <p className="mt-0.5 text-xs text-destructive">{errors.durationSeconds.message}</p>
+                  <p className="mt-0.5 text-xs text-destructive">
+                    {errors.durationSeconds.message}
+                  </p>
                 )}
               </div>
             </div>
 
-            {computedPace && (
-              <p className="text-xs text-muted-foreground">
-                Pace: {computedPace}
-              </p>
-            )}
+            {computedPace && <p className="text-xs text-muted-foreground">Pace: {computedPace}</p>}
 
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -271,7 +300,9 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
                   type="number"
                   min={0}
                   placeholder="Optional"
-                  {...register('elevationGainM', { setValueAs: v => v === '' ? undefined : Number(v) })}
+                  {...register('elevationGainM', {
+                    setValueAs: (v) => (v === '' ? undefined : Number(v)),
+                  })}
                 />
               </div>
               <div>
@@ -280,17 +311,16 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
                   type="number"
                   min={0}
                   placeholder="Optional"
-                  {...register('caloriesBurned', { setValueAs: v => v === '' ? undefined : Number(v) })}
+                  {...register('caloriesBurned', {
+                    setValueAs: (v) => (v === '' ? undefined : Number(v)),
+                  })}
                 />
               </div>
             </div>
 
             <div>
               <label className="mb-1 block text-xs font-medium">Notes</label>
-              <Input
-                placeholder="Optional notes..."
-                {...register('notes')}
-              />
+              <Input placeholder="Optional notes..." {...register('notes')} />
             </div>
 
             <div className="flex gap-2">

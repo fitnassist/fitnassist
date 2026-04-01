@@ -1,41 +1,15 @@
 import { test, expect } from '@playwright/test';
+import { TEST_TRAINER, loginViaUI } from './helpers/auth';
 
 test.describe('Trainer Flow', () => {
-  const timestamp = Date.now();
-  const trainerEmail = `trainer-flow-${timestamp}@test.com`;
-
-  test('trainer creates profile and views dashboard', async ({ page }) => {
-    // Register as trainer
-    await page.goto('/register');
-    await page.getByLabel(/name/i).fill('Flow Trainer');
-    await page.getByLabel(/email/i).fill(trainerEmail);
-    await page.getByLabel(/^password$/i).fill('Test1234!');
-    await page.getByLabel(/confirm/i).fill('Test1234!');
-
-    const trainerOption = page.getByText(/personal trainer/i).first();
-    await trainerOption.click();
-
-    await page.getByRole('button', { name: /sign up|register|create/i }).click();
-    await page.waitForURL(/\/(dashboard|trainer)/, { timeout: 10000 });
-
-    // Should be redirected to create profile or be on dashboard
+  test('trainer views dashboard', async ({ page }) => {
+    await loginViaUI(page, TEST_TRAINER.email, TEST_TRAINER.password);
     await expect(page.locator('h1')).toBeVisible();
   });
 
   test('trainer can navigate dashboard sections', async ({ page }) => {
-    // Register as trainer
-    await page.goto('/register');
-    await page.getByLabel(/name/i).fill('Nav Trainer');
-    await page.getByLabel(/email/i).fill(`nav-trainer-${timestamp}@test.com`);
-    await page.getByLabel(/^password$/i).fill('Test1234!');
-    await page.getByLabel(/confirm/i).fill('Test1234!');
+    await loginViaUI(page, TEST_TRAINER.email, TEST_TRAINER.password);
 
-    const trainerOption = page.getByText(/personal trainer/i).first();
-    await trainerOption.click();
-    await page.getByRole('button', { name: /sign up|register|create/i }).click();
-    await page.waitForURL(/\/(dashboard|trainer)/, { timeout: 10000 });
-
-    // Navigate to each section and verify it loads
     const sections = [
       '/dashboard/requests',
       '/dashboard/messages',

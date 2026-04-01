@@ -2,7 +2,15 @@ import { useState } from 'react';
 import { Dumbbell, Plus, Trash2, Clock, Flame } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  ConfirmDialog,
+} from '@/components/ui';
 import { Select } from '@/components/ui';
 import { useLogWorkout, useMyWorkoutPlans, useDeleteDiaryEntry } from '@/api/diary';
 import { logWorkoutSchema, type LogWorkoutInput } from '@fitnassist/schemas';
@@ -30,12 +38,19 @@ export const WorkoutLogger = ({ date, entries }: WorkoutLoggerProps) => {
   const deleteEntry = useDeleteDiaryEntry();
   const { data: workoutPlans } = useMyWorkoutPlans();
 
-  const { register, handleSubmit, control, reset, setValue, formState: { errors } } = useForm<LogWorkoutInput>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<LogWorkoutInput>({
     resolver: zodResolver(logWorkoutSchema),
     defaultValues: { date, durationMinutes: 30 },
   });
 
-  const planOptions = (workoutPlans ?? []).map(p => ({ value: p.id, label: p.name }));
+  const planOptions = (workoutPlans ?? []).map((p) => ({ value: p.id, label: p.name }));
 
   const onSubmit = (data: LogWorkoutInput) => {
     logWorkout.mutate(data, {
@@ -73,7 +88,10 @@ export const WorkoutLogger = ({ date, entries }: WorkoutLoggerProps) => {
               const log = entry.workoutLogEntry;
               if (!log) return null;
               return (
-                <div key={entry.id} className="flex items-center justify-between rounded-lg border p-2.5">
+                <div
+                  key={entry.id}
+                  className="flex items-center justify-between rounded-lg border p-2.5"
+                >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">
                       {log.workoutPlanName || log.workoutPlan?.name || 'Freeform Workout'}
@@ -119,14 +137,17 @@ export const WorkoutLogger = ({ date, entries }: WorkoutLoggerProps) => {
 
             {planOptions.length > 0 && (
               <div>
-                <label className="mb-1 block text-xs font-medium">Workout Plan (optional)</label>
+                <label htmlFor="workout-plan" className="mb-1 block text-xs font-medium">
+                  Workout Plan (optional)
+                </label>
                 <Controller
                   name="workoutPlanId"
                   control={control}
                   render={({ field }) => (
                     <Select
+                      inputId="workout-plan"
                       options={planOptions}
-                      value={planOptions.find(o => o.value === field.value) ?? null}
+                      value={planOptions.find((o) => o.value === field.value) ?? null}
                       onChange={(opt) => {
                         field.onChange(opt?.value ?? undefined);
                         if (opt) {
@@ -150,7 +171,9 @@ export const WorkoutLogger = ({ date, entries }: WorkoutLoggerProps) => {
                   {...register('durationMinutes', { valueAsNumber: true })}
                 />
                 {errors.durationMinutes && (
-                  <p className="mt-0.5 text-xs text-destructive">{errors.durationMinutes.message}</p>
+                  <p className="mt-0.5 text-xs text-destructive">
+                    {errors.durationMinutes.message}
+                  </p>
                 )}
               </div>
               <div>
@@ -159,17 +182,16 @@ export const WorkoutLogger = ({ date, entries }: WorkoutLoggerProps) => {
                   type="number"
                   min={0}
                   placeholder="Optional"
-                  {...register('caloriesBurned', { setValueAs: v => v === '' ? undefined : Number(v) })}
+                  {...register('caloriesBurned', {
+                    setValueAs: (v) => (v === '' ? undefined : Number(v)),
+                  })}
                 />
               </div>
             </div>
 
             <div>
               <label className="mb-1 block text-xs font-medium">Notes</label>
-              <Input
-                placeholder="Optional notes..."
-                {...register('notes')}
-              />
+              <Input placeholder="Optional notes..." {...register('notes')} />
             </div>
 
             <div className="flex gap-2">

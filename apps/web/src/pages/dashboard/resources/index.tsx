@@ -38,7 +38,11 @@ export const ResourcesPage = () => {
         options={[
           { value: 'exercises', label: 'Exercises', icon: <Dumbbell className="h-4 w-4" /> },
           { value: 'recipes', label: 'Recipes', icon: <UtensilsCrossed className="h-4 w-4" /> },
-          { value: 'workout-plans', label: 'Workout Plans', icon: <ClipboardList className="h-4 w-4" /> },
+          {
+            value: 'workout-plans',
+            label: 'Workout Plans',
+            icon: <ClipboardList className="h-4 w-4" />,
+          },
           { value: 'meal-plans', label: 'Meal Plans', icon: <Salad className="h-4 w-4" /> },
         ]}
         tabsListClassName="mb-6"

@@ -61,12 +61,13 @@ export const AboutForm = ({ sectionId, content }: AboutFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label>Image Position</Label>
+        <Label htmlFor="about-image-position">Image Position</Label>
         <Controller
           name="imagePosition"
           control={control}
           render={({ field }) => (
             <Select
+              inputId="about-image-position"
               options={IMAGE_POSITION_OPTIONS}
               value={IMAGE_POSITION_OPTIONS.find((o) => o.value === field.value) || null}
               onChange={(option) => field.onChange(option?.value || 'right')}

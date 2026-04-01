@@ -16,10 +16,9 @@ describe('useDebounce', () => {
   });
 
   it('updates the value after the delay', () => {
-    const { result, rerender } = renderHook(
-      ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: 'hello', delay: 500 } },
-    );
+    const { result, rerender } = renderHook(({ value, delay }) => useDebounce(value, delay), {
+      initialProps: { value: 'hello', delay: 500 },
+    });
 
     rerender({ value: 'world', delay: 500 });
     expect(result.current).toBe('hello');
@@ -32,10 +31,9 @@ describe('useDebounce', () => {
   });
 
   it('does not update before the delay expires', () => {
-    const { result, rerender } = renderHook(
-      ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: 'hello', delay: 500 } },
-    );
+    const { result, rerender } = renderHook(({ value, delay }) => useDebounce(value, delay), {
+      initialProps: { value: 'hello', delay: 500 },
+    });
 
     rerender({ value: 'world', delay: 500 });
 
@@ -47,10 +45,9 @@ describe('useDebounce', () => {
   });
 
   it('resets the timer on rapid changes and only emits the final value', () => {
-    const { result, rerender } = renderHook(
-      ({ value, delay }) => useDebounce(value, delay),
-      { initialProps: { value: 'a', delay: 500 } },
-    );
+    const { result, rerender } = renderHook(({ value, delay }) => useDebounce(value, delay), {
+      initialProps: { value: 'a', delay: 500 },
+    });
 
     rerender({ value: 'b', delay: 500 });
     act(() => {

@@ -1,10 +1,5 @@
 import { CheckCircle, Clock, XCircle } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  ResponsiveTabs,
-  TabsContent,
-} from '@/components/ui';
+import { Card, CardContent, ResponsiveTabs, TabsContent } from '@/components/ui';
 import { useTabParam } from '@/hooks';
 import { useDisconnectByConnection, useTraineeDisconnect } from '@/api/client-roster';
 import { ContactCard } from '../ContactCard';
@@ -93,9 +88,21 @@ export const ContactsTabs = ({
       value={activeTab}
       onValueChange={setActiveTab}
       options={[
-        { value: 'connected', label: `Connected (${counts.accepted})`, icon: <CheckCircle className="h-4 w-4" /> },
-        { value: 'pending', label: `Pending (${counts.pending})`, icon: <Clock className="h-4 w-4" /> },
-        { value: 'declined', label: `Declined (${counts.declined})`, icon: <XCircle className="h-4 w-4" /> },
+        {
+          value: 'connected',
+          label: `Connected (${counts.accepted})`,
+          icon: <CheckCircle className="h-4 w-4" />,
+        },
+        {
+          value: 'pending',
+          label: `Pending (${counts.pending})`,
+          icon: <Clock className="h-4 w-4" />,
+        },
+        {
+          value: 'declined',
+          label: `Declined (${counts.declined})`,
+          icon: <XCircle className="h-4 w-4" />,
+        },
       ]}
       className="space-y-4"
     >

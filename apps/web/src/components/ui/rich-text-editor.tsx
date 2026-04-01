@@ -58,11 +58,7 @@ const ToolbarButton = ({
   </Button>
 );
 
-const LinkPopover = ({
-  editor,
-}: {
-  editor: NonNullable<ReturnType<typeof useEditor>>;
-}) => {
+const LinkPopover = ({ editor }: { editor: NonNullable<ReturnType<typeof useEditor>> }) => {
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState('');
   const [linkText, setLinkText] = useState('');
@@ -88,11 +84,7 @@ const LinkPopover = ({
     } else if (needsText) {
       // No text selected — insert link text with href
       const displayText = linkText || url;
-      editor
-        .chain()
-        .focus()
-        .insertContent(`<a href="${url}">${displayText}</a>`)
-        .run();
+      editor.chain().focus().insertContent(`<a href="${url}">${displayText}</a>`).run();
     } else {
       editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
     }
@@ -169,34 +161,37 @@ const ImageButton = ({
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !onUploadImage) return;
+  const handleFileChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file || !onUploadImage) return;
 
-    setUploading(true);
-    try {
-      const url = await onUploadImage(file);
-      editor.chain().focus().setImage({ src: url }).run();
-    } catch {
-      // Upload failed silently
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+      setUploading(true);
+      try {
+        const url = await onUploadImage(file);
+        editor.chain().focus().setImage({ src: url }).run();
+      } catch {
+        // Upload failed silently
+      } finally {
+        setUploading(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
-    }
-  }, [editor, onUploadImage]);
+    },
+    [editor, onUploadImage],
+  );
 
   if (!onUploadImage) return null;
 
   return (
     <>
-      <ToolbarButton
-        onClick={handleClick}
-        disabled={uploading}
-        title="Insert Image"
-      >
-        {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+      <ToolbarButton onClick={handleClick} disabled={uploading} title="Insert Image">
+        {uploading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <ImageIcon className="h-4 w-4" />
+        )}
       </ToolbarButton>
       <input
         ref={fileInputRef}
@@ -338,7 +333,7 @@ export const RichTextEditor = ({
     <div
       className={cn(
         'rounded-md border bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
-        className
+        className,
       )}
     >
       <EditorToolbar editor={editor} onUploadImage={onUploadImage} />

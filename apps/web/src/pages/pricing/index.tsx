@@ -66,11 +66,12 @@ export const PricingPage = () => {
           </h2>
           <p className="text-muted-foreground leading-relaxed mb-4">
             Whether you're chasing your first fitness goal or growing a personal training business,
-            Fitnassist has a plan that fits. Trainees always use the platform for free — and trainers
-            can start with a full-featured 30-day Pro trial, no card required.
+            Fitnassist has a plan that fits. Trainees always use the platform for free — and
+            trainers can start with a full-featured 30-day Pro trial, no card required.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            Pick the plan that matches where you are today. You can upgrade, downgrade, or cancel at any time.
+            Pick the plan that matches where you are today. You can upgrade, downgrade, or cancel at
+            any time.
           </p>
         </div>
       </section>
@@ -165,10 +166,14 @@ export const PricingPage = () => {
           <p className="text-muted-foreground leading-relaxed mb-4">
             Use Fitnassist on your own or pair up with a trainer who can view your diary, set goals,
             and keep you accountable. Find out how Fitnassist can help you{' '}
-            <Link to={routes.trainers} className="text-coral hover:underline">reach your goals</Link>.
+            <Link to={routes.trainers} className="text-coral underline">
+              reach your goals
+            </Link>
+            .
           </p>
           <p className="text-muted-foreground leading-relaxed mb-8">
-            Fitnassist is <strong>FREE</strong> for trainees, forever. Ready to start your fitness journey?
+            Fitnassist is <strong>FREE</strong> for trainees, forever. Ready to start your fitness
+            journey?
           </p>
           {!isAuthenticated && (
             <Link to={routes.register}>

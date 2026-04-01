@@ -38,9 +38,7 @@ export const ProfileEditPage = () => {
         <Card className="mx-auto max-w-md">
           <CardHeader>
             <CardTitle>No Profile Found</CardTitle>
-            <CardDescription>
-              You haven't created a trainer profile yet.
-            </CardDescription>
+            <CardDescription>You haven't created a trainer profile yet.</CardDescription>
           </CardHeader>
           <CardContent>
             <Link to={routes.trainerProfileCreate}>

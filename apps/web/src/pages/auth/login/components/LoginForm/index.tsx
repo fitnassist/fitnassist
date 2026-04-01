@@ -28,19 +28,22 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setIsLoading(true);
 
     try {
-      await signIn.email({
-        email: data.email,
-        password: data.password,
-      }, {
-        onSuccess: () => {
-          navigate(routes.dashboard);
-          onSuccess?.();
+      await signIn.email(
+        {
+          email: data.email,
+          password: data.password,
         },
-        onError: (ctx) => {
-          setError(ctx.error.message || 'Login failed');
-          setIsLoading(false);
+        {
+          onSuccess: () => {
+            navigate(routes.dashboard);
+            onSuccess?.();
+          },
+          onError: (ctx) => {
+            setError(ctx.error.message || 'Login failed');
+            setIsLoading(false);
+          },
         },
-      });
+      );
     } catch {
       setError('An unexpected error occurred');
       setIsLoading(false);
@@ -49,14 +52,13 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      {error && (
-        <div className="bg-red-500/20 text-red-200 text-sm p-3 rounded-md">
-          {error}
-        </div>
-      )}
+      {error && <div className="bg-red-500/20 text-red-200 text-sm p-3 rounded-md">{error}</div>}
 
       <div>
-        <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+        <label
+          htmlFor="email"
+          className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2"
+        >
           Email Address
         </label>
         <Input
@@ -67,13 +69,14 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
           {...register('email')}
           disabled={isLoading}
         />
-        {errors.email && (
-          <p className="text-sm text-red-300 mt-1">{errors.email.message}</p>
-        )}
+        {errors.email && <p className="text-sm text-red-300 mt-1">{errors.email.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+        <label
+          htmlFor="password"
+          className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2"
+        >
           Password
         </label>
         <div className="relative">
@@ -94,14 +97,9 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-sm text-red-300 mt-1">{errors.password.message}</p>
-        )}
+        {errors.password && <p className="text-sm text-red-300 mt-1">{errors.password.message}</p>}
         <div className="flex justify-start mt-2">
-          <Link
-            to={routes.forgotPassword}
-            className="text-sm text-primary hover:underline"
-          >
+          <Link to={routes.forgotPassword} className="text-sm text-primary hover:underline">
             Forgotten password?
           </Link>
         </div>

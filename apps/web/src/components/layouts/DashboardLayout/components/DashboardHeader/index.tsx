@@ -20,7 +20,7 @@ export const DashboardHeader = ({ isDark, onToggleTheme }: DashboardHeaderProps)
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
           <Logo />
-          <nav className="flex items-center gap-2">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
@@ -28,11 +28,7 @@ export const DashboardHeader = ({ isDark, onToggleTheme }: DashboardHeaderProps)
               aria-label="Toggle theme"
               className="text-white/80 hover:text-white hover:bg-white/10"
             >
-              {isDark ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
             <NotificationBell />

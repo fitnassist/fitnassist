@@ -1,7 +1,12 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MapPin, Briefcase, Award, Image } from 'lucide-react';
-import { wizardReviewSchema, type WizardReviewInput, TRAINER_SERVICES, TRAINER_QUALIFICATIONS } from '@fitnassist/schemas';
+import {
+  wizardReviewSchema,
+  type WizardReviewInput,
+  TRAINER_SERVICES,
+  TRAINER_QUALIFICATIONS,
+} from '@fitnassist/schemas';
 import { Badge, Button, Card, CardContent, Separator } from '@/components/ui';
 import type { WizardStepProps, WizardStep } from '../../ProfileWizard/ProfileWizard.types';
 
@@ -42,10 +47,7 @@ export const ReviewStep = ({
   isSubmitting,
   onSubmit,
 }: ReviewStepProps) => {
-  const {
-    control,
-    handleSubmit,
-  } = useForm<WizardReviewInput>({
+  const { control, handleSubmit } = useForm<WizardReviewInput>({
     resolver: zodResolver(wizardReviewSchema),
     defaultValues: data.review,
   });
@@ -79,12 +81,11 @@ export const ReviewStep = ({
         >
           <div className="space-y-2">
             <p>
-              <span className="font-medium">Display Name:</span>{' '}
-              {data.basicInfo.displayName}
+              <span className="font-medium">Display Name:</span> {data.basicInfo.displayName}
             </p>
             <p>
-              <span className="font-medium">Profile URL:</span>{' '}
-              fitnassist.co/{data.basicInfo.handle}
+              <span className="font-medium">Profile URL:</span> fitnassist.co/
+              {data.basicInfo.handle}
             </p>
             {data.basicInfo.bio && (
               <p>
@@ -110,16 +111,22 @@ export const ReviewStep = ({
                 <span className="font-medium">Address:</span>
                 <p className="text-muted-foreground">
                   {data.location.addressLine1}
-                  {data.location.addressLine2 && <><br />{data.location.addressLine2}</>}
+                  {data.location.addressLine2 && (
+                    <>
+                      <br />
+                      {data.location.addressLine2}
+                    </>
+                  )}
                   <br />
-                  {[data.location.city, data.location.county, data.location.postcode].filter(Boolean).join(', ')}
+                  {[data.location.city, data.location.county, data.location.postcode]
+                    .filter(Boolean)
+                    .join(', ')}
                 </p>
               </div>
             )}
             {!data.location.addressLine1 && data.location.postcode && (
               <p>
-                <span className="font-medium">Postcode:</span>{' '}
-                {data.location.postcode}
+                <span className="font-medium">Postcode:</span> {data.location.postcode}
               </p>
             )}
             <p>
@@ -139,9 +146,7 @@ export const ReviewStep = ({
               <p className="mb-1 font-medium">Services:</p>
               <div className="flex flex-wrap gap-1">
                 {data.services.services.map((s) => (
-                  <Badge key={s}>
-                    {getServiceLabel(s)}
-                  </Badge>
+                  <Badge key={s}>{getServiceLabel(s)}</Badge>
                 ))}
               </div>
             </div>
@@ -210,8 +215,8 @@ export const ReviewStep = ({
                 <div>
                   <p className="font-medium">Publish profile immediately</p>
                   <p className="text-sm text-muted-foreground">
-                    Your profile will be visible to potential clients. You can unpublish
-                    it later from your dashboard.
+                    Your profile will be visible to potential clients. You can unpublish it later
+                    from your dashboard.
                   </p>
                 </div>
               </label>

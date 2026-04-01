@@ -72,7 +72,7 @@ const ConnectCard = ({ trainer }: { trainer: PublicTrainer }) => {
   // Check pending request
   const { data: pendingData } = trpc.contact.checkPendingRequest.useQuery(
     { trainerId: trainer.id },
-    { enabled: isAuthenticated }
+    { enabled: isAuthenticated },
   );
 
   const utils = trpc.useUtils();
@@ -141,9 +141,7 @@ const ConnectCard = ({ trainer }: { trainer: PublicTrainer }) => {
     return (
       <Card className="border-[hsl(var(--border))] bg-[hsl(var(--card))]">
         <CardContent className="p-6 text-center space-y-4">
-          <p className="text-sm font-medium text-[hsl(var(--card-foreground))]">
-            Request pending
-          </p>
+          <p className="text-sm font-medium text-[hsl(var(--card-foreground))]">Request pending</p>
           <p className="text-sm text-[hsl(var(--muted-foreground))]">
             You've already sent a request to {trainer.displayName}. Please wait for them to respond.
           </p>
@@ -167,7 +165,10 @@ const ConnectCard = ({ trainer }: { trainer: PublicTrainer }) => {
           </Button>
           <p className="text-xs text-center text-[hsl(var(--muted-foreground))]">
             Already have an account?{' '}
-            <a href="https://fitnassist.co/login" className="text-[hsl(var(--primary))] hover:underline">
+            <a
+              href="https://fitnassist.co/login"
+              className="text-[hsl(var(--primary))] hover:underline"
+            >
               Log in
             </a>
           </p>
@@ -218,18 +219,32 @@ const ConnectCard = ({ trainer }: { trainer: PublicTrainer }) => {
             <div className="space-y-4 py-4">
               <div>
                 <Label htmlFor="phone">Phone Number *</Label>
-                <Input id="phone" type="tel" placeholder="07123 456789" {...callbackForm.register('phone')} />
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="07123 456789"
+                  {...callbackForm.register('phone')}
+                />
                 {callbackForm.formState.errors.phone && (
-                  <p className="text-sm text-destructive">{callbackForm.formState.errors.phone.message}</p>
+                  <p className="text-sm text-destructive">
+                    {callbackForm.formState.errors.phone.message}
+                  </p>
                 )}
               </div>
               <div>
                 <Label htmlFor="cb-message">Message (optional)</Label>
-                <Textarea id="cb-message" placeholder="Best time to call..." rows={3} {...callbackForm.register('message')} />
+                <Textarea
+                  id="cb-message"
+                  placeholder="Best time to call..."
+                  rows={3}
+                  {...callbackForm.register('message')}
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setCallbackOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setCallbackOpen(false)}>
+                Cancel
+              </Button>
               <Button type="submit" disabled={callbackMutation.isPending}>
                 {callbackMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Send Request
@@ -261,12 +276,16 @@ const ConnectCard = ({ trainer }: { trainer: PublicTrainer }) => {
                   {...connectionForm.register('message')}
                 />
                 {connectionForm.formState.errors.message && (
-                  <p className="text-sm text-destructive">{connectionForm.formState.errors.message.message}</p>
+                  <p className="text-sm text-destructive">
+                    {connectionForm.formState.errors.message.message}
+                  </p>
                 )}
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setConnectionOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setConnectionOpen(false)}>
+                Cancel
+              </Button>
               <Button type="submit" disabled={connectionMutation.isPending}>
                 {connectionMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Send Request
@@ -316,10 +335,7 @@ interface LocationInfo {
   zoom: number;
 }
 
-const resolveLocation = (
-  content: ContactContent,
-  trainer: PublicTrainer
-): LocationInfo | null => {
+const resolveLocation = (content: ContactContent, trainer: PublicTrainer): LocationInfo | null => {
   const source = content.addressSource ?? 'profile';
   const detail = content.addressDetail ?? 'postcode';
 
@@ -331,7 +347,10 @@ const resolveLocation = (
     const lng = content.customLongitude ?? null;
 
     return {
-      displayText: detail === 'full' ? customAddr : getPostcodeArea(customAddr.split(',').pop()?.trim() ?? null) + ' area',
+      displayText:
+        detail === 'full'
+          ? customAddr
+          : getPostcodeArea(customAddr.split(',').pop()?.trim() ?? null) + ' area',
       latitude: lat,
       longitude: lng,
       zoom: detail === 'full' ? 15 : 12,
@@ -363,11 +382,12 @@ const resolveLocation = (
   // Postcode area
   const postcodeArea = getPostcodeArea(trainer.postcode);
   const city = trainer.city;
-  const displayText = postcodeArea && city
-    ? `${city}, ${postcodeArea} area`
-    : postcodeArea
-      ? `${postcodeArea} area`
-      : city || '';
+  const displayText =
+    postcodeArea && city
+      ? `${city}, ${postcodeArea} area`
+      : postcodeArea
+        ? `${postcodeArea} area`
+        : city || '';
 
   return {
     displayText,
@@ -380,15 +400,17 @@ const resolveLocation = (
 export const ContactSection = ({ section, trainer, preview }: ContactSectionProps) => {
   const content = parseContent(section.content);
 
-  const email = trainer.contactEmail || (trainer as unknown as { user?: { email: string } }).user?.email;
+  const email =
+    trainer.contactEmail || (trainer as unknown as { user?: { email: string } }).user?.email;
   const showEmail = content.showEmail !== false && email;
   const showPhone = content.showPhone !== false && trainer.phoneNumber;
   const showForm = content.showForm !== false;
   const location = content.showAddress ? resolveLocation(content, trainer) : null;
 
-  const mapUrl = location?.latitude && location?.longitude
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=${location.zoom}&size=600x300&scale=2&maptype=roadmap&markers=color:red%7C${location.latitude},${location.longitude}&key=${env.GOOGLE_MAPS_API_KEY}`
-    : null;
+  const mapUrl =
+    location?.latitude && location?.longitude
+      ? `https://maps.googleapis.com/maps/api/staticmap?center=${location.latitude},${location.longitude}&zoom=${location.zoom}&size=600x300&scale=2&maptype=roadmap&markers=color:red%7C${location.latitude},${location.longitude}&key=${env.GOOGLE_MAPS_API_KEY}`
+      : null;
 
   return (
     <section id={`section-${section.id}`} className="py-16 sm:py-20">
@@ -445,7 +467,12 @@ export const ContactSection = ({ section, trainer, preview }: ContactSectionProp
           </div>
 
           {/* Callback / Connect request card */}
-          {showForm && (preview ? <ConnectCardPlaceholder trainer={trainer} /> : <ConnectCard trainer={trainer} />)}
+          {showForm &&
+            (preview ? (
+              <ConnectCardPlaceholder trainer={trainer} />
+            ) : (
+              <ConnectCard trainer={trainer} />
+            ))}
         </div>
       </div>
     </section>

@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { Heart } from 'lucide-react';
-import {
-  Button,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { usePostLikers, useDiaryEntryLikers } from '@/api/post';
 
@@ -20,7 +14,15 @@ interface LikeButtonProps {
   diaryEntryId?: string;
 }
 
-export const LikeButton = ({ liked, count, onLike, onUnlike, disabled, postId, diaryEntryId }: LikeButtonProps) => {
+export const LikeButton = ({
+  liked,
+  count,
+  onLike,
+  onUnlike,
+  disabled,
+  postId,
+  diaryEntryId,
+}: LikeButtonProps) => {
   const [hovered, setHovered] = useState(false);
   const shouldFetch = hovered && count > 0;
 
@@ -29,9 +31,8 @@ export const LikeButton = ({ liked, count, onLike, onUnlike, disabled, postId, d
 
   const likers = postId ? postLikers.data : diaryLikers.data;
 
-  const tooltipContent = likers && likers.length > 0
-    ? likers.map((l) => l.name).join(', ')
-    : undefined;
+  const tooltipContent =
+    likers && likers.length > 0 ? likers.map((l) => l.name).join(', ') : undefined;
 
   const button = (
     <Button
@@ -44,10 +45,7 @@ export const LikeButton = ({ liked, count, onLike, onUnlike, disabled, postId, d
       onMouseLeave={() => setHovered(false)}
     >
       <Heart
-        className={cn(
-          'h-4 w-4 transition-colors',
-          liked && 'fill-coral-500 text-coral-500'
-        )}
+        className={cn('h-4 w-4 transition-colors', liked && 'fill-coral-500 text-coral-500')}
       />
       {count > 0 && <span className="text-xs">{count}</span>}
     </Button>
@@ -58,12 +56,8 @@ export const LikeButton = ({ liked, count, onLike, onUnlike, disabled, postId, d
   return (
     <TooltipProvider>
       <Tooltip delayDuration={300}>
-        <TooltipTrigger asChild>
-          {button}
-        </TooltipTrigger>
-        <TooltipContent>
-          {tooltipContent ?? 'Loading...'}
-        </TooltipContent>
+        <TooltipTrigger asChild>{button}</TooltipTrigger>
+        <TooltipContent>{tooltipContent ?? 'Loading...'}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

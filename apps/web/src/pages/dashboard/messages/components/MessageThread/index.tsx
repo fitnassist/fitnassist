@@ -2,7 +2,16 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Loader2, ArrowLeft, Send } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage, Button, Skeleton, SkeletonAvatar, SkeletonText, Textarea } from '@/components/ui';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Button,
+  Skeleton,
+  SkeletonAvatar,
+  SkeletonText,
+  Textarea,
+} from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { routes } from '@/config/routes';
 import { getInitials, getSenderAvatarUrl } from '../../messages.utils';
@@ -81,18 +90,12 @@ export const MessageThread = ({
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <Avatar>
-              {otherPerson.image && (
-                <AvatarImage src={otherPerson.image} alt={otherPerson.name} />
-              )}
-              <AvatarFallback>
-                {getInitials(otherPerson.name)}
-              </AvatarFallback>
+              {otherPerson.image && <AvatarImage src={otherPerson.image} alt={otherPerson.name} />}
+              <AvatarFallback>{getInitials(otherPerson.name)}</AvatarFallback>
             </Avatar>
             <div>
               <p className="font-semibold hover:underline">{otherPerson.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {connectionStatus}
-              </p>
+              <p className="text-xs text-muted-foreground">{connectionStatus}</p>
             </div>
           </Link>
         ) : otherPerson?.userId ? (
@@ -101,35 +104,23 @@ export const MessageThread = ({
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <Avatar>
-              {otherPerson.image && (
-                <AvatarImage src={otherPerson.image} alt={otherPerson.name} />
-              )}
-              <AvatarFallback>
-                {getInitials(otherPerson.name)}
-              </AvatarFallback>
+              {otherPerson.image && <AvatarImage src={otherPerson.image} alt={otherPerson.name} />}
+              <AvatarFallback>{getInitials(otherPerson.name)}</AvatarFallback>
             </Avatar>
             <div>
               <p className="font-semibold hover:underline">{otherPerson.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {connectionStatus}
-              </p>
+              <p className="text-xs text-muted-foreground">{connectionStatus}</p>
             </div>
           </Link>
         ) : (
           <>
             <Avatar>
-              {otherPerson?.image && (
-                <AvatarImage src={otherPerson.image} alt={otherPerson.name} />
-              )}
-              <AvatarFallback>
-                {otherPerson ? getInitials(otherPerson.name) : '?'}
-              </AvatarFallback>
+              {otherPerson?.image && <AvatarImage src={otherPerson.image} alt={otherPerson.name} />}
+              <AvatarFallback>{otherPerson ? getInitials(otherPerson.name) : '?'}</AvatarFallback>
             </Avatar>
             <div>
               <p className="font-semibold">{otherPerson?.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {connectionStatus}
-              </p>
+              <p className="text-xs text-muted-foreground">{connectionStatus}</p>
             </div>
           </>
         )}
@@ -160,15 +151,13 @@ export const MessageThread = ({
                 className={cn(
                   'flex items-end gap-2',
                   isOwn && 'flex-row-reverse',
-                  !isFirstInGroup && '-mt-2'
+                  !isFirstInGroup && '-mt-2',
                 )}
               >
                 {/* Avatar: visible only on first message in group, invisible spacer otherwise */}
                 {isFirstInGroup ? (
                   <Avatar className="h-8 w-8 flex-shrink-0">
-                    {senderAvatarUrl && (
-                      <AvatarImage src={senderAvatarUrl} alt={msg.sender.name} />
-                    )}
+                    {senderAvatarUrl && <AvatarImage src={senderAvatarUrl} alt={msg.sender.name} />}
                     <AvatarFallback className="text-xs">{senderInitials}</AvatarFallback>
                   </Avatar>
                 ) : (
@@ -179,16 +168,18 @@ export const MessageThread = ({
                   <div
                     className={cn(
                       'w-fit rounded-2xl px-3 py-1.5',
-                      isOwn ? 'bg-coral text-white ml-auto' : 'bg-muted'
+                      isOwn ? 'bg-coral text-white ml-auto' : 'bg-muted',
                     )}
                   >
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   </div>
                   {isLastInGroup && (
-                    <p className={cn(
-                      'text-xs mt-2 px-3 text-muted-foreground',
-                      isOwn && 'text-right'
-                    )}>
+                    <p
+                      className={cn(
+                        'text-xs mt-2 px-3 text-muted-foreground',
+                        isOwn && 'text-right',
+                      )}
+                    >
                       {formatDistanceToNow(new Date(msg.createdAt), { addSuffix: true })}
                     </p>
                   )}
@@ -231,9 +222,7 @@ export const MessageThread = ({
               )}
             </Button>
           </form>
-          {error && (
-            <p className="text-sm text-destructive mt-2">{error.message}</p>
-          )}
+          {error && <p className="text-sm text-destructive mt-2">{error.message}</p>}
         </div>
       )}
     </>

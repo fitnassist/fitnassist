@@ -1,5 +1,13 @@
 import { Crown, ExternalLink, Clock } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent, Badge } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  Badge,
+} from '@/components/ui';
 import { SkeletonText } from '@/components/ui';
 import { useSubscription, useCreatePortalSession } from '@/api/subscription';
 import { TIER_INFO, FREE_TIER_INFO, formatPricePence } from '@fitnassist/schemas';
@@ -26,14 +34,21 @@ export const SubscriptionTab = () => {
 
   const subscription = data?.subscription;
   const effectiveTier = data?.effectiveTier ?? 'FREE';
-  const tierInfo = effectiveTier === 'FREE' ? FREE_TIER_INFO : TIER_INFO[effectiveTier as keyof typeof TIER_INFO];
+  const tierInfo =
+    effectiveTier === 'FREE' ? FREE_TIER_INFO : TIER_INFO[effectiveTier as keyof typeof TIER_INFO];
 
   const isTrialing = subscription?.status === 'TRIALING';
   const isCanceling = subscription?.cancelAtPeriodEnd;
 
-  const trialDaysLeft = isTrialing && subscription?.trialEndDate
-    ? Math.max(0, Math.ceil((new Date(subscription.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-    : 0;
+  const trialDaysLeft =
+    isTrialing && subscription?.trialEndDate
+      ? Math.max(
+          0,
+          Math.ceil(
+            (new Date(subscription.trialEndDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+          ),
+        )
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -49,7 +64,7 @@ export const SubscriptionTab = () => {
               <CardDescription>
                 {isTrialing
                   ? `Pro trial - ${trialDaysLeft} day${trialDaysLeft !== 1 ? 's' : ''} remaining`
-                  : tierInfo?.name ?? 'Free'}
+                  : (tierInfo?.name ?? 'Free')}
               </CardDescription>
             </div>
             <Badge variant={effectiveTier === 'FREE' ? 'secondary' : 'default'}>
@@ -83,8 +98,9 @@ export const SubscriptionTab = () => {
             <div className="text-sm text-muted-foreground">
               {formatPricePence(
                 subscription.billingPeriod === 'ANNUAL'
-                  ? TIER_INFO[subscription.tier as keyof typeof TIER_INFO]?.annualPricePence ?? 0
-                  : TIER_INFO[subscription.tier as keyof typeof TIER_INFO]?.monthlyPricePence ?? 0
+                  ? (TIER_INFO[subscription.tier as keyof typeof TIER_INFO]?.annualPricePence ?? 0)
+                  : (TIER_INFO[subscription.tier as keyof typeof TIER_INFO]?.monthlyPricePence ??
+                      0),
               )}
               /{subscription.billingPeriod === 'ANNUAL' ? 'year' : 'month'}
             </div>

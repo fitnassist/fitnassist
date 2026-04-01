@@ -85,12 +85,13 @@ export const HeroForm = ({ sectionId, content }: HeroFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label>CTA Link Type</Label>
+        <Label htmlFor="hero-cta-link-type">CTA Link Type</Label>
         <Controller
           name="ctaLinkType"
           control={control}
           render={({ field }) => (
             <Select
+              inputId="hero-cta-link-type"
               options={CTA_LINK_TYPE_OPTIONS}
               value={CTA_LINK_TYPE_OPTIONS.find((o) => o.value === field.value) || null}
               onChange={(option) => field.onChange(option?.value || 'section')}
@@ -101,12 +102,13 @@ export const HeroForm = ({ sectionId, content }: HeroFormProps) => {
 
       {ctaLinkType === 'section' ? (
         <div className="space-y-2">
-          <Label>Scroll to Section</Label>
+          <Label htmlFor="hero-scroll-to-section">Scroll to Section</Label>
           <Controller
             name="ctaLink"
             control={control}
             render={({ field }) => (
               <Select
+                inputId="hero-scroll-to-section"
                 options={SECTION_LINK_OPTIONS}
                 value={SECTION_LINK_OPTIONS.find((o) => o.value === field.value) || null}
                 onChange={(option) => field.onChange(option?.value || '')}

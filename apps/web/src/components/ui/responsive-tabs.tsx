@@ -44,7 +44,8 @@ export const ResponsiveTabs = ({
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}{option.badge ? ` (${option.badge})` : ''}
+              {option.label}
+              {option.badge ? ` (${option.badge})` : ''}
             </option>
           ))}
         </select>

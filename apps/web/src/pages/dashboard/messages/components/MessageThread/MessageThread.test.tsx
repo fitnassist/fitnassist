@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { render, screen } from '@/test/utils';
 import userEvent from '@testing-library/user-event';
 import { MessageThread } from './index';
-import type { OtherPerson } from '../../messages.types';
+import type { Message, OtherPerson } from '../../messages.types';
 
 // Mock scrollIntoView which is not available in jsdom
 beforeAll(() => {
@@ -54,7 +54,7 @@ const mockMessages = [
       traineeProfile: null,
     },
   },
-] as any;
+] as Message[];
 
 const defaultProps = {
   messages: mockMessages,
@@ -117,7 +117,7 @@ describe('MessageThread', () => {
     render(<MessageThread {...defaultProps} messages={[]} />);
 
     expect(
-      screen.getByText('Start the conversation by sending a message below.')
+      screen.getByText('Start the conversation by sending a message below.'),
     ).toBeInTheDocument();
   });
 
@@ -125,7 +125,7 @@ describe('MessageThread', () => {
     render(<MessageThread {...defaultProps} messages={undefined} />);
 
     expect(
-      screen.getByText('Start the conversation by sending a message below.')
+      screen.getByText('Start the conversation by sending a message below.'),
     ).toBeInTheDocument();
   });
 
@@ -133,9 +133,7 @@ describe('MessageThread', () => {
     const onMessageChange = vi.fn();
     const user = userEvent.setup();
 
-    render(
-      <MessageThread {...defaultProps} onMessageChange={onMessageChange} />
-    );
+    render(<MessageThread {...defaultProps} onMessageChange={onMessageChange} />);
 
     const textarea = screen.getByPlaceholderText('Type a message...');
     await user.type(textarea, 'H');
@@ -144,12 +142,7 @@ describe('MessageThread', () => {
   });
 
   it('should display error message when error is provided', () => {
-    render(
-      <MessageThread
-        {...defaultProps}
-        error={{ message: 'Failed to send message' }}
-      />
-    );
+    render(<MessageThread {...defaultProps} error={{ message: 'Failed to send message' }} />);
 
     expect(screen.getByText('Failed to send message')).toBeInTheDocument();
   });
@@ -168,9 +161,7 @@ describe('MessageThread', () => {
       isTrainer: false,
     };
 
-    render(
-      <MessageThread {...defaultProps} otherPerson={nonTrainerPerson} />
-    );
+    render(<MessageThread {...defaultProps} otherPerson={nonTrainerPerson} />);
 
     expect(screen.getByText('Alice Trainee')).toBeInTheDocument();
     // No link wrapping the header since no trainerHandle and no userId

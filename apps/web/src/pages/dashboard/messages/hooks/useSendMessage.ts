@@ -17,31 +17,28 @@ export const useSendMessage = (connectionId: string | undefined) => {
       });
 
       if (user) {
-        utils.message.getThread.setData(
-          { connectionId: newMessage.connectionId },
-          (old) => {
-            if (!old) return old;
-            return [
-              ...old,
-              {
-                id: `temp-${Date.now()}`,
-                connectionId: newMessage.connectionId,
-                senderId: user.id,
-                content: newMessage.content,
-                isRead: false,
-                readAt: null,
-                createdAt: new Date(),
-                sender: {
-                  id: user.id,
-                  name: user.name || 'You',
-                  image: user.image || null,
-                  trainerProfile: null,
-                  traineeProfile: null,
-                },
+        utils.message.getThread.setData({ connectionId: newMessage.connectionId }, (old) => {
+          if (!old) return old;
+          return [
+            ...old,
+            {
+              id: `temp-${Date.now()}`,
+              connectionId: newMessage.connectionId,
+              senderId: user.id,
+              content: newMessage.content,
+              isRead: false,
+              readAt: null,
+              createdAt: new Date(),
+              sender: {
+                id: user.id,
+                name: user.name || 'You',
+                image: user.image || null,
+                trainerProfile: null,
+                traineeProfile: null,
               },
-            ];
-          }
-        );
+            },
+          ];
+        });
       }
 
       setMessage('');
@@ -51,7 +48,7 @@ export const useSendMessage = (connectionId: string | undefined) => {
       if (context?.previousMessages) {
         utils.message.getThread.setData(
           { connectionId: newMessage.connectionId },
-          context.previousMessages
+          context.previousMessages,
         );
       }
     },

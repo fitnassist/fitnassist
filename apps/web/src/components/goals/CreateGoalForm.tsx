@@ -68,11 +68,11 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
     });
   };
 
-  const targetEntryOptions = ENTRY_TYPE_OPTIONS
-    .filter(o => o.value === 'WEIGHT' || o.value === 'MEASUREMENT')
-    .map(o => ({ value: o.value, label: o.label }));
+  const targetEntryOptions = ENTRY_TYPE_OPTIONS.filter(
+    (o) => o.value === 'WEIGHT' || o.value === 'MEASUREMENT',
+  ).map((o) => ({ value: o.value, label: o.label }));
 
-  const habitOptions = HABIT_ENTRY_TYPE_OPTIONS.map(o => ({ value: o.value, label: o.label }));
+  const habitOptions = HABIT_ENTRY_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }));
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -120,9 +120,7 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
           className="mt-1.5"
           placeholder={goalType === 'TARGET' ? 'e.g., Reach 75kg' : 'e.g., Drink water daily'}
         />
-        {errors.name && (
-          <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>}
       </div>
 
       {/* Description */}
@@ -140,14 +138,15 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
       {goalType === 'TARGET' && (
         <>
           <div>
-            <Label>Track via</Label>
+            <Label htmlFor="goal-track-via">Track via</Label>
             <Controller
               name="entryType"
               control={control}
               render={({ field }) => (
                 <Select
+                  inputId="goal-track-via"
                   className="mt-1.5"
-                  value={targetEntryOptions.find(o => o.value === field.value) ?? null}
+                  value={targetEntryOptions.find((o) => o.value === field.value) ?? null}
                   onChange={(opt) => {
                     if (opt) field.onChange(opt.value);
                   }}
@@ -159,18 +158,19 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
 
           {fieldOptions && fieldOptions.length > 1 && (
             <div>
-              <Label>Measurement</Label>
+              <Label htmlFor="goal-measurement">Measurement</Label>
               <Controller
                 name="entryField"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="goal-measurement"
                     className="mt-1.5"
-                    value={fieldOptions.find(o => o.value === field.value) ?? null}
+                    value={fieldOptions.find((o) => o.value === field.value) ?? null}
                     onChange={(opt) => {
                       if (opt) field.onChange(opt.value);
                     }}
-                    options={fieldOptions.map(o => ({ value: o.value, label: o.label }))}
+                    options={fieldOptions.map((o) => ({ value: o.value, label: o.label }))}
                   />
                 )}
               />
@@ -197,14 +197,15 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
       {goalType === 'HABIT' && (
         <>
           <div>
-            <Label>What counts as doing it?</Label>
+            <Label htmlFor="goal-habit-entry-type">What counts as doing it?</Label>
             <Controller
               name="habitEntryType"
               control={control}
               render={({ field }) => (
                 <Select
+                  inputId="goal-habit-entry-type"
                   className="mt-1.5"
-                  value={habitOptions.find(o => o.value === field.value) ?? null}
+                  value={habitOptions.find((o) => o.value === field.value) ?? null}
                   onChange={(opt) => {
                     if (opt) field.onChange(opt.value);
                   }}
@@ -234,11 +235,7 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
       {/* Deadline */}
       <div>
         <Label>Deadline (optional)</Label>
-        <Input
-          {...register('deadline')}
-          className="mt-1.5"
-          type="date"
-        />
+        <Input {...register('deadline')} className="mt-1.5" type="date" />
       </div>
 
       {/* Actions */}

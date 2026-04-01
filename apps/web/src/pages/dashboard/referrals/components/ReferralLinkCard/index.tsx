@@ -34,18 +34,14 @@ export const ReferralLinkCard = () => {
           <h3 className="font-semibold">Your Referral Link</h3>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Share this link with other trainers. When they subscribe, you get 1 month free and they get 20% off their first payment.
+          Share this link with other trainers. When they subscribe, you get 1 month free and they
+          get 20% off their first payment.
         </p>
         <div className="flex gap-2">
           <div className="flex-1 bg-muted rounded-md px-3 py-2 text-sm font-mono truncate">
             {data.url}
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleCopy}
-            className="shrink-0"
-          >
+          <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0">
             {copied ? (
               <>
                 <Check className="h-4 w-4 mr-1" />

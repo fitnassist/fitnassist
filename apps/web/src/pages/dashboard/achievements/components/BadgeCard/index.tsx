@@ -1,4 +1,22 @@
-import { Flame, Dumbbell, Utensils, Heart, Users, Target, Compass, Footprints, Droplets, Moon, Smile, Camera, Award, Star, Trophy, Zap, type LucideIcon } from 'lucide-react';
+import {
+  Flame,
+  Dumbbell,
+  Utensils,
+  Heart,
+  Users,
+  Target,
+  Compass,
+  Footprints,
+  Droplets,
+  Moon,
+  Smile,
+  Camera,
+  Award,
+  Star,
+  Trophy,
+  Zap,
+  type LucideIcon,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BadgeDefinition } from '@fitnassist/schemas';
 
@@ -51,7 +69,14 @@ interface BadgeCardProps {
   onClick?: () => void;
 }
 
-export const BadgeCard = ({ badge, earned, earnedAt, isShowcase, onToggleShowcase, onClick }: BadgeCardProps) => {
+export const BadgeCard = ({
+  badge,
+  earned,
+  earnedAt,
+  isShowcase,
+  onToggleShowcase,
+  onClick,
+}: BadgeCardProps) => {
   const Icon = ICON_MAP[badge.icon] ?? Award;
   const tier = TIER_STYLES[badge.tier];
 
@@ -72,10 +97,12 @@ export const BadgeCard = ({ badge, earned, earnedAt, isShowcase, onToggleShowcas
           Showcase
         </div>
       )}
-      <div className={cn(
-        'flex h-12 w-12 items-center justify-center rounded-full',
-        earned ? tier.bg : 'bg-muted',
-      )}>
+      <div
+        className={cn(
+          'flex h-12 w-12 items-center justify-center rounded-full',
+          earned ? tier.bg : 'bg-muted',
+        )}
+      >
         <Icon className={cn('h-6 w-6', earned ? tier.icon : 'text-muted-foreground')} />
       </div>
       <div className="space-y-0.5">

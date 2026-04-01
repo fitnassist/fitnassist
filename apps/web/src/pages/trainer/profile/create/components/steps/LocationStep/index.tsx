@@ -23,12 +23,7 @@ const TRAVEL_OPTIONS = [
   },
 ];
 
-export function LocationStep({
-  data,
-  onUpdate,
-  onNext,
-  onBack,
-}: WizardStepProps) {
+export function LocationStep({ data, onUpdate, onNext, onBack }: WizardStepProps) {
   const {
     handleSubmit,
     control,
@@ -108,9 +103,7 @@ export function LocationStep({
                   <label
                     key={option.value}
                     className={`flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent ${
-                      field.value === option.value
-                        ? 'border-primary bg-primary/5'
-                        : 'border-input'
+                      field.value === option.value ? 'border-primary bg-primary/5' : 'border-input'
                     }`}
                   >
                     <input
@@ -123,9 +116,7 @@ export function LocationStep({
                     />
                     <div>
                       <p className="font-medium">{option.label}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {option.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{option.description}</p>
                     </div>
                   </label>
                 ))}
@@ -142,9 +133,7 @@ export function LocationStep({
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button type="submit">
-          Continue
-        </Button>
+        <Button type="submit">Continue</Button>
       </div>
     </form>
   );

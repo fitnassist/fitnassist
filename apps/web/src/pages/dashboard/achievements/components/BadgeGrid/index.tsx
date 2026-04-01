@@ -25,9 +25,10 @@ export const BadgeGrid = ({
 }: BadgeGridProps) => {
   const earnedMap = new Map(earnedBadges.map((b) => [b.badgeId, b]));
 
-  const categories = filterCategory === 'ALL'
-    ? BADGE_CATEGORIES
-    : BADGE_CATEGORIES.filter((c) => c.key === filterCategory);
+  const categories =
+    filterCategory === 'ALL'
+      ? BADGE_CATEGORIES
+      : BADGE_CATEGORIES.filter((c) => c.key === filterCategory);
 
   return (
     <div className="space-y-8">

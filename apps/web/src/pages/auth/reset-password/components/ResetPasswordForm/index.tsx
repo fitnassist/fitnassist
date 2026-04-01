@@ -54,9 +54,7 @@ export function ResetPasswordForm({ token, onSuccess }: ResetPasswordFormProps) 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {error && (
-        <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
-          {error}
-        </div>
+        <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">{error}</div>
       )}
 
       <input type="hidden" {...register('token')} />
@@ -80,9 +78,7 @@ export function ResetPasswordForm({ token, onSuccess }: ResetPasswordFormProps) 
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-sm text-destructive">{errors.password.message}</p>
-        )}
+        {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
         <p className="text-xs text-muted-foreground">
           At least 8 characters with uppercase, lowercase, and a number
         </p>

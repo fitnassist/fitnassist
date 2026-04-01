@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Moon, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog, SourceBadge } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  ConfirmDialog,
+  SourceBadge,
+} from '@/components/ui';
 import { useLogSleep, useDeleteDiaryEntry } from '@/api/diary';
 import { getSleepQualityLabel } from '../../diary.utils';
 
@@ -27,7 +36,12 @@ export const SleepLogger = ({ date, entry }: SleepLoggerProps) => {
     if (isNaN(numHours) || numHours < 0 || numHours > 24 || quality < 1) return;
     logSleep.mutate(
       { date, hoursSlept: numHours, quality },
-      { onSuccess: () => { setHours(''); setQuality(0); } }
+      {
+        onSuccess: () => {
+          setHours('');
+          setQuality(0);
+        },
+      },
     );
   };
 

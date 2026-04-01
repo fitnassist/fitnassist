@@ -12,10 +12,16 @@ interface ShopSectionProps {
   onAddToCart?: (productId: string) => void;
 }
 
-export const ShopSection = ({ section, trainerId, onNavigateShop, onNavigateProduct, onAddToCart }: ShopSectionProps) => {
+export const ShopSection = ({
+  section,
+  trainerId,
+  onNavigateShop,
+  onNavigateProduct,
+  onAddToCart,
+}: ShopSectionProps) => {
   const { data: products, isLoading } = trpc.product.getPublicProducts.useQuery(
     { trainerId: trainerId ?? '' },
-    { enabled: !!trainerId }
+    { enabled: !!trainerId },
   );
 
   const displayed = (products ?? []).slice(0, 6);

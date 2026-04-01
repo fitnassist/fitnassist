@@ -24,7 +24,12 @@ interface ContactCardProps {
   isDisconnecting?: boolean;
 }
 
-export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }: ContactCardProps) => {
+export const ContactCard = ({
+  contact,
+  variant,
+  onDisconnect,
+  isDisconnecting,
+}: ContactCardProps) => {
   const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
   const isTrainee = isTraineeContact(contact);
 
@@ -62,7 +67,7 @@ export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }:
       <div className="flex items-center gap-2">
         {profileHandle && (
           <Link to={routes.trainerPublicProfile(profileHandle)}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" aria-label="View Profile">
               <User className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">View Profile</span>
             </Button>
@@ -70,21 +75,21 @@ export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }:
         )}
         {traineeUserId && (
           <Link to={routes.traineeProfileView(traineeUserId)}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" aria-label="View Profile">
               <User className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">View Profile</span>
             </Button>
           </Link>
         )}
         <Link to={routes.dashboardMessageThread(contact.id)}>
-          <Button size="sm">
+          <Button size="sm" aria-label="Message">
             <MessageCircle className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">Message</span>
           </Button>
         </Link>
         {isTrainee && (
           <Link to={routes.dashboardBookingsBook(contact.trainer.id)}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" aria-label="Book">
               <Calendar className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Book</span>
             </Button>
@@ -94,6 +99,7 @@ export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }:
           <Button
             variant="outline"
             size="sm"
+            aria-label="Disconnect"
             disabled={isDisconnecting}
             onClick={() => setShowDisconnectDialog(true)}
           >
@@ -122,23 +128,21 @@ export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }:
       <Card>
         <CardContent className="p-3 sm:p-4">
           <div className="flex items-center gap-3 sm:gap-4">
-            <Avatar className={`h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 ${variant === 'declined' ? 'opacity-50' : ''}`}>
-              {avatarUrl && (
-                <AvatarImage src={avatarUrl} alt={displayName} />
-              )}
-              <AvatarFallback>
-                {getInitials(displayName)}
-              </AvatarFallback>
+            <Avatar
+              className={`h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 ${variant === 'declined' ? 'opacity-50' : ''}`}
+            >
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
+              <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="min-w-0">
-                  <p className={`font-medium truncate ${variant === 'declined' ? 'text-muted-foreground' : ''}`}>
+                  <p
+                    className={`font-medium truncate ${variant === 'declined' ? 'text-muted-foreground' : ''}`}
+                  >
                     {displayName}
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {getTimestamp()}
-                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{getTimestamp()}</p>
                 </div>
                 {renderActions()}
               </div>

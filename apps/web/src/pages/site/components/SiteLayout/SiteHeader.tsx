@@ -36,11 +36,21 @@ const getSectionLabel = (section: PublicSection): string => {
   return labels[section.type] ?? section.type;
 };
 
-export const SiteHeader = ({ website, onNavigateBlog, onNavigateHome, onNavigateShop, onOpenCart, cartItemCount = 0, hasBlogPosts, hasProducts, isHomePage }: SiteHeaderProps) => {
+export const SiteHeader = ({
+  website,
+  onNavigateBlog,
+  onNavigateHome,
+  onNavigateShop,
+  onOpenCart,
+  cartItemCount = 0,
+  hasBlogPosts,
+  hasProducts,
+  isHomePage,
+}: SiteHeaderProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const navSections = website.sections.filter(
-    (s) => s.isVisible && s.type !== 'HERO' && s.type !== 'BLOG' && s.type !== 'SHOP'
+    (s) => s.isVisible && s.type !== 'HERO' && s.type !== 'BLOG' && s.type !== 'SHOP',
   );
 
   // Show blog nav item if there are published posts (regardless of BLOG section)

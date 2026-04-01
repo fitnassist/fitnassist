@@ -19,7 +19,9 @@ export const getOtherPerson = (connection: ConnectionBase, userId?: string): Oth
       }
     : {
         name: connection.sender?.name || connection.name,
-        image: (connection.sender as { traineeProfile?: { avatarUrl: string | null } | null })?.traineeProfile?.avatarUrl || connection.sender?.image,
+        image:
+          (connection.sender as { traineeProfile?: { avatarUrl: string | null } | null })
+            ?.traineeProfile?.avatarUrl || connection.sender?.image,
         isTrainer: false,
         userId: connection.sender?.id,
       };

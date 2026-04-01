@@ -16,16 +16,44 @@ interface TraineeDashboardContentProps {
 }
 
 const quickActions = [
-  { label: 'Diary', href: routes.dashboardDiary, icon: BookHeart, color: 'text-rose-500', description: 'Log food, weight & more' },
-  { label: 'Goals', href: routes.dashboardGoals, icon: Target, color: 'text-blue-500', description: 'Track your progress' },
-  { label: 'My Plans', href: routes.dashboardMyPlans, icon: ClipboardList, color: 'text-emerald-500', description: 'View assigned plans' },
-  { label: 'Find Trainers', href: routes.trainers, icon: Search, color: 'text-violet-500', description: 'Browse trainers near you' },
-  { label: 'My Contacts', href: routes.dashboardContacts, icon: User, color: 'text-amber-500', description: 'Your trainer connections' },
+  {
+    label: 'Diary',
+    href: routes.dashboardDiary,
+    icon: BookHeart,
+    color: 'text-rose-500',
+    description: 'Log food, weight & more',
+  },
+  {
+    label: 'Goals',
+    href: routes.dashboardGoals,
+    icon: Target,
+    color: 'text-blue-500',
+    description: 'Track your progress',
+  },
+  {
+    label: 'My Plans',
+    href: routes.dashboardMyPlans,
+    icon: ClipboardList,
+    color: 'text-emerald-500',
+    description: 'View assigned plans',
+  },
+  {
+    label: 'Find Trainers',
+    href: routes.trainers,
+    icon: Search,
+    color: 'text-violet-500',
+    description: 'Browse trainers near you',
+  },
+  {
+    label: 'My Contacts',
+    href: routes.dashboardContacts,
+    icon: User,
+    color: 'text-amber-500',
+    description: 'Your trainer connections',
+  },
 ];
 
-export const TraineeDashboardContent = ({
-  badgeCounts,
-}: TraineeDashboardContentProps) => {
+export const TraineeDashboardContent = ({ badgeCounts }: TraineeDashboardContentProps) => {
   const { data: traineeProfile } = trpc.trainee.getMyProfile.useQuery();
   const unitPreference = traineeProfile?.unitPreference ?? 'METRIC';
 

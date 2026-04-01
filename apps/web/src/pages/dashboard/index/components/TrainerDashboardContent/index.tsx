@@ -1,4 +1,4 @@
-import { trpc } from "@/lib/trpc";
+import { trpc } from '@/lib/trpc';
 import {
   LoadingState,
   NoProfileState,
@@ -6,12 +6,10 @@ import {
   QuickActions,
   ClientActivityFeed,
   StatsRow,
-} from "./components";
-import type { TrainerDashboardContentProps } from "./TrainerDashboardContent.types";
+} from './components';
+import type { TrainerDashboardContentProps } from './TrainerDashboardContent.types';
 
-export const TrainerDashboardContent = ({
-  badgeCounts,
-}: TrainerDashboardContentProps) => {
+export const TrainerDashboardContent = ({ badgeCounts }: TrainerDashboardContentProps) => {
   const { data: profile, isLoading } = trpc.trainer.getMyProfile.useQuery();
 
   if (isLoading) {

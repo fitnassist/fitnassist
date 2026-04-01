@@ -9,7 +9,7 @@ interface ProfileBlogPostsProps {
 export const ProfileBlogPosts = ({ subdomain }: ProfileBlogPostsProps) => {
   const { data, isLoading } = trpc.blog.getPublicPosts.useQuery(
     { subdomain, limit: 3 },
-    { enabled: !!subdomain }
+    { enabled: !!subdomain },
   );
 
   const posts = data?.posts ?? [];

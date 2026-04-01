@@ -20,7 +20,7 @@ export const DiaryComments = ({ entries }: DiaryCommentsProps) => {
     (entry.comments ?? []).map((comment) => ({
       ...comment,
       entryType: entry.type,
-    }))
+    })),
   );
 
   if (allComments.length === 0) return null;

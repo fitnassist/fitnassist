@@ -5,18 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { cn } from '@/lib/utils';
 import { trpc } from '@/lib/trpc';
 import { routes } from '@/config/routes';
-import {
-  BasicInfoStep,
-  LocationStep,
-  ServicesStep,
-  ImagesStep,
-  ReviewStep,
-} from '../steps';
-import {
-  WIZARD_STEPS,
-  type WizardStep,
-  type WizardFormData,
-} from './ProfileWizard.types';
+import { BasicInfoStep, LocationStep, ServicesStep, ImagesStep, ReviewStep } from '../steps';
+import { WIZARD_STEPS, type WizardStep, type WizardFormData } from './ProfileWizard.types';
 
 const initialFormData: WizardFormData = {
   basicInfo: {
@@ -62,10 +52,7 @@ export function ProfileWizard() {
   const isFirstStep = currentStepIndex === 0;
   const isLastStep = currentStepIndex === WIZARD_STEPS.length - 1;
 
-  const handleUpdate = <K extends keyof WizardFormData>(
-    step: K,
-    data: WizardFormData[K]
-  ) => {
+  const handleUpdate = <K extends keyof WizardFormData>(step: K, data: WizardFormData[K]) => {
     setFormData((prev) => ({ ...prev, [step]: data }));
   };
 
@@ -150,7 +137,7 @@ export function ProfileWizard() {
                   disabled={index > currentStepIndex}
                   className={cn(
                     'flex flex-col items-center gap-2',
-                    index > currentStepIndex && 'cursor-not-allowed opacity-50'
+                    index > currentStepIndex && 'cursor-not-allowed opacity-50',
                   )}
                 >
                   <div
@@ -158,7 +145,9 @@ export function ProfileWizard() {
                       'flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-medium transition-colors',
                       isCompleted && 'border-primary bg-primary text-primary-foreground',
                       isCurrent && 'border-primary text-primary',
-                      !isCompleted && !isCurrent && 'border-muted-foreground/25 text-muted-foreground'
+                      !isCompleted &&
+                        !isCurrent &&
+                        'border-muted-foreground/25 text-muted-foreground',
                     )}
                   >
                     {isCompleted ? <Check className="h-5 w-5" /> : index + 1}
@@ -166,7 +155,7 @@ export function ProfileWizard() {
                   <span
                     className={cn(
                       'hidden text-xs sm:block',
-                      isCurrent ? 'font-medium text-foreground' : 'text-muted-foreground'
+                      isCurrent ? 'font-medium text-foreground' : 'text-muted-foreground',
                     )}
                   >
                     {step.title}
@@ -176,7 +165,7 @@ export function ProfileWizard() {
                   <div
                     className={cn(
                       'mx-2 h-0.5 flex-1',
-                      isCompleted ? 'bg-primary' : 'bg-muted-foreground/25'
+                      isCompleted ? 'bg-primary' : 'bg-muted-foreground/25',
                     )}
                   />
                 )}

@@ -14,7 +14,15 @@ import { ActivityChart } from './ActivityChart';
 import { StepsChart } from './StepsChart';
 import { ChartTabBar } from './ChartTabBar';
 
-type ChartType = 'weight' | 'measurements' | 'nutrition' | 'water' | 'mood' | 'sleep' | 'activity' | 'steps';
+type ChartType =
+  | 'weight'
+  | 'measurements'
+  | 'nutrition'
+  | 'water'
+  | 'mood'
+  | 'sleep'
+  | 'activity'
+  | 'steps';
 
 const CHART_TABS: Array<{ key: ChartType; label: string }> = [
   { key: 'weight', label: 'Weight' },
@@ -41,19 +49,19 @@ export const Trends = ({ unitPreference }: TrendsProps) => {
   const { data: entries } = useDiaryRange(startDate, endDate);
 
   const weightData = (entries ?? [])
-    .filter(e => e.type === 'WEIGHT' && e.weightEntry)
-    .map(e => ({ date: e.date as unknown as string, weightKg: e.weightEntry!.weightKg }));
+    .filter((e) => e.type === 'WEIGHT' && e.weightEntry)
+    .map((e) => ({ date: e.date as unknown as string, weightKg: e.weightEntry!.weightKg }));
 
   const measurementData = (entries ?? [])
-    .filter(e => e.type === 'MEASUREMENT' && e.measurementEntry)
-    .map(e => ({
+    .filter((e) => e.type === 'MEASUREMENT' && e.measurementEntry)
+    .map((e) => ({
       date: e.date as unknown as string,
       ...e.measurementEntry!,
     }));
 
   const nutritionData = (entries ?? [])
-    .filter(e => e.type === 'FOOD' && e.foodEntries && e.foodEntries.length > 0)
-    .map(e => {
+    .filter((e) => e.type === 'FOOD' && e.foodEntries && e.foodEntries.length > 0)
+    .map((e) => {
       const foods = e.foodEntries ?? [];
       return {
         date: e.date as unknown as string,
@@ -65,33 +73,34 @@ export const Trends = ({ unitPreference }: TrendsProps) => {
     });
 
   const waterData = (entries ?? [])
-    .filter(e => e.type === 'WATER' && e.waterEntry)
-    .map(e => ({ date: e.date as unknown as string, totalMl: e.waterEntry!.totalMl }));
+    .filter((e) => e.type === 'WATER' && e.waterEntry)
+    .map((e) => ({ date: e.date as unknown as string, totalMl: e.waterEntry!.totalMl }));
 
   const moodData = (entries ?? [])
-    .filter(e => e.type === 'MOOD' && e.moodEntry)
-    .map(e => ({ date: e.date as unknown as string, level: e.moodEntry!.level }));
+    .filter((e) => e.type === 'MOOD' && e.moodEntry)
+    .map((e) => ({ date: e.date as unknown as string, level: e.moodEntry!.level }));
 
   const sleepData = (entries ?? [])
-    .filter(e => e.type === 'SLEEP' && e.sleepEntry)
-    .map(e => ({
+    .filter((e) => e.type === 'SLEEP' && e.sleepEntry)
+    .map((e) => ({
       date: e.date as unknown as string,
       hoursSlept: e.sleepEntry!.hoursSlept,
       quality: e.sleepEntry!.quality,
     }));
 
   const activityData = (entries ?? [])
-    .filter(e => e.type === 'ACTIVITY' && e.activityEntry)
-    .map(e => ({
+    .filter((e) => e.type === 'ACTIVITY' && e.activityEntry)
+    .map((e) => ({
       date: e.date as unknown as string,
       activityType: (e as { activityEntry: { activityType: string } }).activityEntry.activityType,
       distanceKm: (e as { activityEntry: { distanceKm: number | null } }).activityEntry.distanceKm,
-      durationSeconds: (e as { activityEntry: { durationSeconds: number } }).activityEntry.durationSeconds,
+      durationSeconds: (e as { activityEntry: { durationSeconds: number } }).activityEntry
+        .durationSeconds,
     }));
 
   const stepsData = (entries ?? [])
-    .filter(e => e.type === 'STEPS' && e.stepsEntry)
-    .map(e => ({ date: e.date as unknown as string, totalSteps: e.stepsEntry!.totalSteps }));
+    .filter((e) => e.type === 'STEPS' && e.stepsEntry)
+    .map((e) => ({ date: e.date as unknown as string, totalSteps: e.stepsEntry!.totalSteps }));
 
   return (
     <Card>
@@ -109,8 +118,12 @@ export const Trends = ({ unitPreference }: TrendsProps) => {
         <ChartTabBar tabs={CHART_TABS} activeTab={activeChart} onTabChange={setActiveChart} />
 
         {/* Active chart */}
-        {activeChart === 'weight' && <WeightChart data={weightData} unitPreference={unitPreference} />}
-        {activeChart === 'measurements' && <MeasurementChart data={measurementData} unitPreference={unitPreference} />}
+        {activeChart === 'weight' && (
+          <WeightChart data={weightData} unitPreference={unitPreference} />
+        )}
+        {activeChart === 'measurements' && (
+          <MeasurementChart data={measurementData} unitPreference={unitPreference} />
+        )}
         {activeChart === 'nutrition' && <NutritionChart data={nutritionData} />}
         {activeChart === 'water' && <WaterChart data={waterData} />}
         {activeChart === 'mood' && <MoodChart data={moodData} />}

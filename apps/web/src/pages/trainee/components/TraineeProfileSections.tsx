@@ -1,4 +1,13 @@
-import { MapPin, Ruler, Weight, Target, Dumbbell, Activity, Calendar, AlertTriangle } from 'lucide-react';
+import {
+  MapPin,
+  Ruler,
+  Weight,
+  Target,
+  Dumbbell,
+  Activity,
+  Calendar,
+  AlertTriangle,
+} from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -47,16 +56,12 @@ export const TraineeProfileHeader = ({ profile }: ProfileHeaderProps) => {
   return (
     <div className="flex items-center gap-4">
       <Avatar className="h-16 w-16">
-        {profile.avatarUrl && (
-          <AvatarImage src={profile.avatarUrl} alt={userName} />
-        )}
+        {profile.avatarUrl && <AvatarImage src={profile.avatarUrl} alt={userName} />}
         <AvatarFallback className="text-lg">{getInitials(userName)}</AvatarFallback>
       </Avatar>
       <div>
         <h1 className="text-2xl font-bold">{userName}</h1>
-        {profile.handle && (
-          <p className="text-sm text-muted-foreground">@{profile.handle}</p>
-        )}
+        {profile.handle && <p className="text-sm text-muted-foreground">@{profile.handle}</p>}
         <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           {(profile.city || profile.location) && (
             <span className="flex items-center gap-1">
@@ -64,13 +69,14 @@ export const TraineeProfileHeader = ({ profile }: ProfileHeaderProps) => {
               {profile.city || profile.location}
             </span>
           )}
-          {profile.gender && (
-            <span>{getLabel(GENDER_OPTIONS, profile.gender)}</span>
-          )}
+          {profile.gender && <span>{getLabel(GENDER_OPTIONS, profile.gender)}</span>}
           {profile.dateOfBirth && (
             <span className="flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5" />
-              {Math.floor((Date.now() - new Date(profile.dateOfBirth).getTime()) / 31557600000)} years old
+              {Math.floor(
+                (Date.now() - new Date(profile.dateOfBirth).getTime()) / 31557600000,
+              )}{' '}
+              years old
             </span>
           )}
         </div>
@@ -89,7 +95,9 @@ export const TraineeProfileBio = ({ profile }: { profile: FilteredTraineeProfile
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg sm:text-xl font-light uppercase tracking-wider">About</CardTitle>
+        <CardTitle className="text-lg sm:text-xl font-light uppercase tracking-wider">
+          About
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
@@ -195,7 +203,9 @@ export const TraineeProfileGoals = ({ profile }: { profile: FilteredTraineeProfi
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg sm:text-xl font-light uppercase tracking-wider">Fitness Goals</CardTitle>
+        <CardTitle className="text-lg sm:text-xl font-light uppercase tracking-wider">
+          Fitness Goals
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {profile.fitnessGoals.length > 0 && (

@@ -86,9 +86,7 @@ export const VideoUpload = ({
 
   return (
     <div className={cn('space-y-2', className)}>
-      {label && (
-        <label className="text-sm font-medium leading-none">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium leading-none">{label}</label>}
 
       <div
         onDrop={handleDrop}
@@ -105,7 +103,7 @@ export const VideoUpload = ({
           !dragActive && !value && 'border-muted-foreground/25 hover:border-muted-foreground/50',
           value && 'border-transparent',
           disabled && 'cursor-not-allowed opacity-50',
-          error && 'border-destructive'
+          error && 'border-destructive',
         )}
       >
         <input
@@ -154,20 +152,14 @@ export const VideoUpload = ({
               <p className="text-sm font-medium">
                 {dragActive ? 'Drop video here' : 'Click or drag to upload'}
               </p>
-              {description && (
-                <p className="text-xs text-muted-foreground">{description}</p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Max {maxSizeMB}MB
-              </p>
+              {description && <p className="text-xs text-muted-foreground">{description}</p>}
+              <p className="text-xs text-muted-foreground">Max {maxSizeMB}MB</p>
             </div>
           </div>
         )}
       </div>
 
-      {(error || uploadError) && (
-        <p className="text-sm text-destructive">{error || uploadError}</p>
-      )}
+      {(error || uploadError) && <p className="text-sm text-destructive">{error || uploadError}</p>}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { TEST_TRAINEE, loginViaUI } from './helpers/auth';
 
 const publicPages = [
   { name: 'home', path: '/' },
@@ -13,21 +14,18 @@ const publicPages = [
 ];
 
 test.describe('Accessibility - Public Pages', () => {
-  for (const page of publicPages) {
-    test(`${page.name} has no accessibility violations`, async ({ page: p }) => {
-      await p.goto(page.path, { waitUntil: 'networkidle' });
+  for (const pg of publicPages) {
+    test(`${pg.name} has no accessibility violations`, async ({ page }) => {
+      await page.goto(pg.path, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(2000);
 
-      const results = await new AxeBuilder({ page: p })
-        .disableRules(['color-contrast']) // Disable until design system is audited
-        .analyze();
-
+      const results = await new AxeBuilder({ page }).disableRules(['color-contrast']).analyze();
       expect(results.violations).toEqual([]);
     });
   }
 });
 
 test.describe('Accessibility - Authenticated Pages', () => {
-  const timestamp = Date.now();
   const dashboardPages = [
     { name: 'dashboard', path: '/dashboard' },
     { name: 'messages', path: '/dashboard/messages' },
@@ -37,18 +35,8 @@ test.describe('Accessibility - Authenticated Pages', () => {
   ];
 
   test.beforeAll(async ({ browser }) => {
-    // Register a user via the UI once for all tests in this describe
     const page = await browser.newPage();
-    await page.goto('/register');
-    await page.getByLabel(/name/i).fill('A11y User');
-    await page.getByLabel(/email/i).fill(`a11y-${timestamp}@test.com`);
-    await page.getByLabel(/^password$/i).fill('Test1234!');
-    await page.getByLabel(/confirm/i).fill('Test1234!');
-    const traineeOption = page.getByText(/trainee/i).first();
-    await traineeOption.click();
-    await page.getByRole('button', { name: /sign up|register|create/i }).click();
-    await page.waitForURL(/\/dashboard/, { timeout: 10000 });
-    // Save storage state for reuse
+    await loginViaUI(page, TEST_TRAINEE.email, TEST_TRAINEE.password);
     await page.context().storageState({ path: 'e2e/.auth/a11y-user.json' });
     await page.close();
   });
@@ -58,11 +46,10 @@ test.describe('Accessibility - Authenticated Pages', () => {
       const context = await browser.newContext({ storageState: 'e2e/.auth/a11y-user.json' });
       const page = await context.newPage();
 
-      await page.goto(dp.path, { waitUntil: 'networkidle' });
+      await page.goto(dp.path, { waitUntil: 'domcontentloaded' });
+      await page.waitForTimeout(2000);
 
-      const results = await new AxeBuilder({ page })
-        .disableRules(['color-contrast'])
-        .analyze();
+      const results = await new AxeBuilder({ page }).disableRules(['color-contrast']).analyze();
 
       expect(results.violations).toEqual([]);
 

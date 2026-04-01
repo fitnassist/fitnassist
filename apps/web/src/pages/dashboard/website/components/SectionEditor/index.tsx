@@ -36,7 +36,7 @@ export const SectionEditor = ({ website }: SectionEditorProps) => {
 
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const handleDragEnd = useCallback(
@@ -49,7 +49,7 @@ export const SectionEditor = ({ website }: SectionEditorProps) => {
         reorderSections.mutate({ sectionIds: reordered.map((s) => s.id) });
       }
     },
-    [sections, reorderSections]
+    [sections, reorderSections],
   );
 
   const handleToggleExpand = (sectionId: string) => {

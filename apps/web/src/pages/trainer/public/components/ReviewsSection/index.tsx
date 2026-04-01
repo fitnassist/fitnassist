@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { Star, Pencil } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, StarRating, Skeleton } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  StarRating,
+  Skeleton,
+} from '@/components/ui';
 import { useTrainerReviews, useReviewEligibility } from '@/api/review';
 import { useAuth } from '@/hooks';
 import { ReviewCard } from './ReviewCard';
@@ -16,10 +24,7 @@ export const ReviewsSection = ({ trainerId, ratingAverage, ratingCount }: Review
   const { isAuthenticated } = useAuth();
   const [showForm, setShowForm] = useState(false);
 
-  const { data: eligibility } = useReviewEligibility(
-    trainerId,
-    isAuthenticated
-  );
+  const { data: eligibility } = useReviewEligibility(trainerId, isAuthenticated);
 
   const {
     data: reviewsData,

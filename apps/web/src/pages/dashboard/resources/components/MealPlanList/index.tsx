@@ -81,11 +81,23 @@ export const MealPlanList = () => {
 
           {(data.hasMore || page > 1) && (
             <div className="flex justify-center gap-2 pt-2">
-              <Button variant="outline" size="sm" onClick={() => setPage(p => p - 1)} disabled={page === 1}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p - 1)}
+                disabled={page === 1}
+              >
                 Previous
               </Button>
-              <span className="flex items-center text-sm text-muted-foreground px-2">Page {page}</span>
-              <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={!data.hasMore}>
+              <span className="flex items-center text-sm text-muted-foreground px-2">
+                Page {page}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={!data.hasMore}
+              >
                 Next
               </Button>
             </div>

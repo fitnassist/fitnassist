@@ -12,7 +12,7 @@ export function getTravelOptionDisplay(value: string): { label: string; descript
   const options: Record<string, { label: string; description: string }> = {
     CLIENT_TRAVELS: {
       label: 'Studio/Gym Based',
-      description: 'Clients travel to trainer\'s location',
+      description: "Clients travel to trainer's location",
     },
     TRAINER_TRAVELS: {
       label: 'Mobile Trainer',
@@ -33,7 +33,10 @@ export function getPostcodeArea(postcode: string | null | undefined): string {
   return match?.[1]?.toUpperCase() || postcode;
 }
 
-export function formatRate(min: number | null | undefined, max: number | null | undefined): string | null {
+export function formatRate(
+  min: number | null | undefined,
+  max: number | null | undefined,
+): string | null {
   if (!min && !max) return null;
   const minPounds = min ? Math.round(min / 100) : null;
   const maxPounds = max ? Math.round(max / 100) : null;

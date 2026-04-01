@@ -12,8 +12,5 @@ export const useWebsitePreview = () => {
 };
 
 export const usePublicWebsite = (subdomain: string) => {
-  return trpc.website.getBySubdomain.useQuery(
-    { subdomain },
-    { enabled: !!subdomain }
-  );
+  return trpc.website.getBySubdomain.useQuery({ subdomain }, { enabled: !!subdomain });
 };

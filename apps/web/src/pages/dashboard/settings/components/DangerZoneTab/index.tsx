@@ -48,7 +48,7 @@ export const DangerZoneTab = () => {
       navigate(routes.home);
     } catch (error) {
       setError(
-        error instanceof Error ? error.message : 'Failed to delete account. Please try again.'
+        error instanceof Error ? error.message : 'Failed to delete account. Please try again.',
       );
     }
   };

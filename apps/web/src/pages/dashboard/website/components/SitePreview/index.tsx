@@ -13,19 +13,18 @@ interface SitePreviewProps {
   onClose: () => void;
 }
 
-const PreviewContent = ({ preview }: { preview: NonNullable<ReturnType<typeof useWebsitePreview>['data']> }) => {
+const PreviewContent = ({
+  preview,
+}: {
+  preview: NonNullable<ReturnType<typeof useWebsitePreview>['data']>;
+}) => {
   return (
     <SiteThemeProvider website={preview}>
       <SiteLayout website={preview}>
         {[...preview.sections]
           .sort((a, b) => a.sortOrder - b.sortOrder)
           .map((section) => (
-            <SectionRenderer
-              key={section.id}
-              section={section}
-              trainer={preview.trainer}
-              preview
-            />
+            <SectionRenderer key={section.id} section={section} trainer={preview.trainer} preview />
           ))}
       </SiteLayout>
     </SiteThemeProvider>
@@ -49,7 +48,9 @@ export const SitePreview = ({ website, onClose }: SitePreviewProps) => {
 
     // Copy stylesheets from parent document into iframe
     doc.open();
-    doc.write('<!DOCTYPE html><html><head></head><body><div id="preview-root"></div></body></html>');
+    doc.write(
+      '<!DOCTYPE html><html><head></head><body><div id="preview-root"></div></body></html>',
+    );
     doc.close();
 
     // Copy all stylesheets

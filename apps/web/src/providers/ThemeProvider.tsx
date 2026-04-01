@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useState, useCallback, useSyncExternalStore, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -26,7 +34,11 @@ const getSystemThemeSnapshot = () => window.matchMedia('(prefers-color-scheme: d
 const getServerSnapshot = () => false;
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const systemIsDark = useSyncExternalStore(subscribeToSystemTheme, getSystemThemeSnapshot, getServerSnapshot);
+  const systemIsDark = useSyncExternalStore(
+    subscribeToSystemTheme,
+    getSystemThemeSnapshot,
+    getServerSnapshot,
+  );
 
   const [theme, setThemeState] = useState<Theme>(() => {
     if (typeof window === 'undefined') return 'system';

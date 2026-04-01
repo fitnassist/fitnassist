@@ -11,9 +11,10 @@ interface UpgradePromptProps {
 }
 
 export const UpgradePrompt = ({ requiredTier, featureName }: UpgradePromptProps) => {
-  const tierName = requiredTier === 'FREE'
-    ? 'Free'
-    : TIER_INFO[requiredTier as keyof typeof TIER_INFO]?.name ?? requiredTier;
+  const tierName =
+    requiredTier === 'FREE'
+      ? 'Free'
+      : (TIER_INFO[requiredTier as keyof typeof TIER_INFO]?.name ?? requiredTier);
 
   return (
     <Card className="border-dashed">
@@ -25,8 +26,8 @@ export const UpgradePrompt = ({ requiredTier, featureName }: UpgradePromptProps)
           {featureName ? `${featureName} requires ${tierName}` : `Upgrade to ${tierName}`}
         </h3>
         <p className="text-sm text-muted-foreground max-w-md mb-6">
-          This feature is available on the {tierName} plan and above.
-          Upgrade your subscription to unlock it.
+          This feature is available on the {tierName} plan and above. Upgrade your subscription to
+          unlock it.
         </p>
         <Link to={routes.pricing}>
           <Button>View Plans</Button>

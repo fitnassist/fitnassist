@@ -5,10 +5,7 @@ export const useMyPendingOnboarding = () => {
 };
 
 export const useTraineeOnboardingResponse = (responseId: string) => {
-  return trpc.onboarding.getResponse.useQuery(
-    { responseId },
-    { enabled: !!responseId }
-  );
+  return trpc.onboarding.getResponse.useQuery({ responseId }, { enabled: !!responseId });
 };
 
 export const useSubmitOnboarding = () => {

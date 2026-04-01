@@ -1,7 +1,19 @@
 import { useMemo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Link } from 'react-router-dom';
-import { Activity, Scale, Droplets, Ruler, SmilePlus, Moon, UtensilsCrossed, Dumbbell, Footprints, Camera, Trophy } from 'lucide-react';
+import {
+  Activity,
+  Scale,
+  Droplets,
+  Ruler,
+  SmilePlus,
+  Moon,
+  UtensilsCrossed,
+  Dumbbell,
+  Footprints,
+  Camera,
+  Trophy,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { useRecentClientActivity } from '@/api/diary';
 import { useRecentClientGoalUpdates } from '@/api/goal';
@@ -56,7 +68,10 @@ export const ClientActivityFeed = () => {
       };
       if (!typed.user) continue;
 
-      const iconInfo = ENTRY_ICONS[entry.type] ?? { icon: Activity, color: 'text-muted-foreground' };
+      const iconInfo = ENTRY_ICONS[entry.type] ?? {
+        icon: Activity,
+        color: 'text-muted-foreground',
+      };
       const label = ENTRY_LABELS[entry.type] ?? 'logged an entry';
 
       items.push({
@@ -92,9 +107,7 @@ export const ClientActivityFeed = () => {
     }
 
     // Sort by timestamp descending, take first 10
-    return items
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-      .slice(0, 10);
+    return items.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()).slice(0, 10);
   }, [diaryActivity, goalUpdates]);
 
   if (feedItems.length === 0) {
@@ -116,10 +129,16 @@ export const ClientActivityFeed = () => {
             return (
               <Link
                 key={`${item.type}-${item.id}`}
-                to={item.clientRosterId ? `/dashboard/clients/${item.clientRosterId}` : '/dashboard/clients'}
+                to={
+                  item.clientRosterId
+                    ? `/dashboard/clients/${item.clientRosterId}`
+                    : '/dashboard/clients'
+                }
                 className="flex items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-muted/50"
               >
-                <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted ${item.iconColor}`}>
+                <div
+                  className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted ${item.iconColor}`}
+                >
                   <IconComponent className="h-3.5 w-3.5" />
                 </div>
                 <div className="min-w-0 flex-1">

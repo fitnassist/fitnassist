@@ -8,9 +8,7 @@ interface ProfileHeroProps {
 }
 
 export function ProfileHero({ trainer }: ProfileHeroProps) {
-  const locationText = [trainer.city, getPostcodeArea(trainer.postcode)]
-    .filter(Boolean)
-    .join(' ');
+  const locationText = [trainer.city, getPostcodeArea(trainer.postcode)].filter(Boolean).join(' ');
   const rateDisplay = formatRate(trainer.hourlyRateMin, trainer.hourlyRateMax);
 
   return (
@@ -18,11 +16,7 @@ export function ProfileHero({ trainer }: ProfileHeroProps) {
       {/* Cover Image */}
       <div className="relative h-64 sm:h-80 lg:h-96 w-full overflow-hidden">
         {trainer.coverImageUrl ? (
-          <img
-            src={trainer.coverImageUrl}
-            alt=""
-            className="h-full w-full object-cover"
-          />
+          <img src={trainer.coverImageUrl} alt="" className="h-full w-full object-cover" />
         ) : (
           <div className="h-full w-full bg-gradient-to-br from-[#20415c] to-[#5a0c30]" />
         )}

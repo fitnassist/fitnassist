@@ -20,9 +20,7 @@ const getInitials = (name: string) =>
 export const UserCard = ({ name, handle, avatarUrl, profileUrl, children }: UserCardProps) => {
   const avatarContent = (
     <Avatar className="h-10 w-10">
-      {avatarUrl ? (
-        <AvatarImage src={avatarUrl} alt={name} />
-      ) : null}
+      {avatarUrl ? <AvatarImage src={avatarUrl} alt={name} /> : null}
       <AvatarFallback>{getInitials(name)}</AvatarFallback>
     </Avatar>
   );
@@ -30,9 +28,7 @@ export const UserCard = ({ name, handle, avatarUrl, profileUrl, children }: User
   const nameContent = (
     <div className="min-w-0">
       <p className="text-sm font-medium truncate">{name}</p>
-      {handle && (
-        <p className="text-xs text-muted-foreground truncate">@{handle}</p>
-      )}
+      {handle && <p className="text-xs text-muted-foreground truncate">@{handle}</p>}
     </div>
   );
 
@@ -54,11 +50,7 @@ export const UserCard = ({ name, handle, avatarUrl, profileUrl, children }: User
         <div className="min-w-0 flex-1">{nameContent}</div>
       )}
 
-      {children && (
-        <div className="ml-auto flex shrink-0 items-center gap-2">
-          {children}
-        </div>
-      )}
+      {children && <div className="ml-auto flex shrink-0 items-center gap-2">{children}</div>}
     </div>
   );
 };

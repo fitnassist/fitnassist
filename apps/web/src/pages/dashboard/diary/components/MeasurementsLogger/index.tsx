@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { Ruler, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, ConfirmDialog } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Input,
+  ConfirmDialog,
+} from '@/components/ui';
 import { useLogMeasurements, useDeleteDiaryEntry } from '@/api/diary';
 import { formatMeasurement } from '../../diary.utils';
 
@@ -56,12 +64,17 @@ export const MeasurementsLogger = ({ date, entry, unitPreference }: Measurements
     if (Object.keys(data).length === 0) return;
     logMeasurements.mutate(
       { date, ...data },
-      { onSuccess: () => { setValues({}); setExpanded(false); } }
+      {
+        onSuccess: () => {
+          setValues({});
+          setExpanded(false);
+        },
+      },
     );
   };
 
   const filledCount = currentMeasurements
-    ? FIELDS.filter(f => currentMeasurements[f.key] != null).length
+    ? FIELDS.filter((f) => currentMeasurements[f.key] != null).length
     : 0;
 
   return (
@@ -72,7 +85,9 @@ export const MeasurementsLogger = ({ date, entry, unitPreference }: Measurements
             <Ruler className="h-4 w-4 text-green-500" />
             Measurements
             {filledCount > 0 && (
-              <span className="text-xs font-normal text-muted-foreground">({filledCount} logged)</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                ({filledCount} logged)
+              </span>
             )}
           </CardTitle>
           <div className="flex items-center gap-1">
@@ -115,7 +130,10 @@ export const MeasurementsLogger = ({ date, entry, unitPreference }: Measurements
               if (val == null) return null;
               return (
                 <span key={key} className="text-muted-foreground">
-                  {label}: <span className="font-medium text-foreground">{formatMeasurement(val, unitPreference)}</span>
+                  {label}:{' '}
+                  <span className="font-medium text-foreground">
+                    {formatMeasurement(val, unitPreference)}
+                  </span>
                 </span>
               );
             })}
@@ -134,7 +152,7 @@ export const MeasurementsLogger = ({ date, entry, unitPreference }: Measurements
                   min="0"
                   placeholder={isImperial ? 'inches' : 'cm'}
                   value={values[key] ?? ''}
-                  onChange={(e) => setValues(prev => ({ ...prev, [key]: e.target.value }))}
+                  onChange={(e) => setValues((prev) => ({ ...prev, [key]: e.target.value }))}
                   className="flex-1"
                 />
                 {currentMeasurements?.[key] != null && (
@@ -144,11 +162,7 @@ export const MeasurementsLogger = ({ date, entry, unitPreference }: Measurements
                 )}
               </div>
             ))}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={logMeasurements.isPending}
-            >
+            <Button type="submit" className="w-full" disabled={logMeasurements.isPending}>
               {currentMeasurements ? 'Update' : 'Log'}
             </Button>
           </form>

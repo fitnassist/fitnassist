@@ -32,11 +32,7 @@ export const RecipeCard = ({ recipe, onDelete, isDeleting }: RecipeCardProps) =>
           {/* Image / Placeholder */}
           <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
             {recipe.imageUrl ? (
-              <img
-                src={recipe.imageUrl}
-                alt={recipe.name}
-                className="w-full h-full object-cover"
-              />
+              <img src={recipe.imageUrl} alt={recipe.name} className="w-full h-full object-cover" />
             ) : (
               <UtensilsCrossed className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
             )}
@@ -84,9 +80,7 @@ export const RecipeCard = ({ recipe, onDelete, isDeleting }: RecipeCardProps) =>
                     {recipe.carbsG != null && (
                       <span className="text-amber-600">C: {recipe.carbsG}g</span>
                     )}
-                    {recipe.fatG != null && (
-                      <span className="text-red-600">F: {recipe.fatG}g</span>
-                    )}
+                    {recipe.fatG != null && <span className="text-red-600">F: {recipe.fatG}g</span>}
                   </div>
                 )}
               </div>
@@ -114,14 +108,10 @@ export const RecipeCard = ({ recipe, onDelete, isDeleting }: RecipeCardProps) =>
             {recipe.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {recipe.tags.slice(0, 4).map((tag) => (
-                  <Badge key={tag}>
-                    {tag}
-                  </Badge>
+                  <Badge key={tag}>{tag}</Badge>
                 ))}
                 {recipe.tags.length > 4 && (
-                  <Badge variant="secondary">
-                    +{recipe.tags.length - 4} more
-                  </Badge>
+                  <Badge variant="secondary">+{recipe.tags.length - 4} more</Badge>
                 )}
               </div>
             )}

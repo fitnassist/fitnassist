@@ -36,7 +36,12 @@ interface ClientPlansProps {
   isDisconnected?: boolean;
 }
 
-export const ClientPlans = ({ clientId, workoutPlanAssignments, mealPlanAssignments, isDisconnected }: ClientPlansProps) => {
+export const ClientPlans = ({
+  clientId,
+  workoutPlanAssignments,
+  mealPlanAssignments,
+  isDisconnected,
+}: ClientPlansProps) => {
   const assignWorkout = useAssignWorkoutPlan();
   const unassignWorkout = useUnassignWorkoutPlan();
   const assignMeal = useAssignMealPlan();
@@ -45,32 +50,36 @@ export const ClientPlans = ({ clientId, workoutPlanAssignments, mealPlanAssignme
   const { data: workoutPlanData } = useWorkoutPlans({ limit: 50 });
   const { data: mealPlanData } = useMealPlans({ limit: 50 });
 
-  const workoutPlanOptions: SelectOption[] = (workoutPlanData?.plans ?? []).map(p => ({
+  const workoutPlanOptions: SelectOption[] = (workoutPlanData?.plans ?? []).map((p) => ({
     value: p.id,
     label: p.name,
   }));
 
-  const mealPlanOptions: SelectOption[] = (mealPlanData?.plans ?? []).map(p => ({
+  const mealPlanOptions: SelectOption[] = (mealPlanData?.plans ?? []).map((p) => ({
     value: p.id,
     label: p.name,
   }));
 
   const selectedWorkoutPlans: SelectOption[] = workoutPlanAssignments
-    .filter(a => a.workoutPlan)
-    .map(a => ({ value: a.workoutPlan!.id, label: a.workoutPlan!.name }));
+    .filter((a) => a.workoutPlan)
+    .map((a) => ({ value: a.workoutPlan!.id, label: a.workoutPlan!.name }));
 
   const selectedMealPlans: SelectOption[] = mealPlanAssignments
-    .filter(a => a.mealPlan)
-    .map(a => ({ value: a.mealPlan!.id, label: a.mealPlan!.name }));
+    .filter((a) => a.mealPlan)
+    .map((a) => ({ value: a.mealPlan!.id, label: a.mealPlan!.name }));
 
-  const currentWorkoutIds = new Set(selectedWorkoutPlans.map(o => o.value));
-  const currentMealIds = new Set(selectedMealPlans.map(o => o.value));
+  const currentWorkoutIds = new Set(selectedWorkoutPlans.map((o) => o.value));
+  const currentMealIds = new Set(selectedMealPlans.map((o) => o.value));
 
   const handleWorkoutChange = (options: readonly SelectOption[]) => {
-    const newIds = new Set(options.map(o => o.value));
+    const newIds = new Set(options.map((o) => o.value));
     for (const opt of options) {
       if (!currentWorkoutIds.has(opt.value)) {
-        assignWorkout.mutate({ clientRosterId: clientId, workoutPlanId: opt.value, planName: opt.label });
+        assignWorkout.mutate({
+          clientRosterId: clientId,
+          workoutPlanId: opt.value,
+          planName: opt.label,
+        });
       }
     }
     for (const id of currentWorkoutIds) {
@@ -81,7 +90,7 @@ export const ClientPlans = ({ clientId, workoutPlanAssignments, mealPlanAssignme
   };
 
   const handleMealChange = (options: readonly SelectOption[]) => {
-    const newIds = new Set(options.map(o => o.value));
+    const newIds = new Set(options.map((o) => o.value));
     for (const opt of options) {
       if (!currentMealIds.has(opt.value)) {
         assignMeal.mutate({ clientRosterId: clientId, mealPlanId: opt.value, planName: opt.label });
@@ -104,7 +113,11 @@ export const ClientPlans = ({ clientId, workoutPlanAssignments, mealPlanAssignme
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <label htmlFor="client-workout-plans" className="sr-only">
+            Workout plans
+          </label>
           <Select
+            inputId="client-workout-plans"
             isMulti
             options={workoutPlanOptions}
             value={selectedWorkoutPlans}
@@ -123,7 +136,11 @@ export const ClientPlans = ({ clientId, workoutPlanAssignments, mealPlanAssignme
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <label htmlFor="client-meal-plans" className="sr-only">
+            Meal plans
+          </label>
           <Select
+            inputId="client-meal-plans"
             isMulti
             options={mealPlanOptions}
             value={selectedMealPlans}

@@ -51,9 +51,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               <Button variant="outline" onClick={this.handleReset}>
                 Try again
               </Button>
-              <Button onClick={this.handleReload}>
-                Go home
-              </Button>
+              <Button onClick={this.handleReload}>Go home</Button>
             </div>
           </div>
         </div>

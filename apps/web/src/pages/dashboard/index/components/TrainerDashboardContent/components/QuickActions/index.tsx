@@ -84,9 +84,7 @@ export const QuickActions = ({ profileHandle, badgeCounts }: QuickActionsProps) 
             </div>
             <div>
               <p className="font-medium">Messages</p>
-              <p className="text-sm text-muted-foreground">
-                Chat with your connected trainees
-              </p>
+              <p className="text-sm text-muted-foreground">Chat with your connected trainees</p>
             </div>
           </div>
         </Link>

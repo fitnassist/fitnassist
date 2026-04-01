@@ -1,14 +1,20 @@
 import {
-  Layout, User, Briefcase, Image, Quote, FileText, Mail,
-  Type, Play, PoundSterling, HelpCircle, Megaphone, Share2, ShoppingBag,
+  Layout,
+  User,
+  Briefcase,
+  Image,
+  Quote,
+  FileText,
+  Mail,
+  Type,
+  Play,
+  PoundSterling,
+  HelpCircle,
+  Megaphone,
+  Share2,
+  ShoppingBag,
 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Button,
-} from '@/components/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Button } from '@/components/ui';
 import { useAddSection } from '@/api/website';
 import { SECTION_TYPES } from '../../website.constants';
 import type { AddSectionInput } from '@fitnassist/schemas';
@@ -42,7 +48,7 @@ export const AddSectionDialog = ({ open, onOpenChange }: AddSectionDialogProps) 
     const config = SECTION_TYPES.find((s) => s.type === type);
     addSection.mutate(
       { type, title: config?.label ?? type },
-      { onSuccess: () => onOpenChange(false) }
+      { onSuccess: () => onOpenChange(false) },
     );
   };
 

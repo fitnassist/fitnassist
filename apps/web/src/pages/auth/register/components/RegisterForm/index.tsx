@@ -9,7 +9,7 @@ import { signUp } from '@/lib/auth-client';
 import { trpc } from '@/lib/trpc';
 import type { RegisterFormProps } from './RegisterForm.types';
 
-const inputClass = "bg-white/10 border-white/20 text-white placeholder:text-white/40";
+const inputClass = 'bg-white/10 border-white/20 text-white placeholder:text-white/40';
 
 export function RegisterForm({ onSuccess, referralCode }: RegisterFormProps) {
   const [error, setError] = useState<string | null>(null);
@@ -69,9 +69,7 @@ export function RegisterForm({ onSuccess, referralCode }: RegisterFormProps) {
   if (isSuccess) {
     return (
       <div className="text-center space-y-4">
-        <div className="text-primary font-medium">
-          Registration successful!
-        </div>
+        <div className="text-primary font-medium">Registration successful!</div>
         <p className="text-sm text-white/60">
           Please check your email to verify your account before signing in.
         </p>
@@ -81,14 +79,13 @@ export function RegisterForm({ onSuccess, referralCode }: RegisterFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      {error && (
-        <div className="bg-red-500/20 text-red-200 text-sm p-3 rounded-md">
-          {error}
-        </div>
-      )}
+      {error && <div className="bg-red-500/20 text-red-200 text-sm p-3 rounded-md">{error}</div>}
 
       <div>
-        <label htmlFor="name" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+        <label
+          htmlFor="name"
+          className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2"
+        >
           Name
         </label>
         <Input
@@ -99,13 +96,14 @@ export function RegisterForm({ onSuccess, referralCode }: RegisterFormProps) {
           {...register('name')}
           disabled={isLoading}
         />
-        {errors.name && (
-          <p className="text-sm text-red-300 mt-1">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="text-sm text-red-300 mt-1">{errors.name.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+        <label
+          htmlFor="email"
+          className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2"
+        >
           Email Address
         </label>
         <Input
@@ -116,13 +114,14 @@ export function RegisterForm({ onSuccess, referralCode }: RegisterFormProps) {
           {...register('email')}
           disabled={isLoading}
         />
-        {errors.email && (
-          <p className="text-sm text-red-300 mt-1">{errors.email.message}</p>
-        )}
+        {errors.email && <p className="text-sm text-red-300 mt-1">{errors.email.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+        <label
+          htmlFor="password"
+          className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2"
+        >
           Password
         </label>
         <div className="relative">
@@ -143,16 +142,17 @@ export function RegisterForm({ onSuccess, referralCode }: RegisterFormProps) {
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-sm text-red-300 mt-1">{errors.password.message}</p>
-        )}
+        {errors.password && <p className="text-sm text-red-300 mt-1">{errors.password.message}</p>}
         <p className="text-xs text-white/40 mt-1">
           At least 8 characters with uppercase, lowercase, and a number
         </p>
       </div>
 
       <div>
-        <label htmlFor="confirmPassword" className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2">
+        <label
+          htmlFor="confirmPassword"
+          className="block text-xs font-semibold uppercase tracking-wider text-white/80 mb-2"
+        >
           Confirm Password
         </label>
         <div className="relative">

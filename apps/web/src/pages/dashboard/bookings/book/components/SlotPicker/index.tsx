@@ -39,7 +39,7 @@ export const SlotPicker = ({ slots, selectedSlot, onSelect, isLoading }: SlotPic
             'px-3 py-2 rounded-lg border text-sm font-medium transition-colors',
             selectedSlot === slot.startTime
               ? 'bg-primary text-primary-foreground border-primary'
-              : 'hover:bg-primary/5 hover:border-primary/30'
+              : 'hover:bg-primary/5 hover:border-primary/30',
           )}
         >
           {slot.startTime}

@@ -14,14 +14,11 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
       case 'new_message': {
         const { connectionId, message } = lastEvent;
 
-        utils.message.getThread.setData(
-          { connectionId },
-          (old) => {
-            if (!old) return old;
-            if (old.some((m) => m.id === message.id)) return old;
-            return [...old, message];
-          }
-        );
+        utils.message.getThread.setData({ connectionId }, (old) => {
+          if (!old) return old;
+          if (old.some((m) => m.id === message.id)) return old;
+          return [...old, message];
+        });
 
         utils.message.getConnections.invalidate();
         utils.message.getUnreadCount.invalidate();
@@ -112,7 +109,15 @@ export const useSseEvents = (lastEvent: SseEvent | null) => {
         const { notification } = lastEvent;
 
         // Invalidate order queries when order-related notifications arrive
-        if (['NEW_ORDER', 'ORDER_CONFIRMED', 'ORDER_SHIPPED', 'ORDER_DELIVERED', 'ORDER_REFUNDED'].includes(notification.type)) {
+        if (
+          [
+            'NEW_ORDER',
+            'ORDER_CONFIRMED',
+            'ORDER_SHIPPED',
+            'ORDER_DELIVERED',
+            'ORDER_REFUNDED',
+          ].includes(notification.type)
+        ) {
           utils.order.myOrders.invalidate();
           utils.order.trainerOrders.invalidate();
         }

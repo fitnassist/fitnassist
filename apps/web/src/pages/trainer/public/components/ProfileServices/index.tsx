@@ -22,9 +22,7 @@ export const ProfileServices = ({ services }: ProfileServicesProps) => {
       <CardContent>
         <div className="flex flex-wrap gap-2">
           {services.map((service) => (
-            <Badge key={service}>
-              {getServiceLabel(service)}
-            </Badge>
+            <Badge key={service}>{getServiceLabel(service)}</Badge>
           ))}
         </div>
       </CardContent>

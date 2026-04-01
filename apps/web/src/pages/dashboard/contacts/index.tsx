@@ -8,10 +8,6 @@ import { EmptyContacts, ContactsTabs } from './components';
 
 export const ContactsPage = () => {
   const { isTrainer } = useAuth();
-
-  if (isTrainer) {
-    return <Navigate to={routes.dashboardClients} replace />;
-  }
   const {
     isLoading,
     hasAnyContacts,
@@ -21,6 +17,10 @@ export const ContactsPage = () => {
     counts,
     userType,
   } = useContacts();
+
+  if (isTrainer) {
+    return <Navigate to={routes.dashboardClients} replace />;
+  }
 
   if (isLoading) {
     return (
@@ -34,16 +34,14 @@ export const ContactsPage = () => {
     );
   }
 
-  const description = userType === 'trainer'
-    ? 'View and message your connected trainees.'
-    : 'View your connection requests and connected trainers.';
+  const description =
+    userType === 'trainer'
+      ? 'View and message your connected trainees.'
+      : 'View your connection requests and connected trainers.';
 
   return (
     <PageLayout>
-      <PageLayout.Header
-        title="My Contacts"
-        description={description}
-      />
+      <PageLayout.Header title="My Contacts" description={description} />
       <PageLayout.Content>
         {!hasAnyContacts ? (
           <EmptyContacts userType={userType} />

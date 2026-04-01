@@ -1,4 +1,12 @@
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from 'recharts';
 import { format } from 'date-fns';
 import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
@@ -24,10 +32,12 @@ interface MoodChartProps {
 
 export const MoodChart = ({ data }: MoodChartProps) => {
   if (data.length === 0) {
-    return <p className="py-8 text-center text-sm text-muted-foreground">No mood data for this period</p>;
+    return (
+      <p className="py-8 text-center text-sm text-muted-foreground">No mood data for this period</p>
+    );
   }
 
-  const chartData = data.map(d => ({
+  const chartData = data.map((d) => ({
     label: format(new Date(d.date), 'MMM d'),
     value: MOOD_VALUES[d.level] ?? 3,
   }));

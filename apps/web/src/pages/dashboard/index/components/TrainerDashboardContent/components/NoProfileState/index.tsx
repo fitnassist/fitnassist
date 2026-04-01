@@ -7,9 +7,7 @@ export const NoProfileState = () => (
     <Card>
       <CardHeader>
         <CardTitle>Complete Your Profile</CardTitle>
-        <CardDescription>
-          Set up your trainer profile to start attracting clients.
-        </CardDescription>
+        <CardDescription>Set up your trainer profile to start attracting clients.</CardDescription>
       </CardHeader>
       <CardContent>
         <Link to={routes.trainerProfileCreate}>

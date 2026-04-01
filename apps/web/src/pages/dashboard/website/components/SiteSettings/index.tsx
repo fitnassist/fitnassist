@@ -68,11 +68,7 @@ const SubdomainSettings = ({ website }: SiteSettingsProps) => {
           <div>
             <Label htmlFor="subdomain">Your website URL</Label>
             <div className="flex items-center gap-1 mt-1">
-              <Input
-                id="subdomain"
-                {...register('subdomain')}
-                className="max-w-[200px]"
-              />
+              <Input id="subdomain" {...register('subdomain')} className="max-w-[200px]" />
               <span className="text-sm text-muted-foreground">.sites.fitnassist.co</span>
             </div>
             {errors.subdomain && (
@@ -108,7 +104,8 @@ const LogoSettings = ({ website }: SiteSettingsProps) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Upload a logo to display in your site header. If no logo is set, your display name will be shown instead.
+          Upload a logo to display in your site header. If no logo is set, your display name will be
+          shown instead.
         </p>
         <ImageUpload
           value={logoUrl}
@@ -164,11 +161,7 @@ const PublishSettings = ({ website }: SiteSettingsProps) => {
 
         {isPublished ? (
           <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowUnpublish(true)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowUnpublish(true)}>
               Unpublish
             </Button>
             <ConfirmDialog
@@ -200,10 +193,7 @@ const SeoSettings = ({ website }: SiteSettingsProps) => {
   const { uploadImage, deleteFile } = useWebsiteUpload();
   const [ogImageUrl, setOgImageUrl] = useState<string>(website.ogImageUrl || '');
 
-  const {
-    register,
-    handleSubmit,
-  } = useForm({
+  const { register, handleSubmit } = useForm({
     resolver: zodResolver(updateWebsiteSettingsSchema),
     defaultValues: {
       seoTitle: website.seoTitle ?? '',

@@ -26,6 +26,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck 2>&1 | grep -v "packages/database/src/generated/zod" || true
 
+      - name: Format check
+        run: npm run format:check -w @fitnassist/web
+
       - name: Lint
         run: npm run lint -w @fitnassist/web
 
@@ -36,12 +39,6 @@ jobs:
     name: E2E
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
-      BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-      BETTER_AUTH_URL: http://localhost:3001
-      FRONTEND_URL: http://localhost:3000
-      VITE_API_URL: http://localhost:3001
-      NODE_ENV: test
       CI: true
     steps:
       - uses: actions/checkout@v4
@@ -56,9 +53,44 @@ jobs:
       - name: Generate Prisma client & Zod schemas
         run: npm run db:generate
 
+      - name: Create Neon branch
+        id: neon
+        uses: neondatabase/create-branch-action@v6
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_name: ci/pr-${{ github.event.pull_request.number || github.sha }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+
       - name: Push schema to test database
         run: npx prisma db push --skip-generate
         working-directory: packages/database
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url_pooled }}
+
+      - name: Create .env files
+        run: |
+          echo "DATABASE_URL=${{ steps.neon.outputs.db_url_pooled }}" > apps/api/.env
+          echo "BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}" >> apps/api/.env
+          echo "BETTER_AUTH_URL=http://localhost:3001" >> apps/api/.env
+          echo "FRONTEND_URL=http://localhost:3000" >> apps/api/.env
+          echo "NODE_ENV=test" >> apps/api/.env
+          echo "VITE_API_URL=http://localhost:3001" > apps/web/.env
+
+      - name: Seed test database
+        run: |
+          npx tsx apps/api/src/server.ts &
+          API_PID=$!
+          sleep 5
+          npm run db:seed
+          kill $API_PID || true
+          sleep 2
+          lsof -ti:3001 | xargs kill -9 2>/dev/null || true
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url_pooled }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: http://localhost:3001
+          FRONTEND_URL: http://localhost:3000
+          NODE_ENV: test
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -66,6 +98,12 @@ jobs:
 
       - name: Run E2E tests
         run: npm run e2e -w @fitnassist/web
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url_pooled }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: http://localhost:3001
+          FRONTEND_URL: http://localhost:3000
+          VITE_API_URL: http://localhost:3001
 
       - name: Upload Playwright report
         if: failure()
@@ -74,3 +112,11 @@ jobs:
           name: playwright-report
           path: apps/web/playwright-report/
           retention-days: 7
+
+      - name: Delete Neon branch
+        if: always()
+        run: |
+          npm i -g neonctl@latest
+          neonctl branches delete ${{ steps.neon.outputs.branch_id }} --project-id ${{ vars.NEON_PROJECT_ID }}
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
