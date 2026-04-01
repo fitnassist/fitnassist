@@ -128,12 +128,16 @@ export const TrainerList = ({
           {total === 1 ? 'trainer' : 'trainers'} found
         </p>
         <div className="w-48">
+          <label htmlFor="sort-by-select" className="sr-only">
+            Sort by
+          </label>
           <Select
             value={availableSortOptions.find((o) => o.value === sortBy) || availableSortOptions[0]}
             onChange={(opt) => onSortByChange((opt?.value as SortBy) || 'newest')}
             options={availableSortOptions}
             isClearable={false}
             placeholder="Sort by..."
+            inputId="sort-by-select"
           />
         </div>
       </div>

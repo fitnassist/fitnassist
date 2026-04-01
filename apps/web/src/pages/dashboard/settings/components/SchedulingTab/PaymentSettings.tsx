@@ -306,10 +306,14 @@ export const PaymentSettings = () => {
           </div>
           <div className="grid gap-3">
             <div className="flex items-center gap-3">
-              <Label className="text-xs text-muted-foreground w-40 shrink-0">
+              <Label
+                className="text-xs text-muted-foreground w-40 shrink-0"
+                htmlFor="full-refund-hours"
+              >
                 Full refund if cancelled
               </Label>
               <Select
+                inputId="full-refund-hours"
                 options={FULL_REFUND_OPTIONS}
                 value={
                   FULL_REFUND_OPTIONS.find((o) => o.value === String(policy.fullRefundHours)) ??
@@ -323,10 +327,14 @@ export const PaymentSettings = () => {
               <span className="text-xs text-muted-foreground">before session</span>
             </div>
             <div className="flex items-center gap-3">
-              <Label className="text-xs text-muted-foreground w-40 shrink-0">
+              <Label
+                className="text-xs text-muted-foreground w-40 shrink-0"
+                htmlFor="partial-refund-hours"
+              >
                 Partial refund if cancelled
               </Label>
               <Select
+                inputId="partial-refund-hours"
                 options={PARTIAL_REFUND_OPTIONS}
                 value={
                   PARTIAL_REFUND_OPTIONS.find(
@@ -342,10 +350,14 @@ export const PaymentSettings = () => {
             </div>
             {policy.partialRefundHours > 0 && (
               <div className="flex items-center gap-3">
-                <Label className="text-xs text-muted-foreground w-40 shrink-0">
+                <Label
+                  className="text-xs text-muted-foreground w-40 shrink-0"
+                  htmlFor="partial-refund-percent"
+                >
                   Partial refund amount
                 </Label>
                 <Select
+                  inputId="partial-refund-percent"
                   options={PARTIAL_PERCENT_OPTIONS}
                   value={
                     PARTIAL_PERCENT_OPTIONS.find(

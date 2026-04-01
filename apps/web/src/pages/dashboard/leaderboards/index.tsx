@@ -72,7 +72,11 @@ export const LeaderboardsPage = () => {
           {/* Filters */}
           <div className="flex flex-wrap gap-3">
             <div className="w-48">
+              <label htmlFor="leaderboard-type" className="sr-only">
+                Leaderboard category
+              </label>
               <Select
+                inputId="leaderboard-type"
                 options={TYPE_OPTIONS}
                 value={TYPE_OPTIONS.find((o) => o.value === type)}
                 onChange={(opt) => opt && setType(opt.value as LeaderboardType)}
@@ -81,7 +85,11 @@ export const LeaderboardsPage = () => {
             </div>
             {showPeriod && (
               <div className="w-40">
+                <label htmlFor="leaderboard-period" className="sr-only">
+                  Leaderboard period
+                </label>
                 <Select
+                  inputId="leaderboard-period"
                   options={PERIOD_OPTIONS}
                   value={PERIOD_OPTIONS.find((o) => o.value === period)}
                   onChange={(opt) => opt && setPeriod(opt.value as LeaderboardPeriod)}

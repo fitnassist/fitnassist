@@ -221,12 +221,15 @@ export const ActivityLogger = ({ date, entries }: ActivityLoggerProps) => {
             <input type="hidden" {...register('date')} value={date} />
 
             <div>
-              <label className="mb-1 block text-xs font-medium">Activity Type</label>
+              <label htmlFor="activity-type" className="mb-1 block text-xs font-medium">
+                Activity Type
+              </label>
               <Controller
                 name="activityType"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="activity-type"
                     options={activityTypeSelectOptions}
                     value={activityTypeSelectOptions.find((o) => o.value === field.value) ?? null}
                     onChange={(opt) => field.onChange(opt?.value ?? 'RUN')}

@@ -79,12 +79,13 @@ export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label>Source</Label>
+        <Label htmlFor="gallery-source">Source</Label>
         <Controller
           name="sourceType"
           control={control}
           render={({ field }) => (
             <Select
+              inputId="gallery-source"
               options={SOURCE_OPTIONS}
               value={SOURCE_OPTIONS.find((o) => o.value === field.value) || null}
               onChange={(option) => field.onChange(option?.value || 'profile')}

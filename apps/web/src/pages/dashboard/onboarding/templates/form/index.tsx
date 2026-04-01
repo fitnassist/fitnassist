@@ -116,7 +116,11 @@ const SortableQuestion = ({
           />
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="w-full sm:w-48">
+              <label htmlFor={`question-type-${question.id}`} className="sr-only">
+                Question type
+              </label>
               <Select
+                inputId={`question-type-${question.id}`}
                 value={QUESTION_TYPE_OPTIONS.find((o) => o.value === question.type)}
                 onChange={(opt) => updateQuestion(qIndex, 'type', opt?.value as QuestionType)}
                 options={QUESTION_TYPE_OPTIONS}

@@ -289,8 +289,11 @@ export const MealPlanFormPage = () => {
 
                         <div className="grid grid-cols-2 gap-2">
                           <div>
-                            <Label className="text-xs">Day</Label>
+                            <Label className="text-xs" htmlFor={`meal-plan-day-${recipe.tempId}`}>
+                              Day
+                            </Label>
                             <Select
+                              inputId={`meal-plan-day-${recipe.tempId}`}
                               options={DAY_OPTIONS}
                               value={
                                 recipe.dayOfWeek != null
@@ -312,8 +315,11 @@ export const MealPlanFormPage = () => {
                             />
                           </div>
                           <div>
-                            <Label className="text-xs">Meal</Label>
+                            <Label className="text-xs" htmlFor={`meal-plan-meal-${recipe.tempId}`}>
+                              Meal
+                            </Label>
                             <Select
+                              inputId={`meal-plan-meal-${recipe.tempId}`}
                               options={MEAL_TYPE_OPTIONS}
                               value={
                                 recipe.mealType

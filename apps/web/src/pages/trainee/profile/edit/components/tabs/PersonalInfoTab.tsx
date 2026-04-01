@@ -233,12 +233,13 @@ export const PersonalInfoTab = ({ profile }: PersonalInfoTabProps) => {
             </div>
 
             <div>
-              <Label>Gender</Label>
+              <Label htmlFor="edit-gender">Gender</Label>
               <Controller
                 name="gender"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="edit-gender"
                     options={genderOptions}
                     value={genderOptions.find((o) => o.value === field.value) || null}
                     onChange={(opt: SelectOption | null) => field.onChange(opt?.value || undefined)}

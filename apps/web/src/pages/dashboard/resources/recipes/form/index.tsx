@@ -256,6 +256,8 @@ export const RecipeFormPage = () => {
                     name={`ingredients.${index}.unit`}
                     render={({ field }) => (
                       <Select
+                        inputId={`ingredient-unit-${index}`}
+                        aria-label={`Unit for ingredient ${index + 1}`}
                         options={UNIT_OPTIONS}
                         value={UNIT_OPTIONS.find((o) => o.value === field.value) ?? null}
                         onChange={(opt) => field.onChange(opt?.value ?? '')}

@@ -71,8 +71,11 @@ export const ReportDialog = ({ reviewId, open, onClose }: ReportDialogProps) => 
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label className="mb-2 block">Reason</Label>
+            <Label className="mb-2 block" htmlFor="report-reason">
+              Reason
+            </Label>
             <Select
+              inputId="report-reason"
               value={REASON_OPTIONS.find((o) => o.value === reason) || null}
               onChange={(opt) => {
                 if (opt) {

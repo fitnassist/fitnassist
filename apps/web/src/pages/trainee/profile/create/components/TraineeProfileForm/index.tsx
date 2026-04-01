@@ -201,12 +201,13 @@ export const TraineeProfileForm = () => {
             </div>
 
             <div>
-              <Label>Gender</Label>
+              <Label htmlFor="create-gender">Gender</Label>
               <Controller
                 name="gender"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="create-gender"
                     options={genderOptions}
                     value={genderOptions.find((o) => o.value === field.value) || null}
                     onChange={(opt: SelectOption | null) => field.onChange(opt?.value || undefined)}
@@ -396,12 +397,13 @@ export const TraineeProfileForm = () => {
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label>Experience Level</Label>
+              <Label htmlFor="create-experience-level">Experience Level</Label>
               <Controller
                 name="experienceLevel"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="create-experience-level"
                     options={experienceOptions}
                     value={experienceOptions.find((o) => o.value === field.value) || null}
                     onChange={(opt: SelectOption | null) => field.onChange(opt?.value || undefined)}
@@ -413,12 +415,13 @@ export const TraineeProfileForm = () => {
             </div>
 
             <div>
-              <Label>Activity Level</Label>
+              <Label htmlFor="create-activity-level">Activity Level</Label>
               <Controller
                 name="activityLevel"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="create-activity-level"
                     options={activityOptions}
                     value={activityOptions.find((o) => o.value === field.value) || null}
                     onChange={(opt: SelectOption | null) => field.onChange(opt?.value || undefined)}

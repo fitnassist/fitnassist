@@ -116,7 +116,11 @@ export const ClientOverview = ({
               ) : (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <div className="w-40">
+                    <label htmlFor="client-status" className="sr-only">
+                      Client status
+                    </label>
                     <Select
+                      inputId="client-status"
                       value={STATUS_OPTIONS.find((o) => o.value === client.status)}
                       onChange={(opt) => onStatusChange(opt?.value as ActiveClientStatus)}
                       options={STATUS_OPTIONS}

@@ -113,12 +113,13 @@ export const FitnessTab = ({ profile }: FitnessTabProps) => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label>Experience Level</Label>
+              <Label htmlFor="edit-experience-level">Experience Level</Label>
               <Controller
                 name="experienceLevel"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="edit-experience-level"
                     options={experienceOptions}
                     value={experienceOptions.find((o) => o.value === field.value) || null}
                     onChange={(opt: SelectOption | null) => field.onChange(opt?.value || undefined)}
@@ -130,12 +131,13 @@ export const FitnessTab = ({ profile }: FitnessTabProps) => {
             </div>
 
             <div>
-              <Label>Activity Level</Label>
+              <Label htmlFor="edit-activity-level">Activity Level</Label>
               <Controller
                 name="activityLevel"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="edit-activity-level"
                     options={activityOptions}
                     value={activityOptions.find((o) => o.value === field.value) || null}
                     onChange={(opt: SelectOption | null) => field.onChange(opt?.value || undefined)}

@@ -137,12 +137,15 @@ export const WorkoutLogger = ({ date, entries }: WorkoutLoggerProps) => {
 
             {planOptions.length > 0 && (
               <div>
-                <label className="mb-1 block text-xs font-medium">Workout Plan (optional)</label>
+                <label htmlFor="workout-plan" className="mb-1 block text-xs font-medium">
+                  Workout Plan (optional)
+                </label>
                 <Controller
                   name="workoutPlanId"
                   control={control}
                   render={({ field }) => (
                     <Select
+                      inputId="workout-plan"
                       options={planOptions}
                       value={planOptions.find((o) => o.value === field.value) ?? null}
                       onChange={(opt) => {

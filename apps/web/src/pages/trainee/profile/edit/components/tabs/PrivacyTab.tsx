@@ -29,29 +29,37 @@ const SettingRow = ({
   description,
   value,
   onChange,
+  settingKey,
 }: {
   label: string;
   description: string;
   value: VisibilityLevel;
   onChange: (value: VisibilityLevel) => void;
-}) => (
-  <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
-    <div className="space-y-0.5">
-      <Label className="text-sm font-medium">{label}</Label>
-      <p className="text-xs text-muted-foreground">{description}</p>
+  settingKey: string;
+}) => {
+  const selectId = `privacy-${settingKey}`;
+  return (
+    <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="space-y-0.5">
+        <Label className="text-sm font-medium" htmlFor={selectId}>
+          {label}
+        </Label>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </div>
+      <div className="w-full sm:w-48">
+        <Select
+          inputId={selectId}
+          options={visibilitySelectOptions}
+          value={visibilitySelectOptions.find((opt) => opt.value === value)}
+          onChange={(opt) => {
+            if (opt) onChange(opt.value as VisibilityLevel);
+          }}
+          menuPlacement="auto"
+        />
+      </div>
     </div>
-    <div className="w-full sm:w-48">
-      <Select
-        options={visibilitySelectOptions}
-        value={visibilitySelectOptions.find((opt) => opt.value === value)}
-        onChange={(opt) => {
-          if (opt) onChange(opt.value as VisibilityLevel);
-        }}
-        menuPlacement="auto"
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 export const PrivacyTab = () => {
   const { data: settings, isLoading } = usePrivacySettings();
@@ -120,6 +128,7 @@ export const PrivacyTab = () => {
             {SECTION_PRIVACY_SETTINGS.map((setting) => (
               <SettingRow
                 key={setting.key}
+                settingKey={setting.key}
                 label={setting.label}
                 description={setting.description}
                 value={localSettings[setting.key] as VisibilityLevel}
@@ -146,6 +155,7 @@ export const PrivacyTab = () => {
             {TREND_PRIVACY_SETTINGS.map((setting) => (
               <SettingRow
                 key={setting.key}
+                settingKey={setting.key}
                 label={setting.label}
                 description={setting.description}
                 value={localSettings[setting.key] as VisibilityLevel}

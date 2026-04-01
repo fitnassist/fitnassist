@@ -113,7 +113,11 @@ export const ClientPlans = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <label htmlFor="client-workout-plans" className="sr-only">
+            Workout plans
+          </label>
           <Select
+            inputId="client-workout-plans"
             isMulti
             options={workoutPlanOptions}
             value={selectedWorkoutPlans}
@@ -132,7 +136,11 @@ export const ClientPlans = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <label htmlFor="client-meal-plans" className="sr-only">
+            Meal plans
+          </label>
           <Select
+            inputId="client-meal-plans"
             isMulti
             options={mealPlanOptions}
             value={selectedMealPlans}

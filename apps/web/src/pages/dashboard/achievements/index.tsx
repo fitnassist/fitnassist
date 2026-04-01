@@ -114,7 +114,11 @@ export const AchievementsPage = () => {
 
           {/* Filter */}
           <div className="w-48">
+            <label htmlFor="badge-category-filter" className="sr-only">
+              Badge category
+            </label>
             <Select
+              inputId="badge-category-filter"
               options={CATEGORY_OPTIONS}
               value={CATEGORY_OPTIONS.find((o) => o.value === filterCategory)}
               onChange={(opt) => opt && setFilterCategory(opt.value as BadgeCategory | 'ALL')}

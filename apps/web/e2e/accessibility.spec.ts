@@ -19,14 +19,7 @@ test.describe('Accessibility - Public Pages', () => {
       await page.goto(pg.path, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(2000);
 
-      const builder = new AxeBuilder({ page }).disableRules(['color-contrast']);
-
-      // react-select generates inputs without proper label association
-      if (pg.path === '/trainers') {
-        builder.exclude('[class*="dummyInput"]');
-      }
-
-      const results = await builder.analyze();
+      const results = await new AxeBuilder({ page }).disableRules(['color-contrast']).analyze();
       expect(results.violations).toEqual([]);
     });
   }

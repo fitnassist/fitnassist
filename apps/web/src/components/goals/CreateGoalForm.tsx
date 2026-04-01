@@ -138,12 +138,13 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
       {goalType === 'TARGET' && (
         <>
           <div>
-            <Label>Track via</Label>
+            <Label htmlFor="goal-track-via">Track via</Label>
             <Controller
               name="entryType"
               control={control}
               render={({ field }) => (
                 <Select
+                  inputId="goal-track-via"
                   className="mt-1.5"
                   value={targetEntryOptions.find((o) => o.value === field.value) ?? null}
                   onChange={(opt) => {
@@ -157,12 +158,13 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
 
           {fieldOptions && fieldOptions.length > 1 && (
             <div>
-              <Label>Measurement</Label>
+              <Label htmlFor="goal-measurement">Measurement</Label>
               <Controller
                 name="entryField"
                 control={control}
                 render={({ field }) => (
                   <Select
+                    inputId="goal-measurement"
                     className="mt-1.5"
                     value={fieldOptions.find((o) => o.value === field.value) ?? null}
                     onChange={(opt) => {
@@ -195,12 +197,13 @@ export const CreateGoalForm = ({ clientRosterId, onSuccess, onCancel }: CreateGo
       {goalType === 'HABIT' && (
         <>
           <div>
-            <Label>What counts as doing it?</Label>
+            <Label htmlFor="goal-habit-entry-type">What counts as doing it?</Label>
             <Controller
               name="habitEntryType"
               control={control}
               render={({ field }) => (
                 <Select
+                  inputId="goal-habit-entry-type"
                   className="mt-1.5"
                   value={habitOptions.find((o) => o.value === field.value) ?? null}
                   onChange={(opt) => {

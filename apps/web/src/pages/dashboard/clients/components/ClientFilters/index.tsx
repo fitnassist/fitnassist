@@ -41,7 +41,11 @@ export const ClientFilters = ({
         />
       </div>
       <div className="w-full sm:w-48">
+        <label htmlFor="client-status-filter" className="sr-only">
+          Client status
+        </label>
         <Select
+          inputId="client-status-filter"
           value={STATUS_OPTIONS.find((o) => o.value === (status || '')) || STATUS_OPTIONS[0]}
           onChange={(opt) => onStatusChange((opt?.value as ActiveClientStatus) || undefined)}
           options={STATUS_OPTIONS}
