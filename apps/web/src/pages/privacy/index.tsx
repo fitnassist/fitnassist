@@ -120,11 +120,11 @@ export const PrivacyPolicyPage = () => {
             </ul>
             <p className="mt-2">
               You can exercise these rights through your{' '}
-              <Link to={routes.dashboardSettings} className="text-coral hover:underline">
+              <Link to={routes.dashboardSettings} className="text-coral underline">
                 account settings
               </Link>{' '}
               or by contacting us through our{' '}
-              <Link to={routes.support} className="text-coral hover:underline">
+              <Link to={routes.support} className="text-coral underline">
                 support page
               </Link>
               .
@@ -152,7 +152,7 @@ export const PrivacyPolicyPage = () => {
             <h2 className="text-xl font-semibold text-foreground">10. Contact Us</h2>
             <p className="mt-2">
               If you have any questions about this Privacy Policy, please{' '}
-              <Link to={routes.support} className="text-coral hover:underline">
+              <Link to={routes.support} className="text-coral underline">
                 contact us
               </Link>
               .

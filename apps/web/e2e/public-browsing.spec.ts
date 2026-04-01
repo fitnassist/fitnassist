@@ -4,7 +4,7 @@ test.describe('Public Browsing', () => {
   test('home page loads with hero and CTAs', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.getByRole('link', { name: /find.*trainer/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /find.*trainer/i }).first()).toBeVisible();
   });
 
   test('navigate to trainers search page', async ({ page }) => {

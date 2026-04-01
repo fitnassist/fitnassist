@@ -18,6 +18,9 @@ export function RegisterPage() {
 
   return (
     <div className="w-full max-w-sm mx-auto">
+      <h1 className="text-2xl font-light uppercase tracking-wider text-white text-center mb-8">
+        Create Account
+      </h1>
       {referralCode && referrerInfo && (
         <div className="mb-6 bg-primary/10 border border-primary/20 rounded-lg p-4 text-center">
           <Gift className="h-5 w-5 text-primary mx-auto mb-2" />

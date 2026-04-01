@@ -42,7 +42,7 @@ export function MainLayout() {
             <Logo />
 
             {/* Desktop nav */}
-            <nav className="hidden sm:flex items-center gap-4">
+            <nav aria-label="Main navigation" className="hidden sm:flex items-center gap-4">
               <Button
                 variant="ghost"
                 size="icon"
@@ -141,7 +141,7 @@ export function MainLayout() {
             mobileMenuOpen ? 'max-h-64' : 'max-h-0',
           )}
         >
-          <div className="px-4 py-3 space-y-1">
+          <nav aria-label="Mobile navigation" className="px-4 py-3 space-y-1">
             <Link
               to={routes.trainers}
               className="block px-3 py-2 rounded-md text-sm font-semibold uppercase tracking-wider text-white/80 hover:bg-white/10 hover:text-white"
@@ -196,7 +196,7 @@ export function MainLayout() {
                 </Link>
               </>
             )}
-          </div>
+          </nav>
         </div>
       </header>
 
@@ -213,7 +213,7 @@ export function MainLayout() {
                 {new Date().getFullYear()} Fitnassist. All rights reserved.
               </p>
             </div>
-            <nav className="flex gap-8 sm:gap-12">
+            <nav aria-label="Footer navigation" className="flex gap-8 sm:gap-12">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wider text-white/70">
                   Product

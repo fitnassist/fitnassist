@@ -132,7 +132,7 @@ export const TermsOfServicePage = () => {
             <h2 className="text-xl font-semibold text-foreground">10. Termination</h2>
             <p className="mt-2">
               You may delete your account at any time through your{' '}
-              <Link to={routes.dashboardSettings} className="text-coral hover:underline">
+              <Link to={routes.dashboardSettings} className="text-coral underline">
                 account settings
               </Link>
               . We reserve the right to suspend or terminate your account if you violate these
@@ -161,7 +161,7 @@ export const TermsOfServicePage = () => {
             <h2 className="text-xl font-semibold text-foreground">13. Contact Us</h2>
             <p className="mt-2">
               If you have any questions about these Terms of Service, please{' '}
-              <Link to={routes.support} className="text-coral hover:underline">
+              <Link to={routes.support} className="text-coral underline">
                 contact us
               </Link>
               .

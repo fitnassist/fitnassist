@@ -196,6 +196,7 @@ export const TrainersPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen md:h-screen pt-16">
+      <h1 className="sr-only">Find a Trainer</h1>
       {/* Search Bar */}
       <SearchBar
         location={location}

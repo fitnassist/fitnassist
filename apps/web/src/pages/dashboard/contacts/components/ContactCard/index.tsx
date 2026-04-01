@@ -67,7 +67,7 @@ export const ContactCard = ({
       <div className="flex items-center gap-2">
         {profileHandle && (
           <Link to={routes.trainerPublicProfile(profileHandle)}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" aria-label="View Profile">
               <User className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">View Profile</span>
             </Button>
@@ -75,21 +75,21 @@ export const ContactCard = ({
         )}
         {traineeUserId && (
           <Link to={routes.traineeProfileView(traineeUserId)}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" aria-label="View Profile">
               <User className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">View Profile</span>
             </Button>
           </Link>
         )}
         <Link to={routes.dashboardMessageThread(contact.id)}>
-          <Button size="sm">
+          <Button size="sm" aria-label="Message">
             <MessageCircle className="h-4 w-4 sm:mr-2" />
             <span className="hidden sm:inline">Message</span>
           </Button>
         </Link>
         {isTrainee && (
           <Link to={routes.dashboardBookingsBook(contact.trainer.id)}>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" aria-label="Book">
               <Calendar className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Book</span>
             </Button>
@@ -99,6 +99,7 @@ export const ContactCard = ({
           <Button
             variant="outline"
             size="sm"
+            aria-label="Disconnect"
             disabled={isDisconnecting}
             onClick={() => setShowDisconnectDialog(true)}
           >

@@ -116,6 +116,7 @@ const ConversationRow = ({
               onClick={(e) => e.stopPropagation()}
             >
               <MoreVertical className="h-4 w-4" />
+              <span className="sr-only">More options</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

@@ -110,7 +110,7 @@ export const IntegrationCard = ({ meta, connection }: IntegrationCardProps) => {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-semibold">{meta.name}</h3>
+                <h2 className="font-semibold">{meta.name}</h2>
                 {isConnected && <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>}
               </div>
               <p className="text-sm text-muted-foreground mt-0.5">{meta.description}</p>

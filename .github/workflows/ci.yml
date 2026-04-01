@@ -69,16 +69,26 @@ jobs:
 
       - name: Create .env files
         run: |
-          cat > apps/api/.env <<EOF
-          DATABASE_URL=${{ steps.neon.outputs.db_url_pooled }}
-          BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}
-          BETTER_AUTH_URL=http://localhost:3001
-          FRONTEND_URL=http://localhost:3000
-          NODE_ENV=test
-          EOF
-          cat > apps/web/.env <<EOF
-          VITE_API_URL=http://localhost:3001
-          EOF
+          echo "DATABASE_URL=${{ steps.neon.outputs.db_url_pooled }}" > apps/api/.env
+          echo "BETTER_AUTH_SECRET=${{ secrets.BETTER_AUTH_SECRET }}" >> apps/api/.env
+          echo "BETTER_AUTH_URL=http://localhost:3001" >> apps/api/.env
+          echo "FRONTEND_URL=http://localhost:3000" >> apps/api/.env
+          echo "NODE_ENV=test" >> apps/api/.env
+          echo "VITE_API_URL=http://localhost:3001" > apps/web/.env
+
+      - name: Seed test database
+        run: |
+          npx tsx apps/api/src/server.ts &
+          API_PID=$!
+          sleep 5
+          npm run db:seed
+          kill $API_PID || true
+        env:
+          DATABASE_URL: ${{ steps.neon.outputs.db_url_pooled }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: http://localhost:3001
+          FRONTEND_URL: http://localhost:3000
+          NODE_ENV: test
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium

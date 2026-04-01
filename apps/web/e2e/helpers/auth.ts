@@ -1,4 +1,17 @@
-import type { APIRequestContext, Browser } from '@playwright/test';
+import type { APIRequestContext, Browser, Page } from '@playwright/test';
+
+// Seeded test users (created by npm run db:seed)
+export const TEST_TRAINER = {
+  email: 'test-trainer@fitnassist.dev',
+  password: 'Test1234!',
+  name: 'Coach Sarah',
+};
+
+export const TEST_TRAINEE = {
+  email: 'test-trainee@fitnassist.dev',
+  password: 'Test1234!',
+  name: 'Alex Johnson',
+};
 
 interface RegisterInput {
   name: string;
@@ -43,11 +56,11 @@ export const authenticatedContext = async (browser: Browser, cookies: string[]) 
 
   for (const cookie of cookies) {
     const [nameValue] = cookie.split(';');
-    const [name, value] = nameValue.split('=');
+    const [name, value] = nameValue!.split('=');
     await context.addCookies([
       {
-        name: name.trim(),
-        value: value.trim(),
+        name: name!.trim(),
+        value: value!.trim(),
         domain: 'localhost',
         path: '/',
       },
@@ -55,4 +68,12 @@ export const authenticatedContext = async (browser: Browser, cookies: string[]) 
   }
 
   return context;
+};
+
+export const loginViaUI = async (page: Page, email: string, password: string) => {
+  await page.goto('/login');
+  await page.getByLabel(/email/i).fill(email);
+  await page.locator('input[type="password"]').fill(password);
+  await page.getByRole('button', { name: /sign in|log in/i }).click();
+  await page.waitForURL(/\/dashboard/, { timeout: 15000 });
 };

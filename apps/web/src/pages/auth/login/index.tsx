@@ -15,6 +15,9 @@ export function LoginPage() {
 
   return (
     <div className="w-full max-w-sm mx-auto">
+      <h1 className="text-2xl font-light uppercase tracking-wider text-white text-center mb-8">
+        Sign In
+      </h1>
       {message === 'password_reset' && (
         <div className="bg-green-500/20 text-green-200 text-sm p-3 rounded-md mb-6">
           Your password has been reset. Please sign in with your new password.

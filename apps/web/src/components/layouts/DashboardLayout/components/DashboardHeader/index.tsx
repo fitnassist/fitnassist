@@ -20,7 +20,7 @@ export const DashboardHeader = ({ isDark, onToggleTheme }: DashboardHeaderProps)
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
           <Logo />
-          <nav className="flex items-center gap-2">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"

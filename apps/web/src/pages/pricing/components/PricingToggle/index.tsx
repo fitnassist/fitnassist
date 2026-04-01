@@ -21,6 +21,7 @@ export const PricingToggle = ({ billingPeriod, onChange }: PricingToggleProps) =
       </span>
       <button
         type="button"
+        aria-label="Toggle annual pricing"
         onClick={() => onChange(isAnnual ? 'MONTHLY' : 'ANNUAL')}
         className={cn(
           'relative inline-flex h-7 w-12 items-center rounded-full transition-colors',

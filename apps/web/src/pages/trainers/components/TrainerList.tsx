@@ -111,7 +111,7 @@ export const TrainerList = ({
     return (
       <div className="p-8 text-center">
         <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-        <h3 className="font-medium text-lg mb-2">No trainers found</h3>
+        <h2 className="font-medium text-lg mb-2">No trainers found</h2>
         <p className="text-muted-foreground">
           Try adjusting your search location or filters to find trainers in your area.
         </p>
@@ -193,7 +193,7 @@ const TrainerCard = ({ trainer, isSelected, onSelect }: TrainerCardProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>
-              <h3 className="font-medium truncate">{trainer.displayName}</h3>
+              <h2 className="font-medium truncate">{trainer.displayName}</h2>
               {(trainer.city || trainer.postcode) && (
                 <p className="text-sm text-muted-foreground flex items-center gap-1">
                   <MapPin className="h-3 w-3" />

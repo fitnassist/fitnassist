@@ -166,7 +166,7 @@ export const PricingPage = () => {
           <p className="text-muted-foreground leading-relaxed mb-4">
             Use Fitnassist on your own or pair up with a trainer who can view your diary, set goals,
             and keep you accountable. Find out how Fitnassist can help you{' '}
-            <Link to={routes.trainers} className="text-coral hover:underline">
+            <Link to={routes.trainers} className="text-coral underline">
               reach your goals
             </Link>
             .
