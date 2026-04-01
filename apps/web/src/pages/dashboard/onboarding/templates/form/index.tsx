@@ -121,7 +121,6 @@ const SortableQuestion = ({
                 onChange={(opt) => updateQuestion(qIndex, 'type', opt?.value as QuestionType)}
                 options={QUESTION_TYPE_OPTIONS}
                 isClearable={false}
-                isSearchable={false}
               />
             </div>
             <div className="flex items-center gap-2">

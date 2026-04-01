@@ -115,8 +115,8 @@ jobs:
 
       - name: Delete Neon branch
         if: always()
-        uses: neondatabase/delete-branch-action@v3
-        with:
-          project_id: ${{ vars.NEON_PROJECT_ID }}
-          branch_name: ci/pr-${{ github.event.pull_request.number || github.sha }}
-          api_key: ${{ secrets.NEON_API_KEY }}
+        run: |
+          npm i -g neonctl@latest
+          neonctl branches delete ${{ steps.neon.outputs.branch_id }} --project-id ${{ vars.NEON_PROJECT_ID }}
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}

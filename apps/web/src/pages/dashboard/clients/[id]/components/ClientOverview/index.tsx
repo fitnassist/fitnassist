@@ -121,7 +121,6 @@ export const ClientOverview = ({
                       onChange={(opt) => onStatusChange(opt?.value as ActiveClientStatus)}
                       options={STATUS_OPTIONS}
                       isClearable={false}
-                      isSearchable={false}
                       isDisabled={isUpdating}
                     />
                   </div>

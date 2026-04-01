@@ -46,7 +46,6 @@ export const ClientFilters = ({
           onChange={(opt) => onStatusChange((opt?.value as ActiveClientStatus) || undefined)}
           options={STATUS_OPTIONS}
           isClearable={false}
-          isSearchable={false}
         />
       </div>
       <div className="flex items-center gap-2">

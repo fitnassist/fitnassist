@@ -47,7 +47,6 @@ const SettingRow = ({
         onChange={(opt) => {
           if (opt) onChange(opt.value as VisibilityLevel);
         }}
-        isSearchable={false}
         menuPlacement="auto"
       />
     </div>

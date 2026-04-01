@@ -133,7 +133,6 @@ export const TrainerList = ({
             onChange={(opt) => onSortByChange((opt?.value as SortBy) || 'newest')}
             options={availableSortOptions}
             isClearable={false}
-            isSearchable={false}
             placeholder="Sort by..."
           />
         </div>
