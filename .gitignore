@@ -37,6 +37,9 @@ packages/database/prisma/*.db-journal
 # TypeScript
 *.tsbuildinfo
 
+# Claude Code
+.claude/settings.local.json
+
 # Misc
 .turbo/
 .cache/
