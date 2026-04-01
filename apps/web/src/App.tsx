@@ -87,10 +87,10 @@ function App() {
                   <Route path={routes.pricing} element={<PricingPage />} />
                 </Route>
                 {/* Auth routes */}
+                <Route path="/select-role" element={<SelectRolePage />} />
                 <Route element={<AuthLayout />}>
                   <Route path={routes.register} element={<RegisterPage />} />
                   <Route path={routes.login} element={<LoginPage />} />
-                  <Route path="/select-role" element={<SelectRolePage />} />
                   <Route path={routes.forgotPassword} element={<ForgotPasswordPage />} />
                   <Route path={routes.resetPassword} element={<ResetPasswordPage />} />
                 </Route>
