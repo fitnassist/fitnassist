@@ -22,9 +22,12 @@ const roles = [
 
 export const SelectRolePage = () => {
   const navigate = useNavigate();
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const [selected, setSelected] = useState<'TRAINEE' | 'TRAINER'>('TRAINEE');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Wait for session to load
+  if (isPending) return null;
 
   // If not authenticated, redirect to login
   if (!session?.user) {
