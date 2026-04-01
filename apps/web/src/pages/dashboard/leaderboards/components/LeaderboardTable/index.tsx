@@ -21,7 +21,12 @@ interface LeaderboardTableProps {
 }
 
 const getInitials = (name: string) =>
-  name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+  name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
 const RankBadge = ({ rank }: { rank: number }) => {
   if (rank === 1) return <Trophy className="h-5 w-5 text-yellow-500" />;
@@ -52,36 +57,34 @@ export const LeaderboardTable = ({
         <span className="text-right">{valueLabel}</span>
       </div>
       {entries.map((entry) => {
-        const profileUrl = entry.handle
-          ? routes.traineePublicProfile(entry.handle)
-          : undefined;
+        const profileUrl = entry.handle ? routes.traineePublicProfile(entry.handle) : undefined;
 
         return (
           <div
             key={entry.userId}
             className={cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-lg',
-              entry.isCurrentUser && 'bg-coral-50 dark:bg-coral-950/20 border border-coral-200 dark:border-coral-800',
-              entry.rank <= 3 && !entry.isCurrentUser && 'bg-muted/50'
+              entry.isCurrentUser &&
+                'bg-coral-50 dark:bg-coral-950/20 border border-coral-200 dark:border-coral-800',
+              entry.rank <= 3 && !entry.isCurrentUser && 'bg-muted/50',
             )}
           >
             <div className="w-7 flex justify-center">
               <RankBadge rank={entry.rank} />
             </div>
 
-            <Link
-              to={profileUrl ?? '#'}
-              className="flex items-center gap-2.5 flex-1 min-w-0"
-            >
+            <Link to={profileUrl ?? '#'} className="flex items-center gap-2.5 flex-1 min-w-0">
               <Avatar className="h-8 w-8">
                 {entry.avatarUrl && <AvatarImage src={entry.avatarUrl} alt={entry.name} />}
                 <AvatarFallback className="text-xs">{getInitials(entry.name)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className={cn(
-                  'text-sm font-medium truncate',
-                  entry.isCurrentUser && 'text-coral-600 dark:text-coral-400'
-                )}>
+                <p
+                  className={cn(
+                    'text-sm font-medium truncate',
+                    entry.isCurrentUser && 'text-coral-600 dark:text-coral-400',
+                  )}
+                >
                   {entry.name}
                   {entry.isCurrentUser && <span className="text-xs ml-1">(You)</span>}
                 </p>
@@ -91,11 +94,13 @@ export const LeaderboardTable = ({
               </div>
             </Link>
 
-            <span className={cn(
-              'text-sm font-semibold tabular-nums',
-              entry.rank === 1 && 'text-yellow-600 dark:text-yellow-400',
-              entry.isCurrentUser && 'text-coral-600 dark:text-coral-400'
-            )}>
+            <span
+              className={cn(
+                'text-sm font-semibold tabular-nums',
+                entry.rank === 1 && 'text-yellow-600 dark:text-yellow-400',
+                entry.isCurrentUser && 'text-coral-600 dark:text-coral-400',
+              )}
+            >
               {formatValue(entry.value)}
             </span>
           </div>

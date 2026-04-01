@@ -1,4 +1,13 @@
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+} from 'recharts';
 import { format } from 'date-fns';
 import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
@@ -36,22 +45,26 @@ interface MeasurementChartProps {
   unitPreference: 'METRIC' | 'IMPERIAL';
 }
 
-const cmToInches = (cm: number) => Math.round(cm / 2.54 * 10) / 10;
+const cmToInches = (cm: number) => Math.round((cm / 2.54) * 10) / 10;
 
 export const MeasurementChart = ({ data, unitPreference }: MeasurementChartProps) => {
   const isImperial = unitPreference === 'IMPERIAL';
   const unit = isImperial ? 'in' : 'cm';
 
   // Find which measurements have data
-  const fields = Object.keys(MEASUREMENT_LABELS).filter(field =>
-    data.some(d => (d as Record<string, unknown>)[field] != null)
+  const fields = Object.keys(MEASUREMENT_LABELS).filter((field) =>
+    data.some((d) => (d as Record<string, unknown>)[field] != null),
   );
 
   if (fields.length === 0) {
-    return <p className="py-8 text-center text-sm text-muted-foreground">No measurement data for this period</p>;
+    return (
+      <p className="py-8 text-center text-sm text-muted-foreground">
+        No measurement data for this period
+      </p>
+    );
   }
 
-  const chartData = data.map(d => {
+  const chartData = data.map((d) => {
     const point: Record<string, string | number> = {
       label: format(new Date(d.date), 'MMM d'),
     };
@@ -70,9 +83,13 @@ export const MeasurementChart = ({ data, unitPreference }: MeasurementChartProps
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
         <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}${unit}`} />
-        <Tooltip contentStyle={CHART_TOOLTIP_STYLE} itemStyle={{ color: '#fff' }} labelStyle={{ color: 'rgba(255,255,255,0.7)' }} />
+        <Tooltip
+          contentStyle={CHART_TOOLTIP_STYLE}
+          itemStyle={{ color: '#fff' }}
+          labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
+        />
         <Legend wrapperStyle={{ fontSize: 11 }} />
-        {fields.map(field => (
+        {fields.map((field) => (
           <Line
             key={field}
             type="monotone"

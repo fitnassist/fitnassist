@@ -22,7 +22,10 @@ export const BookingAnalytics = () => {
     upcoming: d.upcoming,
   }));
 
-  const totalBookings = chartData.reduce((sum, d) => sum + d.completed + d.cancelled + d.upcoming, 0);
+  const totalBookings = chartData.reduce(
+    (sum, d) => sum + d.completed + d.cancelled + d.upcoming,
+    0,
+  );
   const totalCompleted = chartData.reduce((sum, d) => sum + d.completed, 0);
   const avgPerWeek = chartData.length > 0 ? Math.round(totalBookings / chartData.length) : 0;
   const completionRate = totalBookings > 0 ? Math.round((totalCompleted / totalBookings) * 100) : 0;
@@ -59,7 +62,11 @@ export const BookingAnalytics = () => {
               <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="week" tick={{ fontSize: 11 }} className="text-muted-foreground" />
-                <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />
+                <YAxis
+                  tick={{ fontSize: 11 }}
+                  className="text-muted-foreground"
+                  allowDecimals={false}
+                />
                 <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
                 <Legend />
                 <Bar dataKey="completed" name="Completed" stackId="a" fill="hsl(170, 58%, 50%)" />

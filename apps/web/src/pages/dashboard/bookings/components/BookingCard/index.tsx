@@ -1,14 +1,38 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, MapPin, User, MoreVertical, X, Check, AlertTriangle, CalendarClock, MessageSquare, ArrowRight, Video, CreditCard, RotateCcw, Gift } from 'lucide-react';
 import {
-  Button, Badge, Card, CardContent,
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  Clock,
+  MapPin,
+  User,
+  MoreVertical,
+  X,
+  Check,
+  AlertTriangle,
+  CalendarClock,
+  MessageSquare,
+  ArrowRight,
+  Video,
+  CreditCard,
+  RotateCcw,
+  Gift,
+} from 'lucide-react';
+import {
+  Button,
+  Badge,
+  Card,
+  CardContent,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   ConfirmDialog,
 } from '@/components/ui';
 import {
-  useCancelBooking, useCompleteBooking, useNoShowBooking,
-  useConfirmBooking, useDeclineBooking,
+  useCancelBooking,
+  useCompleteBooking,
+  useNoShowBooking,
+  useConfirmBooking,
+  useDeclineBooking,
 } from '@/api/booking';
 import { routes } from '@/config/routes';
 
@@ -58,7 +82,10 @@ interface BookingCardProps {
   onViewSuggestions?: (bookingId: string) => void;
 }
 
-const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline'> = {
+const STATUS_VARIANTS: Record<
+  string,
+  'default' | 'secondary' | 'destructive' | 'success' | 'warning' | 'info' | 'outline'
+> = {
   PENDING: 'warning',
   CONFIRMED: 'info',
   DECLINED: 'destructive',
@@ -81,9 +108,15 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const formatPrice = (amount: number, currency: string = 'gbp') =>
-  new Intl.NumberFormat('en-GB', { style: 'currency', currency: currency.toUpperCase() }).format(amount / 100);
+  new Intl.NumberFormat('en-GB', { style: 'currency', currency: currency.toUpperCase() }).format(
+    amount / 100,
+  );
 
-const PaymentBadge = ({ payment }: { payment: { status: string; amount: number; currency: string; refundAmount?: number | null } }) => {
+const PaymentBadge = ({
+  payment,
+}: {
+  payment: { status: string; amount: number; currency: string; refundAmount?: number | null };
+}) => {
   switch (payment.status) {
     case 'SUCCEEDED':
       return (
@@ -126,8 +159,12 @@ const PaymentBadge = ({ payment }: { payment: { status: string; amount: number; 
 };
 
 export const BookingCard = ({
-  booking, isTrainer, currentUserId,
-  onSuggestAlternative, onReschedule, onViewSuggestions,
+  booking,
+  isTrainer,
+  currentUserId,
+  onSuggestAlternative,
+  onReschedule,
+  onViewSuggestions,
 }: BookingCardProps) => {
   const navigate = useNavigate();
   const [showCancel, setShowCancel] = useState(false);
@@ -149,19 +186,20 @@ export const BookingCard = ({
   // Determine if current user is the confirming party (not the initiator)
   const isConfirmingParty = booking.status === 'PENDING' && booking.initiatedBy !== currentUserId;
   const isInitiator = booking.status === 'PENDING' && booking.initiatedBy === currentUserId;
-  const pendingSuggestionCount = booking.suggestions?.filter((s) => s.status === 'PENDING').length ?? 0;
+  const pendingSuggestionCount =
+    booking.suggestions?.filter((s) => s.status === 'PENDING').length ?? 0;
 
-  const bookingDateIso = typeof booking.date === 'string'
-    ? booking.date.split('T')[0]
-    : new Date(booking.date).toISOString().split('T')[0];
-  const isSessionExpired = new Date(`${bookingDateIso}T${booking.endTime}:00`).getTime() < Date.now();
-  const isCallJoinable = new Date(`${bookingDateIso}T${booking.startTime}:00`).getTime() - 5 * 60_000 <= Date.now();
+  const bookingDateIso =
+    typeof booking.date === 'string'
+      ? booking.date.split('T')[0]
+      : new Date(booking.date).toISOString().split('T')[0];
+  const isSessionExpired =
+    new Date(`${bookingDateIso}T${booking.endTime}:00`).getTime() < Date.now();
+  const isCallJoinable =
+    new Date(`${bookingDateIso}T${booking.startTime}:00`).getTime() - 5 * 60_000 <= Date.now();
 
   const handleCancel = () => {
-    cancelMutation.mutate(
-      { id: booking.id },
-      { onSuccess: () => setShowCancel(false) }
-    );
+    cancelMutation.mutate({ id: booking.id }, { onSuccess: () => setShowCancel(false) });
   };
 
   const handleConfirm = () => {
@@ -169,23 +207,21 @@ export const BookingCard = ({
   };
 
   const handleDecline = () => {
-    declineMutation.mutate(
-      { id: booking.id },
-      { onSuccess: () => setShowDecline(false) }
-    );
+    declineMutation.mutate({ id: booking.id }, { onSuccess: () => setShowDecline(false) });
   };
 
   return (
     <>
-      <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => navigate(routes.dashboardBookingDetail(booking.id))}>
+      <Card
+        className="cursor-pointer hover:bg-accent/50 transition-colors"
+        onClick={() => navigate(routes.dashboardBookingDetail(booking.id))}
+      >
         <CardContent className="p-4">
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0 space-y-1.5">
               <div className="flex flex-wrap items-center gap-2">
                 <User className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <span className="font-medium text-sm">
-                  {isTrainer ? clientName : trainerName}
-                </span>
+                <span className="font-medium text-sm">{isTrainer ? clientName : trainerName}</span>
                 <Badge variant={STATUS_VARIANTS[booking.status] ?? 'secondary'}>
                   {STATUS_LABELS[booking.status] ?? booking.status}
                 </Badge>
@@ -195,9 +231,7 @@ export const BookingCard = ({
                     Video
                   </Badge>
                 )}
-                {booking.payment && (
-                  <PaymentBadge payment={booking.payment} />
-                )}
+                {booking.payment && <PaymentBadge payment={booking.payment} />}
                 {booking.isFreeSession && !booking.payment && (
                   <Badge variant="outline" className="gap-1 text-green-700 border-green-300">
                     <Gift className="h-3 w-3" />
@@ -210,7 +244,9 @@ export const BookingCard = ({
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-3.5 w-3.5 shrink-0" />
-                <span>{dateStr} {booking.startTime} - {booking.endTime}</span>
+                <span>
+                  {dateStr} {booking.startTime} - {booking.endTime}
+                </span>
                 <span className="text-xs">({booking.durationMin}min)</span>
               </div>
               {booking.location && (
@@ -223,7 +259,9 @@ export const BookingCard = ({
                 <p className="text-xs text-muted-foreground mt-1">{booking.notes}</p>
               )}
               {booking.cancellationReason && (
-                <p className="text-xs text-destructive mt-1">Reason: {booking.cancellationReason}</p>
+                <p className="text-xs text-destructive mt-1">
+                  Reason: {booking.cancellationReason}
+                </p>
               )}
               {booking.declineReason && (
                 <p className="text-xs text-destructive mt-1">Declined: {booking.declineReason}</p>
@@ -232,19 +270,29 @@ export const BookingCard = ({
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                   <ArrowRight className="h-3 w-3" />
                   <span>
-                    Rescheduled from {new Date(booking.rescheduledFrom.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} at {booking.rescheduledFrom.startTime}
+                    Rescheduled from{' '}
+                    {new Date(booking.rescheduledFrom.date).toLocaleDateString('en-GB', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}{' '}
+                    at {booking.rescheduledFrom.startTime}
                   </span>
                 </div>
               )}
               {booking.rescheduledTo && (
-                <p className="text-xs text-muted-foreground mt-1">This booking has been rescheduled</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  This booking has been rescheduled
+                </p>
               )}
             </div>
 
             <div className="flex shrink-0 items-center gap-2" onClick={(e) => e.stopPropagation()}>
               {/* Join Call button for confirmed video calls (hide if session ended) */}
-              {booking.status === 'CONFIRMED' && booking.sessionType === 'VIDEO_CALL' && booking.dailyRoomUrl && !isSessionExpired && (
-                isCallJoinable ? (
+              {booking.status === 'CONFIRMED' &&
+                booking.sessionType === 'VIDEO_CALL' &&
+                booking.dailyRoomUrl &&
+                !isSessionExpired &&
+                (isCallJoinable ? (
                   <Button
                     size="sm"
                     variant="default"
@@ -255,16 +303,11 @@ export const BookingCard = ({
                   </Button>
                 ) : (
                   <span className="text-xs text-muted-foreground">Opens 5 min before</span>
-                )
-              )}
+                ))}
               {/* Pending: confirm/decline buttons for the confirming party */}
               {isConfirmingParty && (
                 <>
-                  <Button
-                    size="sm"
-                    onClick={handleConfirm}
-                    disabled={confirmMutation.isPending}
-                  >
+                  <Button size="sm" onClick={handleConfirm} disabled={confirmMutation.isPending}>
                     <Check className="h-4 w-4 mr-1" />
                     Confirm
                   </Button>
@@ -291,11 +334,7 @@ export const BookingCard = ({
 
               {/* Pending suggestions badge for the initiator */}
               {isInitiator && pendingSuggestionCount > 0 && onViewSuggestions && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onViewSuggestions(booking.id)}
-                >
+                <Button size="sm" variant="outline" onClick={() => onViewSuggestions(booking.id)}>
                   <MessageSquare className="h-4 w-4 mr-1" />
                   {pendingSuggestionCount} suggestion{pendingSuggestionCount > 1 ? 's' : ''}
                 </Button>
@@ -312,7 +351,9 @@ export const BookingCard = ({
                   <DropdownMenuContent align="end">
                     {booking.status === 'CONFIRMED' && isTrainer && (
                       <>
-                        <DropdownMenuItem onClick={() => completeMutation.mutate({ id: booking.id })}>
+                        <DropdownMenuItem
+                          onClick={() => completeMutation.mutate({ id: booking.id })}
+                        >
                           <Check className="h-4 w-4 mr-2" />
                           Mark Complete
                         </DropdownMenuItem>
@@ -328,7 +369,10 @@ export const BookingCard = ({
                         Reschedule
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={() => setShowCancel(true)} className="text-destructive">
+                    <DropdownMenuItem
+                      onClick={() => setShowCancel(true)}
+                      className="text-destructive"
+                    >
                       <X className="h-4 w-4 mr-2" />
                       Cancel
                     </DropdownMenuItem>

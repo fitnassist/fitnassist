@@ -44,12 +44,14 @@ export const authenticatedContext = async (browser: Browser, cookies: string[]) 
   for (const cookie of cookies) {
     const [nameValue] = cookie.split(';');
     const [name, value] = nameValue.split('=');
-    await context.addCookies([{
-      name: name.trim(),
-      value: value.trim(),
-      domain: 'localhost',
-      path: '/',
-    }]);
+    await context.addCookies([
+      {
+        name: name.trim(),
+        value: value.trim(),
+        domain: 'localhost',
+        path: '/',
+      },
+    ]);
   }
 
   return context;

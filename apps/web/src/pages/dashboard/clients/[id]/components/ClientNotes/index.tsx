@@ -29,18 +29,12 @@ export const ClientNotes = ({ clientRosterId }: ClientNotesProps) => {
     const trimmed = content.trim();
     if (!trimmed) return;
 
-    addNote.mutate(
-      { clientRosterId, content: trimmed },
-      { onSuccess: () => setContent('') }
-    );
+    addNote.mutate({ clientRosterId, content: trimmed }, { onSuccess: () => setContent('') });
   };
 
   const handleDeleteNote = () => {
     if (!deleteNoteId) return;
-    deleteNote.mutate(
-      { id: deleteNoteId },
-      { onSuccess: () => setDeleteNoteId(null) }
-    );
+    deleteNote.mutate({ id: deleteNoteId }, { onSuccess: () => setDeleteNoteId(null) });
   };
 
   return (
@@ -62,9 +56,7 @@ export const ClientNotes = ({ clientRosterId }: ClientNotesProps) => {
               maxLength={2000}
             />
             <div className="flex items-center justify-between">
-              <p className="text-xs text-muted-foreground">
-                {content.length}/2000 characters
-              </p>
+              <p className="text-xs text-muted-foreground">{content.length}/2000 characters</p>
               <Button
                 onClick={handleAddNote}
                 disabled={!content.trim() || addNote.isPending}
@@ -87,10 +79,7 @@ export const ClientNotes = ({ clientRosterId }: ClientNotesProps) => {
           ) : notes && notes.length > 0 ? (
             <div className="space-y-3">
               {notes.map((note) => (
-                <div
-                  key={note.id}
-                  className="rounded-lg border p-3 space-y-2"
-                >
+                <div key={note.id} className="rounded-lg border p-3 space-y-2">
                   <p className="text-sm whitespace-pre-wrap">{note.content}</p>
                   <div className="flex items-center justify-between">
                     <p className="text-xs text-muted-foreground">
@@ -118,7 +107,9 @@ export const ClientNotes = ({ clientRosterId }: ClientNotesProps) => {
 
       <ConfirmDialog
         open={!!deleteNoteId}
-        onOpenChange={(open) => { if (!open) setDeleteNoteId(null); }}
+        onOpenChange={(open) => {
+          if (!open) setDeleteNoteId(null);
+        }}
         title="Delete Note"
         description="Are you sure you want to delete this note? This action cannot be undone."
         confirmLabel="Delete"

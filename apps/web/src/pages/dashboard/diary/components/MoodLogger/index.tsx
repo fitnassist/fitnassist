@@ -1,6 +1,14 @@
 import { useState } from 'react';
 import { SmilePlus, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Textarea, ConfirmDialog } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Textarea,
+  ConfirmDialog,
+} from '@/components/ui';
 import { useLogMood, useDeleteDiaryEntry } from '@/api/diary';
 import { MOOD_OPTIONS, getMoodEmoji, getMoodLabel } from '../../diary.utils';
 
@@ -20,7 +28,7 @@ export const MoodLogger = ({ date, entry }: MoodLoggerProps) => {
 
   const currentMood = entry?.moodEntry;
 
-  const handleSelect = (level: typeof MOOD_OPTIONS[number]['value']) => {
+  const handleSelect = (level: (typeof MOOD_OPTIONS)[number]['value']) => {
     logMood.mutate({ date, level, notes: notes || undefined });
   };
 
@@ -57,7 +65,9 @@ export const MoodLogger = ({ date, entry }: MoodLoggerProps) => {
       <CardContent className="flex flex-1 flex-col justify-end">
         {currentMood && (
           <div className="mb-3">
-            <p className="text-2xl">{getMoodEmoji(currentMood.level)} {getMoodLabel(currentMood.level)}</p>
+            <p className="text-2xl">
+              {getMoodEmoji(currentMood.level)} {getMoodLabel(currentMood.level)}
+            </p>
             {currentMood.notes && (
               <p className="mt-1 text-sm text-muted-foreground">{currentMood.notes}</p>
             )}

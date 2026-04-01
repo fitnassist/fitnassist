@@ -31,9 +31,7 @@ export const AboutSection = ({ section, trainer }: AboutSectionProps) => {
           </h2>
         )}
         {section.subtitle && (
-          <p className="mb-8 text-lg text-[hsl(var(--muted-foreground))]">
-            {section.subtitle}
-          </p>
+          <p className="mb-8 text-lg text-[hsl(var(--muted-foreground))]">{section.subtitle}</p>
         )}
 
         <div

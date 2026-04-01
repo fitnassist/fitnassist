@@ -23,14 +23,9 @@ export const SectionCard = ({
   const toggleVisibility = useToggleSectionVisibility();
   const config = SECTION_TYPES.find((s) => s.type === section.type);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: section.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: section.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -68,17 +63,8 @@ export const SectionCard = ({
         </div>
 
         <div className="flex items-center gap-1 flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={onToggleExpand}
-          >
-            {isExpanded ? (
-              <ChevronDown className="h-4 w-4" />
-            ) : (
-              <Pencil className="h-4 w-4" />
-            )}
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onToggleExpand}>
+            {isExpanded ? <ChevronDown className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
           </Button>
           <Button
             variant="ghost"
@@ -86,11 +72,7 @@ export const SectionCard = ({
             className="h-8 w-8"
             onClick={() => toggleVisibility.mutate({ sectionId: section.id })}
           >
-            {section.isVisible ? (
-              <Eye className="h-4 w-4" />
-            ) : (
-              <EyeOff className="h-4 w-4" />
-            )}
+            {section.isVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
           </Button>
           {section.type !== 'CONTACT' && (
             <Button

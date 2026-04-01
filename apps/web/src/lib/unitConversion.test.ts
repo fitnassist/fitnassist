@@ -70,7 +70,7 @@ describe('formatHeight', () => {
   });
 
   it('formats imperial', () => {
-    expect(formatHeight(180, 'IMPERIAL')).toBe("5'11\"");
+    expect(formatHeight(180, 'IMPERIAL')).toBe('5\'11"');
   });
 });
 

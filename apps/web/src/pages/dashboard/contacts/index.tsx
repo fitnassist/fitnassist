@@ -34,16 +34,14 @@ export const ContactsPage = () => {
     );
   }
 
-  const description = userType === 'trainer'
-    ? 'View and message your connected trainees.'
-    : 'View your connection requests and connected trainers.';
+  const description =
+    userType === 'trainer'
+      ? 'View and message your connected trainees.'
+      : 'View your connection requests and connected trainers.';
 
   return (
     <PageLayout>
-      <PageLayout.Header
-        title="My Contacts"
-        description={description}
-      />
+      <PageLayout.Header title="My Contacts" description={description} />
       <PageLayout.Content>
         {!hasAnyContacts ? (
           <EmptyContacts userType={userType} />

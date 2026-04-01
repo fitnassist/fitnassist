@@ -10,19 +10,13 @@ interface DiaryDatePickerProps {
 export const DiaryDatePicker = ({ date, onChange }: DiaryDatePickerProps) => {
   return (
     <div className="flex items-center justify-between gap-4">
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={() => onChange(prevDay(date))}
-      >
+      <Button variant="outline" size="icon" onClick={() => onChange(prevDay(date))}>
         <ChevronLeft className="h-4 w-4" />
       </Button>
 
       <div className="text-center">
         <p className="text-sm font-medium sm:text-base">{formatDisplayDate(date)}</p>
-        {isToday(date) && (
-          <p className="text-xs text-muted-foreground">Today</p>
-        )}
+        {isToday(date) && <p className="text-xs text-muted-foreground">Today</p>}
       </div>
 
       <Button

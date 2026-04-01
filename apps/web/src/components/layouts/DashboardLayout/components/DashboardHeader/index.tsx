@@ -28,11 +28,7 @@ export const DashboardHeader = ({ isDark, onToggleTheme }: DashboardHeaderProps)
               aria-label="Toggle theme"
               className="text-white/80 hover:text-white hover:bg-white/10"
             >
-              {isDark ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
             <NotificationBell />

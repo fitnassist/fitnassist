@@ -1,22 +1,17 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from 'react';
 
 interface HeroBannerProps {
   title: string;
   imageUrl: string;
-  size?: "default" | "small";
+  size?: 'default' | 'small';
   children?: ReactNode;
 }
 
-export const HeroBanner = ({
-  title,
-  imageUrl,
-  size = "default",
-  children,
-}: HeroBannerProps) => {
+export const HeroBanner = ({ title, imageUrl, size = 'default', children }: HeroBannerProps) => {
   return (
     <section
       className={`relative flex items-center justify-center overflow-hidden ${
-        size === "small" ? "min-h-[30vh]" : "min-h-[60vh]"
+        size === 'small' ? 'min-h-[30vh]' : 'min-h-[60vh]'
       }`}
     >
       <div

@@ -24,7 +24,12 @@ interface ContactCardProps {
   isDisconnecting?: boolean;
 }
 
-export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }: ContactCardProps) => {
+export const ContactCard = ({
+  contact,
+  variant,
+  onDisconnect,
+  isDisconnecting,
+}: ContactCardProps) => {
   const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
   const isTrainee = isTraineeContact(contact);
 
@@ -122,23 +127,21 @@ export const ContactCard = ({ contact, variant, onDisconnect, isDisconnecting }:
       <Card>
         <CardContent className="p-3 sm:p-4">
           <div className="flex items-center gap-3 sm:gap-4">
-            <Avatar className={`h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 ${variant === 'declined' ? 'opacity-50' : ''}`}>
-              {avatarUrl && (
-                <AvatarImage src={avatarUrl} alt={displayName} />
-              )}
-              <AvatarFallback>
-                {getInitials(displayName)}
-              </AvatarFallback>
+            <Avatar
+              className={`h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 ${variant === 'declined' ? 'opacity-50' : ''}`}
+            >
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
+              <AvatarFallback>{getInitials(displayName)}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div className="min-w-0">
-                  <p className={`font-medium truncate ${variant === 'declined' ? 'text-muted-foreground' : ''}`}>
+                  <p
+                    className={`font-medium truncate ${variant === 'declined' ? 'text-muted-foreground' : ''}`}
+                  >
                     {displayName}
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {getTimestamp()}
-                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{getTimestamp()}</p>
                 </div>
                 {renderActions()}
               </div>

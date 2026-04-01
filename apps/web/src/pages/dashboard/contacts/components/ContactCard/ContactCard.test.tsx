@@ -65,9 +65,7 @@ const mockTrainerConnectedContact: TrainerContact = {
 
 describe('ContactCard', () => {
   it('should render connected contact with message button', () => {
-    render(
-      <ContactCard contact={mockTraineeConnectedContact} variant="connected" />
-    );
+    render(<ContactCard contact={mockTraineeConnectedContact} variant="connected" />);
 
     expect(screen.getByText('John Smith')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /message/i })).toBeInTheDocument();
@@ -75,9 +73,7 @@ describe('ContactCard', () => {
   });
 
   it('should render pending contact with correct status', () => {
-    render(
-      <ContactCard contact={mockTraineePendingContact} variant="pending" />
-    );
+    render(<ContactCard contact={mockTraineePendingContact} variant="pending" />);
 
     expect(screen.getByText('Jane Doe')).toBeInTheDocument();
     expect(screen.getByText('Awaiting response')).toBeInTheDocument();
@@ -85,18 +81,14 @@ describe('ContactCard', () => {
   });
 
   it('should render pending contact message when present', () => {
-    render(
-      <ContactCard contact={mockTraineePendingContact} variant="pending" />
-    );
+    render(<ContactCard contact={mockTraineePendingContact} variant="pending" />);
 
     expect(screen.getByText('Your message:')).toBeInTheDocument();
     expect(screen.getByText('Hi, I would like to train with you!')).toBeInTheDocument();
   });
 
   it('should render declined contact', () => {
-    render(
-      <ContactCard contact={mockTraineeDeclinedContact} variant="declined" />
-    );
+    render(<ContactCard contact={mockTraineeDeclinedContact} variant="declined" />);
 
     expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     expect(screen.getByText('Declined')).toBeInTheDocument();
@@ -104,26 +96,20 @@ describe('ContactCard', () => {
   });
 
   it('should display avatar with initials as fallback', () => {
-    render(
-      <ContactCard contact={mockTraineePendingContact} variant="pending" />
-    );
+    render(<ContactCard contact={mockTraineePendingContact} variant="pending" />);
 
     expect(screen.getByText('JD')).toBeInTheDocument();
   });
 
   it('should show trainer name and timestamp info', () => {
-    render(
-      <ContactCard contact={mockTraineeConnectedContact} variant="connected" />
-    );
+    render(<ContactCard contact={mockTraineeConnectedContact} variant="connected" />);
 
     expect(screen.getByText('John Smith')).toBeInTheDocument();
     expect(screen.getByText(/connected/i)).toBeInTheDocument();
   });
 
   it('should render trainer perspective connected contact with message button', () => {
-    render(
-      <ContactCard contact={mockTrainerConnectedContact} variant="connected" />
-    );
+    render(<ContactCard contact={mockTrainerConnectedContact} variant="connected" />);
 
     expect(screen.getByText('Alice Trainee')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /message/i })).toBeInTheDocument();

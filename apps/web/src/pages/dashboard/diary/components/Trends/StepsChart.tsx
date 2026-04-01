@@ -25,7 +25,7 @@ export const StepsChart = ({ data, goalSteps = 10000 }: StepsChartProps) => {
     );
   }
 
-  const chartData = data.map(d => ({
+  const chartData = data.map((d) => ({
     label: format(new Date(d.date), 'MMM d'),
     steps: d.totalSteps,
   }));
@@ -35,7 +35,10 @@ export const StepsChart = ({ data, goalSteps = 10000 }: StepsChartProps) => {
       <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
         <XAxis dataKey="label" tick={{ fontSize: 11 }} />
-        <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : `${v}`} />
+        <YAxis
+          tick={{ fontSize: 11 }}
+          tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(0)}K` : `${v}`)}
+        />
         <Tooltip
           contentStyle={CHART_TOOLTIP_STYLE}
           itemStyle={{ color: '#fff' }}
@@ -43,9 +46,7 @@ export const StepsChart = ({ data, goalSteps = 10000 }: StepsChartProps) => {
           formatter={(v) => [`${Number(v).toLocaleString()} steps`, 'Steps']}
         />
         <Bar dataKey="steps" fill="#14b8a6" radius={[4, 4, 0, 0]} />
-        {goalSteps > 0 && (
-          <ReferenceLine y={goalSteps} stroke="#ef4444" strokeDasharray="5 5" />
-        )}
+        {goalSteps > 0 && <ReferenceLine y={goalSteps} stroke="#ef4444" strokeDasharray="5 5" />}
       </BarChart>
     </ResponsiveContainer>
   );

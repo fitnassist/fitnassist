@@ -39,10 +39,7 @@ export const CartDrawer = ({
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-50 bg-black/50"
-        onClick={() => onOpenChange(false)}
-      />
+      <div className="fixed inset-0 z-50 bg-black/50" onClick={() => onOpenChange(false)} />
 
       {/* Drawer */}
       <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-[hsl(var(--background))] shadow-xl">
@@ -72,7 +69,10 @@ export const CartDrawer = ({
           ) : (
             <div className="space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="flex gap-3 rounded-lg border border-[hsl(var(--border))] p-3">
+                <div
+                  key={item.id}
+                  className="flex gap-3 rounded-lg border border-[hsl(var(--border))] p-3"
+                >
                   {item.imageUrl ? (
                     <img
                       src={item.imageUrl}

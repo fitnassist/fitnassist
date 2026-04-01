@@ -7,7 +7,7 @@ export const useBooking = (id: string) => {
 export const useTrainerBookings = (startDate: string, endDate: string) => {
   return trpc.booking.listByDateRange.useQuery(
     { startDate, endDate },
-    { enabled: !!startDate && !!endDate, refetchInterval: 10_000 }
+    { enabled: !!startDate && !!endDate, refetchInterval: 10_000 },
   );
 };
 
@@ -18,7 +18,7 @@ export const useUpcomingBookings = () => {
 export const useClientRosterBookings = (clientRosterId: string) => {
   return trpc.booking.listByClientRoster.useQuery(
     { clientRosterId },
-    { enabled: !!clientRosterId }
+    { enabled: !!clientRosterId },
   );
 };
 
@@ -84,10 +84,7 @@ export const useRespondToSuggestion = () => {
 };
 
 export const useBookingSuggestions = (bookingId: string) => {
-  return trpc.booking.getSuggestions.useQuery(
-    { bookingId },
-    { enabled: !!bookingId }
-  );
+  return trpc.booking.getSuggestions.useQuery({ bookingId }, { enabled: !!bookingId });
 };
 
 export const useCancelBooking = () => {

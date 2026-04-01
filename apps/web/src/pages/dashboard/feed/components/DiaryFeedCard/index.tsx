@@ -36,26 +36,37 @@ interface DiaryFeedCardProps {
   moodEntry?: { level: string; notes: string | null } | null;
   sleepEntry?: { hoursSlept: number; quality: number | null } | null;
   stepsEntry?: { count: number } | null;
-  activityEntry?: { activityType: string; durationMinutes: number; distanceKm: number | null; caloriesBurned: number | null } | null;
+  activityEntry?: {
+    activityType: string;
+    durationMinutes: number;
+    distanceKm: number | null;
+    caloriesBurned: number | null;
+  } | null;
   workoutLogEntry?: { workoutPlan: { name: string } | null; notes: string | null } | null;
   foodEntryCount?: number;
 }
 
-const DIARY_TYPE_CONFIG: Record<string, { icon: React.ElementType; label: string; color: string }> = {
-  WEIGHT: { icon: Scale, label: 'Logged weight', color: 'text-blue-500' },
-  WATER: { icon: Droplets, label: 'Logged water', color: 'text-cyan-500' },
-  MEASUREMENT: { icon: Ruler, label: 'Logged measurements', color: 'text-purple-500' },
-  MOOD: { icon: Smile, label: 'Logged mood', color: 'text-yellow-500' },
-  SLEEP: { icon: Moon, label: 'Logged sleep', color: 'text-indigo-500' },
-  FOOD: { icon: Utensils, label: 'Logged food', color: 'text-green-500' },
-  WORKOUT_LOG: { icon: Dumbbell, label: 'Logged a workout', color: 'text-coral-500' },
-  PROGRESS_PHOTO: { icon: Camera, label: 'Added progress photos', color: 'text-pink-500' },
-  STEPS: { icon: Footprints, label: 'Logged steps', color: 'text-orange-500' },
-  ACTIVITY: { icon: Activity, label: 'Logged activity', color: 'text-emerald-500' },
-};
+const DIARY_TYPE_CONFIG: Record<string, { icon: React.ElementType; label: string; color: string }> =
+  {
+    WEIGHT: { icon: Scale, label: 'Logged weight', color: 'text-blue-500' },
+    WATER: { icon: Droplets, label: 'Logged water', color: 'text-cyan-500' },
+    MEASUREMENT: { icon: Ruler, label: 'Logged measurements', color: 'text-purple-500' },
+    MOOD: { icon: Smile, label: 'Logged mood', color: 'text-yellow-500' },
+    SLEEP: { icon: Moon, label: 'Logged sleep', color: 'text-indigo-500' },
+    FOOD: { icon: Utensils, label: 'Logged food', color: 'text-green-500' },
+    WORKOUT_LOG: { icon: Dumbbell, label: 'Logged a workout', color: 'text-coral-500' },
+    PROGRESS_PHOTO: { icon: Camera, label: 'Added progress photos', color: 'text-pink-500' },
+    STEPS: { icon: Footprints, label: 'Logged steps', color: 'text-orange-500' },
+    ACTIVITY: { icon: Activity, label: 'Logged activity', color: 'text-emerald-500' },
+  };
 
 const getInitials = (name: string) =>
-  name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2);
+  name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
 const getDiaryDetail = (props: DiaryFeedCardProps): string | null => {
   switch (props.type) {
@@ -70,7 +81,9 @@ const getDiaryDetail = (props: DiaryFeedCardProps): string | null => {
     case 'SLEEP':
       return props.sleepEntry?.hoursSlept != null ? `${props.sleepEntry.hoursSlept} hours` : null;
     case 'STEPS':
-      return props.stepsEntry?.count != null ? `${props.stepsEntry.count.toLocaleString()} steps` : null;
+      return props.stepsEntry?.count != null
+        ? `${props.stepsEntry.count.toLocaleString()} steps`
+        : null;
     case 'ACTIVITY': {
       if (!props.activityEntry?.activityType) return null;
       const parts = [
@@ -81,7 +94,9 @@ const getDiaryDetail = (props: DiaryFeedCardProps): string | null => {
       return parts.join(' · ');
     }
     case 'WORKOUT_LOG':
-      return props.workoutLogEntry?.workoutPlan?.name ?? (props.workoutLogEntry ? 'Free workout' : null);
+      return (
+        props.workoutLogEntry?.workoutPlan?.name ?? (props.workoutLogEntry ? 'Free workout' : null)
+      );
     case 'FOOD':
       return props.foodEntryCount ? `${props.foodEntryCount} items logged` : null;
     default:
@@ -122,9 +137,7 @@ export const DiaryFeedCard = (props: DiaryFeedCardProps) => {
             </Link>
             <span className="text-sm text-muted-foreground">{config.label}</span>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {formatRelativeTime(props.createdAt)}
-          </div>
+          <div className="text-xs text-muted-foreground">{formatRelativeTime(props.createdAt)}</div>
         </div>
 
         <div className={`shrink-0 ${config.color}`}>

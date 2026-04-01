@@ -94,13 +94,13 @@ export const MealPlanFormPage = () => {
           recipeName: mr.recipe.name,
           dayOfWeek: mr.dayOfWeek,
           mealType: mr.mealType,
-        }))
+        })),
       );
     }
   }, [existing, reset]);
 
   const addRecipe = (recipe: { id: string; name: string }) => {
-    setPlanRecipes(prev => [
+    setPlanRecipes((prev) => [
       ...prev,
       {
         tempId: `new-${Date.now()}-${Math.random()}`,
@@ -114,14 +114,16 @@ export const MealPlanFormPage = () => {
     setRecipeSearch('');
   };
 
-  const updateRecipe = (tempId: string, field: 'dayOfWeek' | 'mealType', value: number | string | null) => {
-    setPlanRecipes(prev =>
-      prev.map(r => r.tempId === tempId ? { ...r, [field]: value } : r)
-    );
+  const updateRecipe = (
+    tempId: string,
+    field: 'dayOfWeek' | 'mealType',
+    value: number | string | null,
+  ) => {
+    setPlanRecipes((prev) => prev.map((r) => (r.tempId === tempId ? { ...r, [field]: value } : r)));
   };
 
   const removeRecipe = (tempId: string) => {
-    setPlanRecipes(prev => prev.filter(r => r.tempId !== tempId));
+    setPlanRecipes((prev) => prev.filter((r) => r.tempId !== tempId));
   };
 
   const onSubmit = async (data: CreateMealPlanInput) => {
@@ -186,12 +188,10 @@ export const MealPlanFormPage = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                {...register('name')}
-                placeholder="e.g. High Protein Weekly Plan"
-              />
-              {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+              <Input id="name" {...register('name')} placeholder="e.g. High Protein Weekly Plan" />
+              {errors.name && (
+                <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
+              )}
             </div>
             <div>
               <Label htmlFor="description">Description</Label>
@@ -292,12 +292,20 @@ export const MealPlanFormPage = () => {
                             <Label className="text-xs">Day</Label>
                             <Select
                               options={DAY_OPTIONS}
-                              value={recipe.dayOfWeek != null ? DAY_OPTIONS.find(o => o.value === String(recipe.dayOfWeek)) ?? null : null}
-                              onChange={(opt) => updateRecipe(
-                                recipe.tempId,
-                                'dayOfWeek',
-                                opt ? parseInt(opt.value) : null
-                              )}
+                              value={
+                                recipe.dayOfWeek != null
+                                  ? (DAY_OPTIONS.find(
+                                      (o) => o.value === String(recipe.dayOfWeek),
+                                    ) ?? null)
+                                  : null
+                              }
+                              onChange={(opt) =>
+                                updateRecipe(
+                                  recipe.tempId,
+                                  'dayOfWeek',
+                                  opt ? parseInt(opt.value) : null,
+                                )
+                              }
                               placeholder="Any day"
                               isClearable
                               menuPlacement="auto"
@@ -307,12 +315,15 @@ export const MealPlanFormPage = () => {
                             <Label className="text-xs">Meal</Label>
                             <Select
                               options={MEAL_TYPE_OPTIONS}
-                              value={recipe.mealType ? MEAL_TYPE_OPTIONS.find(o => o.value === recipe.mealType) ?? null : null}
-                              onChange={(opt) => updateRecipe(
-                                recipe.tempId,
-                                'mealType',
-                                opt ? opt.value : null
-                              )}
+                              value={
+                                recipe.mealType
+                                  ? (MEAL_TYPE_OPTIONS.find((o) => o.value === recipe.mealType) ??
+                                    null)
+                                  : null
+                              }
+                              onChange={(opt) =>
+                                updateRecipe(recipe.tempId, 'mealType', opt ? opt.value : null)
+                              }
                               placeholder="Any meal"
                               isClearable
                               menuPlacement="auto"

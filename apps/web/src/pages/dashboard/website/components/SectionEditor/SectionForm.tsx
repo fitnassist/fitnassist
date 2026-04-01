@@ -58,9 +58,7 @@ export const SectionForm = ({ section }: SectionFormProps) => {
       return <SocialLinksForm sectionId={section.id} content={content} />;
     default:
       return (
-        <p className="text-sm text-muted-foreground">
-          No editor available for this section type.
-        </p>
+        <p className="text-sm text-muted-foreground">No editor available for this section type.</p>
       );
   }
 };

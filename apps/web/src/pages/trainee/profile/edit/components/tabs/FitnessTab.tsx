@@ -107,9 +107,7 @@ export const FitnessTab = ({ profile }: FitnessTabProps) => {
     <Card>
       <CardHeader>
         <CardTitle>Fitness Information</CardTitle>
-        <CardDescription>
-          Update your experience level, activity level, and goals.
-        </CardDescription>
+        <CardDescription>Update your experience level, activity level, and goals.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -198,9 +196,7 @@ export const FitnessTab = ({ profile }: FitnessTabProps) => {
             )}
           </div>
 
-          {mutation.error && (
-            <p className="text-sm text-destructive">{mutation.error.message}</p>
-          )}
+          {mutation.error && <p className="text-sm text-destructive">{mutation.error.message}</p>}
 
           <div className="flex justify-end">
             <Button type="submit" disabled={isSaving || !isDirty}>

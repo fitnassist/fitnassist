@@ -1,5 +1,14 @@
 import { Link } from 'react-router-dom';
-import { Utensils, Droplets, Scale, Moon, SmilePlus, Dumbbell, Footprints, Check } from 'lucide-react';
+import {
+  Utensils,
+  Droplets,
+  Scale,
+  Moon,
+  SmilePlus,
+  Dumbbell,
+  Footprints,
+  Check,
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { useDiaryEntries, useDailyNutrition } from '@/api/diary';
 import { trpc } from '@/lib/trpc';
@@ -16,19 +25,20 @@ export const TodaySummary = () => {
   const { data: nutrition } = useDailyNutrition(dateStr);
   const { data: targets } = trpc.trainee.getNutritionTargets.useQuery();
 
-  const hasWeight = entries?.some(e => e.type === 'WEIGHT');
-  const hasWater = entries?.some(e => e.type === 'WATER');
-  const hasMood = entries?.some(e => e.type === 'MOOD');
-  const hasSleep = entries?.some(e => e.type === 'SLEEP');
-  const hasFood = entries?.some(e => e.type === 'FOOD');
-  const hasWorkout = entries?.some(e => e.type === 'WORKOUT_LOG');
-  const hasSteps = entries?.some(e => e.type === 'STEPS');
+  const hasWeight = entries?.some((e) => e.type === 'WEIGHT');
+  const hasWater = entries?.some((e) => e.type === 'WATER');
+  const hasMood = entries?.some((e) => e.type === 'MOOD');
+  const hasSleep = entries?.some((e) => e.type === 'SLEEP');
+  const hasFood = entries?.some((e) => e.type === 'FOOD');
+  const hasWorkout = entries?.some((e) => e.type === 'WORKOUT_LOG');
+  const hasSteps = entries?.some((e) => e.type === 'STEPS');
 
   const caloriesConsumed = nutrition?.totalCalories ?? 0;
   const caloriesBurned = nutrition?.caloriesBurned ?? 0;
   const calorieTarget = targets?.effective?.calories ?? 0;
   const netCalories = caloriesConsumed - caloriesBurned;
-  const calorieProgress = calorieTarget > 0 ? Math.min((netCalories / calorieTarget) * 100, 100) : 0;
+  const calorieProgress =
+    calorieTarget > 0 ? Math.min((netCalories / calorieTarget) * 100, 100) : 0;
 
   const trackers = [
     { key: 'food', icon: Utensils, label: 'Food', done: hasFood, color: 'text-orange-500' },
@@ -36,7 +46,13 @@ export const TodaySummary = () => {
     { key: 'weight', icon: Scale, label: 'Weight', done: hasWeight, color: 'text-emerald-500' },
     { key: 'mood', icon: SmilePlus, label: 'Mood', done: hasMood, color: 'text-amber-500' },
     { key: 'sleep', icon: Moon, label: 'Sleep', done: hasSleep, color: 'text-indigo-500' },
-    { key: 'workout', icon: Dumbbell, label: 'Workout', done: hasWorkout, color: 'text-violet-500' },
+    {
+      key: 'workout',
+      icon: Dumbbell,
+      label: 'Workout',
+      done: hasWorkout,
+      color: 'text-violet-500',
+    },
     { key: 'steps', icon: Footprints, label: 'Steps', done: hasSteps, color: 'text-green-500' },
   ];
 
@@ -52,16 +68,31 @@ export const TodaySummary = () => {
             <div className="mb-4 flex items-center gap-4">
               <div className="relative h-16 w-16 shrink-0">
                 <svg className="h-16 w-16 -rotate-90" viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted" />
                   <circle
-                    cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3"
+                    cx="18"
+                    cy="18"
+                    r="15"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    className="text-muted"
+                  />
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="15"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
                     className="text-primary"
                     strokeDasharray={`${Math.max(calorieProgress, 0) * 0.942} 100`}
                     strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs font-semibold">{Math.round(Math.max(calorieProgress, 0))}%</span>
+                  <span className="text-xs font-semibold">
+                    {Math.round(Math.max(calorieProgress, 0))}%
+                  </span>
                 </div>
               </div>
               <div>
@@ -103,7 +134,11 @@ export const TodaySummary = () => {
                     <Check className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-green-500 p-0.5 text-white" />
                   )}
                 </div>
-                <span className={`text-[10px] ${done ? 'text-foreground' : 'text-muted-foreground/50'}`}>{label}</span>
+                <span
+                  className={`text-[10px] ${done ? 'text-foreground' : 'text-muted-foreground/50'}`}
+                >
+                  {label}
+                </span>
               </div>
             ))}
           </div>

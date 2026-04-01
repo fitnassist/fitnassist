@@ -26,7 +26,17 @@ interface SectionRendererProps {
   preview?: boolean;
 }
 
-export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePost, onNavigateShop, onNavigateProduct, onAddToCart, subdomain, preview }: SectionRendererProps) => {
+export const SectionRenderer = ({
+  section,
+  trainer,
+  onNavigateBlog,
+  onNavigatePost,
+  onNavigateShop,
+  onNavigateProduct,
+  onAddToCart,
+  subdomain,
+  preview,
+}: SectionRendererProps) => {
   if (!section.isVisible) return null;
 
   const renderSection = () => {
@@ -42,9 +52,24 @@ export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePo
       case 'TESTIMONIALS':
         return <TestimonialsSection section={section} trainer={trainer} />;
       case 'BLOG':
-        return preview ? null : <BlogSection section={section} subdomain={subdomain} onNavigateBlog={onNavigateBlog} onNavigatePost={onNavigatePost} />;
+        return preview ? null : (
+          <BlogSection
+            section={section}
+            subdomain={subdomain}
+            onNavigateBlog={onNavigateBlog}
+            onNavigatePost={onNavigatePost}
+          />
+        );
       case 'SHOP':
-        return preview ? null : <ShopSection section={section} trainerId={trainer.id} onNavigateShop={onNavigateShop} onNavigateProduct={onNavigateProduct} onAddToCart={onAddToCart} />;
+        return preview ? null : (
+          <ShopSection
+            section={section}
+            trainerId={trainer.id}
+            onNavigateShop={onNavigateShop}
+            onNavigateProduct={onNavigateProduct}
+            onAddToCart={onAddToCart}
+          />
+        );
       case 'CONTACT':
         return <ContactSection section={section} trainer={trainer} preview={preview} />;
       case 'CUSTOM_TEXT':
@@ -65,8 +90,6 @@ export const SectionRenderer = ({ section, trainer, onNavigateBlog, onNavigatePo
   };
 
   return (
-    <div data-section-type={section.type.toLowerCase().replace('_', '-')}>
-      {renderSection()}
-    </div>
+    <div data-section-type={section.type.toLowerCase().replace('_', '-')}>{renderSection()}</div>
   );
 };

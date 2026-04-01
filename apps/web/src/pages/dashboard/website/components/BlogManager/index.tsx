@@ -43,8 +43,7 @@ export const BlogManager = () => {
             </div>
             <h3 className="text-lg font-semibold mb-2">No Blog Posts Yet</h3>
             <p className="text-sm text-muted-foreground max-w-md mb-6">
-              Start writing blog posts to share your fitness knowledge and
-              attract new clients.
+              Start writing blog posts to share your fitness knowledge and attract new clients.
             </p>
             <Button onClick={() => setIsCreating(true)}>
               <Plus className="mr-2 h-4 w-4" />

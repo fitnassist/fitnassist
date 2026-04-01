@@ -16,12 +16,7 @@ import {
 } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { toast } from '@/lib/toast';
-import {
-  cmToFeetInches,
-  feetInchesToCm,
-  kgToLbs,
-  lbsToKg,
-} from '@/lib/unitConversion';
+import { cmToFeetInches, feetInchesToCm, kgToLbs, lbsToKg } from '@/lib/unitConversion';
 
 const bodyMetricsSchema = updateTraineeProfileSchema.pick({
   heightCm: true,
@@ -46,11 +41,21 @@ export const BodyMetricsTab = ({ profile }: BodyMetricsTabProps) => {
   const [unitPref, setUnitPref] = useState(profile?.unitPreference ?? 'METRIC');
 
   // Compute initial imperial values
-  const initialFeetInches = profile?.heightCm ? cmToFeetInches(profile.heightCm) : { feet: 0, inches: 0 };
-  const [heightFeet, setHeightFeet] = useState(profile?.heightCm ? String(initialFeetInches.feet) : '');
-  const [heightInches, setHeightInches] = useState(profile?.heightCm ? String(initialFeetInches.inches) : '');
-  const [weightLbs, setWeightLbs] = useState(profile?.startWeightKg ? String(kgToLbs(profile.startWeightKg)) : '');
-  const [goalWeightLbs, setGoalWeightLbs] = useState(profile?.goalWeightKg ? String(kgToLbs(profile.goalWeightKg)) : '');
+  const initialFeetInches = profile?.heightCm
+    ? cmToFeetInches(profile.heightCm)
+    : { feet: 0, inches: 0 };
+  const [heightFeet, setHeightFeet] = useState(
+    profile?.heightCm ? String(initialFeetInches.feet) : '',
+  );
+  const [heightInches, setHeightInches] = useState(
+    profile?.heightCm ? String(initialFeetInches.inches) : '',
+  );
+  const [weightLbs, setWeightLbs] = useState(
+    profile?.startWeightKg ? String(kgToLbs(profile.startWeightKg)) : '',
+  );
+  const [goalWeightLbs, setGoalWeightLbs] = useState(
+    profile?.goalWeightKg ? String(kgToLbs(profile.goalWeightKg)) : '',
+  );
 
   const utils = trpc.useUtils();
   const createMutation = trpc.trainee.create.useMutation({
@@ -131,14 +136,15 @@ export const BodyMetricsTab = ({ profile }: BodyMetricsTabProps) => {
           <div className="flex items-center gap-3">
             <Label>Units</Label>
             <div className="flex items-center gap-2">
-              <span className={`text-sm ${unitPref === 'METRIC' ? 'font-medium' : 'text-muted-foreground'}`}>
+              <span
+                className={`text-sm ${unitPref === 'METRIC' ? 'font-medium' : 'text-muted-foreground'}`}
+              >
                 Metric
               </span>
-              <Switch
-                checked={unitPref === 'IMPERIAL'}
-                onCheckedChange={handleUnitToggle}
-              />
-              <span className={`text-sm ${unitPref === 'IMPERIAL' ? 'font-medium' : 'text-muted-foreground'}`}>
+              <Switch checked={unitPref === 'IMPERIAL'} onCheckedChange={handleUnitToggle} />
+              <span
+                className={`text-sm ${unitPref === 'IMPERIAL' ? 'font-medium' : 'text-muted-foreground'}`}
+              >
                 Imperial
               </span>
             </div>
@@ -239,9 +245,7 @@ export const BodyMetricsTab = ({ profile }: BodyMetricsTabProps) => {
             </div>
           </div>
 
-          {mutation.error && (
-            <p className="text-sm text-destructive">{mutation.error.message}</p>
-          )}
+          {mutation.error && <p className="text-sm text-destructive">{mutation.error.message}</p>}
 
           <div className="flex justify-end">
             <Button type="submit" disabled={isSaving || !isDirty}>

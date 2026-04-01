@@ -13,7 +13,12 @@ import { useAuth } from '@/hooks';
 import { useTrainerBookings, useUpcomingBookings } from '@/api/booking';
 import { trpc } from '@/lib/trpc';
 import { routes } from '@/config/routes';
-import { BookingCard, BookingCalendar, SuggestAlternativeDialog, RescheduleDialog } from './components';
+import {
+  BookingCard,
+  BookingCalendar,
+  SuggestAlternativeDialog,
+  RescheduleDialog,
+} from './components';
 
 type ViewMode = 'calendar' | 'list';
 type Period = 'week' | 'month';
@@ -48,7 +53,10 @@ export const BookingsPage = () => {
   const { startDate, endDate } = useMemo(() => getDateRange(period), [period]);
 
   // Trainer uses date-range query, trainee uses upcoming
-  const { data: trainerBookings, isLoading: trainerLoading } = useTrainerBookings(startDate, endDate);
+  const { data: trainerBookings, isLoading: trainerLoading } = useTrainerBookings(
+    startDate,
+    endDate,
+  );
   const { data: upcomingBookings, isLoading: upcomingLoading } = useUpcomingBookings();
 
   // Trainee: fetch connected trainers for "Book a Session" button
@@ -60,9 +68,7 @@ export const BookingsPage = () => {
   const isLoading = isTrainer ? trainerLoading : upcomingLoading;
 
   // Find the booking being suggested/rescheduled
-  const suggestBooking = suggestBookingId
-    ? bookings?.find((b) => b.id === suggestBookingId)
-    : null;
+  const suggestBooking = suggestBookingId ? bookings?.find((b) => b.id === suggestBookingId) : null;
   const rescheduleBooking = rescheduleBookingId
     ? bookings?.find((b) => b.id === rescheduleBookingId)
     : null;
@@ -165,13 +171,15 @@ export const BookingsPage = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {myTrainers.filter((r) => r.trainer).map((r) => (
-            <DropdownMenuItem key={r.id} asChild>
-              <Link to={routes.dashboardBookingsBook(r.trainer!.id)}>
-                {r.trainer!.displayName}
-              </Link>
-            </DropdownMenuItem>
-          ))}
+          {myTrainers
+            .filter((r) => r.trainer)
+            .map((r) => (
+              <DropdownMenuItem key={r.id} asChild>
+                <Link to={routes.dashboardBookingsBook(r.trainer!.id)}>
+                  {r.trainer!.displayName}
+                </Link>
+              </DropdownMenuItem>
+            ))}
         </DropdownMenuContent>
       </DropdownMenu>
     ) : undefined
@@ -186,16 +194,11 @@ export const BookingsPage = () => {
         action={trainerActions ?? traineeActions}
       />
       <PageLayout.Content>
-        {isLoading && (
-          <div className="text-sm text-muted-foreground">Loading bookings...</div>
-        )}
+        {isLoading && <div className="text-sm text-muted-foreground">Loading bookings...</div>}
 
         {/* Calendar view (trainer only) */}
         {isTrainer && viewMode === 'calendar' && !isLoading && (
-          <BookingCalendar
-            isTrainer={isTrainer}
-            view={period}
-          />
+          <BookingCalendar isTrainer={isTrainer} view={period} />
         )}
 
         {/* List view */}
@@ -228,13 +231,15 @@ export const BookingsPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                          {myTrainers?.filter((r) => r.trainer).map((r) => (
-                            <DropdownMenuItem key={r.id} asChild>
-                              <Link to={routes.dashboardBookingsBook(r.trainer!.id)}>
-                                {r.trainer!.displayName}
-                              </Link>
-                            </DropdownMenuItem>
-                          ))}
+                          {myTrainers
+                            ?.filter((r) => r.trainer)
+                            .map((r) => (
+                              <DropdownMenuItem key={r.id} asChild>
+                                <Link to={routes.dashboardBookingsBook(r.trainer!.id)}>
+                                  {r.trainer!.displayName}
+                                </Link>
+                              </DropdownMenuItem>
+                            ))}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
@@ -277,7 +282,9 @@ export const BookingsPage = () => {
         {suggestBooking && suggestBooking.trainer && (
           <SuggestAlternativeDialog
             open={!!suggestBookingId}
-            onOpenChange={(open) => { if (!open) setSuggestBookingId(null); }}
+            onOpenChange={(open) => {
+              if (!open) setSuggestBookingId(null);
+            }}
             bookingId={suggestBooking.id}
             trainerId={suggestBooking.trainer.id}
             durationMin={suggestBooking.durationMin}
@@ -288,7 +295,9 @@ export const BookingsPage = () => {
         {rescheduleBooking && rescheduleBooking.trainer && (
           <RescheduleDialog
             open={!!rescheduleBookingId}
-            onOpenChange={(open) => { if (!open) setRescheduleBookingId(null); }}
+            onOpenChange={(open) => {
+              if (!open) setRescheduleBookingId(null);
+            }}
             bookingId={rescheduleBooking.id}
             trainerId={rescheduleBooking.trainer.id}
             durationMin={rescheduleBooking.durationMin}

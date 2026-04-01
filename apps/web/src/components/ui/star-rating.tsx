@@ -39,9 +39,7 @@ export const StarRating = ({ rating, count, size = 'md', className }: StarRating
         })}
       </div>
       {count !== undefined && (
-        <span className={cn(text, 'text-muted-foreground ml-1')}>
-          ({count})
-        </span>
+        <span className={cn(text, 'text-muted-foreground ml-1')}>({count})</span>
       )}
     </div>
   );
@@ -54,16 +52,18 @@ interface InteractiveStarRatingProps {
   className?: string;
 }
 
-export const InteractiveStarRating = ({ value, onChange, size = 'lg', className }: InteractiveStarRatingProps) => {
+export const InteractiveStarRating = ({
+  value,
+  onChange,
+  size = 'lg',
+  className,
+}: InteractiveStarRatingProps) => {
   const [hoverValue, setHoverValue] = useState(0);
   const { star, gap } = SIZE_MAP[size];
   const displayValue = hoverValue || value;
 
   return (
-    <div
-      className={cn('flex items-center', gap, className)}
-      onMouseLeave={() => setHoverValue(0)}
-    >
+    <div className={cn('flex items-center', gap, className)} onMouseLeave={() => setHoverValue(0)}>
       {[1, 2, 3, 4, 5].map((starValue) => (
         <button
           key={starValue}
@@ -77,7 +77,7 @@ export const InteractiveStarRating = ({ value, onChange, size = 'lg', className 
               star,
               starValue <= displayValue
                 ? 'text-yellow-500 fill-yellow-500'
-                : 'text-muted-foreground/30'
+                : 'text-muted-foreground/30',
             )}
           />
         </button>

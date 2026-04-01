@@ -17,17 +17,13 @@ const createEmptyItem = (): FaqItem => ({ question: '', answer: '' });
 
 export const FaqForm = ({ sectionId, content }: FaqFormProps) => {
   const updateSection = useUpdateSection();
-  const initialItems = Array.isArray(content.items)
-    ? (content.items as FaqItem[])
-    : [];
+  const initialItems = Array.isArray(content.items) ? (content.items as FaqItem[]) : [];
   const [items, setItems] = useState<FaqItem[]>(
-    initialItems.length > 0 ? initialItems : [createEmptyItem()]
+    initialItems.length > 0 ? initialItems : [createEmptyItem()],
   );
 
   const handleUpdate = (index: number, field: keyof FaqItem, value: string) => {
-    setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
   const handleAdd = () => {

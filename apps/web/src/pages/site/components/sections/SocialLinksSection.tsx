@@ -1,11 +1,4 @@
-import {
-  Facebook,
-  Instagram,
-  Twitter,
-  Youtube,
-  Linkedin,
-  Globe,
-} from 'lucide-react';
+import { Facebook, Instagram, Twitter, Youtube, Linkedin, Globe } from 'lucide-react';
 import type { PublicSection, PublicTrainer } from '../../site.types';
 
 interface SocialLink {
@@ -46,7 +39,7 @@ const parseProfileSocialLinks = (raw: unknown): SocialLink[] => {
       typeof item === 'object' &&
       item !== null &&
       typeof item.platform === 'string' &&
-      typeof item.url === 'string'
+      typeof item.url === 'string',
   );
 };
 
@@ -55,7 +48,7 @@ export const SocialLinksSection = ({ section, trainer }: SocialLinksSectionProps
   const links =
     content.sourceType === 'profile'
       ? parseProfileSocialLinks(trainer.socialLinks)
-      : content.items ?? content.links ?? [];
+      : (content.items ?? content.links ?? []);
 
   return (
     <section id={`section-${section.id}`} className="py-12 sm:py-16">

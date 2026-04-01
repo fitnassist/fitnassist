@@ -5,12 +5,7 @@ import { Button, ImageUpload } from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import type { WizardStepProps } from '../../ProfileWizard/ProfileWizard.types';
 
-export function ImagesStep({
-  data,
-  onUpdate,
-  onNext,
-  onBack,
-}: WizardStepProps) {
+export function ImagesStep({ data, onUpdate, onNext, onBack }: WizardStepProps) {
   const {
     handleSubmit,
     control,
@@ -40,7 +35,7 @@ export function ImagesStep({
       {
         method: 'POST',
         body: formData,
-      }
+      },
     );
 
     if (!uploadResponse.ok) {
@@ -117,9 +112,7 @@ export function ImagesStep({
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button type="submit">
-          Continue
-        </Button>
+        <Button type="submit">Continue</Button>
       </div>
     </form>
   );

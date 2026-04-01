@@ -13,10 +13,7 @@ const unauthorizedLink: TRPCLink<AppRouter> = () => {
       const unsubscribe = next(op).subscribe({
         next: (value) => observer.next(value),
         error: (err) => {
-          if (
-            err instanceof TRPCClientError &&
-            err.data?.code === 'UNAUTHORIZED'
-          ) {
+          if (err instanceof TRPCClientError && err.data?.code === 'UNAUTHORIZED') {
             // Clear query cache and redirect to login
             window.location.href = '/login';
           }

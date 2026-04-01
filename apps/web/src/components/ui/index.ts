@@ -11,7 +11,11 @@ export { MultiSelect, type MultiSelectOption, type MultiSelectProps } from './mu
 export { ImageUpload, type ImageUploadProps } from './image-upload';
 export { GalleryUpload, type GalleryImage, type GalleryUploadProps } from './gallery-upload';
 export { VideoUpload, type VideoUploadProps } from './video-upload';
-export { AddressAutocomplete, type AddressDetails, type AddressAutocompleteProps } from './address-autocomplete';
+export {
+  AddressAutocomplete,
+  type AddressDetails,
+  type AddressAutocompleteProps,
+} from './address-autocomplete';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { ResponsiveTabs } from './responsive-tabs';
 export {

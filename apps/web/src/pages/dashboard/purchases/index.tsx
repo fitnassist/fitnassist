@@ -15,7 +15,10 @@ const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   CANCELLED: 'Cancelled',
 };
 
-const ORDER_STATUS_VARIANTS: Record<OrderStatus, 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning'> = {
+const ORDER_STATUS_VARIANTS: Record<
+  OrderStatus,
+  'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning'
+> = {
   PENDING_PAYMENT: 'warning',
   PAID: 'default',
   PROCESSING: 'secondary',
@@ -30,11 +33,19 @@ const formatDate = (date: string | Date) =>
 
 const formatPrice = (pence: number) => `£${(pence / 100).toFixed(2)}`;
 
-const DownloadButton = ({ orderId, productId, productName }: { orderId: string; productId: string; productName: string }) => {
+const DownloadButton = ({
+  orderId,
+  productId,
+  productName,
+}: {
+  orderId: string;
+  productId: string;
+  productName: string;
+}) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const downloadQuery = trpc.order.getDownloadUrl.useQuery(
     { orderId, productId },
-    { enabled: false }
+    { enabled: false },
   );
 
   const handleDownload = async () => {
@@ -54,7 +65,11 @@ const DownloadButton = ({ orderId, productId, productName }: { orderId: string; 
 
   return (
     <Button variant="outline" size="sm" onClick={handleDownload} disabled={isDownloading}>
-      {isDownloading ? <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" /> : <Download className="h-3.5 w-3.5 mr-1.5" />}
+      {isDownloading ? (
+        <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+      ) : (
+        <Download className="h-3.5 w-3.5 mr-1.5" />
+      )}
       Download
     </Button>
   );
@@ -95,10 +110,7 @@ export const PurchasesPage = () => {
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
-            <div
-              key={order.id}
-              className="rounded-lg border bg-card p-4 space-y-3"
-            >
+            <div key={order.id} className="rounded-lg border bg-card p-4 space-y-3">
               {/* Order header */}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
@@ -106,9 +118,7 @@ export const PurchasesPage = () => {
                     <p className="text-xs text-muted-foreground">
                       Order #{order.id.slice(-8).toUpperCase()}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatDate(order.createdAt)}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{formatDate(order.createdAt)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -121,7 +131,8 @@ export const PurchasesPage = () => {
 
               {/* Trainer */}
               <div className="text-sm text-muted-foreground">
-                From <span className="font-medium text-foreground">{order.trainer.displayName}</span>
+                From{' '}
+                <span className="font-medium text-foreground">{order.trainer.displayName}</span>
                 {order.trainer.handle && (
                   <a
                     href={`/site/${order.trainer.handle}`}

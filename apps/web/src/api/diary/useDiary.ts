@@ -5,23 +5,22 @@ import { trpc } from '@/lib/trpc';
 // =============================================================================
 
 export const useDiaryEntries = (date: string) => {
-  return trpc.diary.getEntries.useQuery(
-    { date },
-    { enabled: !!date }
-  );
+  return trpc.diary.getEntries.useQuery({ date }, { enabled: !!date });
 };
 
 export const useDiaryRange = (startDate: string, endDate: string, type?: string) => {
   return trpc.diary.getRange.useQuery(
-    { startDate, endDate, ...(type ? { type: type as 'WEIGHT' | 'WATER' | 'MEASUREMENT' | 'MOOD' | 'SLEEP' } : {}) },
-    { enabled: !!startDate && !!endDate }
+    {
+      startDate,
+      endDate,
+      ...(type ? { type: type as 'WEIGHT' | 'WATER' | 'MEASUREMENT' | 'MOOD' | 'SLEEP' } : {}),
+    },
+    { enabled: !!startDate && !!endDate },
   );
 };
 
 export const useRecentClientActivity = () => {
-  return trpc.diary.getRecentClientActivity.useQuery(
-    { limit: 20 },
-  );
+  return trpc.diary.getRecentClientActivity.useQuery({ limit: 20 });
 };
 
 // =============================================================================
@@ -84,10 +83,7 @@ export const useLogSleep = () => {
 // =============================================================================
 
 export const useSearchFood = (query: string) => {
-  return trpc.diary.searchFood.useQuery(
-    { query },
-    { enabled: query.length >= 2 }
-  );
+  return trpc.diary.searchFood.useQuery({ query }, { enabled: query.length >= 2 });
 };
 
 export const useMyRecipes = () => {
@@ -128,10 +124,7 @@ export const useDeleteFoodEntry = () => {
 };
 
 export const useDailyNutrition = (date: string) => {
-  return trpc.diary.getDailyNutrition.useQuery(
-    { date },
-    { enabled: !!date }
-  );
+  return trpc.diary.getDailyNutrition.useQuery({ date }, { enabled: !!date });
 };
 
 // =============================================================================
@@ -174,10 +167,7 @@ export const useLogActivity = () => {
 // =============================================================================
 
 export const usePersonalBests = (userId?: string, enabled = true) => {
-  return trpc.diary.getPersonalBests.useQuery(
-    { userId },
-    { enabled }
-  );
+  return trpc.diary.getPersonalBests.useQuery({ userId }, { enabled });
 };
 
 // =============================================================================
@@ -221,10 +211,7 @@ export const useDeleteProgressPhoto = () => {
 };
 
 export const useProgressPhotos = (startDate?: string, endDate?: string) => {
-  return trpc.diary.getProgressPhotos.useQuery(
-    { startDate, endDate },
-    { enabled: true }
-  );
+  return trpc.diary.getProgressPhotos.useQuery({ startDate, endDate }, { enabled: true });
 };
 
 // =============================================================================
@@ -242,10 +229,7 @@ export const useAddDiaryComment = () => {
 };
 
 export const useDiaryComments = (diaryEntryId: string) => {
-  return trpc.diary.getComments.useQuery(
-    { diaryEntryId },
-    { enabled: !!diaryEntryId }
-  );
+  return trpc.diary.getComments.useQuery({ diaryEntryId }, { enabled: !!diaryEntryId });
 };
 
 export const useDeleteDiaryComment = () => {

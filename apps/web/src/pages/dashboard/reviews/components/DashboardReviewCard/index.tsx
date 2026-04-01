@@ -136,7 +136,9 @@ export const DashboardReviewCard = ({ review }: DashboardReviewCardProps) => {
                   Cancel
                 </Button>
                 <Button type="submit" size="sm" disabled={replyMutation.isPending}>
-                  {replyMutation.isPending && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />}
+                  {replyMutation.isPending && (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                  )}
                   Post Reply
                 </Button>
               </div>

@@ -33,7 +33,10 @@ const DEFAULT_PRESET: ThemePreset = THEME_PRESETS[0] ?? {
 };
 
 const buildCssVariables = (colors: ThemeColors, customColors: unknown): Record<string, string> => {
-  const overrides = (customColors && typeof customColors === 'object') ? customColors as Record<string, string> : {};
+  const overrides =
+    customColors && typeof customColors === 'object'
+      ? (customColors as Record<string, string>)
+      : {};
   const merged = { ...colors, ...overrides };
 
   const vars: Record<string, string> = {};
@@ -55,9 +58,10 @@ const getGoogleFontsUrl = (heading: string, body: string): string => {
 export const SiteThemeProvider = ({ website, children }: SiteThemeProviderProps) => {
   const preset = THEME_PRESETS.find((p) => p.id === website.themeId) ?? DEFAULT_PRESET;
 
-  const customFonts = (website.customFonts && typeof website.customFonts === 'object')
-    ? website.customFonts as { heading?: string; body?: string }
-    : {};
+  const customFonts =
+    website.customFonts && typeof website.customFonts === 'object'
+      ? (website.customFonts as { heading?: string; body?: string })
+      : {};
 
   const headingFont = customFonts.heading ?? preset.fonts.heading;
   const bodyFont = customFonts.body ?? preset.fonts.body;
@@ -65,7 +69,10 @@ export const SiteThemeProvider = ({ website, children }: SiteThemeProviderProps)
   useEffect(() => {
     const id = 'site-google-fonts';
     if (document.getElementById(id)) {
-      (document.getElementById(id) as HTMLLinkElement).href = getGoogleFontsUrl(headingFont, bodyFont);
+      (document.getElementById(id) as HTMLLinkElement).href = getGoogleFontsUrl(
+        headingFont,
+        bodyFont,
+      );
       return;
     }
     const link = document.createElement('link');
@@ -102,9 +109,7 @@ export const SiteThemeProvider = ({ website, children }: SiteThemeProviderProps)
         .site-heading { font-family: var(--font-heading); }
         .site-body { font-family: var(--font-body); }
       `}</style>
-      <div className="site-body">
-        {children}
-      </div>
+      <div className="site-body">{children}</div>
     </div>
   );
 };

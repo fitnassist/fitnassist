@@ -42,9 +42,7 @@ export const FriendsList = () => {
     <div className="space-y-3">
       {friends.map((friendship) => {
         const friend =
-          friendship.requester.id === user?.id
-            ? friendship.addressee
-            : friendship.requester;
+          friendship.requester.id === user?.id ? friendship.addressee : friendship.requester;
 
         const tp = friend.traineeProfile;
         const handle = tp?.handle;

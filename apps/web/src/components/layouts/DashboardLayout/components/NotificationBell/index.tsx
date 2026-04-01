@@ -1,29 +1,23 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Bell } from "lucide-react";
-import {
-  Button,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Bell } from 'lucide-react';
+import { Button, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import {
   useNotifications,
   useUnreadNotificationCount,
   useMarkNotificationRead,
   useMarkAllNotificationsRead,
   useDismissNotification,
-} from "@/api/notification";
-import { NotificationPanel } from "./NotificationPanel";
-import type { NotificationItemData } from "./notification.types";
+} from '@/api/notification';
+import { NotificationPanel } from './NotificationPanel';
+import type { NotificationItemData } from './notification.types';
 
 export const NotificationBell = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   const { data: unreadCount = 0 } = useUnreadNotificationCount();
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useNotifications();
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
   const dismiss = useDismissNotification();
@@ -60,7 +54,7 @@ export const NotificationBell = () => {
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-gray-900">
-              {unreadCount > 99 ? "99+" : unreadCount}
+              {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
         </Button>

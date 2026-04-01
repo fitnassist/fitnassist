@@ -24,9 +24,7 @@ export const DashboardPage = () => {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
       <div className="mb-4 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold">Hello {user?.name}</h1>
-        <p className="text-muted-foreground mt-1">
-          Welcome to your dashboard
-        </p>
+        <p className="text-muted-foreground mt-1">Welcome to your dashboard</p>
       </div>
 
       {isTrainee && <TraineeOnboardingBanner />}
@@ -36,4 +34,4 @@ export const DashboardPage = () => {
       {isTrainee && <TraineeDashboardContent badgeCounts={badgeCounts} />}
     </div>
   );
-}
+};

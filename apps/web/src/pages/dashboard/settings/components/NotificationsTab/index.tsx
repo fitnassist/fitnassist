@@ -33,7 +33,8 @@ export const NotificationsTab = () => {
   const { data: preferences, isLoading } = useNotificationPreferences();
   const updateMutation = useUpdateNotificationPreferences();
   const updatePhoneMutation = useUpdatePhoneNumber();
-  const { isSupported, permission, requestPermission, isEnabled, isConfigured } = usePushNotifications();
+  const { isSupported, permission, requestPermission, isEnabled, isConfigured } =
+    usePushNotifications();
   const [isEnabling, setIsEnabling] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneSaved, setPhoneSaved] = useState(false);
@@ -126,9 +127,7 @@ export const NotificationsTab = () => {
             <Switch
               id="emailNotifyConnectionRequests"
               checked={form.watch('emailNotifyConnectionRequests')}
-              onCheckedChange={(checked) =>
-                form.setValue('emailNotifyConnectionRequests', checked)
-              }
+              onCheckedChange={(checked) => form.setValue('emailNotifyConnectionRequests', checked)}
             />
           </div>
 
@@ -258,7 +257,9 @@ export const NotificationsTab = () => {
                 onClick={async () => {
                   const cleaned = phoneNumber.replace(/\s/g, '');
                   if (cleaned && !/^\+[1-9]\d{1,14}$/.test(cleaned)) {
-                    toast.error('Please enter a valid phone number in international format (e.g. +44...)');
+                    toast.error(
+                      'Please enter a valid phone number in international format (e.g. +44...)',
+                    );
                     return;
                   }
                   await updatePhoneMutation.mutateAsync({ phoneNumber: cleaned || null });
@@ -284,9 +285,7 @@ export const NotificationsTab = () => {
             <Switch
               id="smsNotifyConnectionRequests"
               checked={form.watch('smsNotifyConnectionRequests')}
-              onCheckedChange={(checked) =>
-                form.setValue('smsNotifyConnectionRequests', checked)
-              }
+              onCheckedChange={(checked) => form.setValue('smsNotifyConnectionRequests', checked)}
             />
           </div>
 
@@ -347,9 +346,7 @@ export const NotificationsTab = () => {
             <Bell className="h-5 w-5" />
             Browser Push Notifications
           </CardTitle>
-          <CardDescription>
-            Receive notifications even when you're not on the site.
-          </CardDescription>
+          <CardDescription>Receive notifications even when you're not on the site.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {isSupported && !isEnabled && (
@@ -383,7 +380,8 @@ export const NotificationsTab = () => {
 
           {isSupported && isEnabled && !isConfigured && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
-              Browser permissions granted but push notifications are not yet configured on the server.
+              Browser permissions granted but push notifications are not yet configured on the
+              server.
             </div>
           )}
 
@@ -403,9 +401,7 @@ export const NotificationsTab = () => {
             <Switch
               id="pushNotifyConnectionRequests"
               checked={form.watch('pushNotifyConnectionRequests')}
-              onCheckedChange={(checked) =>
-                form.setValue('pushNotifyConnectionRequests', checked)
-              }
+              onCheckedChange={(checked) => form.setValue('pushNotifyConnectionRequests', checked)}
             />
           </div>
 
@@ -446,9 +442,7 @@ export const NotificationsTab = () => {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label htmlFor="pushNotifyBookingReminders">Booking Reminders</Label>
-              <p className="text-sm text-muted-foreground">
-                Get push reminders before sessions.
-              </p>
+              <p className="text-sm text-muted-foreground">Get push reminders before sessions.</p>
             </div>
             <Switch
               id="pushNotifyBookingReminders"

@@ -10,10 +10,16 @@ interface ProductDetailPageProps {
   onAddToCart?: (productId: string) => void;
 }
 
-export const ProductDetailPage = ({ trainerId, slug, onNavigateBack, onBuyNow, onAddToCart }: ProductDetailPageProps) => {
+export const ProductDetailPage = ({
+  trainerId,
+  slug,
+  onNavigateBack,
+  onBuyNow,
+  onAddToCart,
+}: ProductDetailPageProps) => {
   const { data: product, isLoading } = trpc.product.getPublicProduct.useQuery(
     { trainerId, slug },
-    { enabled: !!trainerId && !!slug }
+    { enabled: !!trainerId && !!slug },
   );
 
   if (isLoading) {
@@ -53,14 +59,18 @@ export const ProductDetailPage = ({ trainerId, slug, onNavigateBack, onBuyNow, o
     );
   }
 
-  const hasDiscount = product.compareAtPricePence && product.compareAtPricePence > product.pricePence;
+  const hasDiscount =
+    product.compareAtPricePence && product.compareAtPricePence > product.pricePence;
 
   return (
     <div className="py-12 sm:py-16">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm">
-          <button onClick={onNavigateBack} className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+          <button
+            onClick={onNavigateBack}
+            className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
+          >
             Shop
           </button>
           <span className="mx-2 text-[hsl(var(--muted-foreground))]">/</span>
@@ -129,10 +139,7 @@ export const ProductDetailPage = ({ trainerId, slug, onNavigateBack, onBuyNow, o
                   </Button>
                 )}
                 {onBuyNow && (
-                  <Button
-                    onClick={() => onBuyNow(product.id)}
-                    size="lg"
-                  >
+                  <Button onClick={() => onBuyNow(product.id)} size="lg">
                     <ShoppingBag className="mr-2 h-5 w-5" />
                     Buy now — £{(product.pricePence / 100).toFixed(2)}
                   </Button>
@@ -143,7 +150,9 @@ export const ProductDetailPage = ({ trainerId, slug, onNavigateBack, onBuyNow, o
             {/* Description */}
             {product.description && (
               <div className="mt-8 border-t border-[hsl(var(--border))] pt-6">
-                <h2 className="mb-3 text-lg font-semibold text-[hsl(var(--foreground))]">Description</h2>
+                <h2 className="mb-3 text-lg font-semibold text-[hsl(var(--foreground))]">
+                  Description
+                </h2>
                 <div
                   className="prose prose-sm max-w-none text-[hsl(var(--muted-foreground))] [&_a]:text-[hsl(var(--primary))] [&_h2]:text-[hsl(var(--foreground))] [&_h3]:text-[hsl(var(--foreground))] [&_strong]:text-[hsl(var(--foreground))]"
                   dangerouslySetInnerHTML={{ __html: product.description }}
@@ -159,7 +168,10 @@ export const ProductDetailPage = ({ trainerId, slug, onNavigateBack, onBuyNow, o
             <h2 className="mb-4 text-lg font-semibold text-[hsl(var(--foreground))]">Gallery</h2>
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {product.galleryUrls.map((url, i) => (
-                <div key={i} className="aspect-square overflow-hidden rounded-lg bg-[hsl(var(--muted))]">
+                <div
+                  key={i}
+                  className="aspect-square overflow-hidden rounded-lg bg-[hsl(var(--muted))]"
+                >
                   <img
                     src={url}
                     alt={`${product.name} - Image ${i + 1}`}

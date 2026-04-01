@@ -281,7 +281,10 @@ describe('RegisterForm', () => {
   it('should show loading state during submission', async () => {
     const mockSignUp = vi.mocked(signUp.email);
     mockSignUp.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ user: { id: '1' }, error: null }), 100))
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ user: { id: '1' }, error: null }), 100),
+        ),
     );
 
     render(<RegisterForm />);
@@ -305,7 +308,10 @@ describe('RegisterForm', () => {
   it('should disable form fields during loading', async () => {
     const mockSignUp = vi.mocked(signUp.email);
     mockSignUp.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ user: { id: '1' }, error: null }), 100))
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ user: { id: '1' }, error: null }), 100),
+        ),
     );
 
     render(<RegisterForm />);
@@ -328,5 +334,4 @@ describe('RegisterForm', () => {
     expect(passwordInput).toBeDisabled();
     expect(confirmPasswordInput).toBeDisabled();
   });
-
 });

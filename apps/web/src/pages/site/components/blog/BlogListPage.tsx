@@ -16,14 +16,11 @@ export const BlogListPage = ({ subdomain, onNavigatePost, onNavigateHome }: Blog
   const [activeSearch, setActiveSearch] = useState('');
   const [activeTag, setActiveTag] = useState<string | undefined>(undefined);
 
-  const { data: tags } = trpc.blog.getPublicTags.useQuery(
-    { subdomain },
-    { enabled: !!subdomain }
-  );
+  const { data: tags } = trpc.blog.getPublicTags.useQuery({ subdomain }, { enabled: !!subdomain });
 
   const { data, isLoading, isError } = trpc.blog.getPublicPosts.useQuery(
     { subdomain, cursor, limit: 12, search: activeSearch || undefined, tag: activeTag },
-    { enabled: !!subdomain }
+    { enabled: !!subdomain },
   );
 
   const handleSearch = (e: React.FormEvent) => {

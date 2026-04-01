@@ -27,7 +27,7 @@ export const BookSessionPage = () => {
   // Get trainer info
   const { data: trainer, isLoading: trainerLoading } = trpc.trainer.getById.useQuery(
     { id: trainerId! },
-    { enabled: !!trainerId }
+    { enabled: !!trainerId },
   );
 
   const [step, setStep] = useState<Step>('date');
@@ -57,13 +57,13 @@ export const BookSessionPage = () => {
   const { data: slots, isLoading: slotsLoading } = useAvailableSlots(
     trainerId ?? '',
     selectedDate ?? '',
-    undefined
+    undefined,
   );
 
   // Get trainer's session locations (for the location step)
   const { data: trainerLocations } = trpc.sessionLocation.listByTrainer.useQuery(
     { trainerId: trainerId! },
-    { enabled: !!trainerId && step === 'location' }
+    { enabled: !!trainerId && step === 'location' },
   );
 
   const selectedSlotObj = slots?.find((s) => s.startTime === selectedSlot);
@@ -72,13 +72,15 @@ export const BookSessionPage = () => {
   const { data: clientRoster } = trpc.clientRoster.myTrainers.useQuery(undefined, {
     enabled: !!trainerId,
   });
-  const myRoster = clientRoster?.find((r: { trainer?: { id: string } }) => r.trainer?.id === trainerId);
+  const myRoster = clientRoster?.find(
+    (r: { trainer?: { id: string } }) => r.trainer?.id === trainerId,
+  );
 
   // Check if payment is required
   const { data: paymentReq } = usePaymentRequirement(
     trainerId ?? '',
     myRoster?.id ?? '',
-    sessionType
+    sessionType,
   );
 
   const handleDateSelect = (date: string) => {
@@ -116,10 +118,14 @@ export const BookSessionPage = () => {
       durationMin: selectedSlotObj.durationMin,
       sessionType,
       locationId: sessionType === 'VIDEO_CALL' ? undefined : (selectedLocationId ?? undefined),
-      clientAddress: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.addressLine1 || undefined),
-      clientPostcode: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.postcode || undefined),
-      clientLatitude: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.latitude || undefined),
-      clientLongitude: sessionType === 'VIDEO_CALL' ? undefined : (clientAddressDetails?.longitude || undefined),
+      clientAddress:
+        sessionType === 'VIDEO_CALL' ? undefined : clientAddressDetails?.addressLine1 || undefined,
+      clientPostcode:
+        sessionType === 'VIDEO_CALL' ? undefined : clientAddressDetails?.postcode || undefined,
+      clientLatitude:
+        sessionType === 'VIDEO_CALL' ? undefined : clientAddressDetails?.latitude || undefined,
+      clientLongitude:
+        sessionType === 'VIDEO_CALL' ? undefined : clientAddressDetails?.longitude || undefined,
       notes: notes || undefined,
     };
 
@@ -135,7 +141,7 @@ export const BookSessionPage = () => {
                 setClientSecret(result.clientSecret);
                 setStep('payment');
               },
-            }
+            },
           );
         },
       });
@@ -160,18 +166,20 @@ export const BookSessionPage = () => {
   const paymentInfo = paymentReq?.paymentRequired
     ? { amount: paymentReq.amount, currency: paymentReq.currency }
     : null;
-  const isFirstFree = paymentReq && !paymentReq.paymentRequired && 'reason' in paymentReq && paymentReq.reason === 'first_session_free';
+  const isFirstFree =
+    paymentReq &&
+    !paymentReq.paymentRequired &&
+    'reason' in paymentReq &&
+    paymentReq.reason === 'first_session_free';
 
   // Build step list
   const baseSteps: Step[] = trainer?.offersVideoSessions
-    ? (sessionType === 'VIDEO_CALL'
+    ? sessionType === 'VIDEO_CALL'
       ? ['date', 'time', 'session-type', 'confirm']
-      : ['date', 'time', 'session-type', 'location', 'confirm'])
+      : ['date', 'time', 'session-type', 'location', 'confirm']
     : ['date', 'time', 'location', 'confirm'];
 
-  const steps: Step[] = paymentInfo
-    ? [...baseSteps, 'payment']
-    : baseSteps;
+  const steps: Step[] = paymentInfo ? [...baseSteps, 'payment'] : baseSteps;
 
   return (
     <PageLayout>
@@ -209,160 +217,177 @@ export const BookSessionPage = () => {
             </div>
           </div>
         ) : (
-        <>
-        {/* Step indicators */}
-        <div className="flex items-center gap-2 mb-6">
-          {steps.map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div
-                className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  s === step
-                    ? 'bg-primary text-primary-foreground'
-                    : i < steps.indexOf(step)
-                      ? 'bg-primary/20 text-primary'
-                      : 'bg-muted text-muted-foreground'
-                }`}
-              >
-                {i + 1}
-              </div>
-              {i < steps.length - 1 && <div className="w-8 h-px bg-border" />}
+          <>
+            {/* Step indicators */}
+            <div className="flex items-center gap-2 mb-6">
+              {steps.map((s, i) => (
+                <div key={s} className="flex items-center gap-2">
+                  <div
+                    className={`h-8 w-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                      s === step
+                        ? 'bg-primary text-primary-foreground'
+                        : i < steps.indexOf(step)
+                          ? 'bg-primary/20 text-primary'
+                          : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {i + 1}
+                  </div>
+                  {i < steps.length - 1 && <div className="w-8 h-px bg-border" />}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
 
-        {step === 'date' && (
-          <DatePicker
-            availableDates={availableDates ?? []}
-            selectedDate={selectedDate}
-            onSelect={handleDateSelect}
-            month={month}
-            onMonthChange={setMonth}
-          />
-        )}
-
-        {step === 'time' && (
-          <div>
-            <h3 className="font-medium mb-3">
-              Available times for{' '}
-              {selectedDate && new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-GB', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-              })}
-            </h3>
-            <SlotPicker
-              slots={slots ?? []}
-              selectedSlot={selectedSlot}
-              onSelect={handleSlotSelect}
-              isLoading={slotsLoading}
-            />
-            <button
-              className="text-sm text-muted-foreground mt-4 hover:underline"
-              onClick={() => setStep('date')}
-            >
-              Change date
-            </button>
-          </div>
-        )}
-
-        {step === 'session-type' && (
-          <div>
-            <h3 className="font-medium mb-3">How would you like to train?</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <Card
-                className={`cursor-pointer transition-colors hover:bg-accent/50 ${sessionType === 'IN_PERSON' ? 'ring-2 ring-primary' : ''}`}
-                onClick={() => handleSessionTypeSelect('IN_PERSON')}
-              >
-                <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
-                  <MapPin className="h-8 w-8 text-primary" />
-                  <span className="font-medium text-sm">In Person</span>
-                  <span className="text-xs text-muted-foreground">Meet at a location</span>
-                </CardContent>
-              </Card>
-              <Card
-                className={`cursor-pointer transition-colors hover:bg-accent/50 ${sessionType === 'VIDEO_CALL' ? 'ring-2 ring-primary' : ''}`}
-                onClick={() => handleSessionTypeSelect('VIDEO_CALL')}
-              >
-                <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
-                  <Video className="h-8 w-8 text-primary" />
-                  <span className="font-medium text-sm">Video Call</span>
-                  <span className="text-xs text-muted-foreground">Train from anywhere</span>
-                </CardContent>
-              </Card>
-            </div>
-            <button
-              className="text-sm text-muted-foreground mt-4 hover:underline"
-              onClick={() => setStep('time')}
-            >
-              Change time
-            </button>
-          </div>
-        )}
-
-        {step === 'location' && (
-          <div>
-            <h3 className="font-medium mb-3">Choose a location</h3>
-            <LocationPicker
-              locations={trainerLocations ?? []}
-              selectedLocationId={selectedLocationId}
-              onSelectLocation={(id) => {
-                setSelectedLocationId(id);
-                setStep('confirm');
-              }}
-              onClientAddressChange={(address) => {
-                setClientAddressDetails(address);
-              }}
-              traineeAddress={traineeProfile}
-              showClientAddress
-            />
-            {(clientAddressDetails || !trainerLocations?.length) && (
-              <button
-                className="text-sm text-primary mt-3 hover:underline"
-                onClick={() => setStep('confirm')}
-              >
-                Continue with this address
-              </button>
+            {step === 'date' && (
+              <DatePicker
+                availableDates={availableDates ?? []}
+                selectedDate={selectedDate}
+                onSelect={handleDateSelect}
+                month={month}
+                onMonthChange={setMonth}
+              />
             )}
-            <button
-              className="text-sm text-muted-foreground mt-2 block hover:underline"
-              onClick={() => setStep('time')}
-            >
-              Change time
-            </button>
-          </div>
-        )}
 
-        {step === 'confirm' && selectedDate && selectedSlot && selectedSlotObj && (
-          <BookingConfirmation
-            date={selectedDate}
-            startTime={selectedSlot}
-            durationMin={selectedSlotObj.durationMin}
-            sessionType={sessionType}
-            locationName={sessionType === 'VIDEO_CALL' ? undefined : trainerLocations?.find((l) => l.id === selectedLocationId)?.name}
-            clientAddress={sessionType === 'VIDEO_CALL' ? '' : (clientAddressDetails ? [clientAddressDetails.addressLine1, clientAddressDetails.city, clientAddressDetails.postcode].filter(Boolean).join(', ') : '')}
-            notes={notes}
-            onNotesChange={setNotes}
-            onConfirm={handleConfirm}
-            onBack={() => setStep(sessionType === 'VIDEO_CALL' ? 'session-type' : 'location')}
-            isSubmitting={createBooking.isPending || createPaymentIntent.isPending}
-            paymentInfo={paymentInfo}
-            isFirstFree={!!isFirstFree}
-          />
-        )}
+            {step === 'time' && (
+              <div>
+                <h3 className="font-medium mb-3">
+                  Available times for{' '}
+                  {selectedDate &&
+                    new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-GB', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                    })}
+                </h3>
+                <SlotPicker
+                  slots={slots ?? []}
+                  selectedSlot={selectedSlot}
+                  onSelect={handleSlotSelect}
+                  isLoading={slotsLoading}
+                />
+                <button
+                  className="text-sm text-muted-foreground mt-4 hover:underline"
+                  onClick={() => setStep('date')}
+                >
+                  Change date
+                </button>
+              </div>
+            )}
 
-        {step === 'payment' && clientSecret && paymentReq?.paymentRequired && (
-          <PaymentStep
-            clientSecret={clientSecret}
-            paymentInfo={{
-              amount: paymentReq.amount,
-              currency: paymentReq.currency,
-              cancellationPolicy: paymentReq.cancellationPolicy,
-            }}
-            onSuccess={handlePaymentSuccess}
-            onBack={() => setStep('confirm')}
-          />
-        )}
-        </>
+            {step === 'session-type' && (
+              <div>
+                <h3 className="font-medium mb-3">How would you like to train?</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <Card
+                    className={`cursor-pointer transition-colors hover:bg-accent/50 ${sessionType === 'IN_PERSON' ? 'ring-2 ring-primary' : ''}`}
+                    onClick={() => handleSessionTypeSelect('IN_PERSON')}
+                  >
+                    <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
+                      <MapPin className="h-8 w-8 text-primary" />
+                      <span className="font-medium text-sm">In Person</span>
+                      <span className="text-xs text-muted-foreground">Meet at a location</span>
+                    </CardContent>
+                  </Card>
+                  <Card
+                    className={`cursor-pointer transition-colors hover:bg-accent/50 ${sessionType === 'VIDEO_CALL' ? 'ring-2 ring-primary' : ''}`}
+                    onClick={() => handleSessionTypeSelect('VIDEO_CALL')}
+                  >
+                    <CardContent className="p-4 flex flex-col items-center gap-2 text-center">
+                      <Video className="h-8 w-8 text-primary" />
+                      <span className="font-medium text-sm">Video Call</span>
+                      <span className="text-xs text-muted-foreground">Train from anywhere</span>
+                    </CardContent>
+                  </Card>
+                </div>
+                <button
+                  className="text-sm text-muted-foreground mt-4 hover:underline"
+                  onClick={() => setStep('time')}
+                >
+                  Change time
+                </button>
+              </div>
+            )}
+
+            {step === 'location' && (
+              <div>
+                <h3 className="font-medium mb-3">Choose a location</h3>
+                <LocationPicker
+                  locations={trainerLocations ?? []}
+                  selectedLocationId={selectedLocationId}
+                  onSelectLocation={(id) => {
+                    setSelectedLocationId(id);
+                    setStep('confirm');
+                  }}
+                  onClientAddressChange={(address) => {
+                    setClientAddressDetails(address);
+                  }}
+                  traineeAddress={traineeProfile}
+                  showClientAddress
+                />
+                {(clientAddressDetails || !trainerLocations?.length) && (
+                  <button
+                    className="text-sm text-primary mt-3 hover:underline"
+                    onClick={() => setStep('confirm')}
+                  >
+                    Continue with this address
+                  </button>
+                )}
+                <button
+                  className="text-sm text-muted-foreground mt-2 block hover:underline"
+                  onClick={() => setStep('time')}
+                >
+                  Change time
+                </button>
+              </div>
+            )}
+
+            {step === 'confirm' && selectedDate && selectedSlot && selectedSlotObj && (
+              <BookingConfirmation
+                date={selectedDate}
+                startTime={selectedSlot}
+                durationMin={selectedSlotObj.durationMin}
+                sessionType={sessionType}
+                locationName={
+                  sessionType === 'VIDEO_CALL'
+                    ? undefined
+                    : trainerLocations?.find((l) => l.id === selectedLocationId)?.name
+                }
+                clientAddress={
+                  sessionType === 'VIDEO_CALL'
+                    ? ''
+                    : clientAddressDetails
+                      ? [
+                          clientAddressDetails.addressLine1,
+                          clientAddressDetails.city,
+                          clientAddressDetails.postcode,
+                        ]
+                          .filter(Boolean)
+                          .join(', ')
+                      : ''
+                }
+                notes={notes}
+                onNotesChange={setNotes}
+                onConfirm={handleConfirm}
+                onBack={() => setStep(sessionType === 'VIDEO_CALL' ? 'session-type' : 'location')}
+                isSubmitting={createBooking.isPending || createPaymentIntent.isPending}
+                paymentInfo={paymentInfo}
+                isFirstFree={!!isFirstFree}
+              />
+            )}
+
+            {step === 'payment' && clientSecret && paymentReq?.paymentRequired && (
+              <PaymentStep
+                clientSecret={clientSecret}
+                paymentInfo={{
+                  amount: paymentReq.amount,
+                  currency: paymentReq.currency,
+                  cancellationPolicy: paymentReq.cancellationPolicy,
+                }}
+                onSuccess={handlePaymentSuccess}
+                onBack={() => setStep('confirm')}
+              />
+            )}
+          </>
         )}
       </PageLayout.Content>
     </PageLayout>

@@ -26,7 +26,11 @@ export const OnboardingBanner = () => {
             </div>
           </div>
           <Link to={routes.dashboardOnboardingComplete(item.id)}>
-            <Button size="sm" variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-blue-300 text-blue-700 hover:bg-blue-100"
+            >
               Complete
               <ArrowRight className="h-4 w-4 ml-1" />
             </Button>

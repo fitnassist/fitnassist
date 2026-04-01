@@ -21,14 +21,10 @@ import { PageLayout } from '@/components/layouts';
 import { routes } from '@/config/routes';
 import { trpc } from '@/lib/trpc';
 import { useRecipe, useCreateRecipe, useUpdateRecipe } from '@/api/recipe';
-import {
-  createRecipeSchema,
-  COMMON_RECIPE_TAGS,
-  COMMON_UNITS,
-} from '@fitnassist/schemas';
+import { createRecipeSchema, COMMON_RECIPE_TAGS, COMMON_UNITS } from '@fitnassist/schemas';
 import type { CreateRecipeInput, Ingredient } from '@fitnassist/schemas';
 
-const UNIT_OPTIONS: SelectOption[] = COMMON_UNITS.map(u => ({ value: u, label: u }));
+const UNIT_OPTIONS: SelectOption[] = COMMON_UNITS.map((u) => ({ value: u, label: u }));
 
 export const RecipeFormPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -112,7 +108,7 @@ export const RecipeFormPage = () => {
 
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${params.cloudName}/${params.resourceType}/upload`,
-      { method: 'POST', body: formData }
+      { method: 'POST', body: formData },
     );
 
     if (!response.ok) throw new Error('Failed to upload image');
@@ -133,7 +129,10 @@ export const RecipeFormPage = () => {
 
   const toggleTag = (tag: string) => {
     if (tags.includes(tag)) {
-      setValue('tags', tags.filter(t => t !== tag));
+      setValue(
+        'tags',
+        tags.filter((t) => t !== tag),
+      );
     } else {
       setValue('tags', [...tags, tag]);
     }
@@ -143,7 +142,7 @@ export const RecipeFormPage = () => {
     setIsSaving(true);
     try {
       // Clean empty strings to null, filter empty ingredients
-      const cleanedIngredients = data.ingredients.filter(i => i.name.trim() !== '');
+      const cleanedIngredients = data.ingredients.filter((i) => i.name.trim() !== '');
       const cleaned = {
         ...data,
         description: data.description || null,
@@ -196,12 +195,10 @@ export const RecipeFormPage = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="name">Name *</Label>
-              <Input
-                id="name"
-                {...register('name')}
-                placeholder="e.g. Chicken Breast with Rice"
-              />
-              {errors.name && <p className="text-sm text-destructive mt-1">{errors.name.message}</p>}
+              <Input id="name" {...register('name')} placeholder="e.g. Chicken Breast with Rice" />
+              {errors.name && (
+                <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
+              )}
             </div>
             <div>
               <Label htmlFor="description">Description</Label>
@@ -243,19 +240,15 @@ export const RecipeFormPage = () => {
             {fields.map((field, index) => (
               <div key={field.id} className="flex items-start gap-2">
                 <div className="flex-1">
-                  <Input
-                    {...register(`ingredients.${index}.name`)}
-                    placeholder="Ingredient name"
-                  />
+                  <Input {...register(`ingredients.${index}.name`)} placeholder="Ingredient name" />
                   {errors.ingredients?.[index]?.name && (
-                    <p className="text-sm text-destructive mt-1">{errors.ingredients[index]?.name?.message}</p>
+                    <p className="text-sm text-destructive mt-1">
+                      {errors.ingredients[index]?.name?.message}
+                    </p>
                   )}
                 </div>
                 <div className="w-20">
-                  <Input
-                    {...register(`ingredients.${index}.quantity`)}
-                    placeholder="Qty"
-                  />
+                  <Input {...register(`ingredients.${index}.quantity`)} placeholder="Qty" />
                 </div>
                 <div className="w-28">
                   <Controller
@@ -264,7 +257,7 @@ export const RecipeFormPage = () => {
                     render={({ field }) => (
                       <Select
                         options={UNIT_OPTIONS}
-                        value={UNIT_OPTIONS.find(o => o.value === field.value) ?? null}
+                        value={UNIT_OPTIONS.find((o) => o.value === field.value) ?? null}
                         onChange={(opt) => field.onChange(opt?.value ?? '')}
                         placeholder="Unit"
                         isClearable
@@ -308,7 +301,9 @@ export const RecipeFormPage = () => {
               placeholder="Step-by-step cooking instructions..."
               rows={6}
             />
-            {errors.instructions && <p className="text-sm text-destructive mt-1">{errors.instructions.message}</p>}
+            {errors.instructions && (
+              <p className="text-sm text-destructive mt-1">{errors.instructions.message}</p>
+            )}
           </CardContent>
         </Card>
 

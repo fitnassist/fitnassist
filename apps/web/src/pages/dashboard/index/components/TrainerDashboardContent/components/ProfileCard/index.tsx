@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
-import { Edit, Eye, MapPin, CheckCircle, Clock } from "lucide-react";
-import { routes } from "@/config/routes";
+import { Link } from 'react-router-dom';
+import { Edit, Eye, MapPin, CheckCircle, Clock } from 'lucide-react';
+import { routes } from '@/config/routes';
 import {
   Button,
   Card,
@@ -11,9 +11,9 @@ import {
   AvatarImage,
   AvatarFallback,
   Badge,
-} from "@/components/ui";
-import { getInitials } from "../../TrainerDashboardContent.utils";
-import type { TrainerProfile } from "../../TrainerDashboardContent.types";
+} from '@/components/ui';
+import { getInitials } from '../../TrainerDashboardContent.utils';
+import type { TrainerProfile } from '../../TrainerDashboardContent.types';
 
 interface ProfileCardProps {
   profile: TrainerProfile;
@@ -29,10 +29,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">
               {profile.profileImageUrl && (
-                <AvatarImage
-                  src={profile.profileImageUrl}
-                  alt={profile.displayName}
-                />
+                <AvatarImage src={profile.profileImageUrl} alt={profile.displayName} />
               )}
               <AvatarFallback className="text-lg">{initials}</AvatarFallback>
             </Avatar>
@@ -52,12 +49,8 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
                 )}
               </CardTitle>
               <CardDescription className="mt-1 truncate">
-                <span className="text-muted-foreground">
-                  fitnassist.co/trainers/
-                </span>
-                <span className="font-medium text-foreground">
-                  {profile.handle}
-                </span>
+                <span className="text-muted-foreground">fitnassist.co/trainers/</span>
+                <span className="font-medium text-foreground">{profile.handle}</span>
               </CardDescription>
               {profile.city && profile.postcode && (
                 <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">

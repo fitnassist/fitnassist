@@ -48,9 +48,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps) {
   if (isSuccess) {
     return (
       <div className="text-center space-y-4">
-        <div className="text-green-600 dark:text-green-400 font-medium">
-          Check your email
-        </div>
+        <div className="text-green-600 dark:text-green-400 font-medium">Check your email</div>
         <p className="text-sm text-muted-foreground">
           If an account exists with that email, we've sent password reset instructions.
         </p>
@@ -64,9 +62,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {error && (
-        <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
-          {error}
-        </div>
+        <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">{error}</div>
       )}
 
       <div>
@@ -78,9 +74,7 @@ export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps) {
           {...register('email')}
           disabled={isLoading}
         />
-        {errors.email && (
-          <p className="text-sm text-destructive">{errors.email.message}</p>
-        )}
+        {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>

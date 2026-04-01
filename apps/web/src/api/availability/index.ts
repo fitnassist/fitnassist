@@ -16,7 +16,7 @@ export const useSetWeeklyAvailability = () => {
 export const useAvailabilityOverrides = (startDate: string, endDate: string) => {
   return trpc.availability.getOverrides.useQuery(
     { startDate, endDate },
-    { enabled: !!startDate && !!endDate }
+    { enabled: !!startDate && !!endDate },
   );
 };
 
@@ -67,13 +67,18 @@ export const useUpdateVideoSettings = () => {
 export const useAvailableSlots = (trainerId: string, date: string, durationMin?: number) => {
   return trpc.availability.getSlots.useQuery(
     { trainerId, date, durationMin },
-    { enabled: !!trainerId && !!date }
+    { enabled: !!trainerId && !!date },
   );
 };
 
-export const useAvailableDates = (trainerId: string, startDate: string, endDate: string, durationMin?: number) => {
+export const useAvailableDates = (
+  trainerId: string,
+  startDate: string,
+  endDate: string,
+  durationMin?: number,
+) => {
   return trpc.availability.getDates.useQuery(
     { trainerId, startDate, endDate, durationMin },
-    { enabled: !!trainerId && !!startDate && !!endDate }
+    { enabled: !!trainerId && !!startDate && !!endDate },
   );
 };

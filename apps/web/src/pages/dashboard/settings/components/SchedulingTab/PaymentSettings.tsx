@@ -2,8 +2,16 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CreditCard, ExternalLink, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import {
-  Card, CardHeader, CardTitle, CardContent,
-  Label, Switch, Badge, Button, Input, Select,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Label,
+  Switch,
+  Badge,
+  Button,
+  Input,
+  Select,
 } from '@/components/ui';
 import type { SelectOption } from '@/components/ui';
 import {
@@ -72,7 +80,9 @@ export const PaymentSettings = () => {
           if (result.onboardingComplete) {
             toast.success('Stripe onboarding complete! You can now accept payments.');
           } else {
-            setErrorMessage('Stripe onboarding not yet complete. Please finish all required steps.');
+            setErrorMessage(
+              'Stripe onboarding not yet complete. Please finish all required steps.',
+            );
           }
         },
       });
@@ -112,7 +122,7 @@ export const PaymentSettings = () => {
           setPriceDirty(false);
           toast.success('Session price updated');
         },
-      }
+      },
     );
   };
 
@@ -165,7 +175,9 @@ export const PaymentSettings = () => {
         <CardTitle className="flex items-center gap-2 text-base">
           <CreditCard className="h-4 w-4" />
           Session Payments
-          <Badge variant="secondary" className="text-xs">ELITE</Badge>
+          <Badge variant="secondary" className="text-xs">
+            ELITE
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -225,9 +237,7 @@ export const PaymentSettings = () => {
         <div className="flex items-center justify-between">
           <div>
             <Label className="text-sm">Accept session payments</Label>
-            <p className="text-xs text-muted-foreground">
-              Charge clients when they book a session
-            </p>
+            <p className="text-xs text-muted-foreground">Charge clients when they book a session</p>
           </div>
           <Switch
             checked={data.paymentsEnabled}
@@ -259,7 +269,11 @@ export const PaymentSettings = () => {
               onClick={handleSavePrice}
               disabled={!priceDirty || updatePriceMutation.isPending}
             >
-              {updatePriceMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Save'}
+              {updatePriceMutation.isPending ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                'Save'
+              )}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
@@ -292,10 +306,15 @@ export const PaymentSettings = () => {
           </div>
           <div className="grid gap-3">
             <div className="flex items-center gap-3">
-              <Label className="text-xs text-muted-foreground w-40 shrink-0">Full refund if cancelled</Label>
+              <Label className="text-xs text-muted-foreground w-40 shrink-0">
+                Full refund if cancelled
+              </Label>
               <Select
                 options={FULL_REFUND_OPTIONS}
-                value={FULL_REFUND_OPTIONS.find(o => o.value === String(policy.fullRefundHours)) ?? null}
+                value={
+                  FULL_REFUND_OPTIONS.find((o) => o.value === String(policy.fullRefundHours)) ??
+                  null
+                }
                 onChange={(option) => {
                   if (option) handleSavePolicy('fullRefundHours', option.value);
                 }}
@@ -304,10 +323,16 @@ export const PaymentSettings = () => {
               <span className="text-xs text-muted-foreground">before session</span>
             </div>
             <div className="flex items-center gap-3">
-              <Label className="text-xs text-muted-foreground w-40 shrink-0">Partial refund if cancelled</Label>
+              <Label className="text-xs text-muted-foreground w-40 shrink-0">
+                Partial refund if cancelled
+              </Label>
               <Select
                 options={PARTIAL_REFUND_OPTIONS}
-                value={PARTIAL_REFUND_OPTIONS.find(o => o.value === String(policy.partialRefundHours)) ?? null}
+                value={
+                  PARTIAL_REFUND_OPTIONS.find(
+                    (o) => o.value === String(policy.partialRefundHours),
+                  ) ?? null
+                }
                 onChange={(option) => {
                   if (option) handleSavePolicy('partialRefundHours', option.value);
                 }}
@@ -317,10 +342,16 @@ export const PaymentSettings = () => {
             </div>
             {policy.partialRefundHours > 0 && (
               <div className="flex items-center gap-3">
-                <Label className="text-xs text-muted-foreground w-40 shrink-0">Partial refund amount</Label>
+                <Label className="text-xs text-muted-foreground w-40 shrink-0">
+                  Partial refund amount
+                </Label>
                 <Select
                   options={PARTIAL_PERCENT_OPTIONS}
-                  value={PARTIAL_PERCENT_OPTIONS.find(o => o.value === String(policy.partialRefundPercent)) ?? null}
+                  value={
+                    PARTIAL_PERCENT_OPTIONS.find(
+                      (o) => o.value === String(policy.partialRefundPercent),
+                    ) ?? null
+                  }
                   onChange={(option) => {
                     if (option) handleSavePolicy('partialRefundPercent', option.value);
                   }}
@@ -331,7 +362,11 @@ export const PaymentSettings = () => {
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Cancellations within {policy.partialRefundHours > 0 ? `${policy.partialRefundHours} hours` : 'the partial refund window'} receive no refund
+            Cancellations within{' '}
+            {policy.partialRefundHours > 0
+              ? `${policy.partialRefundHours} hours`
+              : 'the partial refund window'}{' '}
+            receive no refund
           </p>
         </div>
       </CardContent>

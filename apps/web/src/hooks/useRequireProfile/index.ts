@@ -11,13 +11,10 @@ export interface UseRequireProfileReturn {
 export function useRequireProfile(): UseRequireProfileReturn {
   const { isTrainer, isLoading: isAuthLoading } = useAuth();
 
-  const { data, isLoading: isProfileLoading } = trpc.trainer.hasProfile.useQuery(
-    undefined,
-    {
-      enabled: isTrainer && !isAuthLoading,
-      staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    }
-  );
+  const { data, isLoading: isProfileLoading } = trpc.trainer.hasProfile.useQuery(undefined, {
+    enabled: isTrainer && !isAuthLoading,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
 
   const hasProfile = data?.hasProfile ?? false;
   const isLoading = isAuthLoading || (isTrainer && isProfileLoading);

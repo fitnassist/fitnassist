@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
-import { Sun, Moon, User, LogOut, Menu, X } from "lucide-react";
-import { routes } from "@/config/routes";
-import { Button } from "@/components/ui";
-import { Logo } from "@/components/Logo";
-import { useTheme } from "@/providers";
-import { useAuth } from "@/hooks";
-import { cn } from "@/lib/utils";
+import { useState, useEffect } from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Sun, Moon, User, LogOut, Menu, X } from 'lucide-react';
+import { routes } from '@/config/routes';
+import { Button } from '@/components/ui';
+import { Logo } from '@/components/Logo';
+import { useTheme } from '@/providers';
+import { useAuth } from '@/hooks';
+import { cn } from '@/lib/utils';
 
 export function MainLayout() {
   const { isDark, toggleTheme } = useTheme();
@@ -23,16 +23,18 @@ export function MainLayout() {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-          scrolled || alwaysSolid || mobileMenuOpen ? "bg-[hsl(230,25%,10%)] shadow-lg" : "bg-transparent",
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+          scrolled || alwaysSolid || mobileMenuOpen
+            ? 'bg-[hsl(230,25%,10%)] shadow-lg'
+            : 'bg-transparent',
         )}
       >
         <div className="px-4 sm:px-6 lg:px-8">
@@ -48,11 +50,7 @@ export function MainLayout() {
                 aria-label="Toggle theme"
                 className="text-white/80 hover:text-white hover:bg-white/10"
               >
-                {isDark ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
               <Link to={routes.trainers}>
                 <Button
@@ -81,7 +79,7 @@ export function MainLayout() {
                       className="flex items-center gap-2 text-white/80 hover:text-white hover:bg-white/10 uppercase text-xs tracking-wider font-semibold"
                     >
                       <User className="h-4 w-4" />
-                      {user?.name || "Dashboard"}
+                      {user?.name || 'Dashboard'}
                     </Button>
                   </Link>
                   <Button
@@ -121,11 +119,7 @@ export function MainLayout() {
                 aria-label="Toggle theme"
                 className="text-white/80 hover:text-white hover:bg-white/10"
               >
-                {isDark ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
               <Button
                 variant="ghost"
@@ -134,11 +128,7 @@ export function MainLayout() {
                 aria-label="Toggle menu"
                 className="text-white/80 hover:text-white hover:bg-white/10"
               >
-                {mobileMenuOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <Menu className="h-5 w-5" />
-                )}
+                {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
             </div>
           </div>
@@ -147,8 +137,8 @@ export function MainLayout() {
         {/* Mobile menu dropdown */}
         <div
           className={cn(
-            "sm:hidden bg-[hsl(230,25%,12%)] overflow-hidden transition-all duration-200",
-            mobileMenuOpen ? "max-h-64" : "max-h-0",
+            'sm:hidden bg-[hsl(230,25%,12%)] overflow-hidden transition-all duration-200',
+            mobileMenuOpen ? 'max-h-64' : 'max-h-0',
           )}
         >
           <div className="px-4 py-3 space-y-1">
@@ -175,7 +165,7 @@ export function MainLayout() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <User className="h-4 w-4" />
-                  {user?.name || "Dashboard"}
+                  {user?.name || 'Dashboard'}
                 </Link>
                 <button
                   onClick={() => {
@@ -251,10 +241,7 @@ export function MainLayout() {
                 >
                   Privacy Policy
                 </Link>
-                <Link
-                  to={routes.terms}
-                  className="block text-sm text-white/50 hover:text-white/80"
-                >
+                <Link to={routes.terms} className="block text-sm text-white/50 hover:text-white/80">
                   Terms of Service
                 </Link>
                 <Link

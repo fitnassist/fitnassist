@@ -28,7 +28,7 @@ export const CtaForm = ({ sectionId, content }: CtaFormProps) => {
   const updateSection = useUpdateSection();
   const { uploadImage, deleteFile } = useWebsiteUpload();
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string>(
-    (content.backgroundImageUrl as string) || ''
+    (content.backgroundImageUrl as string) || '',
   );
 
   const { register, handleSubmit, control } = useForm<CtaContent>({

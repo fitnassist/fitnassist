@@ -8,8 +8,8 @@ export const EmptyGoals = () => {
       </div>
       <h3 className="mt-4 text-lg font-medium">No goals yet</h3>
       <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-        Set a target to reach or a habit to build. Goals help you stay on track
-        and measure your progress over time.
+        Set a target to reach or a habit to build. Goals help you stay on track and measure your
+        progress over time.
       </p>
     </div>
   );

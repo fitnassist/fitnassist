@@ -1,16 +1,11 @@
 import { trpc } from '@/lib/trpc';
 
 export const useUserBadges = (userId?: string) => {
-  return trpc.badge.getUserBadges.useQuery(
-    userId ? { userId } : undefined,
-  );
+  return trpc.badge.getUserBadges.useQuery(userId ? { userId } : undefined);
 };
 
 export const useShowcaseBadges = (userId: string) => {
-  return trpc.badge.getShowcaseBadges.useQuery(
-    { userId },
-    { enabled: !!userId },
-  );
+  return trpc.badge.getShowcaseBadges.useQuery({ userId }, { enabled: !!userId });
 };
 
 export const useSetShowcaseBadges = () => {

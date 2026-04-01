@@ -1,4 +1,4 @@
-import { MapPin } from "lucide-react";
+import { MapPin } from 'lucide-react';
 
 interface ProfileHeaderProps {
   userName: string;
@@ -8,22 +8,12 @@ interface ProfileHeaderProps {
   city: string | null;
 }
 
-export const ProfileHeader = ({
-  userName,
-  handle,
-  avatarUrl,
-  bio,
-  city,
-}: ProfileHeaderProps) => {
+export const ProfileHeader = ({ userName, handle, avatarUrl, bio, city }: ProfileHeaderProps) => {
   return (
     <div className="relative">
       {/* Cover */}
       <div className="relative h-64 sm:h-80 lg:h-96 w-full overflow-hidden">
-        <img
-          src="/images/trainee-cover.jpg"
-          alt=""
-          className="h-full w-full object-cover"
-        />
+        <img src="/images/trainee-cover.jpg" alt="" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-br from-[#20415c] to-[#5a0c30] mix-blend-multiply opacity-90" />
       </div>
 
@@ -52,9 +42,7 @@ export const ProfileHeader = ({
             <h1 className="text-2xl sm:text-3xl font-extralight text-foreground uppercase tracking-wider">
               {userName}
             </h1>
-            {handle && (
-              <p className="text-sm text-muted-foreground">@{handle}</p>
-            )}
+            {handle && <p className="text-sm text-muted-foreground">@{handle}</p>}
             <div className="flex flex-wrap items-center gap-3 mt-1.5">
               {city && (
                 <span className="flex items-center gap-1 text-sm text-muted-foreground">
@@ -67,11 +55,7 @@ export const ProfileHeader = ({
         </div>
 
         {/* Bio */}
-        {bio && (
-          <p className="text-muted-foreground whitespace-pre-wrap pb-6">
-            {bio}
-          </p>
-        )}
+        {bio && <p className="text-muted-foreground whitespace-pre-wrap pb-6">{bio}</p>}
       </div>
     </div>
   );

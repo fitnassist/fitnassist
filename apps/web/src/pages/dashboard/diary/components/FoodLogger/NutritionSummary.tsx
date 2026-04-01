@@ -41,16 +41,13 @@ export const NutritionSummary = ({ date }: NutritionSummaryProps) => {
       </div>
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>
-          P: {Math.round(nutrition.totalProtein)}g
-          {proteinTarget > 0 && ` / ${proteinTarget}g`}
+          P: {Math.round(nutrition.totalProtein)}g{proteinTarget > 0 && ` / ${proteinTarget}g`}
         </span>
         <span>
-          C: {Math.round(nutrition.totalCarbs)}g
-          {carbsTarget > 0 && ` / ${carbsTarget}g`}
+          C: {Math.round(nutrition.totalCarbs)}g{carbsTarget > 0 && ` / ${carbsTarget}g`}
         </span>
         <span>
-          F: {Math.round(nutrition.totalFat)}g
-          {fatTarget > 0 && ` / ${fatTarget}g`}
+          F: {Math.round(nutrition.totalFat)}g{fatTarget > 0 && ` / ${fatTarget}g`}
         </span>
       </div>
     </div>

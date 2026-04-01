@@ -1,15 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Video, LinkIcon, Pencil, Trash2, Dumbbell } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  Button,
-  Badge,
-} from '@/components/ui';
+import { Card, CardContent, Button, Badge } from '@/components/ui';
 import { routes } from '@/config/routes';
 import { MUSCLE_GROUP_OPTIONS } from '@fitnassist/schemas';
 
-const DIFFICULTY_STYLES: Record<string, { label: string; variant: 'success' | 'warning' | 'destructive' }> = {
+const DIFFICULTY_STYLES: Record<
+  string,
+  { label: string; variant: 'success' | 'warning' | 'destructive' }
+> = {
   BEGINNER: { label: 'Beginner', variant: 'success' },
   INTERMEDIATE: { label: 'Intermediate', variant: 'warning' },
   ADVANCED: { label: 'Advanced', variant: 'destructive' },
@@ -36,7 +34,7 @@ export const ExerciseCard = ({ exercise, onDelete, isDeleting }: ExerciseCardPro
   const difficultyStyle = exercise.difficulty ? DIFFICULTY_STYLES[exercise.difficulty] : null;
 
   const getMuscleGroupLabel = (value: string) =>
-    MUSCLE_GROUP_OPTIONS.find(o => o.value === value)?.label ?? value;
+    MUSCLE_GROUP_OPTIONS.find((o) => o.value === value)?.label ?? value;
 
   return (
     <Card>
@@ -106,9 +104,7 @@ export const ExerciseCard = ({ exercise, onDelete, isDeleting }: ExerciseCardPro
             {(exercise.muscleGroups.length > 0 || exercise.equipment.length > 0) && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {exercise.muscleGroups.slice(0, 3).map((mg) => (
-                  <Badge key={mg}>
-                    {getMuscleGroupLabel(mg)}
-                  </Badge>
+                  <Badge key={mg}>{getMuscleGroupLabel(mg)}</Badge>
                 ))}
                 {exercise.equipment.slice(0, 2).map((eq) => (
                   <Badge key={eq} variant="secondary">
@@ -117,7 +113,10 @@ export const ExerciseCard = ({ exercise, onDelete, isDeleting }: ExerciseCardPro
                 ))}
                 {(exercise.muscleGroups.length > 3 || exercise.equipment.length > 2) && (
                   <Badge variant="secondary">
-                    +{Math.max(0, exercise.muscleGroups.length - 3) + Math.max(0, exercise.equipment.length - 2)} more
+                    +
+                    {Math.max(0, exercise.muscleGroups.length - 3) +
+                      Math.max(0, exercise.equipment.length - 2)}{' '}
+                    more
                   </Badge>
                 )}
               </div>

@@ -25,9 +25,7 @@ const createEmptyImage = (): GalleryImage => ({ url: '', caption: '' });
 export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
   const updateSection = useUpdateSection();
   const { uploadImage, deleteFile } = useWebsiteUpload();
-  const initialImages = Array.isArray(content.images)
-    ? (content.images as GalleryImage[])
-    : [];
+  const initialImages = Array.isArray(content.images) ? (content.images as GalleryImage[]) : [];
 
   const { control, watch } = useForm({
     values: {
@@ -38,14 +36,12 @@ export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
   const sourceType = watch('sourceType');
 
   const [images, setImages] = useState<GalleryImage[]>(
-    initialImages.length > 0 ? initialImages : [createEmptyImage()]
+    initialImages.length > 0 ? initialImages : [createEmptyImage()],
   );
 
   const handleImageUpload = async (index: number, file: File) => {
     const url = await uploadImage(file);
-    setImages((prev) =>
-      prev.map((img, i) => (i === index ? { ...img, url } : img))
-    );
+    setImages((prev) => prev.map((img, i) => (i === index ? { ...img, url } : img)));
     return url;
   };
 
@@ -54,15 +50,11 @@ export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
     if (current?.url) {
       await deleteFile(current.url);
     }
-    setImages((prev) =>
-      prev.map((img, i) => (i === index ? { ...img, url: '' } : img))
-    );
+    setImages((prev) => prev.map((img, i) => (i === index ? { ...img, url: '' } : img)));
   };
 
   const handleCaptionUpdate = (index: number, caption: string) => {
-    setImages((prev) =>
-      prev.map((img, i) => (i === index ? { ...img, caption } : img))
-    );
+    setImages((prev) => prev.map((img, i) => (i === index ? { ...img, caption } : img)));
   };
 
   const handleAdd = () => {
@@ -122,7 +114,11 @@ export const GalleryForm = ({ sectionId, content }: GalleryFormProps) => {
 
               <ImageUpload
                 value={img.url}
-                onChange={(url) => setImages((prev) => prev.map((im, i) => (i === index ? { ...im, url: url ?? '' } : im)))}
+                onChange={(url) =>
+                  setImages((prev) =>
+                    prev.map((im, i) => (i === index ? { ...im, url: url ?? '' } : im)),
+                  )
+                }
                 onUpload={(file) => handleImageUpload(index, file)}
                 onDelete={() => handleImageDelete(index)}
                 maxSizeMB={10}

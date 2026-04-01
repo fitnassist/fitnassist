@@ -1,9 +1,18 @@
 import { useState } from 'react';
 import { Plus, MoreVertical, Eye, Archive, Trash2, Pencil } from 'lucide-react';
 import { Button, Badge, Card, CardContent, ConfirmDialog } from '@/components/ui';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useProducts, usePublishProduct, useArchiveProduct, useDeleteProduct } from '@/api/product';
-import { PRODUCT_STATUS_LABELS, PRODUCT_STATUS_COLOURS, PRODUCT_TYPE_LABELS } from '../../storefront.constants';
+import {
+  PRODUCT_STATUS_LABELS,
+  PRODUCT_STATUS_COLOURS,
+  PRODUCT_TYPE_LABELS,
+} from '../../storefront.constants';
 import type { Product } from '@fitnassist/database';
 
 interface ProductListProps {
@@ -31,7 +40,9 @@ export const ProductList = ({ onEdit, onCreate }: ProductListProps) => {
   if (!products || products.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground mb-4">No products yet. Create your first product to start selling.</p>
+        <p className="text-muted-foreground mb-4">
+          No products yet. Create your first product to start selling.
+        </p>
         <Button onClick={onCreate}>
           <Plus className="h-4 w-4 mr-2" />
           Create Product
@@ -43,7 +54,9 @@ export const ProductList = ({ onEdit, onCreate }: ProductListProps) => {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-muted-foreground">{products.length} product{products.length !== 1 ? 's' : ''}</p>
+        <p className="text-sm text-muted-foreground">
+          {products.length} product{products.length !== 1 ? 's' : ''}
+        </p>
         <Button onClick={onCreate}>
           <Plus className="h-4 w-4 mr-2" />
           Create Product
@@ -55,7 +68,11 @@ export const ProductList = ({ onEdit, onCreate }: ProductListProps) => {
           <Card key={product.id} className="overflow-hidden">
             {product.imageUrl ? (
               <div className="aspect-video bg-muted">
-                <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
             ) : (
               <div className="aspect-video bg-muted flex items-center justify-center">
@@ -70,7 +87,9 @@ export const ProductList = ({ onEdit, onCreate }: ProductListProps) => {
                     <Badge variant="outline" className={PRODUCT_STATUS_COLOURS[product.status]}>
                       {PRODUCT_STATUS_LABELS[product.status]}
                     </Badge>
-                    <span className="text-xs text-muted-foreground">{PRODUCT_TYPE_LABELS[product.type]}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {PRODUCT_TYPE_LABELS[product.type]}
+                    </span>
                   </div>
                   <p className="text-lg font-semibold mt-2">
                     £{(product.pricePence / 100).toFixed(2)}
@@ -94,13 +113,17 @@ export const ProductList = ({ onEdit, onCreate }: ProductListProps) => {
                       Edit
                     </DropdownMenuItem>
                     {product.status === 'DRAFT' && (
-                      <DropdownMenuItem onClick={() => publishProduct.mutate({ productId: product.id })}>
+                      <DropdownMenuItem
+                        onClick={() => publishProduct.mutate({ productId: product.id })}
+                      >
                         <Eye className="h-4 w-4 mr-2" />
                         Publish
                       </DropdownMenuItem>
                     )}
                     {product.status === 'ACTIVE' && (
-                      <DropdownMenuItem onClick={() => archiveProduct.mutate({ productId: product.id })}>
+                      <DropdownMenuItem
+                        onClick={() => archiveProduct.mutate({ productId: product.id })}
+                      >
                         <Archive className="h-4 w-4 mr-2" />
                         Archive
                       </DropdownMenuItem>

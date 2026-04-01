@@ -69,73 +69,63 @@ export const SupportPage = () => {
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-        <div>
-          <Label htmlFor="name">Name</Label>
-          <Input id="name" placeholder="Your name" {...register('name')} />
-          {errors.name && (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
-          )}
-        </div>
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" placeholder="Your name" {...register('name')} />
+            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+          </div>
 
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
-          )}
-        </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" placeholder="you@example.com" {...register('email')} />
+            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+          </div>
 
-        <div>
-          <Label htmlFor="subject">Subject</Label>
-          <select
-            id="subject"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            defaultValue=""
-            {...register('subject')}
-          >
-            <option value="" disabled>
-              Select a subject...
-            </option>
-            {SUBJECT_OPTIONS.map((option) => (
-              <option key={option.value} value={option.label}>
-                {option.label}
+          <div>
+            <Label htmlFor="subject">Subject</Label>
+            <select
+              id="subject"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              defaultValue=""
+              {...register('subject')}
+            >
+              <option value="" disabled>
+                Select a subject...
               </option>
-            ))}
-          </select>
-          {errors.subject && (
-            <p className="text-sm text-destructive">{errors.subject.message}</p>
-          )}
-        </div>
+              {SUBJECT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.label}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {errors.subject && <p className="text-sm text-destructive">{errors.subject.message}</p>}
+          </div>
 
-        <div>
-          <Label htmlFor="message">Message</Label>
-          <Textarea
-            id="message"
-            placeholder="Tell us how we can help..."
-            rows={6}
-            {...register('message')}
-          />
-          {errors.message && (
-            <p className="text-sm text-destructive">{errors.message.message}</p>
-          )}
-        </div>
+          <div>
+            <Label htmlFor="message">Message</Label>
+            <Textarea
+              id="message"
+              placeholder="Tell us how we can help..."
+              rows={6}
+              {...register('message')}
+            />
+            {errors.message && <p className="text-sm text-destructive">{errors.message.message}</p>}
+          </div>
 
-        {submitMutation.error && (
-          <p className="text-sm text-destructive">
-            Something went wrong. Please try again.
-          </p>
-        )}
-
-        <Button type="submit" disabled={submitMutation.isPending} className="w-full">
-          {submitMutation.isPending ? (
-            'Sending...'
-          ) : (
-            <>
-              <Send className="mr-2 h-4 w-4" />
-              Send message
-            </>
+          {submitMutation.error && (
+            <p className="text-sm text-destructive">Something went wrong. Please try again.</p>
           )}
-        </Button>
+
+          <Button type="submit" disabled={submitMutation.isPending} className="w-full">
+            {submitMutation.isPending ? (
+              'Sending...'
+            ) : (
+              <>
+                <Send className="mr-2 h-4 w-4" />
+                Send message
+              </>
+            )}
+          </Button>
         </form>
       </div>
     </div>

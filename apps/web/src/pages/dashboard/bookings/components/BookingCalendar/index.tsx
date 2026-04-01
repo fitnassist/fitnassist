@@ -41,7 +41,11 @@ const EventContent = ({ event }: EventContentArg) => {
     return (
       <div className="flex flex-col gap-0.5 overflow-hidden">
         <div className="flex items-center gap-1 font-medium truncate">
-          {sessionType === 'VIDEO_CALL' ? <Video className="h-3 w-3 shrink-0" /> : <User className="h-3 w-3 shrink-0" />}
+          {sessionType === 'VIDEO_CALL' ? (
+            <Video className="h-3 w-3 shrink-0" />
+          ) : (
+            <User className="h-3 w-3 shrink-0" />
+          )}
           <span className="truncate">{name}</span>
         </div>
         <span className="text-[0.65rem] text-white/80">
@@ -119,9 +123,12 @@ export const BookingCalendar = ({ isTrainer, view }: BookingCalendarProps) => {
     });
   }, [bookings, isTrainer, view]);
 
-  const handleEventClick = useCallback((info: EventClickArg) => {
-    navigate(routes.dashboardBookingDetail(info.event.id));
-  }, [navigate]);
+  const handleEventClick = useCallback(
+    (info: EventClickArg) => {
+      navigate(routes.dashboardBookingDetail(info.event.id));
+    },
+    [navigate],
+  );
 
   // When FullCalendar navigates (prev/next/today), update the query range.
   // This does NOT cause FullCalendar to remount or reset — the calendar

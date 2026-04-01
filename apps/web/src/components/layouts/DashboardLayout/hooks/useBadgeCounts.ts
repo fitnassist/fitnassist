@@ -2,7 +2,11 @@ import { trpc } from '@/lib/trpc';
 import { BADGE_POLL_INTERVAL } from '../DashboardLayout.constants';
 import type { BadgeCounts } from '../DashboardLayout.types';
 
-export const useBadgeCounts = (isAuthenticated: boolean, isTrainer: boolean, sseConnected: boolean): BadgeCounts => {
+export const useBadgeCounts = (
+  isAuthenticated: boolean,
+  isTrainer: boolean,
+  sseConnected: boolean,
+): BadgeCounts => {
   // Fetch unread message count — SSE invalidates this cache, so no polling needed when connected
   const { data: unreadMessages } = trpc.message.getUnreadCount.useQuery(undefined, {
     enabled: isAuthenticated,

@@ -15,7 +15,13 @@ interface DetailDialogProps {
   children: ReactNode;
 }
 
-export const DetailDialog = ({ open, onOpenChange, title, description, children }: DetailDialogProps) => {
+export const DetailDialog = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  children,
+}: DetailDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">

@@ -92,9 +92,7 @@ export const MessagesPage = () => {
 
   const allConnections = [...(connections ?? []), ...(archivedConnections ?? [])];
   const hasConversations = allConnections.length > 0;
-  const activeOtherPerson = activeConnection
-    ? getOtherPerson(activeConnection, user?.id)
-    : null;
+  const activeOtherPerson = activeConnection ? getOtherPerson(activeConnection, user?.id) : null;
 
   return (
     <div className="h-full flex">
@@ -102,7 +100,7 @@ export const MessagesPage = () => {
       <div
         className={cn(
           'w-full md:w-80 lg:w-96 border-r flex flex-col',
-          connectionId ? 'hidden md:flex' : 'flex'
+          connectionId ? 'hidden md:flex' : 'flex',
         )}
       >
         <div className="p-4 border-b">
@@ -122,12 +120,7 @@ export const MessagesPage = () => {
       </div>
 
       {/* Message Thread - Desktop: always visible, Mobile: shown when thread is active */}
-      <div
-        className={cn(
-          'flex-1 flex flex-col',
-          connectionId ? 'flex' : 'hidden md:flex'
-        )}
-      >
+      <div className={cn('flex-1 flex flex-col', connectionId ? 'flex' : 'hidden md:flex')}>
         {!connectionId ? (
           <EmptyThread />
         ) : hasConversations && activeConnection ? (

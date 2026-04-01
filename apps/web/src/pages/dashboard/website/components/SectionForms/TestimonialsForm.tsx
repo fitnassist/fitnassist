@@ -28,9 +28,7 @@ const createEmptyItem = (): TestimonialItem => ({
 
 export const TestimonialsForm = ({ sectionId, content }: TestimonialsFormProps) => {
   const updateSection = useUpdateSection();
-  const initialItems = Array.isArray(content.items)
-    ? (content.items as TestimonialItem[])
-    : [];
+  const initialItems = Array.isArray(content.items) ? (content.items as TestimonialItem[]) : [];
 
   const { control, watch } = useForm({
     values: {
@@ -41,13 +39,11 @@ export const TestimonialsForm = ({ sectionId, content }: TestimonialsFormProps) 
   const sourceType = watch('sourceType');
 
   const [items, setItems] = useState<TestimonialItem[]>(
-    initialItems.length > 0 ? initialItems : [createEmptyItem()]
+    initialItems.length > 0 ? initialItems : [createEmptyItem()],
   );
 
   const handleUpdate = (index: number, field: keyof TestimonialItem, value: string | number) => {
-    setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
   };
 
   const handleAdd = () => {
@@ -127,9 +123,7 @@ export const TestimonialsForm = ({ sectionId, content }: TestimonialsFormProps) 
                     min={1}
                     max={5}
                     value={item.rating}
-                    onChange={(e) =>
-                      handleUpdate(index, 'rating', parseInt(e.target.value) || 5)
-                    }
+                    onChange={(e) => handleUpdate(index, 'rating', parseInt(e.target.value) || 5)}
                   />
                 </div>
               </div>

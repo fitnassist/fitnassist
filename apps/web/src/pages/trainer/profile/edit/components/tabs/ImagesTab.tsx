@@ -2,7 +2,17 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { wizardImagesSchema, type WizardImagesInput } from '@fitnassist/schemas';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, ImageUpload, GalleryUpload, VideoUpload } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  ImageUpload,
+  GalleryUpload,
+  VideoUpload,
+} from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { toast } from '@/lib/toast';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
@@ -57,7 +67,10 @@ export function ImagesTab({ profile }: ImagesTabProps) {
     },
   });
 
-  const uploadToCloudinary = async (file: File, type: 'profile' | 'cover' | 'gallery' | 'video-intro'): Promise<string> => {
+  const uploadToCloudinary = async (
+    file: File,
+    type: 'profile' | 'cover' | 'gallery' | 'video-intro',
+  ): Promise<string> => {
     const params = await getUploadParamsMutation.mutateAsync({ type });
 
     const formData = new FormData();
@@ -72,7 +85,7 @@ export function ImagesTab({ profile }: ImagesTabProps) {
       {
         method: 'POST',
         body: formData,
-      }
+      },
     );
 
     if (!uploadResponse.ok) {
@@ -141,9 +154,7 @@ export function ImagesTab({ profile }: ImagesTabProps) {
       <Card>
         <CardHeader>
           <CardTitle>Profile Images</CardTitle>
-          <CardDescription>
-            Update your profile photo and cover image.
-          </CardDescription>
+          <CardDescription>Update your profile photo and cover image.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

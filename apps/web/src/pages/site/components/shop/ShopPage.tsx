@@ -11,7 +11,12 @@ interface ShopPageProps {
   onAddToCart?: (productId: string) => void;
 }
 
-export const ShopPage = ({ trainerId, onNavigateProduct, onNavigateHome, onAddToCart }: ShopPageProps) => {
+export const ShopPage = ({
+  trainerId,
+  onNavigateProduct,
+  onNavigateHome,
+  onAddToCart,
+}: ShopPageProps) => {
   const { data: products, isLoading } = trpc.product.getPublicProducts.useQuery({ trainerId });
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<'default' | 'price-asc' | 'price-desc'>('default');
@@ -23,8 +28,7 @@ export const ShopPage = ({ trainerId, onNavigateProduct, onNavigateHome, onAddTo
       const q = search.toLowerCase();
       result = result.filter(
         (p) =>
-          p.name.toLowerCase().includes(q) ||
-          (p.shortDescription ?? '').toLowerCase().includes(q),
+          p.name.toLowerCase().includes(q) || (p.shortDescription ?? '').toLowerCase().includes(q),
       );
     }
     if (sort === 'price-asc') result.sort((a, b) => a.pricePence - b.pricePence);
@@ -37,7 +41,10 @@ export const ShopPage = ({ trainerId, onNavigateProduct, onNavigateHome, onAddTo
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm">
-          <button onClick={onNavigateHome} className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">
+          <button
+            onClick={onNavigateHome}
+            className="text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"
+          >
             Home
           </button>
           <span className="mx-2 text-[hsl(var(--muted-foreground))]">/</span>

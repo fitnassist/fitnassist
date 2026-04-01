@@ -55,7 +55,9 @@ const ThemePreviewCard = ({ theme, isSelected, onSelect }: ThemePreviewCardProps
       onClick={onSelect}
       className={cn(
         'relative rounded-lg border-2 p-3 text-left transition-all hover:shadow-md',
-        isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-border hover:border-primary/50'
+        isSelected
+          ? 'border-primary ring-2 ring-primary/20'
+          : 'border-border hover:border-primary/50',
       )}
     >
       {isSelected && (
@@ -66,10 +68,7 @@ const ThemePreviewCard = ({ theme, isSelected, onSelect }: ThemePreviewCardProps
       {/* Theme preview swatch */}
       <div className="mb-3 rounded-md overflow-hidden h-20">
         <div className="flex h-full">
-          <div
-            className="flex-1"
-            style={{ backgroundColor: `hsl(${theme.colors.background})` }}
-          >
+          <div className="flex-1" style={{ backgroundColor: `hsl(${theme.colors.background})` }}>
             <div className="p-2">
               <div
                 className="h-2 w-12 rounded mb-1"
@@ -81,10 +80,7 @@ const ThemePreviewCard = ({ theme, isSelected, onSelect }: ThemePreviewCardProps
               />
             </div>
           </div>
-          <div
-            className="w-1/3"
-            style={{ backgroundColor: `hsl(${theme.colors.primary})` }}
-          />
+          <div className="w-1/3" style={{ backgroundColor: `hsl(${theme.colors.primary})` }} />
         </div>
       </div>
       <p className="text-sm font-semibold">{theme.name}</p>

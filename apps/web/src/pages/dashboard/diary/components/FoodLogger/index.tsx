@@ -35,7 +35,7 @@ interface FoodLoggerProps {
 }
 
 export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
-  const [searchMealType, setSearchMealType] = useState<typeof MEAL_TYPES[number] | null>(null);
+  const [searchMealType, setSearchMealType] = useState<(typeof MEAL_TYPES)[number] | null>(null);
   const logFood = useLogFood();
   const deleteFoodEntry = useDeleteFoodEntry();
 
@@ -62,7 +62,7 @@ export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
 
         <div className="mt-4 space-y-4">
           {MEAL_TYPES.map((mealType) => {
-            const mealEntries = foodEntries.filter(e => e.mealType === mealType);
+            const mealEntries = foodEntries.filter((e) => e.mealType === mealType);
             return (
               <div key={mealType}>
                 <div className="flex items-center justify-between">
@@ -99,7 +99,9 @@ export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
         {searchMealType && (
           <FoodSearchModal
             open={!!searchMealType}
-            onOpenChange={(open) => { if (!open) setSearchMealType(null); }}
+            onOpenChange={(open) => {
+              if (!open) setSearchMealType(null);
+            }}
             mealType={searchMealType}
             onAddFood={handleAddFood}
           />

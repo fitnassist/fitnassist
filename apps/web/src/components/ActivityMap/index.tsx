@@ -50,19 +50,21 @@ export const ActivityMap = ({
   endLongitude,
   className = '',
 }: ActivityMapProps) => {
-  const positions = polyline.decode(encodedPolyline).map(
-    ([lat, lng]: [number, number]) => [lat, lng] as L.LatLngExpression
-  );
+  const positions = polyline
+    .decode(encodedPolyline)
+    .map(([lat, lng]: [number, number]) => [lat, lng] as L.LatLngExpression);
 
   if (positions.length === 0) return null;
 
-  const startPos = startLatitude && startLongitude
-    ? [startLatitude, startLongitude] as L.LatLngExpression
-    : positions[0];
+  const startPos =
+    startLatitude && startLongitude
+      ? ([startLatitude, startLongitude] as L.LatLngExpression)
+      : positions[0];
 
-  const endPos = endLatitude && endLongitude
-    ? [endLatitude, endLongitude] as L.LatLngExpression
-    : positions[positions.length - 1];
+  const endPos =
+    endLatitude && endLongitude
+      ? ([endLatitude, endLongitude] as L.LatLngExpression)
+      : positions[positions.length - 1];
 
   const center = positions[Math.floor(positions.length / 2)] ?? positions[0];
 

@@ -67,20 +67,19 @@ export const PrivacyTab = () => {
     }
   }, [settings, localSettings]);
 
-  const handleChange = useCallback(
-    (key: string, value: VisibilityLevel) => {
-      setLocalSettings((prev) => {
-        if (!prev) return prev;
-        return { ...prev, [key]: value };
-      });
-      setHasChanges(true);
-    },
-    [],
-  );
+  const handleChange = useCallback((key: string, value: VisibilityLevel) => {
+    setLocalSettings((prev) => {
+      if (!prev) return prev;
+      return { ...prev, [key]: value };
+    });
+    setHasChanges(true);
+  }, []);
 
   const handleSave = async () => {
     if (!localSettings) return;
-    await updateMutation.mutateAsync(localSettings as Parameters<typeof updateMutation.mutateAsync>[0]);
+    await updateMutation.mutateAsync(
+      localSettings as Parameters<typeof updateMutation.mutateAsync>[0],
+    );
     setHasChanges(false);
     toast.success('Privacy settings saved');
   };
@@ -115,9 +114,7 @@ export const PrivacyTab = () => {
             <Shield className="h-5 w-5 text-muted-foreground" />
             <CardTitle>Profile Sections</CardTitle>
           </div>
-          <CardDescription>
-            Control who can see different parts of your profile.
-          </CardDescription>
+          <CardDescription>Control who can see different parts of your profile.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-1">
           <div className="divide-y">
@@ -164,7 +161,8 @@ export const PrivacyTab = () => {
       <Card>
         <CardContent className="py-4">
           <p className="text-sm text-muted-foreground">
-            <strong>Medical Notes</strong> are only visible to your connected personal trainer and are never shown publicly.
+            <strong>Medical Notes</strong> are only visible to your connected personal trainer and
+            are never shown publicly.
           </p>
         </CardContent>
       </Card>
@@ -174,10 +172,7 @@ export const PrivacyTab = () => {
         {updateMutation.error && (
           <p className="text-sm text-destructive">{updateMutation.error.message}</p>
         )}
-        <Button
-          onClick={handleSave}
-          disabled={!hasChanges || updateMutation.isPending}
-        >
+        <Button onClick={handleSave} disabled={!hasChanges || updateMutation.isPending}>
           {updateMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

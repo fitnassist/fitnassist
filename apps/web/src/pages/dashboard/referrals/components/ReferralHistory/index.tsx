@@ -3,7 +3,10 @@ import { ChevronLeft, ChevronRight, UserPlus } from 'lucide-react';
 import { Badge, Button, Card, CardContent, Skeleton } from '@/components/ui';
 import { useReferralHistory } from '@/api/referral';
 
-const STATUS_STYLES: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const STATUS_STYLES: Record<
+  string,
+  { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }
+> = {
   PENDING: { label: 'Pending', variant: 'secondary' },
   ACTIVATED: { label: 'Activated', variant: 'default' },
   EXPIRED: { label: 'Expired', variant: 'outline' },
@@ -60,7 +63,10 @@ export const ReferralHistory = () => {
       <CardContent className="p-0">
         <div className="divide-y">
           {data.items.map((referral) => {
-            const statusInfo = STATUS_STYLES[referral.status] ?? { label: 'Unknown', variant: 'outline' as const };
+            const statusInfo = STATUS_STYLES[referral.status] ?? {
+              label: 'Unknown',
+              variant: 'outline' as const,
+            };
             return (
               <div key={referral.id} className="px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">

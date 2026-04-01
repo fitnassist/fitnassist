@@ -6,11 +6,16 @@ export interface SelectOption {
   label: string;
 }
 
-type SelectProps<IsMulti extends boolean = false> = Omit<Props<SelectOption, IsMulti, GroupBase<SelectOption>>, 'styles' | 'theme'> & {
+type SelectProps<IsMulti extends boolean = false> = Omit<
+  Props<SelectOption, IsMulti, GroupBase<SelectOption>>,
+  'styles' | 'theme'
+> & {
   error?: boolean;
 };
 
-const getStyles = <IsMulti extends boolean = false>(error?: boolean): StylesConfig<SelectOption, IsMulti, GroupBase<SelectOption>> => ({
+const getStyles = <IsMulti extends boolean = false>(
+  error?: boolean,
+): StylesConfig<SelectOption, IsMulti, GroupBase<SelectOption>> => ({
   control: (base, state) => ({
     ...base,
     minHeight: '2.5rem',
@@ -18,17 +23,15 @@ const getStyles = <IsMulti extends boolean = false>(error?: boolean): StylesConf
     borderColor: error
       ? 'hsl(var(--destructive))'
       : state.isFocused
-      ? 'hsl(var(--ring))'
-      : 'hsl(var(--input))',
+        ? 'hsl(var(--ring))'
+        : 'hsl(var(--input))',
     backgroundColor: 'hsl(var(--background))',
     boxShadow: state.isFocused
       ? '0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring))'
       : 'none',
     fontSize: '0.875rem',
     '&:hover': {
-      borderColor: state.isFocused
-        ? 'hsl(var(--ring))'
-        : 'hsl(var(--input))',
+      borderColor: state.isFocused ? 'hsl(var(--ring))' : 'hsl(var(--input))',
     },
   }),
   menu: (base) => ({
@@ -51,8 +54,8 @@ const getStyles = <IsMulti extends boolean = false>(error?: boolean): StylesConf
     backgroundColor: state.isSelected
       ? 'hsl(var(--accent))'
       : state.isFocused
-      ? 'hsl(var(--accent))'
-      : 'transparent',
+        ? 'hsl(var(--accent))'
+        : 'transparent',
     color: 'hsl(var(--popover-foreground))',
     cursor: 'pointer',
     '&:active': {
@@ -110,7 +113,10 @@ const getStyles = <IsMulti extends boolean = false>(error?: boolean): StylesConf
   }),
 });
 
-export const Select = <IsMulti extends boolean = false>({ error, ...props }: SelectProps<IsMulti>) => {
+export const Select = <IsMulti extends boolean = false>({
+  error,
+  ...props
+}: SelectProps<IsMulti>) => {
   return (
     <ReactSelect<SelectOption, IsMulti, GroupBase<SelectOption>>
       styles={getStyles<IsMulti>(error)}

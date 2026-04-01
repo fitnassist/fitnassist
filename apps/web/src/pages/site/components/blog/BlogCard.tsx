@@ -47,9 +47,7 @@ export const BlogCard = ({
           {title}
         </h3>
         {excerpt && (
-          <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))] line-clamp-3">
-            {excerpt}
-          </p>
+          <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))] line-clamp-3">{excerpt}</p>
         )}
         <div className="mt-4 flex items-center gap-3">
           {formattedDate && (

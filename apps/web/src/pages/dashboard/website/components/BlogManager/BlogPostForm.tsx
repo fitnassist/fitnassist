@@ -1,18 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  createBlogPostSchema,
-  type CreateBlogPostInput,
-} from '@fitnassist/schemas';
-import {
-  Button,
-  ImageUpload,
-  Input,
-  Label,
-  Textarea,
-  RichTextEditor,
-} from '@/components/ui';
+import { createBlogPostSchema, type CreateBlogPostInput } from '@fitnassist/schemas';
+import { Button, ImageUpload, Input, Label, Textarea, RichTextEditor } from '@/components/ui';
 import { useCreateBlogPost, useUpdateBlogPost } from '@/api/website';
 import { useWebsiteUpload } from '../../hooks';
 import type { BlogPost } from './BlogManager.types';
@@ -77,10 +67,7 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
     };
 
     if (isEditing) {
-      updateBlogPost.mutate(
-        { postId: post.id, ...cleaned },
-        { onSuccess: onClose }
-      );
+      updateBlogPost.mutate({ postId: post.id, ...cleaned }, { onSuccess: onClose });
     } else {
       createBlogPost.mutate(cleaned, { onSuccess: onClose });
     }
@@ -91,26 +78,14 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="title">Title</Label>
-          <Input
-            id="title"
-            {...register('title')}
-            placeholder="My awesome blog post"
-          />
-          {errors.title && (
-            <p className="text-sm text-destructive">{errors.title.message}</p>
-          )}
+          <Input id="title" {...register('title')} placeholder="My awesome blog post" />
+          {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="slug">Slug</Label>
-          <Input
-            id="slug"
-            {...register('slug')}
-            placeholder="my-awesome-blog-post"
-          />
-          {errors.slug && (
-            <p className="text-sm text-destructive">{errors.slug.message}</p>
-          )}
+          <Input id="slug" {...register('slug')} placeholder="my-awesome-blog-post" />
+          {errors.slug && <p className="text-sm text-destructive">{errors.slug.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -121,9 +96,7 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
             placeholder="A brief summary of your post..."
             rows={3}
           />
-          {errors.excerpt && (
-            <p className="text-sm text-destructive">{errors.excerpt.message}</p>
-          )}
+          {errors.excerpt && <p className="text-sm text-destructive">{errors.excerpt.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -140,9 +113,7 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
               />
             )}
           />
-          {errors.content && (
-            <p className="text-sm text-destructive">{errors.content.message}</p>
-          )}
+          {errors.content && <p className="text-sm text-destructive">{errors.content.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -156,9 +127,7 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
             maxSizeMB={10}
           />
           {errors.coverImageUrl && (
-            <p className="text-sm text-destructive">
-              {errors.coverImageUrl.message}
-            </p>
+            <p className="text-sm text-destructive">{errors.coverImageUrl.message}</p>
           )}
         </div>
 
@@ -185,11 +154,7 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
             {...register('seoTitle')}
             placeholder="SEO-optimised title (max 60 characters)"
           />
-          {errors.seoTitle && (
-            <p className="text-sm text-destructive">
-              {errors.seoTitle.message}
-            </p>
-          )}
+          {errors.seoTitle && <p className="text-sm text-destructive">{errors.seoTitle.message}</p>}
         </div>
 
         <div className="space-y-2">
@@ -201,9 +166,7 @@ export const BlogPostForm = ({ post, onClose }: BlogPostFormProps) => {
             rows={2}
           />
           {errors.seoDescription && (
-            <p className="text-sm text-destructive">
-              {errors.seoDescription.message}
-            </p>
+            <p className="text-sm text-destructive">{errors.seoDescription.message}</p>
           )}
         </div>
       </div>

@@ -5,7 +5,12 @@ import { Select } from '@/components/ui';
 import type { SelectOption } from '@/components/ui';
 import { BADGE_CATEGORIES, BADGE_MAP } from '@fitnassist/schemas';
 import type { BadgeCategory } from '@fitnassist/schemas';
-import { useUserBadges, useAllBadgeDefinitions, useMyShowcaseBadgeIds, useSetShowcaseBadges } from '@/api/badge';
+import {
+  useUserBadges,
+  useAllBadgeDefinitions,
+  useMyShowcaseBadgeIds,
+  useSetShowcaseBadges,
+} from '@/api/badge';
 import { BadgeGrid, ShowcaseEditor } from './components';
 
 const CATEGORY_OPTIONS: SelectOption[] = [
@@ -33,31 +38,38 @@ export const AchievementsPage = () => {
   const totalBadges = allBadges?.length ?? 0;
 
   const showcaseBadges = useMemo(
-    () => Array.from(showcaseIds)
-      .map((id) => BADGE_MAP.get(id))
-      .filter((b): b is NonNullable<typeof b> => b !== undefined),
+    () =>
+      Array.from(showcaseIds)
+        .map((id) => BADGE_MAP.get(id))
+        .filter((b): b is NonNullable<typeof b> => b !== undefined),
     [showcaseIds],
   );
 
-  const handleToggleShowcase = useCallback((badgeId: string) => {
-    setShowcaseIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(badgeId)) {
-        next.delete(badgeId);
-      } else if (next.size < 5) {
-        next.add(badgeId);
-      }
-      setShowcaseMutation.mutate({ badgeIds: Array.from(next) });
-      return next;
-    });
-  }, [setShowcaseMutation]);
+  const handleToggleShowcase = useCallback(
+    (badgeId: string) => {
+      setShowcaseIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(badgeId)) {
+          next.delete(badgeId);
+        } else if (next.size < 5) {
+          next.add(badgeId);
+        }
+        setShowcaseMutation.mutate({ badgeIds: Array.from(next) });
+        return next;
+      });
+    },
+    [setShowcaseMutation],
+  );
 
   const isLoading = loadingEarned || loadingAll;
 
   if (isLoading) {
     return (
       <PageLayout>
-        <PageLayout.Header title="Achievements" description="Earn badges as you progress on your fitness journey." />
+        <PageLayout.Header
+          title="Achievements"
+          description="Earn badges as you progress on your fitness journey."
+        />
         <PageLayout.Content>
           <div className="flex justify-center py-12">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -82,9 +94,7 @@ export const AchievementsPage = () => {
             </div>
             <div>
               <p className="text-2xl font-bold">{totalEarned}</p>
-              <p className="text-sm text-muted-foreground">
-                of {totalBadges} badges earned
-              </p>
+              <p className="text-sm text-muted-foreground">of {totalBadges} badges earned</p>
             </div>
             <div className="ml-auto">
               <div className="h-2 w-32 overflow-hidden rounded-full bg-muted">

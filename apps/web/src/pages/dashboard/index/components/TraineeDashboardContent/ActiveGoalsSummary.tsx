@@ -52,20 +52,22 @@ export const ActiveGoalsSummary = () => {
               const isTarget = goal.type === 'TARGET';
 
               const progress = isTarget
-                ? (goal.targetValue && goal.currentValue != null
-                    ? Math.min(Math.max((goal.currentValue / goal.targetValue) * 100, 0), 100)
-                    : 0)
-                : (goal.frequencyPerWeek
-                    ? Math.min(((goal.weeklyProgress ?? 0) / goal.frequencyPerWeek) * 100, 100)
-                    : 0);
+                ? goal.targetValue && goal.currentValue != null
+                  ? Math.min(Math.max((goal.currentValue / goal.targetValue) * 100, 0), 100)
+                  : 0
+                : goal.frequencyPerWeek
+                  ? Math.min(((goal.weeklyProgress ?? 0) / goal.frequencyPerWeek) * 100, 100)
+                  : 0;
 
               return (
                 <div key={goal.id} className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {isTarget
-                        ? <Target className="h-3.5 w-3.5 text-blue-500" />
-                        : <Repeat className="h-3.5 w-3.5 text-purple-500" />}
+                      {isTarget ? (
+                        <Target className="h-3.5 w-3.5 text-blue-500" />
+                      ) : (
+                        <Repeat className="h-3.5 w-3.5 text-purple-500" />
+                      )}
                       <span className="text-sm">{goal.name}</span>
                     </div>
                     <span className="text-xs text-muted-foreground">{Math.round(progress)}%</span>

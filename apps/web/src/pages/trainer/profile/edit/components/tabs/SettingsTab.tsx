@@ -1,7 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff, ExternalLink, UserCheck, UserX } from 'lucide-react';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Label, Switch } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Label,
+  Switch,
+} from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { routes } from '@/config/routes';
 
@@ -17,8 +26,12 @@ interface SettingsTabProps {
 
 export const SettingsTab = ({ profile }: SettingsTabProps) => {
   const [isUpdating, setIsUpdating] = useState(false);
-  const [rateMin, setRateMin] = useState(profile.hourlyRateMin !== null ? String(profile.hourlyRateMin / 100) : '');
-  const [rateMax, setRateMax] = useState(profile.hourlyRateMax !== null ? String(profile.hourlyRateMax / 100) : '');
+  const [rateMin, setRateMin] = useState(
+    profile.hourlyRateMin !== null ? String(profile.hourlyRateMin / 100) : '',
+  );
+  const [rateMax, setRateMax] = useState(
+    profile.hourlyRateMax !== null ? String(profile.hourlyRateMax / 100) : '',
+  );
   const [rateSaving, setRateSaving] = useState(false);
   const [rateError, setRateError] = useState<string | null>(null);
 
@@ -78,9 +91,7 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Profile Visibility</CardTitle>
-          <CardDescription>
-            Control whether your profile is visible to the public.
-          </CardDescription>
+          <CardDescription>Control whether your profile is visible to the public.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -110,11 +121,7 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
               onClick={handleTogglePublish}
               disabled={isUpdating}
             >
-              {isUpdating
-                ? 'Updating...'
-                : profile.isPublished
-                ? 'Unpublish'
-                : 'Publish'}
+              {isUpdating ? 'Updating...' : profile.isPublished ? 'Unpublish' : 'Publish'}
             </Button>
           </div>
 
@@ -171,15 +178,20 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
         <CardHeader>
           <CardTitle>Hourly Rate</CardTitle>
           <CardDescription>
-            Set your price range so clients can find you based on their budget. This is shown on your public profile and in search results.
+            Set your price range so clients can find you based on their budget. This is shown on
+            your public profile and in search results.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="rate-min" className="mb-2 block">Minimum (£/hr)</Label>
+              <Label htmlFor="rate-min" className="mb-2 block">
+                Minimum (£/hr)
+              </Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">£</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  £
+                </span>
                 <input
                   id="rate-min"
                   type="number"
@@ -193,9 +205,13 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
               </div>
             </div>
             <div>
-              <Label htmlFor="rate-max" className="mb-2 block">Maximum (£/hr)</Label>
+              <Label htmlFor="rate-max" className="mb-2 block">
+                Maximum (£/hr)
+              </Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">£</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  £
+                </span>
                 <input
                   id="rate-max"
                   type="number"
@@ -209,9 +225,7 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
               </div>
             </div>
           </div>
-          {rateError && (
-            <p className="text-sm text-destructive">{rateError}</p>
-          )}
+          {rateError && <p className="text-sm text-destructive">{rateError}</p>}
           {updateMutation.error && (
             <p className="text-sm text-destructive">{updateMutation.error.message}</p>
           )}
@@ -225,15 +239,11 @@ export const SettingsTab = ({ profile }: SettingsTabProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Profile URL</CardTitle>
-          <CardDescription>
-            Share this link with potential clients.
-          </CardDescription>
+          <CardDescription>Share this link with potential clients.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2 rounded-lg border bg-muted/50 p-3">
-            <code className="flex-1 text-sm">
-              fitnassist.co/trainers/{profile.handle}
-            </code>
+            <code className="flex-1 text-sm">fitnassist.co/trainers/{profile.handle}</code>
             <Link
               to={routes.trainerPublicProfile(profile.handle)}
               target="_blank"

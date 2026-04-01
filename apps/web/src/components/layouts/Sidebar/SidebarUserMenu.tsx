@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { LogOut, Settings, ChevronUp, UserCircle } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
+import { LogOut, Settings, ChevronUp, UserCircle } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -13,9 +13,9 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui";
-import { routes } from "@/config/routes";
-import type { SidebarUser } from "./Sidebar.types";
+} from '@/components/ui';
+import { routes } from '@/config/routes';
+import type { SidebarUser } from './Sidebar.types';
 
 interface SidebarUserMenuProps {
   user: SidebarUser;
@@ -23,20 +23,16 @@ interface SidebarUserMenuProps {
   isCollapsed: boolean;
 }
 
-export const SidebarUserMenu = ({
-  user,
-  onSignOut,
-  isCollapsed,
-}: SidebarUserMenuProps) => {
+export const SidebarUserMenu = ({ user, onSignOut, isCollapsed }: SidebarUserMenuProps) => {
   const navigate = useNavigate();
 
   const initials =
     user.name
-      ?.split(" ")
+      ?.split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
-      .slice(0, 2) || "U";
+      .slice(0, 2) || 'U';
 
   const avatarContent = (
     <Avatar className="h-10 w-10 cursor-pointer">
@@ -46,11 +42,7 @@ export const SidebarUserMenu = ({
   );
 
   const menuContent = (
-    <DropdownMenuContent
-      side="top"
-      align={isCollapsed ? "start" : "center"}
-      className="w-56 mb-3"
-    >
+    <DropdownMenuContent side="top" align={isCollapsed ? 'start' : 'center'} className="w-56 mb-3">
       <DropdownMenuLabel>
         <div className="flex flex-col space-y-1">
           <p className="text-sm font-medium">{user.name}</p>
@@ -59,7 +51,9 @@ export const SidebarUserMenu = ({
       </DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuItem
-        onClick={() => navigate(user.role === 'Trainer' ? routes.trainerProfileEdit : routes.traineeProfileEdit)}
+        onClick={() =>
+          navigate(user.role === 'Trainer' ? routes.trainerProfileEdit : routes.traineeProfileEdit)
+        }
         className="cursor-pointer"
       >
         <UserCircle className="mr-2 h-4 w-4" />
@@ -73,10 +67,7 @@ export const SidebarUserMenu = ({
         Settings
       </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem
-        onClick={onSignOut}
-        className="text-destructive cursor-pointer"
-      >
+      <DropdownMenuItem onClick={onSignOut} className="text-destructive cursor-pointer">
         <LogOut className="mr-2 h-4 w-4" />
         Sign out
       </DropdownMenuItem>

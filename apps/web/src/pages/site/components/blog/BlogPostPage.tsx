@@ -9,10 +9,11 @@ interface BlogPostPageProps {
 }
 
 export const BlogPostPage = ({ subdomain, slug, onNavigateBack }: BlogPostPageProps) => {
-  const { data: post, isLoading, isError } = trpc.blog.getPublicPost.useQuery(
-    { subdomain, slug },
-    { enabled: !!subdomain && !!slug }
-  );
+  const {
+    data: post,
+    isLoading,
+    isError,
+  } = trpc.blog.getPublicPost.useQuery({ subdomain, slug }, { enabled: !!subdomain && !!slug });
 
   if (isLoading) {
     return (
@@ -86,11 +87,7 @@ export const BlogPostPage = ({ subdomain, slug, onNavigateBack }: BlogPostPagePr
 
         {post.coverImageUrl && (
           <div className="mt-8 overflow-hidden rounded-lg">
-            <img
-              src={post.coverImageUrl}
-              alt={post.title}
-              className="w-full object-cover"
-            />
+            <img src={post.coverImageUrl} alt={post.title} className="w-full object-cover" />
           </div>
         )}
 

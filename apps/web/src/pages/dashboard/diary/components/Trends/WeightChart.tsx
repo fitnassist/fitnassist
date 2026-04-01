@@ -1,4 +1,13 @@
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, ReferenceLine, CartesianGrid } from 'recharts';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ReferenceLine,
+  CartesianGrid,
+} from 'recharts';
 import { format } from 'date-fns';
 import { CHART_TOOLTIP_STYLE } from './chart.constants';
 
@@ -14,7 +23,7 @@ export const WeightChart = ({ data, goalWeight, unitPreference }: WeightChartPro
   const isImperial = unitPreference === 'IMPERIAL';
   const unit = isImperial ? 'lbs' : 'kg';
 
-  const chartData = data.map(d => ({
+  const chartData = data.map((d) => ({
     date: d.date,
     label: format(new Date(d.date), 'MMM d'),
     value: isImperial ? kgToLbs(d.weightKg) : d.weightKg,
@@ -23,7 +32,11 @@ export const WeightChart = ({ data, goalWeight, unitPreference }: WeightChartPro
   const goalValue = goalWeight ? (isImperial ? kgToLbs(goalWeight) : goalWeight) : null;
 
   if (chartData.length === 0) {
-    return <p className="py-8 text-center text-sm text-muted-foreground">No weight data for this period</p>;
+    return (
+      <p className="py-8 text-center text-sm text-muted-foreground">
+        No weight data for this period
+      </p>
+    );
   }
 
   return (

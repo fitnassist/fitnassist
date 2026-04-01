@@ -46,19 +46,16 @@ export const useReorderSections = () => {
 
       const previous = queryClient.getQueriesData({ queryKey: QUERY_KEY });
 
-      queryClient.setQueriesData<WebsiteData>(
-        { queryKey: QUERY_KEY },
-        (old) => {
-          if (!old) return old;
-          return {
-            ...old,
-            sections: old.sections.map((s) => ({
-              ...s,
-              sortOrder: sectionIds.indexOf(s.id),
-            })),
-          };
-        }
-      );
+      queryClient.setQueriesData<WebsiteData>({ queryKey: QUERY_KEY }, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          sections: old.sections.map((s) => ({
+            ...s,
+            sortOrder: sectionIds.indexOf(s.id),
+          })),
+        };
+      });
 
       return { previous };
     },

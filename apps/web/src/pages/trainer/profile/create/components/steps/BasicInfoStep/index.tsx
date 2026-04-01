@@ -4,11 +4,7 @@ import { wizardBasicInfoSchema, type WizardBasicInfoInput } from '@fitnassist/sc
 import { Button, Input, Label } from '@/components/ui';
 import type { WizardStepProps } from '../../ProfileWizard/ProfileWizard.types';
 
-export function BasicInfoStep({
-  data,
-  onUpdate,
-  onNext,
-}: WizardStepProps) {
+export function BasicInfoStep({ data, onUpdate, onNext }: WizardStepProps) {
   const {
     register,
     handleSubmit,
@@ -37,9 +33,7 @@ export function BasicInfoStep({
               className="flex-1"
             />
           </div>
-          {errors.handle && (
-            <p className="text-sm text-destructive">{errors.handle.message}</p>
-          )}
+          {errors.handle && <p className="text-sm text-destructive">{errors.handle.message}</p>}
           <p className="mt-1.5 text-xs text-muted-foreground">
             This will be your unique profile URL. Use lowercase letters, numbers, and hyphens only.
           </p>
@@ -47,11 +41,7 @@ export function BasicInfoStep({
 
         <div>
           <Label htmlFor="displayName">Display Name</Label>
-          <Input
-            id="displayName"
-            placeholder="John Smith"
-            {...register('displayName')}
-          />
+          <Input id="displayName" placeholder="John Smith" {...register('displayName')} />
           {errors.displayName && (
             <p className="text-sm text-destructive">{errors.displayName.message}</p>
           )}
@@ -69,9 +59,7 @@ export function BasicInfoStep({
             rows={6}
             className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
-          {errors.bio && (
-            <p className="text-sm text-destructive">{errors.bio.message}</p>
-          )}
+          {errors.bio && <p className="text-sm text-destructive">{errors.bio.message}</p>}
           <p className="mt-1.5 text-xs text-muted-foreground">
             Max 2000 characters. This will appear on your public profile.
           </p>
@@ -79,9 +67,7 @@ export function BasicInfoStep({
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit">
-          Continue
-        </Button>
+        <Button type="submit">Continue</Button>
       </div>
     </form>
   );

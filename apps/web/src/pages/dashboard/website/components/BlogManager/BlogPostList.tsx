@@ -1,11 +1,5 @@
 import { useState } from 'react';
-import {
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Globe,
-  GlobeLock,
-} from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2, Globe, GlobeLock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import {
   Card,
@@ -22,11 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui';
-import {
-  useDeleteBlogPost,
-  usePublishBlogPost,
-  useUnpublishBlogPost,
-} from '@/api/website';
+import { useDeleteBlogPost, usePublishBlogPost, useUnpublishBlogPost } from '@/api/website';
 import { BlogPostForm } from './BlogPostForm';
 import type { BlogPost } from './BlogManager.types';
 
@@ -51,9 +41,7 @@ export const BlogPostList = ({ posts }: BlogPostListProps) => {
                 <div className="flex items-center gap-2 mb-1">
                   <p className="text-sm font-medium truncate">{post.title}</p>
                   <Badge
-                    variant={
-                      post.status === 'PUBLISHED' ? 'default' : 'secondary'
-                    }
+                    variant={post.status === 'PUBLISHED' ? 'default' : 'secondary'}
                     className="text-xs"
                   >
                     {post.status === 'PUBLISHED' ? 'Published' : 'Draft'}
@@ -78,20 +66,12 @@ export const BlogPostList = ({ posts }: BlogPostListProps) => {
                     Edit
                   </DropdownMenuItem>
                   {post.status === 'PUBLISHED' ? (
-                    <DropdownMenuItem
-                      onClick={() =>
-                        unpublishBlogPost.mutate({ postId: post.id })
-                      }
-                    >
+                    <DropdownMenuItem onClick={() => unpublishBlogPost.mutate({ postId: post.id })}>
                       <GlobeLock className="mr-2 h-4 w-4" />
                       Unpublish
                     </DropdownMenuItem>
                   ) : (
-                    <DropdownMenuItem
-                      onClick={() =>
-                        publishBlogPost.mutate({ postId: post.id })
-                      }
-                    >
+                    <DropdownMenuItem onClick={() => publishBlogPost.mutate({ postId: post.id })}>
                       <Globe className="mr-2 h-4 w-4" />
                       Publish
                     </DropdownMenuItem>
@@ -110,20 +90,12 @@ export const BlogPostList = ({ posts }: BlogPostListProps) => {
         ))}
       </div>
 
-      <Dialog
-        open={!!editingPost}
-        onOpenChange={(open) => !open && setEditingPost(null)}
-      >
+      <Dialog open={!!editingPost} onOpenChange={(open) => !open && setEditingPost(null)}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Post</DialogTitle>
           </DialogHeader>
-          {editingPost && (
-            <BlogPostForm
-              post={editingPost}
-              onClose={() => setEditingPost(null)}
-            />
-          )}
+          {editingPost && <BlogPostForm post={editingPost} onClose={() => setEditingPost(null)} />}
         </DialogContent>
       </Dialog>
 

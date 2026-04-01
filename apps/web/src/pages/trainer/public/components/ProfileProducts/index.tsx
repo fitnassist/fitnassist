@@ -12,7 +12,7 @@ const formatPrice = (pence: number) => `£${(pence / 100).toFixed(2)}`;
 export const ProfileProducts = ({ trainerId, shopUrl }: ProfileProductsProps) => {
   const { data: products, isLoading } = trpc.product.getTopSelling.useQuery(
     { trainerId, limit: 3 },
-    { enabled: !!trainerId }
+    { enabled: !!trainerId },
   );
 
   if (!isLoading && (!products || products.length === 0)) return null;

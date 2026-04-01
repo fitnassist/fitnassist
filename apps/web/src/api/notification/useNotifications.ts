@@ -6,7 +6,7 @@ export const useNotifications = (cursor?: string) => {
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       initialCursor: cursor,
-    }
+    },
   );
 };
 

@@ -172,7 +172,13 @@ export function AddressAutocomplete({
 
     // Set initial value in input if we have one
     if (value?.addressLine1 && inputRef.current) {
-      const parts = [value.addressLine1, value.addressLine2, value.city, value.county, value.postcode].filter(Boolean);
+      const parts = [
+        value.addressLine1,
+        value.addressLine2,
+        value.city,
+        value.county,
+        value.postcode,
+      ].filter(Boolean);
       inputRef.current.value = parts.join(', ');
     }
 
@@ -233,12 +239,7 @@ export function AddressAutocomplete({
         <div className="flex items-center justify-between">
           <Label>{label}</Label>
           {!loadError && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsManualEntry(false)}
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={() => setIsManualEntry(false)}>
               Use address lookup
             </Button>
           )}
@@ -318,7 +319,12 @@ export function AddressAutocomplete({
             variant="secondary"
             size="sm"
             onClick={handleManualSubmit}
-            disabled={!manualAddress.addressLine1 || !manualAddress.city || !manualAddress.postcode || disabled}
+            disabled={
+              !manualAddress.addressLine1 ||
+              !manualAddress.city ||
+              !manualAddress.postcode ||
+              disabled
+            }
           >
             Confirm address
           </Button>
@@ -350,12 +356,7 @@ export function AddressAutocomplete({
     <div className={cn('space-y-3', className)}>
       <div className="flex items-center justify-between">
         <Label>{label}</Label>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsManualEntry(true)}
-        >
+        <Button type="button" variant="ghost" size="sm" onClick={() => setIsManualEntry(true)}>
           Enter manually
         </Button>
       </div>
@@ -373,7 +374,7 @@ export function AddressAutocomplete({
             'placeholder:text-muted-foreground',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'pl-10'
+            'pl-10',
           )}
         />
 
@@ -395,7 +396,9 @@ export function AddressAutocomplete({
           <p className="font-medium">{displayAddress.addressLine1}</p>
           {displayAddress.addressLine2 && <p>{displayAddress.addressLine2}</p>}
           <p className="text-muted-foreground">
-            {[displayAddress.city, displayAddress.county, displayAddress.postcode].filter(Boolean).join(', ')}
+            {[displayAddress.city, displayAddress.county, displayAddress.postcode]
+              .filter(Boolean)
+              .join(', ')}
           </p>
         </div>
       )}

@@ -8,15 +8,12 @@ export const useTrainerReviews = (trainerId: string) => {
     {
       enabled: !!trainerId,
       getNextPageParam: (lastPage) => lastPage.nextCursor,
-    }
+    },
   );
 };
 
 export const useReviewEligibility = (trainerId: string, enabled = true) => {
-  return trpc.review.checkEligibility.useQuery(
-    { trainerId },
-    { enabled: !!trainerId && enabled }
-  );
+  return trpc.review.checkEligibility.useQuery({ trainerId }, { enabled: !!trainerId && enabled });
 };
 
 export const useDashboardReviews = () => {
@@ -24,7 +21,7 @@ export const useDashboardReviews = () => {
     { limit: 10 },
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
-    }
+    },
   );
 };
 

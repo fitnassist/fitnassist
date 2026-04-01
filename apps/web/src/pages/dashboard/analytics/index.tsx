@@ -47,11 +47,7 @@ export const AnalyticsPage = () => {
 
       <SummaryCards />
 
-      <ResponsiveTabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        options={TAB_OPTIONS}
-      >
+      <ResponsiveTabs value={activeTab} onValueChange={setActiveTab} options={TAB_OPTIONS}>
         <TabsContent value="views">
           <ProfileViewsChart />
         </TabsContent>

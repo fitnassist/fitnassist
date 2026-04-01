@@ -5,10 +5,7 @@ export const useOnboardingTemplates = () => {
 };
 
 export const useOnboardingTemplate = (id: string) => {
-  return trpc.onboarding.getTemplate.useQuery(
-    { id },
-    { enabled: !!id }
-  );
+  return trpc.onboarding.getTemplate.useQuery({ id }, { enabled: !!id });
 };
 
 export const useActiveTemplates = () => {

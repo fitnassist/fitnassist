@@ -11,12 +11,9 @@ export const useTabParam = <T extends string>(defaultTab: T) => {
 
   const setTab = useCallback(
     (value: string) => {
-      setSearchParams(
-        value === defaultTab ? {} : { tab: value },
-        { replace: true }
-      );
+      setSearchParams(value === defaultTab ? {} : { tab: value }, { replace: true });
     },
-    [defaultTab, setSearchParams]
+    [defaultTab, setSearchParams],
   );
 
   return [tab, setTab] as const;

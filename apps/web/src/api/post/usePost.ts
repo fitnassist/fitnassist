@@ -20,7 +20,11 @@ export const useDeletePost = () => {
   });
 };
 
-const toggleLikeOptimistic = (utils: ReturnType<typeof trpc.useUtils>, postId: string, liked: boolean) => {
+const toggleLikeOptimistic = (
+  utils: ReturnType<typeof trpc.useUtils>,
+  postId: string,
+  liked: boolean,
+) => {
   const updatePages = (old: Record<string, unknown> | undefined) => {
     if (!old) return old;
     const pages = old.pages as Array<Record<string, unknown>>;
@@ -30,7 +34,11 @@ const toggleLikeOptimistic = (utils: ReturnType<typeof trpc.useUtils>, postId: s
         ...page,
         items: ((page.items ?? []) as Array<Record<string, unknown>>).map((item) =>
           item.id === postId
-            ? { ...item, hasLiked: liked, likeCount: Math.max(0, (item.likeCount ?? 0) + (liked ? 1 : -1)) }
+            ? {
+                ...item,
+                hasLiked: liked,
+                likeCount: Math.max(0, (item.likeCount ?? 0) + (liked ? 1 : -1)),
+              }
             : item,
         ),
       })),
@@ -85,7 +93,7 @@ export const useUnlikeDiaryEntry = () => {
 export const useFeed = (limit = 20) => {
   return trpc.post.getFeed.useInfiniteQuery(
     { limit },
-    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+    { getNextPageParam: (lastPage) => lastPage.nextCursor },
   );
 };
 
@@ -95,7 +103,7 @@ export const useUserPosts = (userId: string, limit = 20, enabled = true) => {
     {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       enabled,
-    }
+    },
   );
 };
 
@@ -104,7 +112,10 @@ export const usePostLikers = (postId: string, enabled = true) => {
 };
 
 export const useDiaryEntryLikers = (diaryEntryId: string, enabled = true) => {
-  return trpc.post.getDiaryEntryLikers.useQuery({ diaryEntryId }, { enabled: enabled && !!diaryEntryId });
+  return trpc.post.getDiaryEntryLikers.useQuery(
+    { diaryEntryId },
+    { enabled: enabled && !!diaryEntryId },
+  );
 };
 
 export const useNewFeedCount = (enabled = true) => {

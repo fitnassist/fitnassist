@@ -4,7 +4,13 @@ import { PageLayout } from '@/components/layouts';
 import { useTabParam } from '@/hooks';
 import { routes } from '@/config/routes';
 import { trpc } from '@/lib/trpc';
-import { PersonalInfoTab, BodyMetricsTab, FitnessTab, NutritionTab, PrivacyTab } from './components';
+import {
+  PersonalInfoTab,
+  BodyMetricsTab,
+  FitnessTab,
+  NutritionTab,
+  PrivacyTab,
+} from './components';
 
 export const TraineeProfileEditPage = () => {
   const [activeTab, setActiveTab] = useTabParam('personal');
@@ -26,7 +32,11 @@ export const TraineeProfileEditPage = () => {
     <PageLayout maxWidth="3xl">
       <PageLayout.Header
         title={profile ? 'Edit Profile' : 'Set Up Your Profile'}
-        description={profile ? 'Update your profile information' : 'Help trainers understand your goals and fitness level. All fields are optional.'}
+        description={
+          profile
+            ? 'Update your profile information'
+            : 'Help trainers understand your goals and fitness level. All fields are optional.'
+        }
         backLink={{ to: routes.dashboard, label: 'Back to Dashboard' }}
       />
       <ResponsiveTabs

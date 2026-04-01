@@ -33,7 +33,7 @@ export const BulkAssignDialog = ({
   const clients = data?.clients ?? [];
 
   const toggleClient = (id: string) => {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
@@ -48,16 +48,14 @@ export const BulkAssignDialog = ({
     if (selectedIds.size === clients.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(clients.map(c => c.id)));
+      setSelectedIds(new Set(clients.map((c) => c.id)));
     }
   };
 
   const handleAssign = () => {
     const payload = {
       clientIds: Array.from(selectedIds),
-      ...(planType === 'workout'
-        ? { workoutPlanId: planId }
-        : { mealPlanId: planId }),
+      ...(planType === 'workout' ? { workoutPlanId: planId } : { mealPlanId: planId }),
     };
     bulkAssign.mutate(payload, {
       onSuccess: () => {
@@ -72,9 +70,7 @@ export const BulkAssignDialog = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Assign to Clients</DialogTitle>
-          <DialogDescription>
-            Assign "{planName}" to selected clients.
-          </DialogDescription>
+          <DialogDescription>Assign "{planName}" to selected clients.</DialogDescription>
         </DialogHeader>
 
         {clients.length === 0 ? (
@@ -118,13 +114,8 @@ export const BulkAssignDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleAssign}
-            disabled={selectedIds.size === 0 || bulkAssign.isPending}
-          >
-            {bulkAssign.isPending ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : null}
+          <Button onClick={handleAssign} disabled={selectedIds.size === 0 || bulkAssign.isPending}>
+            {bulkAssign.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
             Assign to {selectedIds.size} client{selectedIds.size !== 1 ? 's' : ''}
           </Button>
         </DialogFooter>

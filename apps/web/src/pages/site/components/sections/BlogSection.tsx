@@ -11,10 +11,15 @@ interface BlogSectionProps {
   onNavigatePost?: (slug: string) => void;
 }
 
-export const BlogSection = ({ section, subdomain, onNavigateBlog, onNavigatePost }: BlogSectionProps) => {
+export const BlogSection = ({
+  section,
+  subdomain,
+  onNavigateBlog,
+  onNavigatePost,
+}: BlogSectionProps) => {
   const { data, isLoading } = trpc.blog.getPublicPosts.useQuery(
     { subdomain: subdomain ?? '', limit: 3 },
-    { enabled: !!subdomain }
+    { enabled: !!subdomain },
   );
 
   const posts = data?.posts ?? [];

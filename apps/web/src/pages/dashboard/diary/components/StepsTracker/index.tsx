@@ -1,5 +1,13 @@
 import { Footprints, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, ConfirmDialog, SourceBadge } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  ConfirmDialog,
+  SourceBadge,
+} from '@/components/ui';
 import { useLogSteps, useDeleteDiaryEntry } from '@/api/diary';
 import { STEPS_PRESETS, formatSteps } from '../../diary.utils';
 import { useState } from 'react';

@@ -46,7 +46,10 @@ export const useProductUpload = () => {
 
   const deleteFile = async (url: string, resourceType: 'image' | 'raw' = 'image') => {
     try {
-      await deleteFileMutation.mutateAsync({ url, resourceType: resourceType as 'image' | 'video' });
+      await deleteFileMutation.mutateAsync({
+        url,
+        resourceType: resourceType as 'image' | 'video',
+      });
     } catch (error) {
       console.error('Failed to delete file:', error);
     }

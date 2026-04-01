@@ -18,7 +18,9 @@ export const OrderList = () => {
   if (!orders || orders.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">No orders yet. Orders will appear here when customers make purchases.</p>
+        <p className="text-muted-foreground">
+          No orders yet. Orders will appear here when customers make purchases.
+        </p>
       </div>
     );
   }
@@ -43,9 +45,7 @@ export const OrderList = () => {
               <tr key={order.id} className="border-b">
                 <td className="py-3 font-mono text-xs">{order.id.slice(-8)}</td>
                 <td className="py-3">{order.buyer.name ?? order.buyer.email}</td>
-                <td className="py-3">
-                  {order.items.map((item) => item.product.name).join(', ')}
-                </td>
+                <td className="py-3">{order.items.map((item) => item.product.name).join(', ')}</td>
                 <td className="py-3 font-medium">
                   £{(order.totalPence / 100).toFixed(2)}
                   {order.coupon && (
@@ -61,7 +61,12 @@ export const OrderList = () => {
                   {new Date(order.createdAt).toLocaleDateString()}
                 </td>
                 <td className="py-3">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedOrderId(order.id)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setSelectedOrderId(order.id)}
+                  >
                     <Eye className="h-4 w-4" />
                   </Button>
                 </td>
@@ -71,10 +76,7 @@ export const OrderList = () => {
         </table>
       </div>
 
-      <OrderDetail
-        orderId={selectedOrderId}
-        onClose={() => setSelectedOrderId(null)}
-      />
+      <OrderDetail orderId={selectedOrderId} onClose={() => setSelectedOrderId(null)} />
     </>
   );
 };

@@ -1,5 +1,13 @@
 import { Droplets, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button, ConfirmDialog, SourceBadge } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  ConfirmDialog,
+  SourceBadge,
+} from '@/components/ui';
 import { useLogWater, useDeleteDiaryEntry } from '@/api/diary';
 import { formatWater, WATER_PRESETS } from '../../diary.utils';
 import { useState } from 'react';

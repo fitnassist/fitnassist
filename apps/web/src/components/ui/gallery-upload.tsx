@@ -46,14 +46,9 @@ const SortableImage = ({
   onRemove: (id: string) => void;
   disabled?: boolean;
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: image.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: image.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -66,14 +61,10 @@ const SortableImage = ({
       style={style}
       className={cn(
         'relative aspect-square rounded-lg overflow-hidden border bg-muted group',
-        isDragging && 'opacity-50 z-10'
+        isDragging && 'opacity-50 z-10',
       )}
     >
-      <img
-        src={image.url}
-        alt=""
-        className="h-full w-full object-cover"
-      />
+      <img src={image.url} alt="" className="h-full w-full object-cover" />
       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
       <button
         type="button"
@@ -134,7 +125,7 @@ export const GalleryUpload = ({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const canUpload = displayImages.length < maxImages;
@@ -202,20 +193,11 @@ export const GalleryUpload = ({
         Upload up to {maxImages} photos to showcase your work. Drag to reorder.
       </p>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={displayImages.map((img) => img.id)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {displayImages.map((image) => (
-              <SortableImage
-                key={image.id}
-                image={image}
-                onRemove={onRemove}
-                disabled={disabled}
-              />
+              <SortableImage key={image.id} image={image} onRemove={onRemove} disabled={disabled} />
             ))}
 
             {canUpload && (
@@ -231,7 +213,7 @@ export const GalleryUpload = ({
                   'aspect-square flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors',
                   dragActive && 'border-primary bg-primary/5',
                   !dragActive && 'border-muted-foreground/25 hover:border-muted-foreground/50',
-                  disabled && 'cursor-not-allowed opacity-50'
+                  disabled && 'cursor-not-allowed opacity-50',
                 )}
               >
                 <input
@@ -262,9 +244,7 @@ export const GalleryUpload = ({
         {displayImages.length}/{maxImages} photos uploaded
       </p>
 
-      {(error || uploadError) && (
-        <p className="text-sm text-destructive">{error || uploadError}</p>
-      )}
+      {(error || uploadError) && <p className="text-sm text-destructive">{error || uploadError}</p>}
     </div>
   );
 };

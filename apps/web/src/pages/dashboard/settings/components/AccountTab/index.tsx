@@ -80,7 +80,7 @@ export const AccountTab = () => {
       emailForm.reset();
     } catch (error) {
       setEmailError(
-        error instanceof Error ? error.message : 'Failed to change email. Please try again.'
+        error instanceof Error ? error.message : 'Failed to change email. Please try again.',
       );
     }
   };
@@ -98,7 +98,7 @@ export const AccountTab = () => {
       passwordForm.reset();
     } catch (error) {
       setPasswordError(
-        error instanceof Error ? error.message : 'Failed to change password. Please try again.'
+        error instanceof Error ? error.message : 'Failed to change password. Please try again.',
       );
     }
   };
@@ -138,22 +138,14 @@ export const AccountTab = () => {
 
             <div>
               <Label htmlFor="displayName">Name</Label>
-              <Input
-                id="displayName"
-                placeholder="Your name"
-                {...nameForm.register('name')}
-              />
+              <Input id="displayName" placeholder="Your name" {...nameForm.register('name')} />
               {nameForm.formState.errors.name && (
-                <p className="text-sm text-destructive">
-                  {nameForm.formState.errors.name.message}
-                </p>
+                <p className="text-sm text-destructive">{nameForm.formState.errors.name.message}</p>
               )}
             </div>
 
             <Button type="submit" disabled={updateName.isPending}>
-              {updateName.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+              {updateName.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Update Name
             </Button>
           </form>

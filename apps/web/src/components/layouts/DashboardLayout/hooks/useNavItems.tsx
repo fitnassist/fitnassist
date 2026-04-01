@@ -1,10 +1,29 @@
 import { useMemo } from 'react';
-import { Home, MessageCircle, Phone, User, Users, BookOpen, ClipboardList, ClipboardCheck, BookHeart, Target, Calendar, BarChart3, Heart, Rss, Trophy, Award, Star, Globe, ShoppingBag, Package, UserPlus } from 'lucide-react';
-import { routes } from '@/config/routes';
 import {
-  FEATURE_TIER_MAP,
-  hasFeatureAccess as checkAccess,
-} from '@fitnassist/schemas';
+  Home,
+  MessageCircle,
+  Phone,
+  User,
+  Users,
+  BookOpen,
+  ClipboardList,
+  ClipboardCheck,
+  BookHeart,
+  Target,
+  Calendar,
+  BarChart3,
+  Heart,
+  Rss,
+  Trophy,
+  Award,
+  Star,
+  Globe,
+  ShoppingBag,
+  Package,
+  UserPlus,
+} from 'lucide-react';
+import { routes } from '@/config/routes';
+import { FEATURE_TIER_MAP, hasFeatureAccess as checkAccess } from '@fitnassist/schemas';
 import type { SubscriptionTier } from '@fitnassist/database';
 import type { NavItem } from '@/components/layouts';
 import type { DashboardNavItem, BadgeCounts } from '../DashboardLayout.types';
@@ -190,32 +209,31 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
 export const useNavItems = (
   isTrainer: boolean,
   badgeCounts: BadgeCounts,
-  currentTier: SubscriptionTier = 'FREE'
+  currentTier: SubscriptionTier = 'FREE',
 ): NavItem[] => {
   return useMemo(() => {
-    return BASE_NAV_ITEMS
-      .filter((item) => {
-        if (!item.roles) return true;
-        if (isTrainer && item.roles.includes('TRAINER')) return true;
-        if (!isTrainer && item.roles.includes('TRAINEE')) return true;
-        return false;
-      })
-      .map(({ roles: _roles, badgeKey, requiredFeature, mobileBottom, group, ...item }) => {
-        // Only gate trainer features — trainees see bookings as gated on their trainer's tier,
-        // but we only show the gate for trainer-side nav
-        const isGated = isTrainer && requiredFeature && !checkAccess(currentTier, requiredFeature);
-        const requiredTier = requiredFeature ? FEATURE_TIER_MAP[requiredFeature] : undefined;
+    return BASE_NAV_ITEMS.filter((item) => {
+      if (!item.roles) return true;
+      if (isTrainer && item.roles.includes('TRAINER')) return true;
+      if (!isTrainer && item.roles.includes('TRAINEE')) return true;
+      return false;
+    }).map(({ roles: _roles, badgeKey, requiredFeature, mobileBottom, group, ...item }) => {
+      // Only gate trainer features — trainees see bookings as gated on their trainer's tier,
+      // but we only show the gate for trainer-side nav
+      const isGated = isTrainer && requiredFeature && !checkAccess(currentTier, requiredFeature);
+      const requiredTier = requiredFeature ? FEATURE_TIER_MAP[requiredFeature] : undefined;
 
-        return {
-          ...item,
-          badge: badgeKey ? badgeCounts[badgeKey] : undefined,
-          disabled: isGated || false,
-          disabledTooltip: isGated && requiredTier
+      return {
+        ...item,
+        badge: badgeKey ? badgeCounts[badgeKey] : undefined,
+        disabled: isGated || false,
+        disabledTooltip:
+          isGated && requiredTier
             ? `Upgrade to ${TIER_LABELS[requiredTier] ?? requiredTier} to unlock`
             : undefined,
-          mobileBottom,
-          group,
-        };
-      });
+        mobileBottom,
+        group,
+      };
+    });
   }, [isTrainer, badgeCounts, currentTier]);
 };

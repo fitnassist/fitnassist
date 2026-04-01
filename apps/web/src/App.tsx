@@ -4,7 +4,13 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { trpc, createTRPCClient } from '@/lib/trpc';
 import { queryClient } from '@/lib/queryClient';
 import { routes } from '@/config/routes';
-import { MainLayout, AuthLayout, DashboardLayout, TrainerOnboardingGuard, RoleGuard } from '@/components/layouts';
+import {
+  MainLayout,
+  AuthLayout,
+  DashboardLayout,
+  TrainerOnboardingGuard,
+  RoleGuard,
+} from '@/components/layouts';
 import { HomePage } from '@/pages/home';
 import { RegisterPage } from '@/pages/auth/register';
 import { LoginPage } from '@/pages/auth/login';
@@ -89,7 +95,10 @@ function App() {
                 {/* Profile creation (outside onboarding guard) */}
                 <Route element={<DashboardLayout />}>
                   <Route path={routes.trainerProfileCreate} element={<ProfileCreatePage />} />
-                  <Route path={routes.traineeProfileCreate} element={<TraineeProfileCreatePage />} />
+                  <Route
+                    path={routes.traineeProfileCreate}
+                    element={<TraineeProfileCreatePage />}
+                  />
                 </Route>
                 {/* Dashboard routes (protected + onboarding guard) */}
                 <Route element={<DashboardLayout />}>
@@ -110,21 +119,51 @@ function App() {
                       <Route path="/dashboard/clients/:id" element={<ClientDetailPage />} />
                       <Route path={routes.dashboardResources} element={<ResourcesPage />} />
                       <Route path={routes.dashboardExerciseCreate} element={<ExerciseFormPage />} />
-                      <Route path="/dashboard/resources/exercises/:id/edit" element={<ExerciseFormPage />} />
+                      <Route
+                        path="/dashboard/resources/exercises/:id/edit"
+                        element={<ExerciseFormPage />}
+                      />
                       <Route path={routes.dashboardRecipeCreate} element={<RecipeFormPage />} />
-                      <Route path="/dashboard/resources/recipes/:id/edit" element={<RecipeFormPage />} />
-                      <Route path={routes.dashboardWorkoutPlanCreate} element={<WorkoutPlanFormPage />} />
-                      <Route path="/dashboard/resources/workout-plans/:id/edit" element={<WorkoutPlanFormPage />} />
+                      <Route
+                        path="/dashboard/resources/recipes/:id/edit"
+                        element={<RecipeFormPage />}
+                      />
+                      <Route
+                        path={routes.dashboardWorkoutPlanCreate}
+                        element={<WorkoutPlanFormPage />}
+                      />
+                      <Route
+                        path="/dashboard/resources/workout-plans/:id/edit"
+                        element={<WorkoutPlanFormPage />}
+                      />
                       <Route path={routes.dashboardMealPlanCreate} element={<MealPlanFormPage />} />
-                      <Route path="/dashboard/resources/meal-plans/:id/edit" element={<MealPlanFormPage />} />
+                      <Route
+                        path="/dashboard/resources/meal-plans/:id/edit"
+                        element={<MealPlanFormPage />}
+                      />
                       <Route path={routes.dashboardOnboarding} element={<OnboardingPage />} />
-                      <Route path={routes.dashboardOnboardingTemplateCreate} element={<OnboardingTemplateFormPage />} />
-                      <Route path="/dashboard/onboarding/templates/:id/edit" element={<OnboardingTemplateFormPage />} />
-                      <Route path="/dashboard/onboarding/:responseId" element={<OnboardingCompletePage />} />
+                      <Route
+                        path={routes.dashboardOnboardingTemplateCreate}
+                        element={<OnboardingTemplateFormPage />}
+                      />
+                      <Route
+                        path="/dashboard/onboarding/templates/:id/edit"
+                        element={<OnboardingTemplateFormPage />}
+                      />
+                      <Route
+                        path="/dashboard/onboarding/:responseId"
+                        element={<OnboardingCompletePage />}
+                      />
                       <Route path={routes.dashboardAnalytics} element={<AnalyticsPage />} />
                       <Route path={routes.dashboardReviews} element={<ReviewsPage />} />
-                      <Route path="/dashboard/bookings/book-client" element={<TrainerBookSessionPage />} />
-                      <Route path="/dashboard/bookings/book-client/:clientRosterId" element={<TrainerBookSessionPage />} />
+                      <Route
+                        path="/dashboard/bookings/book-client"
+                        element={<TrainerBookSessionPage />}
+                      />
+                      <Route
+                        path="/dashboard/bookings/book-client/:clientRosterId"
+                        element={<TrainerBookSessionPage />}
+                      />
                       <Route path={routes.dashboardWebsite} element={<WebsitePage />} />
                       <Route path={routes.dashboardStorefront} element={<StorefrontPage />} />
                       <Route path={routes.dashboardReferrals} element={<ReferralsPage />} />
@@ -139,12 +178,18 @@ function App() {
                       <Route path={routes.dashboardGoals} element={<GoalsPage />} />
                       <Route path={routes.dashboardMyPlans} element={<MyPlansPage />} />
                       <Route path={routes.dashboardContacts} element={<ContactsPage />} />
-                      <Route path="/dashboard/bookings/book/:trainerId" element={<BookSessionPage />} />
+                      <Route
+                        path="/dashboard/bookings/book/:trainerId"
+                        element={<BookSessionPage />}
+                      />
                       <Route path={routes.dashboardFriends} element={<FriendsPage />} />
                       <Route path={routes.dashboardLeaderboards} element={<LeaderboardsPage />} />
                       <Route path={routes.dashboardAchievements} element={<AchievementsPage />} />
                       <Route path={routes.dashboardPurchases} element={<PurchasesPage />} />
-                      <Route path={routes.traineeProfileEdit} element={<TraineeProfileEditPage />} />
+                      <Route
+                        path={routes.traineeProfileEdit}
+                        element={<TraineeProfileEditPage />}
+                      />
                     </Route>
                   </Route>
                 </Route>

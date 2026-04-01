@@ -34,7 +34,7 @@ export const TravelSettings = () => {
   const handleSave = () => {
     updateMutation.mutate(
       { travelBufferMin: Number(bufferMin), smartTravelEnabled: smartTravel },
-      { onSuccess: () => toast.success('Travel settings saved') }
+      { onSuccess: () => toast.success('Travel settings saved') },
     );
   };
 
@@ -55,7 +55,10 @@ export const TravelSettings = () => {
             Minimum time between sessions to account for travel
           </p>
           <Select
-            value={{ value: bufferMin, label: BUFFER_OPTIONS.find((o) => o.value === bufferMin)?.label ?? bufferMin }}
+            value={{
+              value: bufferMin,
+              label: BUFFER_OPTIONS.find((o) => o.value === bufferMin)?.label ?? bufferMin,
+            }}
             onChange={(option) => {
               if (option) {
                 setBufferMin((option as { value: string }).value);

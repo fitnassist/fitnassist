@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { Gift } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import { RegisterForm } from "./components";
+import { RegisterForm } from './components';
 
 export function RegisterPage() {
   const [searchParams] = useSearchParams();
@@ -25,9 +25,7 @@ export function RegisterPage() {
             You've been referred by{' '}
             <span className="font-semibold text-primary">{referrerInfo.displayName}</span>
           </p>
-          <p className="text-xs text-white/60 mt-1">
-            Get 20% off your first subscription payment!
-          </p>
+          <p className="text-xs text-white/60 mt-1">Get 20% off your first subscription payment!</p>
         </div>
       )}
       <RegisterForm onSuccess={handleSuccess} referralCode={referralCode} />

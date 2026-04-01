@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { formatDistanceToNow } from "date-fns";
+import { Link } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 import {
   MessageCircle,
   User,
@@ -9,7 +9,7 @@ import {
   XCircle,
   Check,
   ClipboardCheck,
-} from "lucide-react";
+} from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -24,11 +24,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Badge,
-} from "@/components/ui";
-import { routes } from "@/config/routes";
-import type { ClientStatus } from "@fitnassist/database";
+} from '@/components/ui';
+import { routes } from '@/config/routes';
+import type { ClientStatus } from '@fitnassist/database';
 
-type ActiveClientStatus = "ONBOARDING" | "ACTIVE" | "INACTIVE" | "ON_HOLD";
+type ActiveClientStatus = 'ONBOARDING' | 'ACTIVE' | 'INACTIVE' | 'ON_HOLD';
 
 interface ClientCardProps {
   client: {
@@ -61,25 +61,25 @@ const STATUS_BADGES: Record<
   ClientStatus,
   { label: string; variant: 'info' | 'success' | 'warning' | 'secondary' | 'destructive' }
 > = {
-  ONBOARDING: { label: "Onboarding", variant: "info" },
-  ACTIVE: { label: "Active", variant: "success" },
-  ON_HOLD: { label: "On Hold", variant: "warning" },
-  INACTIVE: { label: "Inactive", variant: "secondary" },
-  DISCONNECTED: { label: "Disconnected", variant: "destructive" },
+  ONBOARDING: { label: 'Onboarding', variant: 'info' },
+  ACTIVE: { label: 'Active', variant: 'success' },
+  ON_HOLD: { label: 'On Hold', variant: 'warning' },
+  INACTIVE: { label: 'Inactive', variant: 'secondary' },
+  DISCONNECTED: { label: 'Disconnected', variant: 'destructive' },
 };
 
 const getInitials = (name: string) =>
   name
-    .split(" ")
+    .split(' ')
     .map((n) => n[0])
-    .join("")
+    .join('')
     .toUpperCase()
     .slice(0, 2);
 
 const EXPERIENCE_LABELS: Record<string, string> = {
-  BEGINNER: "Beginner",
-  INTERMEDIATE: "Intermediate",
-  ADVANCED: "Advanced",
+  BEGINNER: 'Beginner',
+  INTERMEDIATE: 'Intermediate',
+  ADVANCED: 'Advanced',
 };
 
 export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
@@ -91,17 +91,17 @@ export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
   const fitnessGoals = sender?.traineeProfile?.fitnessGoals || [];
   const lastMessageDate = connection.messages[0]?.createdAt;
   const statusBadge = STATUS_BADGES[client.status];
-  const isDisconnected = client.status === "DISCONNECTED";
+  const isDisconnected = client.status === 'DISCONNECTED';
 
   const statusOptions: {
     value: ActiveClientStatus;
     label: string;
     icon: typeof Circle;
   }[] = [
-    { value: "ONBOARDING", label: "Onboarding", icon: ClipboardCheck },
-    { value: "ACTIVE", label: "Active", icon: Circle },
-    { value: "ON_HOLD", label: "On Hold", icon: PauseCircle },
-    { value: "INACTIVE", label: "Inactive", icon: XCircle },
+    { value: 'ONBOARDING', label: 'Onboarding', icon: ClipboardCheck },
+    { value: 'ACTIVE', label: 'Active', icon: Circle },
+    { value: 'ON_HOLD', label: 'On Hold', icon: PauseCircle },
+    { value: 'INACTIVE', label: 'Inactive', icon: XCircle },
   ];
 
   return (
@@ -123,20 +123,16 @@ export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
                   >
                     {displayName}
                   </Link>
-                  <Badge variant={statusBadge.variant}>
-                    {statusBadge.label}
-                  </Badge>
+                  <Badge variant={statusBadge.variant}>{statusBadge.label}</Badge>
                 </div>
                 <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                   {experienceLevel && (
-                    <span>
-                      {EXPERIENCE_LABELS[experienceLevel] || experienceLevel}
-                    </span>
+                    <span>{EXPERIENCE_LABELS[experienceLevel] || experienceLevel}</span>
                   )}
                   {experienceLevel && lastMessageDate && <span>·</span>}
                   {lastMessageDate && (
                     <span>
-                      Last message{" "}
+                      Last message{' '}
                       {formatDistanceToNow(new Date(lastMessageDate), {
                         addSuffix: true,
                       })}
@@ -179,9 +175,7 @@ export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
                           >
                             <Icon className="h-4 w-4 mr-2" />
                             {label}
-                            {client.status === value && (
-                              <Check className="h-4 w-4 ml-auto" />
-                            )}
+                            {client.status === value && <Check className="h-4 w-4 ml-auto" />}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuContent>
@@ -197,9 +191,7 @@ export const ClientCard = ({ client, onStatusChange }: ClientCardProps) => {
                   <Badge key={goal}>{goal}</Badge>
                 ))}
                 {fitnessGoals.length > 3 && (
-                  <Badge variant="secondary">
-                    +{fitnessGoals.length - 3} more
-                  </Badge>
+                  <Badge variant="secondary">+{fitnessGoals.length - 3} more</Badge>
                 )}
               </div>
             )}

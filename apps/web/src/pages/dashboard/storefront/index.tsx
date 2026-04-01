@@ -43,10 +43,7 @@ export const StorefrontPage = () => {
   if (view.type === 'product-form') {
     return (
       <div className="p-4 sm:p-6 lg:p-8">
-        <ProductForm
-          product={view.product}
-          onBack={() => setView({ type: 'list' })}
-        />
+        <ProductForm product={view.product} onBack={() => setView({ type: 'list' })} />
       </div>
     );
   }
@@ -63,11 +60,7 @@ export const StorefrontPage = () => {
     <div className="p-4 sm:p-6 lg:p-8">
       <h1 className="text-2xl font-bold mb-6">Storefront</h1>
 
-      <ResponsiveTabs
-        options={TAB_OPTIONS}
-        value={activeTab}
-        onValueChange={setActiveTab}
-      >
+      <ResponsiveTabs options={TAB_OPTIONS} value={activeTab} onValueChange={setActiveTab}>
         <TabsContent value="products">
           <ProductList
             onEdit={(product) => setView({ type: 'product-form', product })}

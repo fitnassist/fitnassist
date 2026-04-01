@@ -121,9 +121,7 @@ export function ImageUpload({
 
   return (
     <div className={cn('space-y-2', className)}>
-      {label && (
-        <label className="text-sm font-medium leading-none">{label}</label>
-      )}
+      {label && <label className="text-sm font-medium leading-none">{label}</label>}
 
       <div
         onDrop={handleDrop}
@@ -138,7 +136,7 @@ export function ImageUpload({
           !dragActive && 'border-muted-foreground/25 hover:border-muted-foreground/50',
           disabled && 'cursor-not-allowed opacity-50',
           error && 'border-destructive',
-          dropZoneClassName
+          dropZoneClassName,
         )}
       >
         <input
@@ -187,20 +185,14 @@ export function ImageUpload({
               <p className="text-sm font-medium">
                 {dragActive ? 'Drop image here' : 'Click or drag to upload'}
               </p>
-              {description && (
-                <p className="text-xs text-muted-foreground">{description}</p>
-              )}
-              <p className="text-xs text-muted-foreground">
-                Max {maxSizeMB}MB
-              </p>
+              {description && <p className="text-xs text-muted-foreground">{description}</p>}
+              <p className="text-xs text-muted-foreground">Max {maxSizeMB}MB</p>
             </div>
           </div>
         )}
       </div>
 
-      {(error || uploadError) && (
-        <p className="text-sm text-destructive">{error || uploadError}</p>
-      )}
+      {(error || uploadError) && <p className="text-sm text-destructive">{error || uploadError}</p>}
     </div>
   );
 }

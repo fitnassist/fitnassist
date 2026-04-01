@@ -6,18 +6,29 @@ import { trpc } from '@/lib/trpc';
 interface CouponInputProps {
   trainerId: string;
   subtotalPence: number;
-  onApply: (result: { code: string; discountPence: number; percentOff: number | null; amountOffPence: number | null }) => void;
+  onApply: (result: {
+    code: string;
+    discountPence: number;
+    percentOff: number | null;
+    amountOffPence: number | null;
+  }) => void;
   onRemove: () => void;
   appliedCode: string | null;
 }
 
-export const CouponInput = ({ trainerId, subtotalPence, onApply, onRemove, appliedCode }: CouponInputProps) => {
+export const CouponInput = ({
+  trainerId,
+  subtotalPence,
+  onApply,
+  onRemove,
+  appliedCode,
+}: CouponInputProps) => {
   const [code, setCode] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const validate = trpc.coupon.validate.useQuery(
     { trainerId, code: code.toUpperCase(), subtotalPence },
-    { enabled: false }
+    { enabled: false },
   );
 
   const handleApply = async () => {
@@ -76,9 +87,7 @@ export const CouponInput = ({ trainerId, subtotalPence, onApply, onRemove, appli
           {validate.isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Apply'}
         </Button>
       </div>
-      {error && (
-        <p className="text-xs text-red-500">{error}</p>
-      )}
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   );
 };

@@ -9,7 +9,11 @@ interface NotificationItemProps {
   onDismiss: (id: string) => void;
 }
 
-export const NotificationItem = ({ notification, onNavigate, onDismiss }: NotificationItemProps) => {
+export const NotificationItem = ({
+  notification,
+  onNavigate,
+  onDismiss,
+}: NotificationItemProps) => {
   const Icon = getNotificationIcon(notification.type);
 
   return (
@@ -20,18 +24,20 @@ export const NotificationItem = ({ notification, onNavigate, onDismiss }: Notifi
       onClick={() => onNavigate(notification)}
     >
       <div className="flex-shrink-0 mt-0.5">
-        <div className={`rounded-full p-1.5 ${!notification.isRead ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+        <div
+          className={`rounded-full p-1.5 ${!notification.isRead ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}
+        >
           <Icon className="h-4 w-4" />
         </div>
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`text-sm leading-tight ${!notification.isRead ? 'font-medium' : 'text-muted-foreground'}`}>
+        <p
+          className={`text-sm leading-tight ${!notification.isRead ? 'font-medium' : 'text-muted-foreground'}`}
+        >
           {notification.title}
         </p>
         {notification.body && (
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-            {notification.body}
-          </p>
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{notification.body}</p>
         )}
         <p className="text-xs text-muted-foreground mt-1">
           {formatRelativeTime(notification.createdAt)}

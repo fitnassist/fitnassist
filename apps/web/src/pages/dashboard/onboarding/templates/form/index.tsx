@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   DndContext,
   closestCenter,
@@ -10,16 +10,16 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-} from "@dnd-kit/core";
+} from '@dnd-kit/core';
 import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable,
   arrayMove,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { ClipboardCheck, Plus, Trash2, GripVertical } from "lucide-react";
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { ClipboardCheck, Plus, Trash2, GripVertical } from 'lucide-react';
 import {
   Button,
   Card,
@@ -32,36 +32,36 @@ import {
   Switch,
   Textarea,
   type SelectOption,
-} from "@/components/ui";
-import { PageLayout } from "@/components/layouts";
-import { routes } from "@/config/routes";
+} from '@/components/ui';
+import { PageLayout } from '@/components/layouts';
+import { routes } from '@/config/routes';
 import {
   useOnboardingTemplate,
   useCreateOnboardingTemplate,
   useUpdateOnboardingTemplate,
-} from "@/api/onboarding";
+} from '@/api/onboarding';
 import {
   createOnboardingTemplateSchema,
   type CreateOnboardingTemplateInput,
   type Question,
   type QuestionType,
-} from "@fitnassist/schemas";
+} from '@fitnassist/schemas';
 
 const QUESTION_TYPE_OPTIONS: SelectOption[] = [
-  { value: "SHORT_TEXT", label: "Short Text" },
-  { value: "LONG_TEXT", label: "Long Text" },
-  { value: "SINGLE_CHOICE", label: "Single Choice" },
-  { value: "MULTIPLE_CHOICE", label: "Multiple Choice" },
-  { value: "YES_NO", label: "Yes / No" },
-  { value: "NUMBER", label: "Number" },
+  { value: 'SHORT_TEXT', label: 'Short Text' },
+  { value: 'LONG_TEXT', label: 'Long Text' },
+  { value: 'SINGLE_CHOICE', label: 'Single Choice' },
+  { value: 'MULTIPLE_CHOICE', label: 'Multiple Choice' },
+  { value: 'YES_NO', label: 'Yes / No' },
+  { value: 'NUMBER', label: 'Number' },
 ];
 
-const CHOICE_TYPES = ["SINGLE_CHOICE", "MULTIPLE_CHOICE"] as const;
+const CHOICE_TYPES = ['SINGLE_CHOICE', 'MULTIPLE_CHOICE'] as const;
 
 const createEmptyQuestion = (): Question => ({
   id: crypto.randomUUID(),
-  type: "SHORT_TEXT",
-  label: "",
+  type: 'SHORT_TEXT',
+  label: '',
   required: false,
 });
 
@@ -84,14 +84,9 @@ const SortableQuestion = ({
   addOption: (qIndex: number) => void;
   removeOption: (qIndex: number, oIndex: number) => void;
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: question.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: question.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -100,11 +95,7 @@ const SortableQuestion = ({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="border rounded-lg p-4 space-y-3 bg-background"
-    >
+    <div ref={setNodeRef} style={style} className="border rounded-lg p-4 space-y-3 bg-background">
       <div className="flex items-start gap-2">
         <div className="flex flex-col items-center gap-1 mt-2">
           <button
@@ -115,31 +106,19 @@ const SortableQuestion = ({
           >
             <GripVertical className="h-5 w-5 text-muted-foreground" />
           </button>
-          <span className="text-sm font-medium text-muted-foreground">
-            Q{qIndex + 1}
-          </span>
+          <span className="text-sm font-medium text-muted-foreground">Q{qIndex + 1}</span>
         </div>
         <div className="flex-1 space-y-3">
           <Input
             placeholder="Question text"
             value={question.label}
-            onChange={(e) =>
-              updateQuestion(qIndex, "label", e.target.value)
-            }
+            onChange={(e) => updateQuestion(qIndex, 'label', e.target.value)}
           />
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="w-full sm:w-48">
               <Select
-                value={QUESTION_TYPE_OPTIONS.find(
-                  (o) => o.value === question.type,
-                )}
-                onChange={(opt) =>
-                  updateQuestion(
-                    qIndex,
-                    "type",
-                    opt?.value as QuestionType,
-                  )
-                }
+                value={QUESTION_TYPE_OPTIONS.find((o) => o.value === question.type)}
+                onChange={(opt) => updateQuestion(qIndex, 'type', opt?.value as QuestionType)}
                 options={QUESTION_TYPE_OPTIONS}
                 isClearable={false}
                 isSearchable={false}
@@ -148,18 +127,14 @@ const SortableQuestion = ({
             <div className="flex items-center gap-2">
               <Switch
                 checked={question.required}
-                onCheckedChange={(checked) =>
-                  updateQuestion(qIndex, "required", checked)
-                }
+                onCheckedChange={(checked) => updateQuestion(qIndex, 'required', checked)}
               />
               <Label className="mb-0">Required</Label>
             </div>
           </div>
 
           {/* Options for choice types */}
-          {CHOICE_TYPES.includes(
-            question.type as (typeof CHOICE_TYPES)[number],
-          ) && (
+          {CHOICE_TYPES.includes(question.type as (typeof CHOICE_TYPES)[number]) && (
             <div className="space-y-2 pl-4 border-l-2 border-muted">
               <Label className="text-sm">Options</Label>
               {(question.options || []).map((option, oIndex) => (
@@ -167,9 +142,7 @@ const SortableQuestion = ({
                   <Input
                     placeholder={`Option ${oIndex + 1}`}
                     value={option}
-                    onChange={(e) =>
-                      updateOption(qIndex, oIndex, e.target.value)
-                    }
+                    onChange={(e) => updateOption(qIndex, oIndex, e.target.value)}
                   />
                   <Button
                     type="button"
@@ -182,12 +155,7 @@ const SortableQuestion = ({
                   </Button>
                 </div>
               ))}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => addOption(qIndex)}
-              >
+              <Button type="button" variant="ghost" size="sm" onClick={() => addOption(qIndex)}>
                 <Plus className="h-4 w-4 mr-1" />
                 Add Option
               </Button>
@@ -213,7 +181,7 @@ export const OnboardingTemplateFormPage = () => {
   const { id } = useParams<{ id: string }>();
   const isEditing = !!id;
 
-  const { data: existingTemplate, isLoading } = useOnboardingTemplate(id || "");
+  const { data: existingTemplate, isLoading } = useOnboardingTemplate(id || '');
   const createTemplate = useCreateOnboardingTemplate();
   const updateTemplate = useUpdateOnboardingTemplate();
 
@@ -240,28 +208,28 @@ export const OnboardingTemplateFormPage = () => {
   } = useForm<CreateOnboardingTemplateInput>({
     resolver: zodResolver(createOnboardingTemplateSchema),
     defaultValues: {
-      name: "",
-      waiverText: "",
+      name: '',
+      waiverText: '',
       isActive: false,
       questions: [createEmptyQuestion()],
     },
     values: existingTemplate
       ? {
           name: existingTemplate.name,
-          waiverText: existingTemplate.waiverText || "",
+          waiverText: existingTemplate.waiverText || '',
           isActive: existingTemplate.isActive,
           questions: existingTemplate.questions as Question[],
         }
       : undefined,
   });
 
-  const isActive = watch("isActive");
+  const isActive = watch('isActive');
 
   const addQuestion = useCallback(() => {
     const newQ = createEmptyQuestion();
     setQuestions((prev) => {
       const updated = [...prev, newQ];
-      setValue("questions", updated, { shouldValidate: true });
+      setValue('questions', updated, { shouldValidate: true });
       return updated;
     });
   }, [setValue]);
@@ -270,7 +238,7 @@ export const OnboardingTemplateFormPage = () => {
     (index: number) => {
       setQuestions((prev) => {
         const updated = prev.filter((_, i) => i !== index);
-        setValue("questions", updated, { shouldValidate: true });
+        setValue('questions', updated, { shouldValidate: true });
         return updated;
       });
     },
@@ -292,7 +260,7 @@ export const OnboardingTemplateFormPage = () => {
           const oldIndex = prev.findIndex((q) => q.id === String(active.id));
           const newIndex = prev.findIndex((q) => q.id === String(over.id));
           const updated = arrayMove(prev, oldIndex, newIndex);
-          setValue("questions", updated, { shouldValidate: true });
+          setValue('questions', updated, { shouldValidate: true });
           return updated;
         });
       }
@@ -307,23 +275,20 @@ export const OnboardingTemplateFormPage = () => {
           if (i !== index) return q;
           const newQ = { ...q, [field]: value };
           // Clear options when switching away from choice types
-          if (
-            field === "type" &&
-            !CHOICE_TYPES.includes(value as (typeof CHOICE_TYPES)[number])
-          ) {
+          if (field === 'type' && !CHOICE_TYPES.includes(value as (typeof CHOICE_TYPES)[number])) {
             newQ.options = undefined;
           }
           // Initialize options when switching to choice types
           if (
-            field === "type" &&
+            field === 'type' &&
             CHOICE_TYPES.includes(value as (typeof CHOICE_TYPES)[number]) &&
             !newQ.options?.length
           ) {
-            newQ.options = [""];
+            newQ.options = [''];
           }
           return newQ;
         });
-        setValue("questions", updated, { shouldValidate: true });
+        setValue('questions', updated, { shouldValidate: true });
         return updated;
       });
     },
@@ -339,7 +304,7 @@ export const OnboardingTemplateFormPage = () => {
           options[oIndex] = value;
           return { ...q, options };
         });
-        setValue("questions", updated, { shouldValidate: true });
+        setValue('questions', updated, { shouldValidate: true });
         return updated;
       });
     },
@@ -351,9 +316,9 @@ export const OnboardingTemplateFormPage = () => {
       setQuestions((prev) => {
         const updated = prev.map((q, i) => {
           if (i !== qIndex) return q;
-          return { ...q, options: [...(q.options || []), ""] };
+          return { ...q, options: [...(q.options || []), ''] };
         });
-        setValue("questions", updated, { shouldValidate: true });
+        setValue('questions', updated, { shouldValidate: true });
         return updated;
       });
     },
@@ -370,7 +335,7 @@ export const OnboardingTemplateFormPage = () => {
             options: (q.options || []).filter((_, j) => j !== oIndex),
           };
         });
-        setValue("questions", updated, { shouldValidate: true });
+        setValue('questions', updated, { shouldValidate: true });
         return updated;
       });
     },
@@ -408,11 +373,11 @@ export const OnboardingTemplateFormPage = () => {
   return (
     <PageLayout>
       <PageLayout.Header
-        title={isEditing ? "Edit Template" : "New Onboarding Template"}
+        title={isEditing ? 'Edit Template' : 'New Onboarding Template'}
         icon={<ClipboardCheck className="h-6 w-6 sm:h-8 sm:w-8" />}
         backLink={{
           to: routes.dashboardOnboarding,
-          label: "Back to Onboarding",
+          label: 'Back to Onboarding',
         }}
       />
 
@@ -425,22 +390,16 @@ export const OnboardingTemplateFormPage = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="name">Template Name</Label>
-              <Input
-                id="name"
-                placeholder="e.g., New Client Questionnaire"
-                {...register("name")}
-              />
+              <Input id="name" placeholder="e.g., New Client Questionnaire" {...register('name')} />
               {errors.name && (
-                <p className="text-sm text-destructive mt-1">
-                  {errors.name.message}
-                </p>
+                <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
               )}
             </div>
 
             <div className="flex items-center gap-3">
               <Switch
                 checked={isActive}
-                onCheckedChange={(checked) => setValue("isActive", checked)}
+                onCheckedChange={(checked) => setValue('isActive', checked)}
               />
               <div>
                 <Label className="mb-0">Set as active template</Label>
@@ -457,12 +416,7 @@ export const OnboardingTemplateFormPage = () => {
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Questions</CardTitle>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addQuestion}
-              >
+              <Button type="button" variant="outline" size="sm" onClick={addQuestion}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Question
               </Button>
@@ -496,9 +450,7 @@ export const OnboardingTemplateFormPage = () => {
               </SortableContext>
             </DndContext>
             {errors.questions && (
-              <p className="text-sm text-destructive">
-                {errors.questions.message}
-              </p>
+              <p className="text-sm text-destructive">{errors.questions.message}</p>
             )}
           </CardContent>
         </Card>
@@ -512,16 +464,14 @@ export const OnboardingTemplateFormPage = () => {
             <Textarea
               placeholder="Enter waiver text that clients must agree to..."
               rows={6}
-              {...register("waiverText")}
+              {...register('waiverText')}
             />
             <p className="text-sm text-muted-foreground mt-2">
-              If provided, clients will need to read and agree to this waiver
-              before completing onboarding.
+              If provided, clients will need to read and agree to this waiver before completing
+              onboarding.
             </p>
             {errors.waiverText && (
-              <p className="text-sm text-destructive mt-1">
-                {errors.waiverText.message}
-              </p>
+              <p className="text-sm text-destructive mt-1">{errors.waiverText.message}</p>
             )}
           </CardContent>
         </Card>
@@ -536,11 +486,7 @@ export const OnboardingTemplateFormPage = () => {
             Cancel
           </Button>
           <Button type="submit" disabled={isSaving}>
-            {isSaving
-              ? "Saving..."
-              : isEditing
-                ? "Update Template"
-                : "Create Template"}
+            {isSaving ? 'Saving...' : isEditing ? 'Update Template' : 'Create Template'}
           </Button>
         </div>
       </form>

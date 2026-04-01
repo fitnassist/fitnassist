@@ -40,14 +40,14 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
   const trainerId = website?.trainer?.id ?? '';
   const { data: blogData } = trpc.blog.getPublicPosts.useQuery(
     { subdomain, limit: 1 },
-    { enabled: !!subdomain }
+    { enabled: !!subdomain },
   );
   const hasBlogPosts = (blogData?.posts?.length ?? 0) > 0;
 
   // Check if products exist for dynamic nav item
   const { data: productsData } = trpc.product.getPublicProducts.useQuery(
     { trainerId },
-    { enabled: !!trainerId }
+    { enabled: !!trainerId },
   );
   const hasProducts = (productsData?.length ?? 0) > 0;
 
@@ -58,37 +58,38 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const handleAddToCart = useCallback((productId: string) => {
-    const product = productsData?.find((p) => p.id === productId);
-    if (!product) return;
+  const handleAddToCart = useCallback(
+    (productId: string) => {
+      const product = productsData?.find((p) => p.id === productId);
+      if (!product) return;
 
-    setCartItems((prev) => {
-      const existing = prev.find((item) => item.id === productId);
-      if (existing) {
-        return prev.map((item) =>
-          item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
-        );
-      }
-      return [
-        ...prev,
-        {
-          id: product.id,
-          name: product.name,
-          pricePence: product.pricePence,
-          type: product.type as 'DIGITAL' | 'PHYSICAL',
-          imageUrl: product.imageUrl,
-          quantity: 1,
-        },
-      ];
-    });
-    setCartOpen(true);
-  }, [productsData]);
+      setCartItems((prev) => {
+        const existing = prev.find((item) => item.id === productId);
+        if (existing) {
+          return prev.map((item) =>
+            item.id === productId ? { ...item, quantity: item.quantity + 1 } : item,
+          );
+        }
+        return [
+          ...prev,
+          {
+            id: product.id,
+            name: product.name,
+            pricePence: product.pricePence,
+            type: product.type as 'DIGITAL' | 'PHYSICAL',
+            imageUrl: product.imageUrl,
+            quantity: 1,
+          },
+        ];
+      });
+      setCartOpen(true);
+    },
+    [productsData],
+  );
 
   const handleUpdateCartQuantity = useCallback((productId: string, quantity: number) => {
     setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === productId ? { ...item, quantity } : item
-      )
+      prev.map((item) => (item.id === productId ? { ...item, quantity } : item)),
     );
   }, []);
 
@@ -105,21 +106,26 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
     setCheckoutOpen(true);
   }, []);
 
-  const handleBuyNow = useCallback((productId: string) => {
-    const product = productsData?.find((p) => p.id === productId);
-    if (!product) return;
+  const handleBuyNow = useCallback(
+    (productId: string) => {
+      const product = productsData?.find((p) => p.id === productId);
+      if (!product) return;
 
-    // Set cart to just this product and open checkout directly
-    setCartItems([{
-      id: product.id,
-      name: product.name,
-      pricePence: product.pricePence,
-      type: product.type as 'DIGITAL' | 'PHYSICAL',
-      imageUrl: product.imageUrl,
-      quantity: 1,
-    }]);
-    setCheckoutOpen(true);
-  }, [productsData]);
+      // Set cart to just this product and open checkout directly
+      setCartItems([
+        {
+          id: product.id,
+          name: product.name,
+          pricePence: product.pricePence,
+          type: product.type as 'DIGITAL' | 'PHYSICAL',
+          imageUrl: product.imageUrl,
+          quantity: 1,
+        },
+      ]);
+      setCheckoutOpen(true);
+    },
+    [productsData],
+  );
 
   const handleCheckoutSuccess = useCallback(() => {
     setCartItems([]);
@@ -142,17 +148,23 @@ export const SiteRenderer = ({ handle }: SiteRendererProps) => {
     navigate({ page: 'blog' }, '/blog');
   }, [navigate]);
 
-  const handleNavigatePost = useCallback((slug: string) => {
-    navigate({ page: 'blog-post', slug }, `/blog/${slug}`);
-  }, [navigate]);
+  const handleNavigatePost = useCallback(
+    (slug: string) => {
+      navigate({ page: 'blog-post', slug }, `/blog/${slug}`);
+    },
+    [navigate],
+  );
 
   const handleNavigateShop = useCallback(() => {
     navigate({ page: 'shop' }, '/shop');
   }, [navigate]);
 
-  const handleNavigateProduct = useCallback((slug: string) => {
-    navigate({ page: 'shop-product', slug }, `/shop/${slug}`);
-  }, [navigate]);
+  const handleNavigateProduct = useCallback(
+    (slug: string) => {
+      navigate({ page: 'shop-product', slug }, `/shop/${slug}`);
+    },
+    [navigate],
+  );
 
   const handleNavigateHome = useCallback(() => {
     navigate({ page: 'home' }, '/');

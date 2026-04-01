@@ -9,12 +9,7 @@ import {
 import { Button, MultiSelect } from '@/components/ui';
 import type { WizardStepProps } from '../../ProfileWizard/ProfileWizard.types';
 
-export function ServicesStep({
-  data,
-  onUpdate,
-  onNext,
-  onBack,
-}: WizardStepProps) {
+export function ServicesStep({ data, onUpdate, onNext, onBack }: WizardStepProps) {
   const {
     handleSubmit,
     control,
@@ -70,9 +65,7 @@ export function ServicesStep({
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button type="submit">
-          Continue
-        </Button>
+        <Button type="submit">Continue</Button>
       </div>
     </form>
   );

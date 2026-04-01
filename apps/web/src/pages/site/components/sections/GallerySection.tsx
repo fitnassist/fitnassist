@@ -33,7 +33,7 @@ export const GallerySection = ({ section, trainer }: GallerySectionProps) => {
           id: img.id,
           imageUrl: img.url,
         }))
-      : content.images ?? [];
+      : (content.images ?? []);
 
   const gridCols =
     columns === 2
@@ -74,9 +74,7 @@ export const GallerySection = ({ section, trainer }: GallerySectionProps) => {
         </div>
 
         {images.length === 0 && (
-          <p className="text-center text-[hsl(var(--muted-foreground))]">
-            No images to display.
-          </p>
+          <p className="text-center text-[hsl(var(--muted-foreground))]">No images to display.</p>
         )}
       </div>
     </section>

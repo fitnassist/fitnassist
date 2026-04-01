@@ -21,7 +21,9 @@ export const CouponList = ({ onCreate }: CouponListProps) => {
   if (!coupons || coupons.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground mb-4">No coupons yet. Create discount codes your customers can use at checkout.</p>
+        <p className="text-muted-foreground mb-4">
+          No coupons yet. Create discount codes your customers can use at checkout.
+        </p>
         <Button onClick={onCreate}>
           <Plus className="h-4 w-4 mr-2" />
           Create Coupon
@@ -33,7 +35,9 @@ export const CouponList = ({ onCreate }: CouponListProps) => {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-muted-foreground">{coupons.length} coupon{coupons.length !== 1 ? 's' : ''}</p>
+        <p className="text-sm text-muted-foreground">
+          {coupons.length} coupon{coupons.length !== 1 ? 's' : ''}
+        </p>
         <Button onClick={onCreate}>
           <Plus className="h-4 w-4 mr-2" />
           Create Coupon
@@ -56,7 +60,9 @@ export const CouponList = ({ onCreate }: CouponListProps) => {
             {coupons.map((coupon) => (
               <tr key={coupon.id} className="border-b">
                 <td className="py-3">
-                  <Badge variant="outline" className="font-mono">{coupon.code}</Badge>
+                  <Badge variant="outline" className="font-mono">
+                    {coupon.code}
+                  </Badge>
                   {coupon.description && (
                     <p className="text-xs text-muted-foreground mt-1">{coupon.description}</p>
                   )}
@@ -78,9 +84,7 @@ export const CouponList = ({ onCreate }: CouponListProps) => {
                   {coupon.maxRedemptions ? ` / ${coupon.maxRedemptions}` : ''}
                 </td>
                 <td className="py-3 text-muted-foreground">
-                  {coupon.expiresAt
-                    ? new Date(coupon.expiresAt).toLocaleDateString()
-                    : 'Never'}
+                  {coupon.expiresAt ? new Date(coupon.expiresAt).toLocaleDateString() : 'Never'}
                 </td>
                 <td className="py-3">
                   <Switch

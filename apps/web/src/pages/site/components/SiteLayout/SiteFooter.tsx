@@ -1,11 +1,4 @@
-import {
-  Facebook,
-  Instagram,
-  Twitter,
-  Youtube,
-  Linkedin,
-  Globe,
-} from 'lucide-react';
+import { Facebook, Instagram, Twitter, Youtube, Linkedin, Globe } from 'lucide-react';
 import type { PublicTrainer } from '../../site.types';
 
 interface SiteFooterProps {
@@ -33,7 +26,7 @@ const parseSocialLinks = (raw: unknown): SocialLink[] => {
       typeof item === 'object' &&
       item !== null &&
       typeof item.platform === 'string' &&
-      typeof item.url === 'string'
+      typeof item.url === 'string',
   );
 };
 

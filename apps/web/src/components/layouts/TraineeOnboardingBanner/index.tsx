@@ -1,17 +1,17 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { X, UserCircle } from "lucide-react";
-import { Button, Card, CardContent } from "@/components/ui";
-import { routes } from "@/config/routes";
-import { useAuth } from "@/hooks";
-import { trpc } from "@/lib/trpc";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { X, UserCircle } from 'lucide-react';
+import { Button, Card, CardContent } from '@/components/ui';
+import { routes } from '@/config/routes';
+import { useAuth } from '@/hooks';
+import { trpc } from '@/lib/trpc';
 
-const DISMISS_KEY = "trainee-onboarding-banner-dismissed";
+const DISMISS_KEY = 'trainee-onboarding-banner-dismissed';
 
 export const TraineeOnboardingBanner = () => {
   const { isTrainee, isAuthenticated } = useAuth();
   const [isDismissed, setIsDismissed] = useState(
-    () => localStorage.getItem(DISMISS_KEY) === "true",
+    () => localStorage.getItem(DISMISS_KEY) === 'true',
   );
 
   const { data, isLoading } = trpc.trainee.hasProfile.useQuery(undefined, {
@@ -24,7 +24,7 @@ export const TraineeOnboardingBanner = () => {
   }
 
   const handleDismiss = () => {
-    localStorage.setItem(DISMISS_KEY, "true");
+    localStorage.setItem(DISMISS_KEY, 'true');
     setIsDismissed(true);
   };
 

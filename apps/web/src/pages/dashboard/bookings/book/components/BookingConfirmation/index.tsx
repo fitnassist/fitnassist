@@ -72,7 +72,9 @@ export const BookingConfirmation = ({
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-muted-foreground" />
-              <span>{startTime} - {endTime} ({durationMin} min)</span>
+              <span>
+                {startTime} - {endTime} ({durationMin} min)
+              </span>
             </div>
             <div className="flex items-center gap-2">
               {sessionType === 'VIDEO_CALL' ? (
@@ -92,7 +94,9 @@ export const BookingConfirmation = ({
                 {isFirstFree ? (
                   <>
                     <Gift className="h-4 w-4 text-green-600" />
-                    <Badge variant="success" className="text-xs">First Session Free</Badge>
+                    <Badge variant="success" className="text-xs">
+                      First Session Free
+                    </Badge>
                   </>
                 ) : paymentInfo ? (
                   <>
@@ -105,7 +109,9 @@ export const BookingConfirmation = ({
             {isFreeSession && (
               <div className="flex items-center gap-2">
                 <Gift className="h-4 w-4 text-green-600" />
-                <Badge variant="success" className="text-xs">Free Session</Badge>
+                <Badge variant="success" className="text-xs">
+                  Free Session
+                </Badge>
               </div>
             )}
           </div>
@@ -116,7 +122,9 @@ export const BookingConfirmation = ({
         <div className="flex items-center justify-between rounded-lg border p-3">
           <div className="space-y-0.5">
             <Label htmlFor="free-session">Free session</Label>
-            <p className="text-xs text-muted-foreground">No payment will be required for this session</p>
+            <p className="text-xs text-muted-foreground">
+              No payment will be required for this session
+            </p>
           </div>
           <Switch
             id="free-session"
@@ -142,11 +150,11 @@ export const BookingConfirmation = ({
           Back
         </Button>
         <Button onClick={onConfirm} disabled={isSubmitting} className="flex-1">
-          {isSubmitting ? 'Booking...' : (
-            paymentInfo && !isFirstFree && !isFreeSession
+          {isSubmitting
+            ? 'Booking...'
+            : paymentInfo && !isFirstFree && !isFreeSession
               ? `Confirm & Pay ${formatPrice(paymentInfo.amount, paymentInfo.currency)}`
-              : 'Confirm Booking'
-          )}
+              : 'Confirm Booking'}
         </Button>
       </div>
     </div>

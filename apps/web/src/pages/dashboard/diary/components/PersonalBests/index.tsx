@@ -39,7 +39,11 @@ const CATEGORY_LABELS: Record<string, string> = {
   CUSTOM: 'Other',
 };
 
-export const PersonalBests = ({ userId, data: externalData, variant = 'default' }: PersonalBestsProps) => {
+export const PersonalBests = ({
+  userId,
+  data: externalData,
+  variant = 'default',
+}: PersonalBestsProps) => {
   const isProfile = variant === 'profile';
   const [isExpanded, setIsExpanded] = useState(true);
   const { data: fetchedPbs } = usePersonalBests(userId, !externalData);
@@ -63,10 +67,13 @@ export const PersonalBests = ({ userId, data: externalData, variant = 'default' 
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className={isProfile
-            ? 'flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider'
-            : 'flex items-center gap-2 text-base'
-          }>
+          <CardTitle
+            className={
+              isProfile
+                ? 'flex items-center gap-2 text-lg sm:text-xl font-light uppercase tracking-wider'
+                : 'flex items-center gap-2 text-base'
+            }
+          >
             <Trophy className={isProfile ? 'h-5 w-5' : 'h-4 w-4 text-yellow-500'} />
             Personal Bests
           </CardTitle>
@@ -95,7 +102,10 @@ export const PersonalBests = ({ userId, data: externalData, variant = 'default' 
                   </h4>
                   <div className="space-y-1.5">
                     {items.map((pb) => (
-                      <div key={pb.id} className="flex items-center justify-between rounded-lg border px-3 py-2">
+                      <div
+                        key={pb.id}
+                        className="flex items-center justify-between rounded-lg border px-3 py-2"
+                      >
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium">{pb.label}</p>
                           <p className="text-xs text-muted-foreground">
@@ -103,7 +113,9 @@ export const PersonalBests = ({ userId, data: externalData, variant = 'default' 
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-semibold">{formatPBValue(pb.value, pb.unit)}</p>
+                          <p className="text-sm font-semibold">
+                            {formatPBValue(pb.value, pb.unit)}
+                          </p>
                           {pb.previousValue != null && (
                             <p className="flex items-center justify-end gap-0.5 text-xs text-muted-foreground">
                               {pb.category === 'FASTEST_DISTANCE' ? (

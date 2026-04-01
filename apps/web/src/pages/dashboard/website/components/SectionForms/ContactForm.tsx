@@ -24,20 +24,25 @@ interface ContactFormProps {
   content: Record<string, unknown>;
 }
 
-const TOGGLE_FIELDS: { name: keyof Pick<ContactContent, 'showForm' | 'showEmail' | 'showPhone' | 'showAddress'>; label: string; description?: string }[] = [
-  { name: 'showForm', label: 'Show callback & connect buttons', description: 'Allow visitors to request a callback or connect with you through Fitnassist' },
+const TOGGLE_FIELDS: {
+  name: keyof Pick<ContactContent, 'showForm' | 'showEmail' | 'showPhone' | 'showAddress'>;
+  label: string;
+  description?: string;
+}[] = [
+  {
+    name: 'showForm',
+    label: 'Show callback & connect buttons',
+    description: 'Allow visitors to request a callback or connect with you through Fitnassist',
+  },
   { name: 'showEmail', label: 'Show email address' },
   { name: 'showPhone', label: 'Show phone number' },
   { name: 'showAddress', label: 'Show address & map' },
 ];
 
 const formatAddressString = (details: AddressDetails): string => {
-  const parts = [
-    details.addressLine1,
-    details.addressLine2,
-    details.city,
-    details.postcode,
-  ].filter(Boolean);
+  const parts = [details.addressLine1, details.addressLine2, details.city, details.postcode].filter(
+    Boolean,
+  );
   return parts.join(', ');
 };
 
@@ -82,9 +87,7 @@ export const ContactForm = ({ sectionId, content }: ContactFormProps) => {
               <Label htmlFor={name} className="text-sm font-normal cursor-pointer mb-0 inline">
                 {label}
               </Label>
-              {description && (
-                <p className="text-xs text-muted-foreground">{description}</p>
-              )}
+              {description && <p className="text-xs text-muted-foreground">{description}</p>}
             </div>
           </div>
         ))}

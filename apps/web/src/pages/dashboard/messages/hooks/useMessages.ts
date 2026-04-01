@@ -3,18 +3,15 @@ import { trpc } from '@/lib/trpc';
 import { CONNECTIONS_POLL_INTERVAL, MESSAGE_POLL_INTERVAL } from '../messages.constants';
 
 export const useConnections = (sseConnected: boolean, archived?: boolean) => {
-  return trpc.message.getConnections.useQuery(
-    archived !== undefined ? { archived } : undefined,
-    {
-      refetchInterval: sseConnected ? false : CONNECTIONS_POLL_INTERVAL,
-    }
-  );
+  return trpc.message.getConnections.useQuery(archived !== undefined ? { archived } : undefined, {
+    refetchInterval: sseConnected ? false : CONNECTIONS_POLL_INTERVAL,
+  });
 };
 
 export const useConnection = (connectionId: string | undefined) => {
   return trpc.message.getConnection.useQuery(
     { connectionId: connectionId! },
-    { enabled: !!connectionId }
+    { enabled: !!connectionId },
   );
 };
 
@@ -27,7 +24,7 @@ export const useThread = (connectionId: string | undefined, sseConnected: boolea
     {
       enabled: !!connectionId,
       refetchInterval: sseConnected ? false : MESSAGE_POLL_INTERVAL,
-    }
+    },
   );
 
   // When new messages arrive via polling, invalidate unread counts

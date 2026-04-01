@@ -31,12 +31,7 @@ export const NotificationPanel = ({
       <div className="flex items-center justify-between p-3 border-b">
         <h3 className="font-semibold text-sm">Notifications</h3>
         {hasUnread && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs gap-1"
-            onClick={onMarkAllRead}
-          >
+          <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={onMarkAllRead}>
             <CheckCheck className="h-3.5 w-3.5" />
             Mark all read
           </Button>
@@ -73,9 +68,7 @@ export const NotificationPanel = ({
                   onClick={onLoadMore}
                   disabled={isFetchingMore}
                 >
-                  {isFetchingMore ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />
-                  ) : null}
+                  {isFetchingMore ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
                   Load more
                 </Button>
               </div>

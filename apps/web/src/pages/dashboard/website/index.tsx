@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import {
-  Layout, Palette, FileText, Settings, ExternalLink, Loader2, Eye,
-} from 'lucide-react';
+import { Layout, Palette, FileText, Settings, ExternalLink, Loader2, Eye } from 'lucide-react';
 import { Button, ResponsiveTabs, TabsContent } from '@/components/ui';
 import { UpgradePrompt } from '@/components/UpgradePrompt';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
@@ -56,13 +54,10 @@ export const WebsitePage = () => {
           </div>
           <h2 className="text-lg font-semibold mb-2">Create Your Website</h2>
           <p className="text-sm text-muted-foreground max-w-md mb-6">
-            Build a branded micro-site for your personal training business.
-            Your site will be available at <strong>{profile?.handle ?? 'yourhandle'}.sites.fitnassist.co</strong>.
+            Build a branded micro-site for your personal training business. Your site will be
+            available at <strong>{profile?.handle ?? 'yourhandle'}.sites.fitnassist.co</strong>.
           </p>
-          <Button
-            onClick={() => createWebsite.mutate()}
-            disabled={createWebsite.isPending}
-          >
+          <Button onClick={() => createWebsite.mutate()} disabled={createWebsite.isPending}>
             {createWebsite.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create Website
           </Button>
@@ -115,11 +110,7 @@ export const WebsitePage = () => {
         </div>
       </div>
 
-      <ResponsiveTabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        options={TAB_OPTIONS}
-      >
+      <ResponsiveTabs value={activeTab} onValueChange={setActiveTab} options={TAB_OPTIONS}>
         <TabsContent value="sections">
           <SectionEditor website={ws} />
         </TabsContent>

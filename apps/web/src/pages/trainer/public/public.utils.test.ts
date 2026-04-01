@@ -1,4 +1,10 @@
-import { getServiceLabel, getQualificationLabel, getTravelOptionDisplay, getPostcodeArea, formatRate } from './public.utils';
+import {
+  getServiceLabel,
+  getQualificationLabel,
+  getTravelOptionDisplay,
+  getPostcodeArea,
+  formatRate,
+} from './public.utils';
 
 describe('getServiceLabel', () => {
   it('returns the label for a known service', () => {

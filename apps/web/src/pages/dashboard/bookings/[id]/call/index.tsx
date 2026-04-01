@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DailyIframe, { DailyCall } from '@daily-co/daily-js';
-import { DailyProvider, DailyVideo, DailyAudio, useLocalSessionId, useParticipantIds, useDailyEvent, useDaily } from '@daily-co/daily-react';
+import {
+  DailyProvider,
+  DailyVideo,
+  DailyAudio,
+  useLocalSessionId,
+  useParticipantIds,
+  useDailyEvent,
+  useDaily,
+} from '@daily-co/daily-react';
 import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { useBooking } from '@/api/booking';
@@ -33,16 +41,22 @@ const CallUI = ({ bookingId, otherPartyName }: { bookingId: string; otherPartyNa
   const [isMicOn, setIsMicOn] = useState(true);
   const [callError, setCallError] = useState<string | null>(null);
 
-  useDailyEvent('left-meeting', useCallback(() => {
-    navigate(routes.dashboardBookingDetail(bookingId));
-  }, [navigate, bookingId]));
+  useDailyEvent(
+    'left-meeting',
+    useCallback(() => {
+      navigate(routes.dashboardBookingDetail(bookingId));
+    }, [navigate, bookingId]),
+  );
 
-  useDailyEvent('error', useCallback((ev?: { errorMsg?: string }) => {
-    console.error('[VideoCall] Daily error event:', ev);
-    if (ev?.errorMsg && !isConfigError(ev.errorMsg)) {
-      setCallError(ev.errorMsg);
-    }
-  }, []));
+  useDailyEvent(
+    'error',
+    useCallback((ev?: { errorMsg?: string }) => {
+      console.error('[VideoCall] Daily error event:', ev);
+      if (ev?.errorMsg && !isConfigError(ev.errorMsg)) {
+        setCallError(ev.errorMsg);
+      }
+    }, []),
+  );
 
   const toggleCamera = useCallback(() => {
     daily?.setLocalVideo(!isCameraOn);
@@ -200,7 +214,10 @@ export const BookingCallPage = () => {
         <AlertCircle className="h-12 w-12 text-white/60" />
         <p className="text-white text-lg">This session has ended.</p>
         <p className="text-white/60 text-sm">The video call is no longer available.</p>
-        <Button variant="secondary" onClick={() => navigate(routes.dashboardBookingDetail(booking.id))}>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(routes.dashboardBookingDetail(booking.id))}
+        >
           Back to Booking
         </Button>
       </div>
@@ -219,7 +236,10 @@ export const BookingCallPage = () => {
         <p className="text-white/60 text-sm">
           You can join 5 minutes before the session starts at {booking.startTime}.
         </p>
-        <Button variant="secondary" onClick={() => navigate(routes.dashboardBookingDetail(booking.id))}>
+        <Button
+          variant="secondary"
+          onClick={() => navigate(routes.dashboardBookingDetail(booking.id))}
+        >
           Back to Booking
         </Button>
       </div>
@@ -240,12 +260,24 @@ export const BookingCallPage = () => {
 
   return (
     <DailyProvider callObject={callObject}>
-      <CallRoom bookingId={booking.id} otherPartyName={otherPartyName} roomUrl={booking.dailyRoomUrl} />
+      <CallRoom
+        bookingId={booking.id}
+        otherPartyName={otherPartyName}
+        roomUrl={booking.dailyRoomUrl}
+      />
     </DailyProvider>
   );
 };
 
-const CallRoom = ({ bookingId, otherPartyName, roomUrl }: { bookingId: string; otherPartyName: string; roomUrl: string }) => {
+const CallRoom = ({
+  bookingId,
+  otherPartyName,
+  roomUrl,
+}: {
+  bookingId: string;
+  otherPartyName: string;
+  roomUrl: string;
+}) => {
   const daily = useDaily();
   const [joined, setJoined] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -268,7 +300,9 @@ const CallRoom = ({ bookingId, otherPartyName, roomUrl }: { bookingId: string; o
         if (msg.includes('expired') || msg.includes('not found')) {
           setError('This video call room has expired or is no longer available.');
         } else if (msg.includes('network') || msg.includes('fetch')) {
-          setError('Could not connect to the video call. Please check your internet connection and try again.');
+          setError(
+            'Could not connect to the video call. Please check your internet connection and try again.',
+          );
         } else {
           setError('Something went wrong joining the call. Please try again.');
         }

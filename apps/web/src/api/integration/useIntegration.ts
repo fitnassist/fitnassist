@@ -10,10 +10,7 @@ export const useIntegrations = () => {
 };
 
 export const useIntegrationStatus = (provider: IntegrationProvider) => {
-  return trpc.integration.status.useQuery(
-    { provider },
-    { enabled: !!provider }
-  );
+  return trpc.integration.status.useQuery({ provider }, { enabled: !!provider });
 };
 
 export const useDisconnectIntegration = () => {

@@ -56,7 +56,12 @@ export const GoalAnalytics = () => {
                 margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                <XAxis type="number" tick={{ fontSize: 11 }} className="text-muted-foreground" allowDecimals={false} />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 11 }}
+                  className="text-muted-foreground"
+                  allowDecimals={false}
+                />
                 <YAxis
                   type="category"
                   dataKey="name"

@@ -9,9 +9,7 @@ export const NotFoundPage = () => {
       <div className="text-center space-y-4">
         <FileQuestion className="h-16 w-16 text-muted-foreground mx-auto" />
         <h1 className="text-4xl font-bold">404</h1>
-        <p className="text-muted-foreground text-lg">
-          The page you're looking for doesn't exist.
-        </p>
+        <p className="text-muted-foreground text-lg">The page you're looking for doesn't exist.</p>
         <div className="flex gap-3 justify-center pt-2">
           <Button variant="outline" asChild>
             <Link to={routes.home}>Home</Link>

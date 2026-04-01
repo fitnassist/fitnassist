@@ -69,13 +69,13 @@ export const ReviewForm = ({ trainerId, existingReview, onCancel, onSuccess }: R
           value={rating}
           onChange={(value) => setValue('rating', value, { shouldValidate: true })}
         />
-        {errors.rating && (
-          <p className="text-sm text-destructive mt-1">{errors.rating.message}</p>
-        )}
+        {errors.rating && <p className="text-sm text-destructive mt-1">{errors.rating.message}</p>}
       </div>
 
       <div>
-        <Label htmlFor="review-text" className="mb-2 block">Your review</Label>
+        <Label htmlFor="review-text" className="mb-2 block">
+          Your review
+        </Label>
         <Textarea
           id="review-text"
           {...register('text')}
@@ -83,9 +83,7 @@ export const ReviewForm = ({ trainerId, existingReview, onCancel, onSuccess }: R
           rows={4}
           className="resize-none"
         />
-        {errors.text && (
-          <p className="text-sm text-destructive mt-1">{errors.text.message}</p>
-        )}
+        {errors.text && <p className="text-sm text-destructive mt-1">{errors.text.message}</p>}
       </div>
 
       <div className="flex items-center gap-2 justify-end">

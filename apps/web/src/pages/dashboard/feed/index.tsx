@@ -6,8 +6,7 @@ import { useFeed, useMarkFeedViewed } from '@/api/post';
 import { CreatePostForm, PostCard, DiaryFeedCard, FeedEmpty } from './components';
 
 export const FeedPage = () => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useFeed();
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useFeed();
   const markViewed = useMarkFeedViewed();
 
   // Mark feed as viewed on mount
@@ -20,10 +19,7 @@ export const FeedPage = () => {
 
   return (
     <PageLayout>
-      <PageLayout.Header
-        title="Feed"
-        description="See what your friends and trainers are up to."
-      />
+      <PageLayout.Header title="Feed" description="See what your friends and trainers are up to." />
       <PageLayout.Content>
         <div className="mx-auto max-w-2xl space-y-4">
           <CreatePostForm />
@@ -70,7 +66,7 @@ export const FeedPage = () => {
                     workoutLogEntry={item.workoutLogEntry}
                     foodEntryCount={item.foodEntryCount}
                   />
-                )
+                ),
               )}
 
               {hasNextPage && (
@@ -81,9 +77,7 @@ export const FeedPage = () => {
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
                   >
-                    {isFetchingNextPage ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : null}
+                    {isFetchingNextPage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                     Load more
                   </Button>
                 </div>

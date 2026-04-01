@@ -10,9 +10,7 @@ export const useGoals = (status?: GoalStatus) => {
 };
 
 export const useRecentClientGoalUpdates = () => {
-  return trpc.goal.getRecentClientGoalUpdates.useQuery(
-    { limit: 10 },
-  );
+  return trpc.goal.getRecentClientGoalUpdates.useQuery({ limit: 10 });
 };
 
 // =============================================================================

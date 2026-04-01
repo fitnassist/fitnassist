@@ -24,7 +24,9 @@ export const VideoSettings = () => {
         <CardTitle className="flex items-center gap-2 text-base">
           <Video className="h-4 w-4" />
           Video Sessions
-          <Badge variant="secondary" className="text-xs">ELITE</Badge>
+          <Badge variant="secondary" className="text-xs">
+            ELITE
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -5,7 +5,13 @@ import { PageLayout } from '@/components/layouts';
 import { useTabParam } from '@/hooks';
 import { useClient, useUpdateClientStatus, useDisconnectClient } from '@/api/client-roster';
 import { routes } from '@/config/routes';
-import { ClientOverview, ClientNotes, ClientPlans, ClientOnboarding, ClientProgress } from './components';
+import {
+  ClientOverview,
+  ClientNotes,
+  ClientPlans,
+  ClientOnboarding,
+  ClientProgress,
+} from './components';
 type ActiveClientStatus = 'ONBOARDING' | 'ACTIVE' | 'INACTIVE' | 'ON_HOLD';
 
 export const ClientDetailPage = () => {
@@ -79,7 +85,13 @@ export const ClientDetailPage = () => {
             client={client}
             onStatusChange={handleStatusChange}
             isUpdating={updateStatus.isPending}
-            onDisconnect={isDisconnected ? undefined : () => { if (id) disconnectClient.mutate({ id }); }}
+            onDisconnect={
+              isDisconnected
+                ? undefined
+                : () => {
+                    if (id) disconnectClient.mutate({ id });
+                  }
+            }
             isDisconnecting={disconnectClient.isPending}
           />
         </TabsContent>
@@ -98,10 +110,7 @@ export const ClientDetailPage = () => {
         </TabsContent>
         {traineeUserId && (
           <TabsContent value="progress">
-            <ClientProgress
-              clientRosterId={client.id}
-              traineeUserId={traineeUserId}
-            />
+            <ClientProgress clientRosterId={client.id} traineeUserId={traineeUserId} />
           </TabsContent>
         )}
         <TabsContent value="notes">

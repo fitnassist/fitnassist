@@ -32,7 +32,7 @@ export const ActivityChart = ({ data }: ActivityChartProps) => {
   const [filter, setFilter] = useState('ALL');
   const [metric, setMetric] = useState<Metric>('distance');
 
-  const filtered = filter === 'ALL' ? data : data.filter(d => d.activityType === filter);
+  const filtered = filter === 'ALL' ? data : data.filter((d) => d.activityType === filter);
 
   if (filtered.length === 0) {
     return (
@@ -42,7 +42,7 @@ export const ActivityChart = ({ data }: ActivityChartProps) => {
     );
   }
 
-  const chartData = filtered.map(d => ({
+  const chartData = filtered.map((d) => ({
     label: format(new Date(d.date), 'MMM d'),
     value: metric === 'distance' ? (d.distanceKm ?? 0) : d.durationSeconds / 60,
   }));
@@ -51,7 +51,7 @@ export const ActivityChart = ({ data }: ActivityChartProps) => {
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <div className="flex gap-1">
-          {ACTIVITY_FILTER_OPTIONS.map(opt => (
+          {ACTIVITY_FILTER_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setFilter(opt.value)}
@@ -66,7 +66,7 @@ export const ActivityChart = ({ data }: ActivityChartProps) => {
           ))}
         </div>
         <div className="ml-auto flex gap-1">
-          {(['distance', 'duration'] as const).map(m => (
+          {(['distance', 'duration'] as const).map((m) => (
             <button
               key={m}
               onClick={() => setMetric(m)}
@@ -88,24 +88,20 @@ export const ActivityChart = ({ data }: ActivityChartProps) => {
           <XAxis dataKey="label" tick={{ fontSize: 11 }} />
           <YAxis
             tick={{ fontSize: 11 }}
-            tickFormatter={(v) => metric === 'distance' ? `${v}km` : `${Math.round(v)}m`}
+            tickFormatter={(v) => (metric === 'distance' ? `${v}km` : `${Math.round(v)}m`)}
           />
           <Tooltip
             contentStyle={CHART_TOOLTIP_STYLE}
             itemStyle={{ color: '#fff' }}
             labelStyle={{ color: 'rgba(255,255,255,0.7)' }}
             formatter={(v) => [
-              metric === 'distance' ? formatDistance(Number(v)) : formatActivityDuration(Math.round(Number(v) * 60)),
+              metric === 'distance'
+                ? formatDistance(Number(v))
+                : formatActivityDuration(Math.round(Number(v) * 60)),
               metric === 'distance' ? 'Distance' : 'Duration',
             ]}
           />
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke="#3b82f6"
-            strokeWidth={2}
-            dot={{ r: 3 }}
-          />
+          <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={{ r: 3 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>

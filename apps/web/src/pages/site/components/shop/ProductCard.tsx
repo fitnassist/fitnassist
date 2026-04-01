@@ -26,10 +26,7 @@ export const ProductCard = ({
 }: ProductCardProps) => {
   return (
     <div className="group rounded-lg overflow-hidden border border-[hsl(var(--border))] bg-[hsl(var(--card))] transition-shadow hover:shadow-lg">
-      <button
-        onClick={() => onNavigate(slug)}
-        className="w-full text-left"
-      >
+      <button onClick={() => onNavigate(slug)} className="w-full text-left">
         <div className="aspect-square bg-[hsl(var(--muted))] overflow-hidden">
           {imageUrl ? (
             <img

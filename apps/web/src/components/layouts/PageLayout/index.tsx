@@ -1,7 +1,12 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { MaxWidth, PageLayoutProps, PageHeaderProps, PageContentProps } from './PageLayout.types';
+import type {
+  MaxWidth,
+  PageLayoutProps,
+  PageHeaderProps,
+  PageContentProps,
+} from './PageLayout.types';
 
 const maxWidthClasses: Record<MaxWidth, string> = {
   '3xl': 'max-w-3xl',
@@ -9,7 +14,7 @@ const maxWidthClasses: Record<MaxWidth, string> = {
   '5xl': 'max-w-5xl',
   '6xl': 'max-w-6xl',
   '7xl': 'max-w-7xl',
-  'full': 'max-w-full',
+  full: 'max-w-full',
 };
 
 const PageHeader = ({ title, description, icon, backLink, action }: PageHeaderProps) => (
@@ -29,9 +34,7 @@ const PageHeader = ({ title, description, icon, backLink, action }: PageHeaderPr
           {icon}
           {title}
         </h1>
-        {description && (
-          <p className="text-muted-foreground mt-1">{description}</p>
-        )}
+        {description && <p className="text-muted-foreground mt-1">{description}</p>}
       </div>
       {action && <div>{action}</div>}
     </div>
@@ -51,4 +54,9 @@ export const PageLayout = ({ children, maxWidth = '4xl' }: PageLayoutProps) => (
 PageLayout.Header = PageHeader;
 PageLayout.Content = PageContent;
 
-export type { PageLayoutProps, PageHeaderProps, PageContentProps, MaxWidth } from './PageLayout.types';
+export type {
+  PageLayoutProps,
+  PageHeaderProps,
+  PageContentProps,
+  MaxWidth,
+} from './PageLayout.types';

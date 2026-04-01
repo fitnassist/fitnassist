@@ -24,10 +24,18 @@ export const OrderDetail = ({ orderId, onClose }: OrderDetailProps) => {
 
   if (!orderId || !order) return null;
 
-  const canRefund = order.status !== 'REFUNDED' && order.status !== 'CANCELLED' && order.status !== 'PENDING_PAYMENT';
+  const canRefund =
+    order.status !== 'REFUNDED' &&
+    order.status !== 'CANCELLED' &&
+    order.status !== 'PENDING_PAYMENT';
   const canUpdateStatus = ['PAID', 'PROCESSING', 'SHIPPED'].includes(order.status);
 
-  const nextStatusMap: Partial<Record<OrderStatus, { status: 'PROCESSING' | 'SHIPPED' | 'DELIVERED'; label: string; icon: typeof Package }>> = {
+  const nextStatusMap: Partial<
+    Record<
+      OrderStatus,
+      { status: 'PROCESSING' | 'SHIPPED' | 'DELIVERED'; label: string; icon: typeof Package }
+    >
+  > = {
     PAID: { status: 'PROCESSING', label: 'Mark Processing', icon: Package },
     PROCESSING: { status: 'SHIPPED', label: 'Mark Shipped', icon: Truck },
     SHIPPED: { status: 'DELIVERED', label: 'Mark Delivered', icon: CheckCircle },
@@ -69,11 +77,17 @@ export const OrderDetail = ({ orderId, onClose }: OrderDetailProps) => {
                   <div key={item.id} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       {item.product.imageUrl && (
-                        <img src={item.product.imageUrl} alt="" className="h-8 w-8 rounded object-cover" />
+                        <img
+                          src={item.product.imageUrl}
+                          alt=""
+                          className="h-8 w-8 rounded object-cover"
+                        />
                       )}
-                      <span>{item.productName} x{item.quantity}</span>
+                      <span>
+                        {item.productName} x{item.quantity}
+                      </span>
                     </div>
-                    <span>£{(item.pricePence * item.quantity / 100).toFixed(2)}</span>
+                    <span>£{((item.pricePence * item.quantity) / 100).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -106,7 +120,9 @@ export const OrderDetail = ({ orderId, onClose }: OrderDetailProps) => {
               {canUpdateStatus && nextAction && (
                 <Button
                   size="sm"
-                  onClick={() => updateStatus.mutate({ orderId: order.id, status: nextAction.status })}
+                  onClick={() =>
+                    updateStatus.mutate({ orderId: order.id, status: nextAction.status })
+                  }
                   disabled={updateStatus.isPending}
                 >
                   <nextAction.icon className="h-4 w-4 mr-2" />

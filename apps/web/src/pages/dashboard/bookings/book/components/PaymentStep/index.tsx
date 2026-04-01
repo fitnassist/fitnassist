@@ -29,7 +29,11 @@ const formatPrice = (amount: number, currency: string = 'gbp') => {
   }).format(amount / 100);
 };
 
-const CheckoutForm = ({ paymentInfo, onSuccess, onBack }: {
+const CheckoutForm = ({
+  paymentInfo,
+  onSuccess,
+  onBack,
+}: {
   paymentInfo: PaymentInfo;
   onSuccess: () => void;
   onBack: () => void;
@@ -93,9 +97,15 @@ const CheckoutForm = ({ paymentInfo, onSuccess, onBack }: {
               <ul className="text-xs text-muted-foreground space-y-0.5">
                 <li>Full refund if cancelled {policy.fullRefundHours}+ hours before</li>
                 {policy.partialRefundHours > 0 && (
-                  <li>{policy.partialRefundPercent}% refund if cancelled {policy.partialRefundHours}+ hours before</li>
+                  <li>
+                    {policy.partialRefundPercent}% refund if cancelled {policy.partialRefundHours}+
+                    hours before
+                  </li>
                 )}
-                <li>No refund within {policy.partialRefundHours || policy.fullRefundHours} hours of session</li>
+                <li>
+                  No refund within {policy.partialRefundHours || policy.fullRefundHours} hours of
+                  session
+                </li>
               </ul>
             </div>
           )}
@@ -117,11 +127,7 @@ const CheckoutForm = ({ paymentInfo, onSuccess, onBack }: {
         <Button variant="outline" onClick={onBack} disabled={isProcessing}>
           Back
         </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={!stripe || isProcessing}
-          className="flex-1"
-        >
+        <Button onClick={handleSubmit} disabled={!stripe || isProcessing} className="flex-1">
           {isProcessing ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -136,21 +142,33 @@ const CheckoutForm = ({ paymentInfo, onSuccess, onBack }: {
   );
 };
 
-export const PaymentStep = ({ clientSecret, paymentInfo, onSuccess, onBack, isFirstFree }: PaymentStepProps) => {
+export const PaymentStep = ({
+  clientSecret,
+  paymentInfo,
+  onSuccess,
+  onBack,
+  isFirstFree,
+}: PaymentStepProps) => {
   if (isFirstFree) {
     return (
       <div className="space-y-4">
         <Card>
           <CardContent className="p-4 text-center space-y-3">
-            <Badge variant="success" className="text-sm">First Session Free</Badge>
+            <Badge variant="success" className="text-sm">
+              First Session Free
+            </Badge>
             <p className="text-sm text-muted-foreground">
               This is your first session — no payment required!
             </p>
           </CardContent>
         </Card>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={onBack}>Back</Button>
-          <Button onClick={onSuccess} className="flex-1">Confirm Booking</Button>
+          <Button variant="outline" onClick={onBack}>
+            Back
+          </Button>
+          <Button onClick={onSuccess} className="flex-1">
+            Confirm Booking
+          </Button>
         </div>
       </div>
     );

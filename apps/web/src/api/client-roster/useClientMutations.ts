@@ -66,7 +66,7 @@ export const useUnassignWorkoutPlan = () => {
         return {
           ...old,
           workoutPlanAssignments: old.workoutPlanAssignments.filter(
-            (a) => a.workoutPlanId !== variables.workoutPlanId
+            (a) => a.workoutPlanId !== variables.workoutPlanId,
           ),
         };
       });
@@ -139,7 +139,7 @@ export const useUnassignMealPlan = () => {
         return {
           ...old,
           mealPlanAssignments: old.mealPlanAssignments.filter(
-            (a) => a.mealPlanId !== variables.mealPlanId
+            (a) => a.mealPlanId !== variables.mealPlanId,
           ),
         };
       });

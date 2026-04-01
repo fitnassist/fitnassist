@@ -27,16 +27,13 @@ export const DateOverrides = () => {
           setDate('');
           setReason('');
         },
-      }
+      },
     );
   };
 
   const handleDelete = () => {
     if (!deleteId) return;
-    deleteMutation.mutate(
-      { id: deleteId },
-      { onSuccess: () => setDeleteId(null) }
-    );
+    deleteMutation.mutate({ id: deleteId }, { onSuccess: () => setDeleteId(null) });
   };
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Loading...</div>;
@@ -65,13 +62,19 @@ export const DateOverrides = () => {
               </div>
               <div>
                 <Label className="text-xs">Reason (optional)</Label>
-                <Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g., Holiday" />
+                <Input
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="e.g., Holiday"
+                />
               </div>
               <div className="flex gap-2">
                 <Button onClick={handleCreate} disabled={!date || createMutation.isPending}>
                   {createMutation.isPending ? 'Blocking...' : 'Block Date'}
                 </Button>
-                <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+                <Button variant="ghost" onClick={() => setShowForm(false)}>
+                  Cancel
+                </Button>
               </div>
             </div>
           )}
@@ -81,7 +84,10 @@ export const DateOverrides = () => {
           )}
 
           {overrides?.map((override) => (
-            <div key={override.id} className="flex items-center justify-between p-3 border rounded-lg">
+            <div
+              key={override.id}
+              className="flex items-center justify-between p-3 border rounded-lg"
+            >
               <div>
                 <span className="font-medium text-sm">
                   {new Date(override.date).toLocaleDateString('en-GB', {

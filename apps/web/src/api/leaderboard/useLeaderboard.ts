@@ -7,7 +7,7 @@ type LeaderboardScope = 'GLOBAL' | 'FRIENDS';
 export const useLeaderboard = (
   type: LeaderboardType,
   period: LeaderboardPeriod,
-  scope: LeaderboardScope
+  scope: LeaderboardScope,
 ) => {
   return trpc.leaderboard.getLeaderboard.useQuery({ type, period, scope });
 };

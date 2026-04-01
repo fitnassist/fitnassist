@@ -14,7 +14,7 @@ export const feetInchesToCm = (feet: number, inches: number): number => {
 };
 
 export const kgToLbs = (kg: number): number => {
-  return Math.round(kg / KG_PER_LB * 10) / 10;
+  return Math.round((kg / KG_PER_LB) * 10) / 10;
 };
 
 export const lbsToKg = (lbs: number): number => {

@@ -1,7 +1,17 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { wizardLocationSchema, type WizardLocationInput } from '@fitnassist/schemas';
-import { Button, Label, Card, CardContent, CardDescription, CardHeader, CardTitle, AddressAutocomplete, type AddressDetails } from '@/components/ui';
+import {
+  Button,
+  Label,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  AddressAutocomplete,
+  type AddressDetails,
+} from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { toast } from '@/lib/toast';
 import { env } from '@/config/env';
@@ -124,7 +134,8 @@ export function LocationTab({ profile }: LocationTabProps) {
       <CardHeader>
         <CardTitle>Location & Contact</CardTitle>
         <CardDescription>
-          Update your address and contact preferences. Only your postcode area will be shown publicly.
+          Update your address and contact preferences. Only your postcode area will be shown
+          publicly.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -181,9 +192,7 @@ export function LocationTab({ profile }: LocationTabProps) {
                       />
                       <div>
                         <p className="font-medium">{option.label}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {option.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{option.description}</p>
                       </div>
                     </label>
                   ))}

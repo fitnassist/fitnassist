@@ -42,10 +42,11 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Check for pending request
-  const { data: pendingData, isLoading: pendingLoading } = trpc.contact.checkPendingRequest.useQuery(
-    { trainerId },
-    { enabled: isAuthenticated && isTrainee }
-  );
+  const { data: pendingData, isLoading: pendingLoading } =
+    trpc.contact.checkPendingRequest.useQuery(
+      { trainerId },
+      { enabled: isAuthenticated && isTrainee },
+    );
 
   const utils = trpc.useUtils();
 
@@ -139,18 +140,12 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
           <p className="text-sm text-muted-foreground">
             Want to train with {trainerName}? Create a free account to send a message.
           </p>
-          <Button
-            onClick={() => navigate(routes.register)}
-            className="w-full"
-          >
+          <Button onClick={() => navigate(routes.register)} className="w-full">
             Sign Up to Contact
           </Button>
           <p className="text-xs text-center text-muted-foreground">
             Already have an account?{' '}
-            <button
-              onClick={() => navigate(routes.login)}
-              className="text-primary hover:underline"
-            >
+            <button onClick={() => navigate(routes.login)} className="text-primary hover:underline">
               Log in
             </button>
           </p>
@@ -230,10 +225,7 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
               <Phone className="h-4 w-4 mr-2" />
               Request a Callback
             </Button>
-            <Button
-              onClick={() => setConnectionModalOpen(true)}
-              className="w-full justify-start"
-            >
+            <Button onClick={() => setConnectionModalOpen(true)} className="w-full justify-start">
               <UserPlus className="h-4 w-4 mr-2" />
               Request to Connect
             </Button>
@@ -285,24 +277,16 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
               </div>
             </div>
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setCallbackModalOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setCallbackModalOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={callbackMutation.isPending}>
-                {callbackMutation.isPending && (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                )}
+                {callbackMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Send Request
               </Button>
             </DialogFooter>
             {callbackMutation.error && (
-              <p className="text-sm text-destructive mt-2">
-                {callbackMutation.error.message}
-              </p>
+              <p className="text-sm text-destructive mt-2">{callbackMutation.error.message}</p>
             )}
           </form>
         </DialogContent>
@@ -335,24 +319,16 @@ export function ProfileContact({ trainerId, trainerName }: ProfileContactProps) 
               </div>
             </div>
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setConnectionModalOpen(false)}
-              >
+              <Button type="button" variant="outline" onClick={() => setConnectionModalOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={connectionMutation.isPending}>
-                {connectionMutation.isPending && (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                )}
+                {connectionMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Send Request
               </Button>
             </DialogFooter>
             {connectionMutation.error && (
-              <p className="text-sm text-destructive mt-2">
-                {connectionMutation.error.message}
-              </p>
+              <p className="text-sm text-destructive mt-2">{connectionMutation.error.message}</p>
             )}
           </form>
         </DialogContent>

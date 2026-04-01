@@ -1,13 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MoreHorizontal, Globe, Users, Lock } from 'lucide-react';
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-  Button,
-  ConfirmDialog,
-} from '@/components/ui';
+import { Avatar, AvatarImage, AvatarFallback, Button, ConfirmDialog } from '@/components/ui';
 import { useAuth } from '@/hooks';
 import { useLikePost, useUnlikePost, useDeletePost } from '@/api/post';
 import { routes } from '@/config/routes';
@@ -92,9 +86,7 @@ export const PostCard = ({
   const profileUrl = getProfileUrl(user);
 
   const typeLabel =
-    type === 'ACHIEVEMENT' ? 'New Achievement' :
-    type === 'MILESTONE' ? 'Milestone' :
-    null;
+    type === 'ACHIEVEMENT' ? 'New Achievement' : type === 'MILESTONE' ? 'Milestone' : null;
 
   return (
     <div className="rounded-lg border bg-card p-4">
@@ -109,10 +101,7 @@ export const PostCard = ({
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <Link
-              to={profileUrl ?? '#'}
-              className="text-sm font-medium hover:underline truncate"
-            >
+            <Link to={profileUrl ?? '#'} className="text-sm font-medium hover:underline truncate">
               {user.name}
             </Link>
             {typeLabel && (

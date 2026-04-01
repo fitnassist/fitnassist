@@ -15,7 +15,7 @@ export const CreatePostForm = () => {
       { content: content.trim() },
       {
         onSuccess: () => setContent(''),
-      }
+      },
     );
   };
 
@@ -43,11 +43,7 @@ export const CreatePostForm = () => {
         <span className="text-xs text-muted-foreground">
           {content.length > 0 && `${content.length}/5000`}
         </span>
-        <Button
-          type="submit"
-          size="sm"
-          disabled={!content.trim() || createPost.isPending}
-        >
+        <Button type="submit" size="sm" disabled={!content.trim() || createPost.isPending}>
           {createPost.isPending ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (

@@ -6,7 +6,15 @@ import {
   TRAINER_SERVICES,
   TRAINER_QUALIFICATIONS,
 } from '@fitnassist/schemas';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, MultiSelect } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  MultiSelect,
+} from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { toast } from '@/lib/toast';
 import { useState } from 'react';
@@ -54,9 +62,7 @@ export function ServicesTab({ profile }: ServicesTabProps) {
     <Card>
       <CardHeader>
         <CardTitle>Services & Qualifications</CardTitle>
-        <CardDescription>
-          Update the services you offer and your qualifications.
-        </CardDescription>
+        <CardDescription>Update the services you offer and your qualifications.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">

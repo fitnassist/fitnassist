@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom';
 import { MapPin, ChevronRight } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback, Badge, Select, StarRating, type SelectOption } from '@/components/ui';
+import {
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  Badge,
+  Select,
+  StarRating,
+  type SelectOption,
+} from '@/components/ui';
 import { routes } from '@/config/routes';
 import { getServiceLabel } from '@/pages/trainer/public/public.utils';
 
@@ -70,7 +78,7 @@ export const TrainerList = ({
   // Filter sort options — "Distance" only available with location
   const availableSortOptions = hasLocation
     ? SORT_OPTIONS
-    : SORT_OPTIONS.filter(o => o.value !== 'distance');
+    : SORT_OPTIONS.filter((o) => o.value !== 'distance');
 
   if (isLoading) {
     return (
@@ -121,7 +129,7 @@ export const TrainerList = ({
         </p>
         <div className="w-48">
           <Select
-            value={availableSortOptions.find(o => o.value === sortBy) || availableSortOptions[0]}
+            value={availableSortOptions.find((o) => o.value === sortBy) || availableSortOptions[0]}
             onChange={(opt) => onSortByChange((opt?.value as SortBy) || 'newest')}
             options={availableSortOptions}
             isClearable={false}
@@ -191,9 +199,7 @@ const TrainerCard = ({ trainer, isSelected, onSelect }: TrainerCardProps) => {
                   <MapPin className="h-3 w-3" />
                   {[trainer.city, trainer.postcode].filter(Boolean).join(', ')}
                   {trainer.distance !== undefined && (
-                    <span className="ml-1">
-                      ({trainer.distance.toFixed(1)} miles)
-                    </span>
+                    <span className="ml-1">({trainer.distance.toFixed(1)} miles)</span>
                   )}
                 </p>
               )}
@@ -220,24 +226,16 @@ const TrainerCard = ({ trainer, isSelected, onSelect }: TrainerCardProps) => {
 
           {/* Bio preview */}
           {trainer.bio && (
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {trainer.bio}
-            </p>
+            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{trainer.bio}</p>
           )}
 
           {/* Services tags */}
           {displayedServices.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {displayedServices.map((service) => (
-                <Badge key={service}>
-                  {getServiceLabel(service)}
-                </Badge>
+                <Badge key={service}>{getServiceLabel(service)}</Badge>
               ))}
-              {moreServices > 0 && (
-                <Badge variant="secondary">
-                  +{moreServices} more
-                </Badge>
-              )}
+              {moreServices > 0 && <Badge variant="secondary">+{moreServices} more</Badge>}
             </div>
           )}
         </div>

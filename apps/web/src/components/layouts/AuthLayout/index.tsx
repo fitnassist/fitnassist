@@ -2,7 +2,6 @@ import { Outlet } from 'react-router-dom';
 import { Logo } from '@/components/Logo';
 
 export function AuthLayout() {
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#20415c] to-[#5a0c30]">
       <header className="absolute top-0 left-0 right-0 z-10">

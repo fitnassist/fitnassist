@@ -1,7 +1,12 @@
 import { useState, useMemo } from 'react';
 import { CalendarClock, X, Plus } from 'lucide-react';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
   Button,
 } from '@/components/ui';
 import { useAvailableDates, useAvailableSlots } from '@/api/availability';
@@ -24,7 +29,11 @@ interface SuggestAlternativeDialogProps {
 }
 
 export const SuggestAlternativeDialog = ({
-  open, onOpenChange, bookingId, trainerId, durationMin,
+  open,
+  onOpenChange,
+  bookingId,
+  trainerId,
+  durationMin,
 }: SuggestAlternativeDialogProps) => {
   const suggestMutation = useSuggestAlternative();
 
@@ -45,7 +54,7 @@ export const SuggestAlternativeDialog = ({
   const { data: slots, isLoading: slotsLoading } = useAvailableSlots(
     trainerId,
     selectedDate ?? '',
-    durationMin
+    durationMin,
   );
 
   const handleSlotSelect = (startTime: string) => {
@@ -84,7 +93,7 @@ export const SuggestAlternativeDialog = ({
           setSelectedDate(null);
           onOpenChange(false);
         },
-      }
+      },
     );
   };
 
@@ -114,14 +123,24 @@ export const SuggestAlternativeDialog = ({
           <div className="space-y-2">
             <p className="text-sm font-medium">Your suggestions ({suggestions.length}/3):</p>
             {suggestions.map((s, i) => (
-              <div key={i} className="flex items-center justify-between bg-muted rounded-lg px-3 py-2">
+              <div
+                key={i}
+                className="flex items-center justify-between bg-muted rounded-lg px-3 py-2"
+              >
                 <span className="text-sm">
                   {new Date(s.date + 'T00:00:00').toLocaleDateString('en-GB', {
-                    weekday: 'short', day: 'numeric', month: 'short',
+                    weekday: 'short',
+                    day: 'numeric',
+                    month: 'short',
                   })}{' '}
                   {s.startTime} - {s.endTime}
                 </span>
-                <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => removeSuggestion(i)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0"
+                  onClick={() => removeSuggestion(i)}
+                >
                   <X className="h-3 w-3" />
                 </Button>
               </div>
@@ -150,7 +169,9 @@ export const SuggestAlternativeDialog = ({
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-medium">
                     {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-GB', {
-                      weekday: 'long', day: 'numeric', month: 'long',
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
                     })}
                   </h4>
                   <Button variant="ghost" size="sm" onClick={() => setSelectedDate(null)}>

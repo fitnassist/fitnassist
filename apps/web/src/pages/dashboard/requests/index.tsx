@@ -1,15 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import {
-  Phone,
-  UserPlus,
-  Check,
-  X,
-  Loader2,
-  Clock,
-  CheckCircle,
-  XCircle,
-} from 'lucide-react';
+import { Phone, UserPlus, Check, X, Loader2, Clock, CheckCircle, XCircle } from 'lucide-react';
 import {
   Badge,
   Button,
@@ -67,9 +58,8 @@ export const RequestsPage = () => {
   });
 
   // Filter out accepted connections - they belong in Contacts page
-  const activeRequests = requests?.filter((r) =>
-    !(r.type === 'CONNECTION_REQUEST' && r.status === 'ACCEPTED')
-  ) || [];
+  const activeRequests =
+    requests?.filter((r) => !(r.type === 'CONNECTION_REQUEST' && r.status === 'ACCEPTED')) || [];
 
   const filteredRequests = activeRequests.filter((request) => {
     if (activeTab === 'callbacks') return request.type === 'CALLBACK_REQUEST';
@@ -112,11 +102,7 @@ export const RequestsPage = () => {
           </Badge>
         );
       case 'CLOSED':
-        return (
-          <Badge variant="secondary">
-            Closed
-          </Badge>
-        );
+        return <Badge variant="secondary">Closed</Badge>;
     }
   };
 
@@ -143,8 +129,16 @@ export const RequestsPage = () => {
         onValueChange={setActiveTab}
         options={[
           { value: 'all', label: `All (${activeRequests.length})` },
-          { value: 'callbacks', label: `Callbacks (${callbackCount})`, icon: <Phone className="h-4 w-4" /> },
-          { value: 'connections', label: `Connections (${connectionCount})`, icon: <UserPlus className="h-4 w-4" /> },
+          {
+            value: 'callbacks',
+            label: `Callbacks (${callbackCount})`,
+            icon: <Phone className="h-4 w-4" />,
+          },
+          {
+            value: 'connections',
+            label: `Connections (${connectionCount})`,
+            icon: <UserPlus className="h-4 w-4" />,
+          },
         ]}
         tabsListClassName="mb-6"
       >
@@ -212,35 +206,36 @@ export const RequestsPage = () => {
                         </p>
 
                         <div className="flex gap-2">
-                          {request.status === 'PENDING' && request.type === 'CONNECTION_REQUEST' && (
-                            <>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => declineMutation.mutate({ requestId: request.id })}
-                                disabled={declineMutation.isPending}
-                              >
-                                {declineMutation.isPending ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <X className="h-4 w-4 mr-1" />
-                                )}
-                                Decline
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={() => acceptMutation.mutate({ requestId: request.id })}
-                                disabled={acceptMutation.isPending}
-                              >
-                                {acceptMutation.isPending ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Check className="h-4 w-4 mr-1" />
-                                )}
-                                Accept
-                              </Button>
-                            </>
-                          )}
+                          {request.status === 'PENDING' &&
+                            request.type === 'CONNECTION_REQUEST' && (
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => declineMutation.mutate({ requestId: request.id })}
+                                  disabled={declineMutation.isPending}
+                                >
+                                  {declineMutation.isPending ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <X className="h-4 w-4 mr-1" />
+                                  )}
+                                  Decline
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={() => acceptMutation.mutate({ requestId: request.id })}
+                                  disabled={acceptMutation.isPending}
+                                >
+                                  {acceptMutation.isPending ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Check className="h-4 w-4 mr-1" />
+                                  )}
+                                  Accept
+                                </Button>
+                              </>
+                            )}
 
                           {request.status === 'PENDING' && request.type === 'CALLBACK_REQUEST' && (
                             <Button
@@ -261,7 +256,6 @@ export const RequestsPage = () => {
                               Mark as Called
                             </Button>
                           )}
-
                         </div>
                       </div>
                     </CardContent>
@@ -274,6 +268,6 @@ export const RequestsPage = () => {
       </ResponsiveTabs>
     </PageLayout>
   );
-}
+};
 
 export default RequestsPage;

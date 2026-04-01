@@ -43,7 +43,7 @@ describe('TraineeOnboardingBanner', () => {
 
     expect(screen.getByText('Complete your profile')).toBeInTheDocument();
     expect(
-      screen.getByText('Help trainers understand your goals by setting up your profile.')
+      screen.getByText('Help trainers understand your goals by setting up your profile.'),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /set up profile/i })).toBeInTheDocument();
   });

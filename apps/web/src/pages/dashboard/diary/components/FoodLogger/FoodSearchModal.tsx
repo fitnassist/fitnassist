@@ -47,7 +47,12 @@ interface SelectedProduct {
 
 type Tab = 'search' | 'recipes';
 
-export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: FoodSearchModalProps) => {
+export const FoodSearchModal = ({
+  open,
+  onOpenChange,
+  mealType,
+  onAddFood,
+}: FoodSearchModalProps) => {
   const [tab, setTab] = useState<Tab>('search');
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<SelectedProduct | null>(null);
@@ -60,7 +65,7 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
   const [recipeFilter, setRecipeFilter] = useState('');
 
   const filteredRecipes = myRecipes?.filter((r: { name: string }) =>
-    r.name.toLowerCase().includes(recipeFilter.toLowerCase())
+    r.name.toLowerCase().includes(recipeFilter.toLowerCase()),
   );
 
   const handleSelect = useCallback((product: SelectedProduct) => {
@@ -68,30 +73,33 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
     setServingSize('1');
   }, []);
 
-  const handleSelectRecipe = useCallback((recipe: {
-    id: string;
-    name: string;
-    mealPlanName: string;
-    mealType: string | null;
-    calories: number | null;
-    proteinG: number | null;
-    carbsG: number | null;
-    fatG: number | null;
-    servings: number | null;
-    imageUrl: string | null;
-  }) => {
-    handleSelect({
-      food_name: recipe.name,
-      brand_name: recipe.mealPlanName,
-      calories: recipe.calories ?? 0,
-      protein_g: recipe.proteinG ?? undefined,
-      carbs_g: recipe.carbsG ?? undefined,
-      fat_g: recipe.fatG ?? undefined,
-      serving_qty: 1,
-      serving_unit: recipe.servings ? `serving (1/${recipe.servings})` : 'serving',
-      thumbnail_url: recipe.imageUrl ?? undefined,
-    });
-  }, [handleSelect]);
+  const handleSelectRecipe = useCallback(
+    (recipe: {
+      id: string;
+      name: string;
+      mealPlanName: string;
+      mealType: string | null;
+      calories: number | null;
+      proteinG: number | null;
+      carbsG: number | null;
+      fatG: number | null;
+      servings: number | null;
+      imageUrl: string | null;
+    }) => {
+      handleSelect({
+        food_name: recipe.name,
+        brand_name: recipe.mealPlanName,
+        calories: recipe.calories ?? 0,
+        protein_g: recipe.proteinG ?? undefined,
+        carbs_g: recipe.carbsG ?? undefined,
+        fat_g: recipe.fatG ?? undefined,
+        serving_qty: 1,
+        serving_unit: recipe.servings ? `serving (1/${recipe.servings})` : 'serving',
+        thumbnail_url: recipe.imageUrl ?? undefined,
+      });
+    },
+    [handleSelect],
+  );
 
   const handleConfirm = useCallback(() => {
     if (!selected) return;
@@ -106,7 +114,9 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
       name,
       mealType,
       calories: Math.round(selected.calories * multiplier),
-      proteinG: selected.protein_g ? Math.round(selected.protein_g * multiplier * 10) / 10 : undefined,
+      proteinG: selected.protein_g
+        ? Math.round(selected.protein_g * multiplier * 10) / 10
+        : undefined,
       carbsG: selected.carbs_g ? Math.round(selected.carbs_g * multiplier * 10) / 10 : undefined,
       fatG: selected.fat_g ? Math.round(selected.fat_g * multiplier * 10) / 10 : undefined,
       fibreG: selected.fibre_g ? Math.round(selected.fibre_g * multiplier * 10) / 10 : undefined,
@@ -129,9 +139,14 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent aria-describedby={undefined} className="max-h-[80vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        aria-describedby={undefined}
+        className="max-h-[80vh] overflow-y-auto sm:max-w-lg"
+      >
         <DialogHeader>
-          <DialogTitle>Add Food — {mealType.charAt(0) + mealType.slice(1).toLowerCase()}</DialogTitle>
+          <DialogTitle>
+            Add Food — {mealType.charAt(0) + mealType.slice(1).toLowerCase()}
+          </DialogTitle>
         </DialogHeader>
 
         {!selected ? (
@@ -140,7 +155,9 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
             <div className="flex gap-1 rounded-lg bg-muted p-1">
               <button
                 className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                  tab === 'search' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  tab === 'search'
+                    ? 'bg-background shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
                 onClick={() => setTab('search')}
               >
@@ -149,7 +166,9 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
               </button>
               <button
                 className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                  tab === 'recipes' ? 'bg-background shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  tab === 'recipes'
+                    ? 'bg-background shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
                 onClick={() => setTab('recipes')}
               >
@@ -187,13 +206,18 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
                         onClick={() => handleSelect(item)}
                       >
                         {item.thumbnail_url && (
-                          <img src={item.thumbnail_url} alt="" className="h-8 w-8 rounded object-cover" />
+                          <img
+                            src={item.thumbnail_url}
+                            alt=""
+                            className="h-8 w-8 rounded object-cover"
+                          />
                         )}
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm">{item.food_name}</p>
                           <p className="text-xs text-muted-foreground">
                             {item.brand_name && `${item.brand_name} · `}
-                            {item.calories} kcal per {item.serving_qty}{item.serving_unit}
+                            {item.calories} kcal per {item.serving_qty}
+                            {item.serving_unit}
                           </p>
                         </div>
                       </button>
@@ -201,9 +225,14 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
                   </div>
                 )}
 
-                {searchResults && searchResults.products?.length === 0 && query.length >= 2 && !isSearching && (
-                  <p className="py-4 text-center text-sm text-muted-foreground">No results found</p>
-                )}
+                {searchResults &&
+                  searchResults.products?.length === 0 &&
+                  query.length >= 2 &&
+                  !isSearching && (
+                    <p className="py-4 text-center text-sm text-muted-foreground">
+                      No results found
+                    </p>
+                  )}
               </>
             ) : (
               <>
@@ -222,25 +251,42 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
                       </div>
                     )}
                     <div className="max-h-[50vh] space-y-1 overflow-y-auto">
-                      {(filteredRecipes ?? myRecipes).map((recipe: { id: string; name: string; mealPlanName: string; mealType: string | null; calories: number | null; proteinG: number | null; carbsG: number | null; fatG: number | null; servings: number | null; imageUrl: string | null }) => (
-                        <button
-                          key={recipe.id}
-                          className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-muted"
-                          onClick={() => handleSelectRecipe(recipe)}
-                        >
-                          {recipe.imageUrl && (
-                            <img src={recipe.imageUrl} alt="" className="h-8 w-8 rounded object-cover" />
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm">{recipe.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {recipe.mealPlanName}
-                              {recipe.calories != null && ` · ${recipe.calories} kcal`}
-                              {recipe.servings && ` · ${recipe.servings} servings`}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
+                      {(filteredRecipes ?? myRecipes).map(
+                        (recipe: {
+                          id: string;
+                          name: string;
+                          mealPlanName: string;
+                          mealType: string | null;
+                          calories: number | null;
+                          proteinG: number | null;
+                          carbsG: number | null;
+                          fatG: number | null;
+                          servings: number | null;
+                          imageUrl: string | null;
+                        }) => (
+                          <button
+                            key={recipe.id}
+                            className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-left hover:bg-muted"
+                            onClick={() => handleSelectRecipe(recipe)}
+                          >
+                            {recipe.imageUrl && (
+                              <img
+                                src={recipe.imageUrl}
+                                alt=""
+                                className="h-8 w-8 rounded object-cover"
+                              />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm">{recipe.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {recipe.mealPlanName}
+                                {recipe.calories != null && ` · ${recipe.calories} kcal`}
+                                {recipe.servings && ` · ${recipe.servings} servings`}
+                              </p>
+                            </div>
+                          </button>
+                        ),
+                      )}
                     </div>
                   </>
                 ) : (
@@ -256,7 +302,11 @@ export const FoodSearchModal = ({ open, onOpenChange, mealType, onAddFood }: Foo
             <div className="rounded-md border p-3">
               <div className="flex items-center gap-3">
                 {selected.thumbnail_url && (
-                  <img src={selected.thumbnail_url} alt="" className="h-12 w-12 rounded object-cover" />
+                  <img
+                    src={selected.thumbnail_url}
+                    alt=""
+                    className="h-12 w-12 rounded object-cover"
+                  />
                 )}
                 <div>
                   <p className="font-medium">{selected.food_name}</p>

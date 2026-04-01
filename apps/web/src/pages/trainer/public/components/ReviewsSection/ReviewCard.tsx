@@ -85,11 +85,7 @@ export const ReviewCard = ({ review }: ReviewCardProps) => {
       </div>
 
       {showReport && (
-        <ReportDialog
-          reviewId={review.id}
-          open={showReport}
-          onClose={() => setShowReport(false)}
-        />
+        <ReportDialog reviewId={review.id} open={showReport} onClose={() => setShowReport(false)} />
       )}
     </div>
   );

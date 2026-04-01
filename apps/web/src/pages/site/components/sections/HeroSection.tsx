@@ -55,16 +55,11 @@ export const HeroSection = ({ section }: HeroSectionProps) => {
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div
-            className="absolute inset-0 bg-black"
-            style={{ opacity: overlayOpacity }}
-          />
+          <div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity }} />
         </>
       )}
 
-      {!content.backgroundImageUrl && (
-        <div className="absolute inset-0 bg-[hsl(var(--primary))]" />
-      )}
+      {!content.backgroundImageUrl && <div className="absolute inset-0 bg-[hsl(var(--primary))]" />}
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 py-20 text-center">
         <h1 className="site-heading text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">

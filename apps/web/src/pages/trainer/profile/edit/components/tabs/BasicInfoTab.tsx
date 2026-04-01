@@ -1,7 +1,16 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { wizardBasicInfoSchema, type WizardBasicInfoInput } from '@fitnassist/schemas';
-import { Button, Input, Label, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
+import {
+  Button,
+  Input,
+  Label,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui';
 import { trpc } from '@/lib/trpc';
 import { toast } from '@/lib/toast';
 import { useState } from 'react';
@@ -61,12 +70,7 @@ export function BasicInfoTab({ profile }: BasicInfoTabProps) {
             <Label htmlFor="handle">Profile URL</Label>
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">fitnassist.co/trainers/</span>
-              <Input
-                id="handle"
-                {...register('handle')}
-                disabled
-                className="flex-1 bg-muted"
-              />
+              <Input id="handle" {...register('handle')} disabled className="flex-1 bg-muted" />
             </div>
             <p className="text-xs text-muted-foreground">
               Your handle cannot be changed after profile creation.
@@ -75,11 +79,7 @@ export function BasicInfoTab({ profile }: BasicInfoTabProps) {
 
           <div>
             <Label htmlFor="displayName">Display Name</Label>
-            <Input
-              id="displayName"
-              placeholder="John Smith"
-              {...register('displayName')}
-            />
+            <Input id="displayName" placeholder="John Smith" {...register('displayName')} />
             {errors.displayName && (
               <p className="text-sm text-destructive">{errors.displayName.message}</p>
             )}
@@ -94,9 +94,7 @@ export function BasicInfoTab({ profile }: BasicInfoTabProps) {
               rows={6}
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
-            {errors.bio && (
-              <p className="text-sm text-destructive">{errors.bio.message}</p>
-            )}
+            {errors.bio && <p className="text-sm text-destructive">{errors.bio.message}</p>}
             <p className="text-xs text-muted-foreground">
               Max 2000 characters. This will appear on your public profile.
             </p>

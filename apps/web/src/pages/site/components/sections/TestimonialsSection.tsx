@@ -48,7 +48,7 @@ export const TestimonialsSection = ({ section, trainer }: TestimonialsSectionPro
           rating: r.rating,
           image: r.reviewer.image,
         }))
-      : content.items ?? [];
+      : (content.items ?? []);
 
   return (
     <section id={`section-${section.id}`} className="bg-[hsl(var(--muted))] py-16 sm:py-20">

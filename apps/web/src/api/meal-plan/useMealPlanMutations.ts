@@ -3,7 +3,9 @@ import { trpc } from '@/lib/trpc';
 export const useCreateMealPlan = () => {
   const utils = trpc.useUtils();
   return trpc.mealPlan.create.useMutation({
-    onSuccess: () => { utils.mealPlan.list.invalidate(); },
+    onSuccess: () => {
+      utils.mealPlan.list.invalidate();
+    },
   });
 };
 
@@ -20,7 +22,9 @@ export const useUpdateMealPlan = () => {
 export const useDeleteMealPlan = () => {
   const utils = trpc.useUtils();
   return trpc.mealPlan.delete.useMutation({
-    onSuccess: () => { utils.mealPlan.list.invalidate(); },
+    onSuccess: () => {
+      utils.mealPlan.list.invalidate();
+    },
   });
 };
 

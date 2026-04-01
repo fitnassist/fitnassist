@@ -1,10 +1,44 @@
 import { useState } from 'react';
 import {
-  Dumbbell, Heart, Timer, Flame, Trophy, Target, Zap, Activity,
-  Apple, Bike, Footprints, Mountain, Waves, Shield, Star, Users,
-  Calendar, Clock, MapPin, Home, Building, Salad, Utensils, Scale,
-  Brain, Eye, Smile, Leaf, Sun, Moon, Compass, TrendingUp, Award,
-  Swords, PersonStanding, HeartPulse, Shirt, HandMetal, Sparkles,
+  Dumbbell,
+  Heart,
+  Timer,
+  Flame,
+  Trophy,
+  Target,
+  Zap,
+  Activity,
+  Apple,
+  Bike,
+  Footprints,
+  Mountain,
+  Waves,
+  Shield,
+  Star,
+  Users,
+  Calendar,
+  Clock,
+  MapPin,
+  Home,
+  Building,
+  Salad,
+  Utensils,
+  Scale,
+  Brain,
+  Eye,
+  Smile,
+  Leaf,
+  Sun,
+  Moon,
+  Compass,
+  TrendingUp,
+  Award,
+  Swords,
+  PersonStanding,
+  HeartPulse,
+  Shirt,
+  HandMetal,
+  Sparkles,
 } from 'lucide-react';
 import { Button, Label } from '@/components/ui';
 import { cn } from '@/lib/utils';
@@ -51,9 +85,10 @@ const ICON_OPTIONS = [
   { value: 'sparkles', label: 'Sparkles', icon: Sparkles },
 ] as const;
 
-export const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = Object.fromEntries(
-  ICON_OPTIONS.map((o) => [o.value, o.icon])
-);
+export const ICON_MAP: Record<
+  string,
+  React.ComponentType<{ className?: string }>
+> = Object.fromEntries(ICON_OPTIONS.map((o) => [o.value, o.icon]));
 
 interface IconPickerProps {
   value: string;
@@ -95,7 +130,7 @@ export const IconPicker = ({ value, onChange }: IconPickerProps) => {
                 title={option.label}
                 className={cn(
                   'flex items-center justify-center rounded-md p-2 hover:bg-muted transition-colors',
-                  value === option.value && 'bg-primary text-primary-foreground hover:bg-primary'
+                  value === option.value && 'bg-primary text-primary-foreground hover:bg-primary',
                 )}
                 onClick={() => {
                   onChange(option.value);

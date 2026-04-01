@@ -22,46 +22,71 @@ const formatPence = (pence: number) => {
   return `£${(pence / 100).toFixed(2)}`;
 };
 
-const sessionStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+const sessionStatusVariant = (
+  status: string,
+): 'default' | 'secondary' | 'destructive' | 'outline' => {
   switch (status) {
-    case 'SUCCEEDED': return 'default';
-    case 'REFUNDED': return 'destructive';
-    case 'PARTIALLY_REFUNDED': return 'secondary';
-    default: return 'outline';
+    case 'SUCCEEDED':
+      return 'default';
+    case 'REFUNDED':
+      return 'destructive';
+    case 'PARTIALLY_REFUNDED':
+      return 'secondary';
+    default:
+      return 'outline';
   }
 };
 
 const sessionStatusLabel = (status: string) => {
   switch (status) {
-    case 'SUCCEEDED': return 'Paid';
-    case 'REFUNDED': return 'Refunded';
-    case 'PARTIALLY_REFUNDED': return 'Partial Refund';
-    case 'PENDING': return 'Pending';
-    default: return status;
+    case 'SUCCEEDED':
+      return 'Paid';
+    case 'REFUNDED':
+      return 'Refunded';
+    case 'PARTIALLY_REFUNDED':
+      return 'Partial Refund';
+    case 'PENDING':
+      return 'Pending';
+    default:
+      return status;
   }
 };
 
-const orderStatusVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+const orderStatusVariant = (
+  status: string,
+): 'default' | 'secondary' | 'destructive' | 'outline' => {
   switch (status) {
     case 'PAID':
-    case 'DELIVERED': return 'default';
+    case 'DELIVERED':
+      return 'default';
     case 'PROCESSING':
-    case 'SHIPPED': return 'secondary';
-    case 'REFUNDED': return 'destructive';
-    case 'CANCELLED': return 'destructive';
-    default: return 'outline';
+    case 'SHIPPED':
+      return 'secondary';
+    case 'REFUNDED':
+      return 'destructive';
+    case 'CANCELLED':
+      return 'destructive';
+    default:
+      return 'outline';
   }
 };
 
 const orderStatusLabel = (status: string) => {
   switch (status) {
-    case 'PAID': return 'Paid';
-    case 'PROCESSING': return 'Processing';
-    case 'SHIPPED': return 'Shipped';
-    case 'DELIVERED': return 'Delivered';
-    case 'REFUNDED': return 'Refunded';
-    case 'CANCELLED': return 'Cancelled';
-    default: return status;
+    case 'PAID':
+      return 'Paid';
+    case 'PROCESSING':
+      return 'Processing';
+    case 'SHIPPED':
+      return 'Shipped';
+    case 'DELIVERED':
+      return 'Delivered';
+    case 'REFUNDED':
+      return 'Refunded';
+    case 'CANCELLED':
+      return 'Cancelled';
+    default:
+      return status;
   }
 };
 
@@ -77,7 +102,8 @@ export const RevenueAnalytics = () => {
   }));
 
   const summary = analytics?.summary;
-  const hasProductData = (summary?.totalOrders30d ?? 0) > 0 || (summary?.totalProductRevenue30d ?? 0) > 0;
+  const hasProductData =
+    (summary?.totalOrders30d ?? 0) > 0 || (summary?.totalProductRevenue30d ?? 0) > 0;
 
   return (
     <div className="space-y-6">
@@ -91,7 +117,8 @@ export const RevenueAnalytics = () => {
             <div className="h-[300px] animate-pulse rounded bg-muted" />
           ) : chartData.length === 0 && !summary?.totalSessions30d && !summary?.totalOrders30d ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              No payment data yet. Revenue will appear here once sessions are paid or products are sold.
+              No payment data yet. Revenue will appear here once sessions are paid or products are
+              sold.
             </p>
           ) : (
             <>
@@ -117,21 +144,29 @@ export const RevenueAnalytics = () => {
               {/* Secondary stats */}
               <div className="grid grid-cols-2 gap-4 mb-6 sm:grid-cols-4">
                 <div className="text-center">
-                  <p className="text-lg font-semibold">{formatPence(summary?.avgSessionPrice ?? 0)}</p>
+                  <p className="text-lg font-semibold">
+                    {formatPence(summary?.avgSessionPrice ?? 0)}
+                  </p>
                   <p className="text-xs text-muted-foreground">Avg Session Price</p>
                 </div>
                 <div className="text-center">
                   <p className="text-lg font-semibold">
-                    {formatPence((summary?.totalRevenue30d ?? 0) - (summary?.totalProductRevenue30d ?? 0))}
+                    {formatPence(
+                      (summary?.totalRevenue30d ?? 0) - (summary?.totalProductRevenue30d ?? 0),
+                    )}
                   </p>
                   <p className="text-xs text-muted-foreground">Session Revenue (30d)</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-lg font-semibold">{formatPence(summary?.totalProductRevenue30d ?? 0)}</p>
+                  <p className="text-lg font-semibold">
+                    {formatPence(summary?.totalProductRevenue30d ?? 0)}
+                  </p>
                   <p className="text-xs text-muted-foreground">Product Revenue (30d)</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-lg font-semibold">{formatPence(summary?.avgOrderValue ?? 0)}</p>
+                  <p className="text-lg font-semibold">
+                    {formatPence(summary?.avgOrderValue ?? 0)}
+                  </p>
                   <p className="text-xs text-muted-foreground">Avg Order Value</p>
                 </div>
               </div>
@@ -140,7 +175,11 @@ export const RevenueAnalytics = () => {
                 <ResponsiveContainer width="100%" height={250}>
                   <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="week" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                    <XAxis
+                      dataKey="week"
+                      tick={{ fontSize: 11 }}
+                      className="text-muted-foreground"
+                    />
                     <YAxis
                       tick={{ fontSize: 11 }}
                       className="text-muted-foreground"
@@ -151,11 +190,28 @@ export const RevenueAnalytics = () => {
                       formatter={(value) => [`£${Number(value).toFixed(2)}`]}
                     />
                     <Legend wrapperStyle={{ fontSize: 12 }} />
-                    <Bar dataKey="sessions" name="Sessions" fill="hsl(170, 58%, 50%)" radius={[4, 4, 0, 0]} stackId="revenue" />
+                    <Bar
+                      dataKey="sessions"
+                      name="Sessions"
+                      fill="hsl(170, 58%, 50%)"
+                      radius={[4, 4, 0, 0]}
+                      stackId="revenue"
+                    />
                     {hasProductData && (
-                      <Bar dataKey="products" name="Products" fill="hsl(210, 58%, 55%)" radius={[4, 4, 0, 0]} stackId="revenue" />
+                      <Bar
+                        dataKey="products"
+                        name="Products"
+                        fill="hsl(210, 58%, 55%)"
+                        radius={[4, 4, 0, 0]}
+                        stackId="revenue"
+                      />
                     )}
-                    <Bar dataKey="refunds" name="Refunds" fill="hsl(0, 50%, 65%)" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="refunds"
+                      name="Refunds"
+                      fill="hsl(0, 50%, 65%)"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -184,11 +240,7 @@ export const RevenueAnalytics = () => {
         </Button>
       </div>
 
-      {activeSection === 'sessions' ? (
-        <SessionTransactions />
-      ) : (
-        <ProductOrderTransactions />
-      )}
+      {activeSection === 'sessions' ? <SessionTransactions /> : <ProductOrderTransactions />}
     </div>
   );
 };
@@ -236,9 +288,7 @@ const SessionTransactions = () => {
             ))}
           </div>
         ) : transactions.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            No session payments yet
-          </p>
+          <p className="py-8 text-center text-sm text-muted-foreground">No session payments yet</p>
         ) : (
           <div className="space-y-2">
             {transactions.map((t) => (
@@ -277,7 +327,11 @@ const SessionTransactionRow = ({ transaction: t }: { transaction: SessionTransac
       >
         <div className="flex items-center gap-3 min-w-0">
           {t.clientImage ? (
-            <img src={t.clientImage} alt="" className="h-8 w-8 rounded-full object-cover shrink-0" />
+            <img
+              src={t.clientImage}
+              alt=""
+              className="h-8 w-8 rounded-full object-cover shrink-0"
+            />
           ) : (
             <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0">
               {t.clientName.charAt(0).toUpperCase()}
@@ -317,12 +371,10 @@ const SessionTransactionRow = ({ transaction: t }: { transaction: SessionTransac
                 <span>Refund</span>
                 <span>-{formatPence(t.refundAmount)}</span>
               </div>
-              {t.refundReason && (
-                <p className="text-destructive">Reason: {t.refundReason}</p>
-              )}
+              {t.refundReason && <p className="text-destructive">Reason: {t.refundReason}</p>}
             </>
           )}
-          <p>Paid {format(new Date(t.paidAt), 'MMM d, yyyy \'at\' h:mm a')}</p>
+          <p>Paid {format(new Date(t.paidAt), "MMM d, yyyy 'at' h:mm a")}</p>
         </div>
       )}
     </div>
@@ -373,9 +425,7 @@ const ProductOrderTransactions = () => {
             ))}
           </div>
         ) : orders.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            No product orders yet
-          </p>
+          <p className="py-8 text-center text-sm text-muted-foreground">No product orders yet</p>
         ) : (
           <div className="space-y-2">
             {orders.map((o) => (
@@ -405,9 +455,10 @@ const ProductOrderTransactions = () => {
 const ProductOrderRow = ({ order: o }: { order: ProductOrder }) => {
   const [expanded, setExpanded] = useState(false);
   const firstItem = o.items[0];
-  const itemSummary = o.items.length === 1 && firstItem
-    ? `${firstItem.productName} x${firstItem.quantity}`
-    : `${o.items.length} items`;
+  const itemSummary =
+    o.items.length === 1 && firstItem
+      ? `${firstItem.productName} x${firstItem.quantity}`
+      : `${o.items.length} items`;
 
   return (
     <div className="rounded-lg border p-3">
@@ -440,7 +491,9 @@ const ProductOrderRow = ({ order: o }: { order: ProductOrder }) => {
         <div className="mt-3 border-t pt-3 text-xs text-muted-foreground space-y-1">
           {o.items.map((item, i) => (
             <div key={i} className="flex justify-between">
-              <span>{item.productName} x{item.quantity}</span>
+              <span>
+                {item.productName} x{item.quantity}
+              </span>
               <span>{formatPence(item.pricePence * item.quantity)}</span>
             </div>
           ))}
@@ -468,12 +521,10 @@ const ProductOrderRow = ({ order: o }: { order: ProductOrder }) => {
                 <span>Refund</span>
                 <span>-{formatPence(o.refundAmount)}</span>
               </div>
-              {o.refundReason && (
-                <p className="text-destructive">Reason: {o.refundReason}</p>
-              )}
+              {o.refundReason && <p className="text-destructive">Reason: {o.refundReason}</p>}
             </>
           )}
-          <p>Paid {format(new Date(o.paidAt), 'MMM d, yyyy \'at\' h:mm a')}</p>
+          <p>Paid {format(new Date(o.paidAt), "MMM d, yyyy 'at' h:mm a")}</p>
         </div>
       )}
     </div>

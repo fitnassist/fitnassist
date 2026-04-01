@@ -55,7 +55,7 @@ export function MultiSelect({
         acc[category].push(option);
         return acc;
       },
-      {} as Record<string, MultiSelectOption[]>
+      {} as Record<string, MultiSelectOption[]>,
     );
   }, [options, groupByCategory]);
 
@@ -63,17 +63,13 @@ export function MultiSelect({
 
   return (
     <div className={cn('space-y-3', className)}>
-      {label && (
-        <Label className="text-base font-medium">{label}</Label>
-      )}
+      {label && <Label className="text-base font-medium">{label}</Label>}
 
       <div className="space-y-4">
         {categories.map((category) => (
           <div key={category} className="space-y-2">
             {category && groupByCategory && (
-              <h4 className="text-sm font-medium text-muted-foreground capitalize">
-                {category}
-              </h4>
+              <h4 className="text-sm font-medium text-muted-foreground capitalize">{category}</h4>
             )}
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {(groupedOptions[category] ?? []).map((option) => {
@@ -90,7 +86,7 @@ export function MultiSelect({
                       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                       isSelected && 'border-primary bg-primary/10 text-primary',
                       !isSelected && 'border-input bg-background',
-                      disabled && 'cursor-not-allowed opacity-50'
+                      disabled && 'cursor-not-allowed opacity-50',
                     )}
                   >
                     <div
@@ -98,7 +94,7 @@ export function MultiSelect({
                         'flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border',
                         isSelected
                           ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-input'
+                          : 'border-input',
                       )}
                     >
                       {isSelected && <Check className="h-3 w-3" />}
@@ -112,15 +108,9 @@ export function MultiSelect({
         ))}
       </div>
 
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
-      {value.length > 0 && (
-        <p className="text-xs text-muted-foreground">
-          {value.length} selected
-        </p>
-      )}
+      {value.length > 0 && <p className="text-xs text-muted-foreground">{value.length} selected</p>}
     </div>
   );
 }
