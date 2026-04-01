@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Input, useAlert } from '@/components/ui';
 import { GradientBackground } from '@/components/GradientBackground';
 import { signUp } from '@/lib/auth';
+import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 
 const registerSchema = z
   .object({
@@ -132,6 +133,8 @@ const RegisterScreen = () => {
                   </TouchableOpacity>
                 </View>
               </View>
+
+              <SocialAuthButtons callbackURL="/(auth)/select-role" disabled={loading} />
 
               <View className="gap-4">
                 <Controller

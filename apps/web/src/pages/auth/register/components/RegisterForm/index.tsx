@@ -7,6 +7,7 @@ import { registerFormSchema, type RegisterFormInput } from '@fitnassist/schemas'
 import { Button, Input } from '@/components/ui';
 import { signUp } from '@/lib/auth-client';
 import { trpc } from '@/lib/trpc';
+import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 import type { RegisterFormProps } from './RegisterForm.types';
 
 const inputClass = 'bg-white/10 border-white/20 text-white placeholder:text-white/40';
@@ -79,6 +80,8 @@ export function RegisterForm({ onSuccess, referralCode }: RegisterFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <SocialAuthButtons callbackURL="/select-role" disabled={isLoading} />
+
       {error && <div className="bg-red-500/20 text-red-200 text-sm p-3 rounded-md">{error}</div>}
 
       <div>

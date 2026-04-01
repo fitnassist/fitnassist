@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Text, Button, Input, useAlert } from '@/components/ui';
 import { GradientBackground } from '@/components/GradientBackground';
 import { signIn } from '@/lib/auth';
+import { SocialAuthButtons } from '@/components/SocialAuthButtons';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -69,6 +70,8 @@ const LoginScreen = () => {
                   Sign in to your Fitnassist account
                 </Text>
               </View>
+
+              <SocialAuthButtons callbackURL="/(tabs)" disabled={loading} />
 
               <View className="gap-4">
                 <Controller
