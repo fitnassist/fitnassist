@@ -33,6 +33,9 @@ module.exports = {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.fitnassist.app',
+      infoPlist: {
+        ITSAppUsesNonExemptEncryption: false,
+      },
     },
     android: {
       adaptiveIcon: {
