@@ -32,8 +32,17 @@ jobs:
       - name: Lint
         run: npm run lint -w @fitnassist/web
 
-      - name: Unit tests
+      - name: Unit tests (web)
         run: npm run test -w @fitnassist/web
+
+      - name: Unit tests (api)
+        run: npm run test -w @fitnassist/api
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          BETTER_AUTH_SECRET: "ci-test-secret-at-least-32-characters"
+          BETTER_AUTH_URL: "http://localhost:3001"
+          FRONTEND_URL: "http://localhost:3000"
+          NODE_ENV: test
 
   e2e:
     name: E2E

@@ -6,6 +6,8 @@ vi.mock('../../repositories/contact.repository', () => ({
     create: vi.fn(),
     findById: vi.fn(),
     findPendingByTraineeAndTrainer: vi.fn(),
+    findClosedConnectionByTraineeAndTrainer: vi.fn(),
+    reopen: vi.fn(),
     findConnectionByTraineeAndTrainer: vi.fn(),
     accept: vi.fn(),
     decline: vi.fn(),
@@ -43,6 +45,37 @@ vi.mock('../notification.service', () => ({
   },
 }));
 
+vi.mock('../client-roster.service', () => ({
+  clientRosterService: {
+    createForConnection: vi.fn().mockResolvedValue({ id: 'roster-1' }),
+  },
+}));
+
+vi.mock('../../repositories/client-roster.repository', () => ({
+  clientRosterRepository: {
+    findByConnectionId: vi.fn().mockResolvedValue(null),
+    updateStatus: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock('../onboarding.service', () => ({
+  onboardingService: {
+    createResponseForConnection: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock('../in-app-notification.service', () => ({
+  inAppNotificationService: {
+    notify: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock('../../lib/sse', () => ({
+  sseManager: {
+    broadcastToUser: vi.fn(),
+  },
+}));
+
 import { contactRepository } from '../../repositories/contact.repository';
 import { trainerRepository } from '../../repositories/trainer.repository';
 import { userRepository } from '../../repositories/user.repository';
@@ -68,6 +101,7 @@ describe('contactService', () => {
         contactEmail: null,
       } as any);
       mockContactRepo.findPendingByTraineeAndTrainer.mockResolvedValue(null);
+      mockContactRepo.findClosedConnectionByTraineeAndTrainer.mockResolvedValue(null);
       mockContactRepo.create.mockResolvedValue({ id: 'request-1' } as any);
 
       const result = await contactService.submitConnectionRequest(

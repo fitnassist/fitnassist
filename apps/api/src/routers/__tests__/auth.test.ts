@@ -103,8 +103,11 @@ describe('Auth API', () => {
         })
         .set('Content-Type', 'application/json');
 
-      expect(response.status).toBe(422);
-      expect(response.body.code).toBe('USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL');
+      // With requireEmailVerification enabled, Better Auth returns 200 with a
+      // synthetic user to prevent email enumeration attacks
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('user');
+      expect(response.body.token).toBeNull();
     });
   });
 
