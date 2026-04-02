@@ -35,7 +35,7 @@
   "author": "",
   "license": "UNLICENSED",
   "engines": {
-    "node": ">=22.0.0"
+    "node": "22.x"
   },
   "overrides": {
     "@types/react": "^19.1.0",
