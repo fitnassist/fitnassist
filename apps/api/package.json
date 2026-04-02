@@ -20,6 +20,7 @@
     "@fitnassist/schemas": "*",
     "@fitnassist/types": "*",
     "@fitnassist/utils": "*",
+    "@sentry/node": "^10.47.0",
     "@trpc/server": "^11.0.0",
     "better-auth": "^1.2.0",
     "cloudinary": "^2.9.0",
