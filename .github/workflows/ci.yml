@@ -91,6 +91,28 @@ jobs:
           FRONTEND_URL: "http://localhost:3000"
           NODE_ENV: test
 
+      - name: Verify API starts
+        run: |
+          npx tsx apps/api/src/server.ts &
+          API_PID=$!
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:3001/health > /dev/null 2>&1; then
+              echo "API started successfully"
+              kill $API_PID || true
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "API failed to start within 15s"
+          kill $API_PID || true
+          exit 1
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          BETTER_AUTH_SECRET: "ci-test-secret-at-least-32-characters"
+          BETTER_AUTH_URL: "http://localhost:3001"
+          FRONTEND_URL: "http://localhost:3000"
+          NODE_ENV: test
+
   e2e:
     name: E2E
     needs: changes
