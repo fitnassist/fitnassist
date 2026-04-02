@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { app } from '../../app';
 
-describe('Auth API', () => {
+const isDummyDb = process.env.DATABASE_URL?.includes('dummy');
+
+describe.skipIf(isDummyDb)('Auth API', () => {
   describe('POST /api/auth/sign-up/email', () => {
     it('should create a new user with valid data', async () => {
       const uniqueEmail = `test-${Date.now()}@example.com`;
@@ -103,8 +105,11 @@ describe('Auth API', () => {
         })
         .set('Content-Type', 'application/json');
 
-      expect(response.status).toBe(422);
-      expect(response.body.code).toBe('USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL');
+      // With requireEmailVerification enabled, Better Auth returns 200 with a
+      // synthetic user to prevent email enumeration attacks
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('user');
+      expect(response.body.token).toBeNull();
     });
   });
 

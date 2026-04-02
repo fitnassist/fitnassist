@@ -104,36 +104,88 @@ describe('traineeService', () => {
   });
 
   describe('getProfileForTrainer', () => {
-    it('returns public profile for any trainer', async () => {
-      const profile = { id: 'p1', isPublic: true, user: { name: 'Jane' } };
-      mockTraineeRepo.findByUserId.mockResolvedValue(profile as any);
+    const mockProfile = {
+      id: 'p1',
+      userId: 'trainee-1',
+      handle: 'jane',
+      avatarUrl: null,
+      unitPreference: 'METRIC',
+      createdAt: new Date(),
+      bio: 'Hello',
+      experienceLevel: 'BEGINNER',
+      activityLevel: 'MODERATE',
+      gender: null,
+      dateOfBirth: null,
+      fitnessGoals: ['WEIGHT_LOSS'],
+      fitnessGoalNotes: null,
+      city: 'London',
+      postcode: 'SW1',
+      location: 'London',
+      heightCm: null,
+      startWeightKg: null,
+      goalWeightKg: null,
+      medicalNotes: 'Some notes',
+      privacyBio: 'EVERYONE',
+      privacyLocation: 'EVERYONE',
+      privacyBodyMetrics: 'EVERYONE',
+      privacyGoals: 'EVERYONE',
+      privacyPersonalBests: 'EVERYONE',
+      privacyProgressPhotos: 'EVERYONE',
+      privacyStats: 'EVERYONE',
+      privacyBadges: 'EVERYONE',
+      privacyFriendCount: 'EVERYONE',
+      privacyTrendWeight: 'EVERYONE',
+      privacyTrendMeasurements: 'EVERYONE',
+      privacyTrendNutrition: 'EVERYONE',
+      privacyTrendWater: 'EVERYONE',
+      privacyTrendMood: 'EVERYONE',
+      privacyTrendSleep: 'EVERYONE',
+      privacyTrendActivity: 'EVERYONE',
+      privacyTrendSteps: 'EVERYONE',
+      user: { name: 'Jane' },
+    };
 
-      const result = await traineeService.getProfileForTrainer('trainee-1', 'trainer-1');
-      expect(result).toEqual(profile);
+    it('returns filtered profile for unconnected trainer (PUBLIC view)', async () => {
+      mockTraineeRepo.findByUserId.mockResolvedValue(mockProfile as any);
+      mockTrainerRepo.findByUserId.mockResolvedValue({ id: 'trainer-profile-1' } as any);
+      mockContactRepo.findConnectionByTraineeAndTrainer.mockResolvedValue(null);
+
+      const result = await traineeService.getProfileForTrainer('trainee-1', 'trainer-user-1');
+      expect(result).toHaveProperty('userName', 'Jane');
+      // Medical notes are hidden for PUBLIC viewers
+      expect(result.medicalNotes).toBeNull();
     });
 
     it('returns private profile for connected trainer', async () => {
-      const profile = { id: 'p1', isPublic: false };
-      mockTraineeRepo.findByUserId.mockResolvedValue(profile as any);
+      mockTraineeRepo.findByUserId.mockResolvedValue(mockProfile as any);
       mockTrainerRepo.findByUserId.mockResolvedValue({ id: 'trainer-profile-1' } as any);
       mockContactRepo.findConnectionByTraineeAndTrainer.mockResolvedValue({ status: 'ACCEPTED' } as any);
 
       const result = await traineeService.getProfileForTrainer('trainee-1', 'trainer-user-1');
-      expect(result).toEqual(profile);
+      expect(result).toHaveProperty('userName', 'Jane');
+      // Connected PT can see medical notes
+      expect(result.medicalNotes).toBe('Some notes');
     });
 
     it('throws FORBIDDEN for unconnected trainer on private profile', async () => {
-      mockTraineeRepo.findByUserId.mockResolvedValue({ id: 'p1', isPublic: false } as any);
+      const privateProfile = {
+        ...mockProfile,
+        privacyBio: 'MY_PT',
+        privacyLocation: 'MY_PT',
+      };
+      mockTraineeRepo.findByUserId.mockResolvedValue(privateProfile as any);
       mockTrainerRepo.findByUserId.mockResolvedValue({ id: 'trainer-profile-1' } as any);
       mockContactRepo.findConnectionByTraineeAndTrainer.mockResolvedValue(null);
 
-      await expect(
-        traineeService.getProfileForTrainer('trainee-1', 'trainer-user-1')
-      ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+      // Does not throw FORBIDDEN anymore - returns filtered profile with restricted fields nulled
+      const result = await traineeService.getProfileForTrainer('trainee-1', 'trainer-user-1');
+      expect(result).toHaveProperty('userName', 'Jane');
+      expect(result.bio).toBeNull();
+      expect(result.city).toBeNull();
     });
 
-    it('throws FORBIDDEN when trainer profile not found for private profile', async () => {
-      mockTraineeRepo.findByUserId.mockResolvedValue({ id: 'p1', isPublic: false } as any);
+    it('throws FORBIDDEN when trainer profile not found', async () => {
+      mockTraineeRepo.findByUserId.mockResolvedValue(mockProfile as any);
       mockTrainerRepo.findByUserId.mockResolvedValue(null);
 
       await expect(

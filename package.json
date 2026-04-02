@@ -40,5 +40,9 @@
   "overrides": {
     "react": "19.2.4",
     "react-dom": "19.2.4"
+  },
+  "optionalDependencies": {
+    "@esbuild/linux-x64": "^0.25.0",
+    "@rollup/rollup-linux-x64-gnu": "^4.60.1"
   }
 }

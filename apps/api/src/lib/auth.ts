@@ -67,7 +67,7 @@ export const auth = betterAuth({
     },
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+      sendChangeEmailVerification: async ({ user, newEmail, url }: { user: { name?: string | null; email: string }; newEmail: string; url: string }) => {
         void sendEmail({
           to: newEmail,
           subject: 'Verify your new email - Fitnassist',
