@@ -7,8 +7,34 @@ on:
     branches: [main]
 
 jobs:
-  quality:
-    name: Quality
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      web: ${{ steps.filter.outputs.web }}
+      api: ${{ steps.filter.outputs.api }}
+      packages: ${{ steps.filter.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            web:
+              - 'apps/web/**'
+              - 'packages/**'
+            api:
+              - 'apps/api/**'
+              - 'packages/**'
+            packages:
+              - 'packages/**'
+
+  quality-web:
+    name: Quality (Web)
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,10 +58,31 @@ jobs:
       - name: Lint
         run: npm run lint -w @fitnassist/web
 
-      - name: Unit tests (web)
+      - name: Unit tests
         run: npm run test -w @fitnassist/web
 
-      - name: Unit tests (api)
+  quality-api:
+    name: Quality (API)
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --include=optional
+
+      - name: Generate Prisma client & Zod schemas
+        run: npm run db:generate
+
+      - name: Typecheck API
+        run: npm run typecheck -w @fitnassist/api 2>&1 | grep -v "packages/database/src/generated/zod" || true
+
+      - name: Unit tests
         run: npm run test -w @fitnassist/api
         env:
           DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
@@ -44,11 +91,10 @@ jobs:
           FRONTEND_URL: "http://localhost:3000"
           NODE_ENV: test
 
-      - name: Typecheck API
-        run: npm run typecheck -w @fitnassist/api 2>&1 | grep -v "packages/database/src/generated/zod" || true
-
   e2e:
     name: E2E
+    needs: changes
+    if: needs.changes.outputs.web == 'true' || needs.changes.outputs.api == 'true'
     runs-on: ubuntu-latest
     env:
       CI: true
@@ -132,3 +178,22 @@ jobs:
           neonctl branches delete ${{ steps.neon.outputs.branch_id }} --project-id ${{ vars.NEON_PROJECT_ID }}
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+
+  ci-gate:
+    name: CI Gate
+    if: always()
+    needs: [changes, quality-web, quality-api, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          echo "Web quality: ${{ needs.quality-web.result }}"
+          echo "API quality: ${{ needs.quality-api.result }}"
+          echo "E2E: ${{ needs.e2e.result }}"
+
+          # Fail if any required job failed (skipped is OK)
+          if [[ "${{ needs.quality-web.result }}" == "failure" ]]; then exit 1; fi
+          if [[ "${{ needs.quality-api.result }}" == "failure" ]]; then exit 1; fi
+          if [[ "${{ needs.e2e.result }}" == "failure" ]]; then exit 1; fi
+
+          echo "All checks passed!"
