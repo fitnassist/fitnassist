@@ -1,3 +1,9 @@
+import { webcrypto } from 'node:crypto';
+if (!globalThis.crypto) {
+  // @ts-expect-error Node 18 compat — polyfill crypto global
+  globalThis.crypto = webcrypto;
+}
+
 import { app } from './app';
 import { env } from './config/env';
 import { prisma } from './lib/prisma';
