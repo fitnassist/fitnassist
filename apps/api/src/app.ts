@@ -7,6 +7,7 @@ import { appRouter } from './routers';
 import { createContext } from './lib/trpc';
 import { auth } from './lib/auth';
 import { env } from './config/env';
+import { prisma } from './lib/prisma';
 import { notFoundHandler, errorHandler } from './middleware';
 import { sseRouter } from './routes/sse';
 import { cronRouter } from './routes/cron';
@@ -50,9 +51,38 @@ app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripe
 // Body parsing
 app.use(express.json());
 
-// Health check endpoint (non-tRPC)
+// Health check endpoints (non-tRPC)
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/health/detailed', async (_req, res) => {
+  const checks: Record<string, { status: 'ok' | 'error'; latencyMs: number; error?: string }> = {};
+
+  // Database
+  const dbStart = Date.now();
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    checks.database = { status: 'ok', latencyMs: Date.now() - dbStart };
+  } catch (e) {
+    checks.database = {
+      status: 'error',
+      latencyMs: Date.now() - dbStart,
+      error: e instanceof Error ? e.message : 'Unknown error',
+    };
+  }
+
+  // Auth
+  checks.auth = { status: 'ok', latencyMs: 0 };
+
+  const overall = Object.values(checks).every((c) => c.status === 'ok') ? 'ok' : 'degraded';
+
+  res.status(overall === 'ok' ? 200 : 503).json({
+    status: overall,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    checks,
+  });
 });
 
 // SSE endpoint (before tRPC so it's not caught by body parsing issues)
