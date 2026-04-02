@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { app } from '../../app';
 
-describe('Auth API', () => {
+const isDummyDb = process.env.DATABASE_URL?.includes('dummy');
+
+describe.skipIf(isDummyDb)('Auth API', () => {
   describe('POST /api/auth/sign-up/email', () => {
     it('should create a new user with valid data', async () => {
       const uniqueEmail = `test-${Date.now()}@example.com`;

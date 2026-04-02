@@ -30,6 +30,21 @@ vi.mock('../notification.service', () => ({
   },
 }));
 
+vi.mock('../../repositories/notification.repository', () => ({
+  notificationRepository: {
+    findExistingUnread: vi.fn().mockResolvedValue(null),
+    dismiss: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
+vi.mock('../../repositories/conversation-preference.repository', () => ({
+  conversationPreferenceRepository: {
+    findByConnectionAndUser: vi.fn().mockResolvedValue(null),
+    findByUserAndConnection: vi.fn().mockResolvedValue(null),
+    findByUser: vi.fn().mockResolvedValue([]),
+  },
+}));
+
 import { messageRepository } from '../../repositories/message.repository';
 import { contactRepository } from '../../repositories/contact.repository';
 import { userRepository } from '../../repositories/user.repository';
