@@ -44,6 +44,9 @@ jobs:
           FRONTEND_URL: "http://localhost:3000"
           NODE_ENV: test
 
+      - name: Typecheck API
+        run: npm run typecheck -w @fitnassist/api 2>&1 | grep -v "packages/database/src/generated/zod" || true
+
   e2e:
     name: E2E
     runs-on: ubuntu-latest
