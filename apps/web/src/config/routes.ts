@@ -35,6 +35,7 @@ export const routes = {
   dashboardDiary: '/dashboard/diary',
   dashboardGoals: '/dashboard/goals',
   dashboardMyPlans: '/dashboard/my-plans',
+  dashboardWorkout: (planId: string) => `/dashboard/workout/${planId}`,
   dashboardResources: '/dashboard/resources',
   dashboardExerciseCreate: '/dashboard/resources/exercises/new',
   dashboardExerciseEdit: (id: string) => `/dashboard/resources/exercises/${id}/edit`,

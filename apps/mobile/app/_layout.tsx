@@ -88,6 +88,7 @@ const RootLayout = () => {
                   <Stack.Screen name="bookings" />
                   <Stack.Screen name="messages" />
                   <Stack.Screen name="tracking" />
+                  <Stack.Screen name="workout" />
                 </Stack>
               </AuthGuard>
               <StatusBar style="light" />
