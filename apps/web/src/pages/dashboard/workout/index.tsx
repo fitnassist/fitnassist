@@ -43,6 +43,9 @@ interface WorkoutExercise {
   reps?: string | null;
   restSeconds?: number | null;
   notes?: string | null;
+  targetWeight?: number | null;
+  weightUnit?: string | null;
+  targetDuration?: string | null;
   exercise: ExerciseDetail;
 }
 
@@ -81,6 +84,29 @@ const MUSCLE_GROUP_LABELS: Record<string, string> = {
 };
 
 const DEFAULT_REST_SECONDS = 60;
+
+// =============================================================================
+// DURATION PARSER
+// =============================================================================
+
+const parseDurationToSeconds = (duration: string): number => {
+  // Handle "30s" format
+  const secMatch = duration.match(/^(\d+)\s*s$/i);
+  if (secMatch?.[1]) return parseInt(secMatch[1]);
+
+  // Handle "2 min" or "2m" format
+  const minMatch = duration.match(/^(\d+)\s*m(?:in)?$/i);
+  if (minMatch?.[1]) return parseInt(minMatch[1]) * 60;
+
+  // Handle "1:30" format
+  const colonMatch = duration.match(/^(\d+):(\d+)$/);
+  if (colonMatch?.[1] && colonMatch[2])
+    return parseInt(colonMatch[1]) * 60 + parseInt(colonMatch[2]);
+
+  // Fallback: try as seconds
+  const num = parseInt(duration);
+  return isNaN(num) ? 60 : num;
+};
 
 // =============================================================================
 // HELPERS
@@ -173,6 +199,51 @@ const useRestTimer = () => {
   return { activeTimer, startTimer, skipTimer };
 };
 
+const useExerciseTimer = () => {
+  const [timer, setTimer] = useState<{
+    exerciseId: string;
+    setIndex: number;
+    remaining: number;
+    total: number;
+  } | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (timer && timer.remaining > 0) {
+      intervalRef.current = setInterval(() => {
+        setTimer((prev) => {
+          if (!prev || prev.remaining <= 1) {
+            return prev ? { ...prev, remaining: 0 } : null;
+          }
+          return { ...prev, remaining: prev.remaining - 1 };
+        });
+      }, 1000);
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [
+    timer?.exerciseId,
+    timer?.setIndex,
+    timer?.remaining !== undefined ? timer.remaining > 0 : false,
+  ]);
+
+  const startExerciseTimer = useCallback(
+    (exerciseId: string, setIndex: number, seconds: number) => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      setTimer({ exerciseId, setIndex, remaining: seconds, total: seconds });
+    },
+    [],
+  );
+
+  const stopExerciseTimer = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setTimer(null);
+  }, []);
+
+  return { exerciseTimer: timer, startExerciseTimer, stopExerciseTimer };
+};
+
 // =============================================================================
 // SUB-COMPONENTS
 // =============================================================================
@@ -230,6 +301,9 @@ const ExerciseDetailDialog = ({
   reps,
   restSeconds,
   notes,
+  targetWeight,
+  weightUnit,
+  targetDuration,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -238,6 +312,9 @@ const ExerciseDetailDialog = ({
   reps?: string | null;
   restSeconds?: number | null;
   notes?: string | null;
+  targetWeight?: number | null;
+  weightUnit?: string | null;
+  targetDuration?: string | null;
 }) => {
   const videoUrl = exercise.videoUrl || exercise.videoUploadUrl;
 
@@ -261,11 +338,24 @@ const ExerciseDetailDialog = ({
             />
           )}
 
-          {(sets || reps || restSeconds) && (
+          {(sets || reps || restSeconds || targetWeight || targetDuration) && (
             <div className="flex flex-wrap gap-2">
               {sets && <Badge variant="secondary">{sets} sets</Badge>}
               {reps && <Badge variant="secondary">{reps} reps</Badge>}
               {restSeconds && <Badge variant="secondary">{restSeconds}s rest</Badge>}
+              {targetWeight && (
+                <Badge variant="secondary" className="gap-1">
+                  <Dumbbell className="h-3 w-3" />
+                  {targetWeight}
+                  {weightUnit ?? 'kg'}
+                </Badge>
+              )}
+              {targetDuration && (
+                <Badge variant="secondary" className="gap-1">
+                  <Timer className="h-3 w-3" />
+                  {targetDuration}
+                </Badge>
+              )}
             </div>
           )}
 
@@ -344,6 +434,41 @@ const RestTimerDisplay = ({ remaining, onSkip }: { remaining: number; onSkip: ()
   );
 };
 
+const ExerciseTimerDisplay = ({
+  remaining,
+  total,
+  onStop,
+}: {
+  remaining: number;
+  total: number;
+  onStop: () => void;
+}) => {
+  const progressPercent = total > 0 ? ((total - remaining) / total) * 100 : 0;
+
+  return (
+    <div className="flex items-center gap-3 p-3 bg-teal-500/10 border border-teal-500/30 rounded-lg mt-2 animate-in fade-in">
+      <Timer className="h-5 w-5 text-teal-500 animate-pulse" />
+      <span className="text-lg font-mono font-semibold tabular-nums text-teal-600 dark:text-teal-400">
+        {formatTime(remaining)}
+      </span>
+      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+        <div
+          className="h-full bg-teal-500 rounded-full transition-all"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onStop}
+        className="text-teal-600 dark:text-teal-400"
+      >
+        Stop
+      </Button>
+    </div>
+  );
+};
+
 const ExerciseCard = ({
   index,
   workoutExercise,
@@ -352,6 +477,9 @@ const ExerciseCard = ({
   restTimer,
   onSkipRest,
   onViewExercise,
+  exerciseTimer,
+  onStartExerciseTimer,
+  onStopExerciseTimer,
 }: {
   index: number;
   workoutExercise: WorkoutExercise;
@@ -360,11 +488,16 @@ const ExerciseCard = ({
   restTimer: { remaining: number } | null;
   onSkipRest: () => void;
   onViewExercise: () => void;
+  exerciseTimer: { setIndex: number; remaining: number; total: number } | null;
+  onStartExerciseTimer: (setIndex: number) => void;
+  onStopExerciseTimer: () => void;
 }) => {
-  const { exercise, sets, reps, restSeconds, notes } = workoutExercise;
+  const { exercise, sets, reps, restSeconds, notes, targetWeight, weightUnit, targetDuration } =
+    workoutExercise;
   const totalSets = sets ?? 1;
   const completedCount = completedSets.filter(Boolean).length;
   const allComplete = completedCount === totalSets;
+  const hasDuration = !!targetDuration;
 
   return (
     <Card className={allComplete ? 'border-primary/30 bg-primary/5' : ''}>
@@ -395,6 +528,26 @@ const ExerciseCard = ({
                 {completedCount}/{totalSets} sets
               </span>
             </div>
+
+            {/* Weight and duration badges */}
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              {targetWeight && (
+                <Badge variant="secondary" className="gap-1 text-sm font-semibold">
+                  <Dumbbell className="h-3.5 w-3.5" />
+                  {targetWeight}
+                  {weightUnit ?? 'kg'}
+                </Badge>
+              )}
+              {targetDuration && (
+                <Badge
+                  variant="secondary"
+                  className="gap-1 text-sm bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/30"
+                >
+                  <Timer className="h-3.5 w-3.5" />
+                  {targetDuration}
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
 
@@ -414,35 +567,59 @@ const ExerciseCard = ({
           </p>
         )}
 
-        {/* Set checkboxes */}
-        <div className="flex flex-wrap items-center gap-2 mb-3">
-          <span className="text-xs font-medium text-muted-foreground mr-1">Sets:</span>
-          {Array.from({ length: totalSets }, (_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => onToggleSet(i)}
-              className="flex items-center gap-1.5 group"
-              aria-label={`Set ${i + 1} - ${completedSets[i] ? 'completed' : 'incomplete'}`}
-            >
-              <Checkbox
-                checked={completedSets[i]}
-                onCheckedChange={() => onToggleSet(i)}
-                className={
-                  completedSets[i]
-                    ? 'border-primary bg-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary'
-                    : ''
-                }
-                aria-label={`Set ${i + 1}`}
-              />
-              <span
-                className={`text-xs ${completedSets[i] ? 'text-primary font-medium' : 'text-muted-foreground'}`}
-              >
-                {i + 1}
-              </span>
-            </button>
-          ))}
+        {/* Set checkboxes (with optional timer buttons for timed exercises) */}
+        <div className="space-y-2 mb-3">
+          <span className="text-xs font-medium text-muted-foreground">Sets:</span>
+          <div className="flex flex-wrap items-center gap-2">
+            {Array.from({ length: totalSets }, (_, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onToggleSet(i)}
+                  className="flex items-center gap-1.5 group"
+                  aria-label={`Set ${i + 1} - ${completedSets[i] ? 'completed' : 'incomplete'}`}
+                >
+                  <Checkbox
+                    checked={completedSets[i]}
+                    onCheckedChange={() => onToggleSet(i)}
+                    className={
+                      completedSets[i]
+                        ? 'border-primary bg-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary'
+                        : ''
+                    }
+                    aria-label={`Set ${i + 1}`}
+                  />
+                  <span
+                    className={`text-xs ${completedSets[i] ? 'text-primary font-medium' : 'text-muted-foreground'}`}
+                  >
+                    {i + 1}
+                  </span>
+                </button>
+                {hasDuration && !completedSets[i] && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-xs text-teal-600 dark:text-teal-400 hover:bg-teal-500/10"
+                    onClick={() => onStartExerciseTimer(i)}
+                    disabled={exerciseTimer !== null}
+                  >
+                    <Play className="h-3 w-3 mr-1" />
+                    Timer
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
+
+        {/* Exercise countdown timer (teal, distinct from rest timer) */}
+        {exerciseTimer && (
+          <ExerciseTimerDisplay
+            remaining={exerciseTimer.remaining}
+            total={exerciseTimer.total}
+            onStop={onStopExerciseTimer}
+          />
+        )}
 
         {/* Rest timer */}
         {restTimer && <RestTimerDisplay remaining={restTimer.remaining} onSkip={onSkipRest} />}
@@ -586,6 +763,7 @@ export const WorkoutRunnerPage = () => {
   const { data: assignments, isLoading } = useMyAssignments();
   const { elapsed, stop } = useElapsedTimer();
   const { activeTimer, startTimer, skipTimer } = useRestTimer();
+  const { exerciseTimer, startExerciseTimer, stopExerciseTimer } = useExerciseTimer();
 
   // Track completed sets per exercise: { [exerciseId]: boolean[] }
   const [completedSets, setCompletedSets] = useState<Record<string, boolean[]>>({});
@@ -644,6 +822,34 @@ export const WorkoutRunnerPage = () => {
   const handleDiscard = useCallback(() => {
     navigate(routes.dashboardMyPlans);
   }, [navigate]);
+
+  // Handle exercise timer completing (auto-mark set and start rest)
+  useEffect(() => {
+    if (exerciseTimer && exerciseTimer.remaining === 0) {
+      const { exerciseId, setIndex } = exerciseTimer;
+      // Auto-complete the set
+      setCompletedSets((prev) => {
+        const current = [...(prev[exerciseId] ?? [])];
+        current[setIndex] = true;
+        return { ...prev, [exerciseId]: current };
+      });
+      // Find the exercise to get rest seconds
+      const we = plan?.exercises.find((e) => e.id === exerciseId);
+      if (we) {
+        const rest = we.restSeconds ?? DEFAULT_REST_SECONDS;
+        startTimer(exerciseId, rest);
+      }
+      stopExerciseTimer();
+    }
+  }, [exerciseTimer, plan?.exercises, startTimer, stopExerciseTimer]);
+
+  const handleStartExerciseTimer = useCallback(
+    (exerciseId: string, setIndex: number, duration: string) => {
+      const seconds = parseDurationToSeconds(duration);
+      startExerciseTimer(exerciseId, setIndex, seconds);
+    },
+    [startExerciseTimer],
+  );
 
   // Check if all sets are complete
   const allSetsComplete =
@@ -737,6 +943,21 @@ export const WorkoutRunnerPage = () => {
             }
             onSkipRest={skipTimer}
             onViewExercise={() => setSelectedExercise(we)}
+            exerciseTimer={
+              exerciseTimer?.exerciseId === we.id
+                ? {
+                    setIndex: exerciseTimer.setIndex,
+                    remaining: exerciseTimer.remaining,
+                    total: exerciseTimer.total,
+                  }
+                : null
+            }
+            onStartExerciseTimer={(setIndex) =>
+              we.targetDuration
+                ? handleStartExerciseTimer(we.id, setIndex, we.targetDuration)
+                : undefined
+            }
+            onStopExerciseTimer={stopExerciseTimer}
           />
         ))}
 
@@ -759,6 +980,9 @@ export const WorkoutRunnerPage = () => {
           reps={selectedExercise.reps}
           restSeconds={selectedExercise.restSeconds}
           notes={selectedExercise.notes}
+          targetWeight={selectedExercise.targetWeight}
+          weightUnit={selectedExercise.weightUnit}
+          targetDuration={selectedExercise.targetDuration}
         />
       )}
 

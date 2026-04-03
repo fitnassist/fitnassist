@@ -49,6 +49,9 @@ interface PlanExercise {
   sets: number | null;
   reps: string;
   restSeconds: number | null;
+  targetWeight: number | null;
+  weightUnit: string;
+  targetDuration: string;
   notes: string;
 }
 
@@ -144,6 +147,62 @@ const SortableExerciseRow = ({
             </div>
           </div>
 
+          <div className="grid grid-cols-3 gap-2">
+            <div className="col-span-2">
+              <Label className="text-xs">Target Weight</Label>
+              <div className="flex gap-1">
+                <Input
+                  type="number"
+                  min={0}
+                  step="any"
+                  value={exercise.targetWeight ?? ''}
+                  onChange={(e) =>
+                    onUpdate(
+                      exercise.tempId,
+                      'targetWeight',
+                      e.target.value ? parseFloat(e.target.value) : null,
+                    )
+                  }
+                  placeholder="e.g. 60"
+                  className="h-8 text-sm flex-1"
+                />
+                <div className="flex rounded-md border overflow-hidden">
+                  <button
+                    type="button"
+                    className={`px-2 text-xs h-8 transition-colors ${
+                      exercise.weightUnit === 'kg'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background hover:bg-muted'
+                    }`}
+                    onClick={() => onUpdate(exercise.tempId, 'weightUnit', 'kg')}
+                  >
+                    kg
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-2 text-xs h-8 transition-colors ${
+                      exercise.weightUnit === 'lbs'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-background hover:bg-muted'
+                    }`}
+                    onClick={() => onUpdate(exercise.tempId, 'weightUnit', 'lbs')}
+                  >
+                    lbs
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Duration</Label>
+              <Input
+                value={exercise.targetDuration}
+                onChange={(e) => onUpdate(exercise.tempId, 'targetDuration', e.target.value)}
+                placeholder="e.g. 30s, 2 min"
+                className="h-8 text-sm"
+              />
+            </div>
+          </div>
+
           <div>
             <Label className="text-xs">Notes</Label>
             <Input
@@ -202,6 +261,9 @@ export const WorkoutPlanFormPage = () => {
           sets: we.sets,
           reps: we.reps ?? '',
           restSeconds: we.restSeconds,
+          targetWeight: we.targetWeight ?? null,
+          weightUnit: we.weightUnit ?? 'kg',
+          targetDuration: we.targetDuration ?? '',
           notes: we.notes ?? '',
         })),
       );
@@ -234,6 +296,9 @@ export const WorkoutPlanFormPage = () => {
         sets: 3,
         reps: '',
         restSeconds: 60,
+        targetWeight: null,
+        weightUnit: 'kg',
+        targetDuration: '',
         notes: '',
       },
     ]);
@@ -279,6 +344,9 @@ export const WorkoutPlanFormPage = () => {
           sets: e.sets,
           reps: e.reps || null,
           restSeconds: e.restSeconds,
+          targetWeight: e.targetWeight,
+          weightUnit: e.targetWeight ? (e.weightUnit as 'kg' | 'lbs') : null,
+          targetDuration: e.targetDuration || null,
           notes: e.notes || null,
           sortOrder: i,
         }));

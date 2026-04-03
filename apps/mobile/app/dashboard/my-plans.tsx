@@ -79,9 +79,49 @@ const MyPlansScreen = () => {
                       </Text>
                     )}
                     {plan.exercises && plan.exercises.length > 0 && (
-                      <Text className="text-xs text-muted-foreground">
-                        {plan.exercises.length} exercises
-                      </Text>
+                      <View className="gap-1 mt-1">
+                        {plan.exercises.map((we: any, i: number) => (
+                          <View
+                            key={we.id || i}
+                            className="flex-row flex-wrap items-center gap-1"
+                          >
+                            <Text className="text-xs text-foreground font-medium">
+                              {we.exercise?.name ?? `Exercise ${i + 1}`}
+                            </Text>
+                            {we.sets != null && (
+                              <Text className="text-xs text-muted-foreground">
+                                {we.sets} sets
+                              </Text>
+                            )}
+                            {we.reps != null && (
+                              <Text className="text-xs text-muted-foreground">
+                                {we.reps} reps
+                              </Text>
+                            )}
+                            {we.targetWeight != null && (
+                              <View className="bg-teal/10 rounded px-1.5 py-0.5">
+                                <Text
+                                  className="text-xs font-medium"
+                                  style={{ color: colors.teal }}
+                                >
+                                  {we.targetWeight}
+                                  {we.weightUnit ?? "kg"}
+                                </Text>
+                              </View>
+                            )}
+                            {we.targetDuration != null && (
+                              <View className="bg-teal/10 rounded px-1.5 py-0.5">
+                                <Text
+                                  className="text-xs font-medium"
+                                  style={{ color: colors.teal }}
+                                >
+                                  {we.targetDuration}
+                                </Text>
+                              </View>
+                            )}
+                          </View>
+                        ))}
+                      </View>
                     )}
                     <Button
                       size="sm"

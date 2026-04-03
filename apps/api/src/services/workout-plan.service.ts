@@ -1,19 +1,22 @@
-import { TRPCError } from '@trpc/server';
-import { workoutPlanRepository } from '../repositories/workout-plan.repository';
-import { exerciseRepository } from '../repositories/exercise.repository';
-import { trainerRepository } from '../repositories/trainer.repository';
+import { TRPCError } from "@trpc/server";
+import { workoutPlanRepository } from "../repositories/workout-plan.repository";
+import { exerciseRepository } from "../repositories/exercise.repository";
+import { trainerRepository } from "../repositories/trainer.repository";
 
 export const workoutPlanService = {
-  async list(userId: string, filters: {
-    search?: string;
-    page: number;
-    limit: number;
-  }) {
+  async list(
+    userId: string,
+    filters: {
+      search?: string;
+      page: number;
+      limit: number;
+    },
+  ) {
     const trainer = await trainerRepository.findByUserId(userId);
     if (!trainer) {
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Trainer profile not found',
+        code: "NOT_FOUND",
+        message: "Trainer profile not found",
       });
     }
 
@@ -27,54 +30,61 @@ export const workoutPlanService = {
     const plan = await workoutPlanRepository.findById(planId);
     if (!plan) {
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Workout plan not found',
+        code: "NOT_FOUND",
+        message: "Workout plan not found",
       });
     }
 
     const trainer = await trainerRepository.findByUserId(userId);
     if (!trainer || plan.trainerId !== trainer.id) {
       throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'You do not have access to this workout plan',
+        code: "FORBIDDEN",
+        message: "You do not have access to this workout plan",
       });
     }
 
     return plan;
   },
 
-  async create(userId: string, data: {
-    name: string;
-    description?: string | null;
-  }) {
+  async create(
+    userId: string,
+    data: {
+      name: string;
+      description?: string | null;
+    },
+  ) {
     const trainer = await trainerRepository.findByUserId(userId);
     if (!trainer) {
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Trainer profile not found',
+        code: "NOT_FOUND",
+        message: "Trainer profile not found",
       });
     }
 
     return workoutPlanRepository.create(trainer.id, data);
   },
 
-  async update(userId: string, planId: string, data: {
-    name?: string;
-    description?: string | null;
-  }) {
+  async update(
+    userId: string,
+    planId: string,
+    data: {
+      name?: string;
+      description?: string | null;
+    },
+  ) {
     const plan = await workoutPlanRepository.findById(planId);
     if (!plan) {
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Workout plan not found',
+        code: "NOT_FOUND",
+        message: "Workout plan not found",
       });
     }
 
     const trainer = await trainerRepository.findByUserId(userId);
     if (!trainer || plan.trainerId !== trainer.id) {
       throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'You do not have access to this workout plan',
+        code: "FORBIDDEN",
+        message: "You do not have access to this workout plan",
       });
     }
 
@@ -85,43 +95,50 @@ export const workoutPlanService = {
     const plan = await workoutPlanRepository.findById(planId);
     if (!plan) {
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Workout plan not found',
+        code: "NOT_FOUND",
+        message: "Workout plan not found",
       });
     }
 
     const trainer = await trainerRepository.findByUserId(userId);
     if (!trainer || plan.trainerId !== trainer.id) {
       throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'You do not have access to this workout plan',
+        code: "FORBIDDEN",
+        message: "You do not have access to this workout plan",
       });
     }
 
     return workoutPlanRepository.delete(planId);
   },
 
-  async setExercises(userId: string, planId: string, exercises: {
-    exerciseId: string;
-    sets?: number | null;
-    reps?: string | null;
-    restSeconds?: number | null;
-    notes?: string | null;
-    sortOrder: number;
-  }[]) {
+  async setExercises(
+    userId: string,
+    planId: string,
+    exercises: {
+      exerciseId: string;
+      sets?: number | null;
+      reps?: string | null;
+      restSeconds?: number | null;
+      targetWeight?: number | null;
+      weightUnit?: string | null;
+      targetDuration?: string | null;
+      notes?: string | null;
+      sortOrder: number;
+    }[],
+  ) {
     const plan = await workoutPlanRepository.findById(planId);
     if (!plan) {
       throw new TRPCError({
-        code: 'NOT_FOUND',
-        message: 'Workout plan not found',
+        code: "NOT_FOUND",
+        message: "Workout plan not found",
       });
     }
 
     const trainer = await trainerRepository.findByUserId(userId);
     if (!trainer || plan.trainerId !== trainer.id) {
       throw new TRPCError({
-        code: 'FORBIDDEN',
-        message: 'You do not have access to this workout plan',
+        code: "FORBIDDEN",
+        message: "You do not have access to this workout plan",
       });
     }
 
@@ -130,7 +147,7 @@ export const workoutPlanService = {
       const exercise = await exerciseRepository.findById(ex.exerciseId);
       if (!exercise || exercise.trainerId !== trainer.id) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
+          code: "BAD_REQUEST",
           message: `Exercise ${ex.exerciseId} not found or does not belong to you`,
         });
       }

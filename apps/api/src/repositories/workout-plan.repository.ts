@@ -1,5 +1,5 @@
-import { prisma } from '../lib/prisma';
-import type { Prisma } from '@fitnassist/database';
+import { prisma } from "../lib/prisma";
+import type { Prisma } from "@fitnassist/database";
 
 export interface WorkoutPlanListParams {
   trainerId: string;
@@ -9,10 +9,13 @@ export interface WorkoutPlanListParams {
 }
 
 export const workoutPlanRepository = {
-  async create(trainerId: string, data: {
-    name: string;
-    description?: string | null;
-  }) {
+  async create(
+    trainerId: string,
+    data: {
+      name: string;
+      description?: string | null;
+    },
+  ) {
     return prisma.workoutPlan.create({
       data: {
         trainerId,
@@ -27,7 +30,7 @@ export const workoutPlanRepository = {
       where: { id },
       include: {
         exercises: {
-          orderBy: { sortOrder: 'asc' },
+          orderBy: { sortOrder: "asc" },
           include: {
             exercise: true,
           },
@@ -42,7 +45,7 @@ export const workoutPlanRepository = {
     const where: Prisma.WorkoutPlanWhereInput = { trainerId };
 
     if (search) {
-      where.name = { contains: search, mode: 'insensitive' };
+      where.name = { contains: search, mode: "insensitive" };
     }
 
     const [plans, total] = await Promise.all([
@@ -51,7 +54,7 @@ export const workoutPlanRepository = {
         include: {
           _count: { select: { exercises: true } },
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { updatedAt: "desc" },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -67,10 +70,13 @@ export const workoutPlanRepository = {
     };
   },
 
-  async update(id: string, data: {
-    name?: string;
-    description?: string | null;
-  }) {
+  async update(
+    id: string,
+    data: {
+      name?: string;
+      description?: string | null;
+    },
+  ) {
     return prisma.workoutPlan.update({
       where: { id },
       data,
@@ -83,18 +89,24 @@ export const workoutPlanRepository = {
     });
   },
 
-  async setExercises(planId: string, exercises: {
-    exerciseId: string;
-    sets?: number | null;
-    reps?: string | null;
-    restSeconds?: number | null;
-    notes?: string | null;
-    sortOrder: number;
-  }[]) {
+  async setExercises(
+    planId: string,
+    exercises: {
+      exerciseId: string;
+      sets?: number | null;
+      reps?: string | null;
+      restSeconds?: number | null;
+      targetWeight?: number | null;
+      weightUnit?: string | null;
+      targetDuration?: string | null;
+      notes?: string | null;
+      sortOrder: number;
+    }[],
+  ) {
     // Delete all existing exercises and replace with new ones
     await prisma.$transaction([
       prisma.workoutExercise.deleteMany({ where: { workoutPlanId: planId } }),
-      ...exercises.map(ex =>
+      ...exercises.map((ex) =>
         prisma.workoutExercise.create({
           data: {
             workoutPlanId: planId,
@@ -102,10 +114,13 @@ export const workoutPlanRepository = {
             sets: ex.sets,
             reps: ex.reps,
             restSeconds: ex.restSeconds,
+            targetWeight: ex.targetWeight,
+            weightUnit: ex.weightUnit,
+            targetDuration: ex.targetDuration,
             notes: ex.notes,
             sortOrder: ex.sortOrder,
           },
-        })
+        }),
       ),
     ]);
 
@@ -114,7 +129,7 @@ export const workoutPlanRepository = {
       where: { id: planId },
       include: {
         exercises: {
-          orderBy: { sortOrder: 'asc' },
+          orderBy: { sortOrder: "asc" },
           include: { exercise: true },
         },
       },
