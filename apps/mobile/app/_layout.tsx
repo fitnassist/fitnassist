@@ -1,24 +1,24 @@
-import '../global.css';
-import '../lib/sentry';
-import { useEffect, useState } from 'react';
-import { AppState } from 'react-native';
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import * as SplashScreen from 'expo-splash-screen';
-import { QueryClientProvider, focusManager } from '@tanstack/react-query';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { queryClient } from '@/lib/queryClient';
-import { trpc, createTRPCClient } from '@/lib/trpc';
-import { useAuth } from '@/hooks/useAuth';
-import { AlertProvider } from '@/components/ui';
-import { useSse } from '@/lib/sse';
-import { useNotifications } from '@/hooks/useNotifications';
+import "../global.css";
+import "../lib/sentry";
+import { useEffect, useState } from "react";
+import { AppState } from "react-native";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import * as SplashScreen from "expo-splash-screen";
+import { QueryClientProvider, focusManager } from "@tanstack/react-query";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { queryClient } from "@/lib/queryClient";
+import { trpc, createTRPCClient } from "@/lib/trpc";
+import { useAuth } from "@/hooks/useAuth";
+import { AlertProvider } from "@/components/ui";
+import { useSse } from "@/lib/sse";
+import { useNotifications } from "@/hooks/useNotifications";
 
 // Tell TanStack Query to treat app foreground as "window focus"
 focusManager.setEventListener((handleFocus) => {
-  const sub = AppState.addEventListener('change', (state) => {
-    handleFocus(state === 'active');
+  const sub = AppState.addEventListener("change", (state) => {
+    handleFocus(state === "active");
   });
   return () => sub.remove();
 });
@@ -26,7 +26,11 @@ focusManager.setEventListener((handleFocus) => {
 // Keep splash screen visible until we're ready
 SplashScreen.preventAutoHideAsync();
 
-const AuthenticatedProviders = ({ children }: { children: React.ReactNode }) => {
+const AuthenticatedProviders = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   useSse();
   useNotifications();
   return <>{children}</>;
@@ -47,12 +51,12 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
       setSplashHidden(true);
     }
 
-    const inAuthGroup = segments[0] === '(auth)';
+    const inAuthGroup = segments[0] === "(auth)";
 
     if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/(auth)');
+      router.replace("/(auth)");
     } else if (isAuthenticated && inAuthGroup) {
-      router.replace('/(tabs)');
+      router.replace("/(tabs)");
     }
   }, [isAuthenticated, isLoading, segments]);
 
@@ -74,15 +78,16 @@ const RootLayout = () => {
                 <Stack
                   screenOptions={{
                     headerShown: false,
-                    animation: 'slide_from_right',
+                    animation: "slide_from_right",
                   }}
                 >
                   <Stack.Screen name="(tabs)" />
-                  <Stack.Screen name="(auth)" options={{ animation: 'fade' }} />
+                  <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
                   <Stack.Screen name="dashboard" />
                   <Stack.Screen name="trainers" />
                   <Stack.Screen name="bookings" />
                   <Stack.Screen name="messages" />
+                  <Stack.Screen name="tracking" />
                 </Stack>
               </AuthGuard>
               <StatusBar style="light" />
