@@ -39,6 +39,7 @@ import { MealPlanFormPage } from '@/pages/dashboard/resources/meal-plans/form';
 import { DiaryPage } from '@/pages/dashboard/diary';
 import { GoalsPage } from '@/pages/dashboard/goals';
 import { MyPlansPage } from '@/pages/dashboard/my-plans';
+import { WorkoutRunnerPage } from '@/pages/dashboard/workout';
 import { OnboardingPage } from '@/pages/dashboard/onboarding';
 import { OnboardingTemplateFormPage } from '@/pages/dashboard/onboarding/templates/form';
 import { OnboardingCompletePage } from '@/pages/dashboard/onboarding/[responseId]';
@@ -181,6 +182,7 @@ function App() {
                       <Route path={routes.dashboardDiary} element={<DiaryPage />} />
                       <Route path={routes.dashboardGoals} element={<GoalsPage />} />
                       <Route path={routes.dashboardMyPlans} element={<MyPlansPage />} />
+                      <Route path="/dashboard/workout/:planId" element={<WorkoutRunnerPage />} />
                       <Route path={routes.dashboardContacts} element={<ContactsPage />} />
                       <Route
                         path="/dashboard/bookings/book/:trainerId"

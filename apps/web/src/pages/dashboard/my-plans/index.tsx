@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ClipboardList,
   Dumbbell,
@@ -17,6 +18,7 @@ import {
   ResponsiveTabs,
   TabsContent,
   Badge,
+  Button,
 } from '@/components/ui';
 import { PageLayout } from '@/components/layouts';
 import { DetailDialog } from '@/components';
@@ -386,6 +388,14 @@ export const MyPlansPage = () => {
                             <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                           </button>
                         ))}
+                        <div className="pt-3">
+                          <Button asChild className="w-full">
+                            <Link to={`/dashboard/workout/${plan.id}`}>
+                              <Play className="h-4 w-4 mr-2" />
+                              Start Workout
+                            </Link>
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </CardContent>
