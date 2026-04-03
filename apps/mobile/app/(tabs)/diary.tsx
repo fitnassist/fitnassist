@@ -22,6 +22,7 @@ import {
   Users,
   Plus,
   MapPin,
+  ScanBarcode,
 } from "lucide-react-native";
 import { Text, Card, CardContent, Skeleton, useAlert } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
@@ -215,12 +216,24 @@ const TraineeDiary = () => {
                         )}
                       </View>
                     </View>
-                    <RNTouchableOpacity
-                      className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
-                      onPress={() => setActiveLogger(LOGGER_MAP[type] ?? null)}
-                    >
-                      <Plus size={16} color={colors.mutedForeground} />
-                    </RNTouchableOpacity>
+                    <View className="flex-row items-center gap-2">
+                      {type === "FOOD" && (
+                        <RNTouchableOpacity
+                          className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
+                          onPress={() => router.push("/scan")}
+                        >
+                          <ScanBarcode size={14} color={colors.teal} />
+                        </RNTouchableOpacity>
+                      )}
+                      <RNTouchableOpacity
+                        className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
+                        onPress={() =>
+                          setActiveLogger(LOGGER_MAP[type] ?? null)
+                        }
+                      >
+                        <Plus size={16} color={colors.mutedForeground} />
+                      </RNTouchableOpacity>
+                    </View>
                   </View>
 
                   {/* Show entry summaries */}

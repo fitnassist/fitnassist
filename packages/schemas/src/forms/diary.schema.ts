@@ -92,6 +92,11 @@ export const searchFoodSchema = z.object({
 });
 export type SearchFoodInput = z.infer<typeof searchFoodSchema>;
 
+export const lookupBarcodeSchema = z.object({
+  barcode: z.string().min(8).max(14),
+});
+export type LookupBarcodeInput = z.infer<typeof lookupBarcodeSchema>;
+
 export const getDailyNutritionSchema = z.object({
   userId: z.string().min(1).optional(),
   date: z.string().date(),

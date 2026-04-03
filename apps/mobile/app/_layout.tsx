@@ -95,7 +95,10 @@ const RootLayout = () => {
                     <Stack.Screen name="shop" />
                     <Stack.Screen name="tracking" />
                     <Stack.Screen name="workout" />
-                    <Stack.Screen name="scan" />
+                    <Stack.Screen
+                      name="scan"
+                      options={{ animation: "slide_from_bottom" }}
+                    />
                   </Stack>
                 </AuthGuard>
               </CartProvider>
