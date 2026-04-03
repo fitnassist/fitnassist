@@ -1,4 +1,5 @@
 import '../global.css';
+import '../lib/sentry';
 import { useEffect, useState } from 'react';
 import { AppState } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
