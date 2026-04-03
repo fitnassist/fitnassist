@@ -1,16 +1,21 @@
-import { router, trainerProcedure, protectedProcedure, requireTier } from '../lib/trpc';
-import { prisma } from '../lib/prisma';
-import { TRPCError } from '@trpc/server';
-import { stripeConnectService } from '../services/stripe-connect.service';
-import { sessionPaymentService } from '../services/session-payment.service';
-import { sessionPriceRepository } from '../repositories/session-price.repository';
-import { cancellationPolicyRepository } from '../repositories/cancellation-policy.repository';
+import {
+  router,
+  trainerProcedure,
+  protectedProcedure,
+  requireTier,
+} from "../lib/trpc";
+import { prisma } from "../lib/prisma";
+import { TRPCError } from "@trpc/server";
+import { stripeConnectService } from "../services/stripe-connect.service";
+import { sessionPaymentService } from "../services/session-payment.service";
+import { sessionPriceRepository } from "../repositories/session-price.repository";
+import { cancellationPolicyRepository } from "../repositories/cancellation-policy.repository";
 import {
   updateSessionPriceSchema,
   updateCancellationPolicySchema,
   updatePaymentSettingsSchema,
-} from '@fitnassist/schemas';
-import { z } from 'zod';
+} from "@fitnassist/schemas";
+import { z } from "zod";
 
 export const paymentRouter = router({
   // Get payment settings (price, policy, toggles, connect status)
@@ -25,7 +30,11 @@ export const paymentRouter = router({
         stripeOnboardingComplete: true,
       },
     });
-    if (!trainer) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trainer profile not found' });
+    if (!trainer)
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Trainer profile not found",
+      });
 
     const [sessionPrice, cancellationPolicy] = await Promise.all([
       sessionPriceRepository.findByTrainerId(trainer.id),
@@ -37,63 +46,83 @@ export const paymentRouter = router({
       firstSessionFree: trainer.firstSessionFree,
       stripeConnectedAccountId: !!trainer.stripeConnectedAccountId,
       stripeOnboardingComplete: trainer.stripeOnboardingComplete,
-      sessionPrice: sessionPrice ? { amount: sessionPrice.amount, currency: sessionPrice.currency } : null,
-      cancellationPolicy: cancellationPolicy ? {
-        fullRefundHours: cancellationPolicy.fullRefundHours,
-        partialRefundHours: cancellationPolicy.partialRefundHours,
-        partialRefundPercent: cancellationPolicy.partialRefundPercent,
-      } : null,
+      sessionPrice: sessionPrice
+        ? { amount: sessionPrice.amount, currency: sessionPrice.currency }
+        : null,
+      cancellationPolicy: cancellationPolicy
+        ? {
+            fullRefundHours: cancellationPolicy.fullRefundHours,
+            partialRefundHours: cancellationPolicy.partialRefundHours,
+            partialRefundPercent: cancellationPolicy.partialRefundPercent,
+          }
+        : null,
     };
   }),
 
   // Update session price
   updateSessionPrice: trainerProcedure
-    .use(requireTier('ELITE'))
+    .use(requireTier("ELITE"))
     .input(updateSessionPriceSchema)
     .mutation(async ({ input, ctx }) => {
       const trainer = await prisma.trainerProfile.findUnique({
         where: { userId: ctx.user.id },
         select: { id: true },
       });
-      if (!trainer) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trainer profile not found' });
-      return sessionPriceRepository.upsert(trainer.id, input.amount, input.currency);
+      if (!trainer)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Trainer profile not found",
+        });
+      return sessionPriceRepository.upsert(
+        trainer.id,
+        input.amount,
+        input.currency,
+      );
     }),
 
   // Update cancellation policy
   updateCancellationPolicy: trainerProcedure
-    .use(requireTier('ELITE'))
+    .use(requireTier("ELITE"))
     .input(updateCancellationPolicySchema)
     .mutation(async ({ input, ctx }) => {
       if (input.partialRefundHours >= input.fullRefundHours) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Partial refund window must be less than full refund window',
+          code: "BAD_REQUEST",
+          message: "Partial refund window must be less than full refund window",
         });
       }
       const trainer = await prisma.trainerProfile.findUnique({
         where: { userId: ctx.user.id },
         select: { id: true },
       });
-      if (!trainer) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trainer profile not found' });
+      if (!trainer)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Trainer profile not found",
+        });
       return cancellationPolicyRepository.upsert(trainer.id, input);
     }),
 
   // Update payment toggles (paymentsEnabled, firstSessionFree)
   updateSettings: trainerProcedure
-    .use(requireTier('ELITE'))
+    .use(requireTier("ELITE"))
     .input(updatePaymentSettingsSchema)
     .mutation(async ({ input, ctx }) => {
       const trainer = await prisma.trainerProfile.findUnique({
         where: { userId: ctx.user.id },
         select: { id: true, stripeOnboardingComplete: true },
       });
-      if (!trainer) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trainer profile not found' });
+      if (!trainer)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Trainer profile not found",
+        });
 
       // Can't enable payments without completing Stripe onboarding
       if (input.paymentsEnabled && !trainer.stripeOnboardingComplete) {
         throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Complete Stripe onboarding before enabling payments',
+          code: "BAD_REQUEST",
+          message: "Complete Stripe onboarding before enabling payments",
         });
       }
 
@@ -106,19 +135,25 @@ export const paymentRouter = router({
 
   // Start Stripe Connect onboarding — creates account if needed, returns onboarding URL
   createOnboardingLink: trainerProcedure
-    .use(requireTier('ELITE'))
+    .use(requireTier("ELITE"))
     .mutation(async ({ ctx }) => {
       const trainer = await prisma.trainerProfile.findUnique({
         where: { userId: ctx.user.id },
         include: { user: { select: { email: true } } },
       });
-      if (!trainer) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trainer profile not found' });
+      if (!trainer)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Trainer profile not found",
+        });
 
       let accountId = trainer.stripeConnectedAccountId as string | null;
 
       // Create account if it doesn't exist
       if (!accountId) {
-        accountId = await stripeConnectService.createConnectedAccount(trainer.user.email);
+        accountId = await stripeConnectService.createConnectedAccount(
+          trainer.user.email,
+        );
         await prisma.trainerProfile.update({
           where: { id: trainer.id },
           data: { stripeConnectedAccountId: accountId },
@@ -131,17 +166,22 @@ export const paymentRouter = router({
 
   // Check Stripe Connect account status (call after returning from onboarding)
   refreshConnectStatus: trainerProcedure
-    .use(requireTier('ELITE'))
+    .use(requireTier("ELITE"))
     .mutation(async ({ ctx }) => {
       const trainer = await prisma.trainerProfile.findUnique({
         where: { userId: ctx.user.id },
         select: { id: true, stripeConnectedAccountId: true },
       });
       if (!trainer?.stripeConnectedAccountId) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'No Stripe account linked' });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "No Stripe account linked",
+        });
       }
 
-      const status = await stripeConnectService.getAccountStatus(trainer.stripeConnectedAccountId);
+      const status = await stripeConnectService.getAccountStatus(
+        trainer.stripeConnectedAccountId,
+      );
       const isComplete = status.chargesEnabled && status.detailsSubmitted;
 
       await prisma.trainerProfile.update({
@@ -154,14 +194,23 @@ export const paymentRouter = router({
 
   // Get Stripe Express dashboard link (for managing payouts)
   getDashboardLink: trainerProcedure
-    .use(requireTier('ELITE'))
+    .use(requireTier("ELITE"))
     .mutation(async ({ ctx }) => {
       const trainer = await prisma.trainerProfile.findUnique({
         where: { userId: ctx.user.id },
-        select: { stripeConnectedAccountId: true, stripeOnboardingComplete: true },
+        select: {
+          stripeConnectedAccountId: true,
+          stripeOnboardingComplete: true,
+        },
       });
-      if (!trainer?.stripeConnectedAccountId || !trainer.stripeOnboardingComplete) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Stripe onboarding not complete' });
+      if (
+        !trainer?.stripeConnectedAccountId ||
+        !trainer.stripeOnboardingComplete
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Stripe onboarding not complete",
+        });
       }
 
       const url = await stripeConnectService.getDashboardUrl();
@@ -189,14 +238,34 @@ export const paymentRouter = router({
 
       return {
         amount: sessionPrice?.amount ?? 0,
-        currency: sessionPrice?.currency ?? 'gbp',
+        currency: sessionPrice?.currency ?? "gbp",
         firstSessionFree: trainer.firstSessionFree,
-        cancellationPolicy: cancellationPolicy ? {
-          fullRefundHours: cancellationPolicy.fullRefundHours,
-          partialRefundHours: cancellationPolicy.partialRefundHours,
-          partialRefundPercent: cancellationPolicy.partialRefundPercent,
-        } : null,
+        cancellationPolicy: cancellationPolicy
+          ? {
+              fullRefundHours: cancellationPolicy.fullRefundHours,
+              partialRefundHours: cancellationPolicy.partialRefundHours,
+              partialRefundPercent: cancellationPolicy.partialRefundPercent,
+            }
+          : null,
       };
+    }),
+
+  // Create Checkout Session for a booking (mobile-friendly alternative to PaymentIntent)
+  createBookingCheckoutSession: protectedProcedure
+    .input(
+      z.object({
+        bookingId: z.string().cuid(),
+        successUrl: z.string().url().optional(),
+        cancelUrl: z.string().url().optional(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      return sessionPaymentService.createCheckoutSession(
+        input.bookingId,
+        ctx.user.id,
+        input.successUrl,
+        input.cancelUrl,
+      );
     }),
 
   // Create PaymentIntent for a booking
@@ -214,13 +283,24 @@ export const paymentRouter = router({
           },
         },
       });
-      if (!booking) throw new TRPCError({ code: 'NOT_FOUND', message: 'Booking not found' });
+      if (!booking)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Booking not found",
+        });
 
       // Only the client (trainee) can pay
       const isClient = booking.clientRoster.connection.senderId === ctx.user.id;
-      if (!isClient) throw new TRPCError({ code: 'FORBIDDEN', message: 'Only the client can pay' });
+      if (!isClient)
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only the client can pay",
+        });
 
-      return sessionPaymentService.createPaymentIntent(booking.id, booking.trainerId);
+      return sessionPaymentService.createPaymentIntent(
+        booking.id,
+        booking.trainerId,
+      );
     }),
 
   // Get payment status for a booking
@@ -232,8 +312,18 @@ export const paymentRouter = router({
 
   // Check if payment is required for a booking (used before creating booking)
   getPaymentRequirement: protectedProcedure
-    .input(z.object({ trainerId: z.string().cuid(), clientRosterId: z.string().cuid(), sessionType: z.string().optional() }))
+    .input(
+      z.object({
+        trainerId: z.string().cuid(),
+        clientRosterId: z.string().cuid(),
+        sessionType: z.string().optional(),
+      }),
+    )
     .query(async ({ input }) => {
-      return sessionPaymentService.getPaymentRequirement(input.trainerId, input.clientRosterId, input.sessionType);
+      return sessionPaymentService.getPaymentRequirement(
+        input.trainerId,
+        input.clientRosterId,
+        input.sessionType,
+      );
     }),
 });

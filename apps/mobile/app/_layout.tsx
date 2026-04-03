@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AlertProvider } from "@/components/ui";
 import { useSse } from "@/lib/sse";
 import { useNotifications } from "@/hooks/useNotifications";
+import { CartProvider } from "@/hooks/useCart";
 
 // Tell TanStack Query to treat app foreground as "window focus"
 focusManager.setEventListener((handleFocus) => {
@@ -74,23 +75,30 @@ const RootLayout = () => {
         <QueryClientProvider client={queryClient}>
           <SafeAreaProvider>
             <AlertProvider>
-              <AuthGuard>
-                <Stack
-                  screenOptions={{
-                    headerShown: false,
-                    animation: "slide_from_right",
-                  }}
-                >
-                  <Stack.Screen name="(tabs)" />
-                  <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
-                  <Stack.Screen name="dashboard" />
-                  <Stack.Screen name="trainers" />
-                  <Stack.Screen name="bookings" />
-                  <Stack.Screen name="messages" />
-                  <Stack.Screen name="tracking" />
-                  <Stack.Screen name="workout" />
-                </Stack>
-              </AuthGuard>
+              <CartProvider>
+                <AuthGuard>
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                      animation: "slide_from_right",
+                    }}
+                  >
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen
+                      name="(auth)"
+                      options={{ animation: "fade" }}
+                    />
+                    <Stack.Screen name="dashboard" />
+                    <Stack.Screen name="trainers" />
+                    <Stack.Screen name="bookings" />
+                    <Stack.Screen name="messages" />
+                    <Stack.Screen name="shop" />
+                    <Stack.Screen name="tracking" />
+                    <Stack.Screen name="workout" />
+                    <Stack.Screen name="scan" />
+                  </Stack>
+                </AuthGuard>
+              </CartProvider>
               <StatusBar style="light" />
             </AlertProvider>
           </SafeAreaProvider>
