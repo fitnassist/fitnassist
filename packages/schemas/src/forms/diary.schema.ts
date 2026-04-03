@@ -227,6 +227,15 @@ export const deleteDiaryCommentSchema = z.object({
 export type DeleteDiaryCommentInput = z.infer<typeof deleteDiaryCommentSchema>;
 
 // =============================================================================
+// AI FOOD RECOGNITION
+// =============================================================================
+
+export const recognizeFoodSchema = z.object({
+  imageBase64: z.string().min(1, { message: 'Image data is required' }),
+});
+export type RecognizeFoodInput = z.infer<typeof recognizeFoodSchema>;
+
+// =============================================================================
 // ACTIVITY FEED
 // =============================================================================
 

@@ -23,6 +23,7 @@ import {
   Plus,
   MapPin,
   ScanBarcode,
+  Camera,
 } from "lucide-react-native";
 import { Text, Card, CardContent, Skeleton, useAlert } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
@@ -218,12 +219,20 @@ const TraineeDiary = () => {
                     </View>
                     <View className="flex-row items-center gap-2">
                       {type === "FOOD" && (
-                        <RNTouchableOpacity
-                          className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
-                          onPress={() => router.push("/scan")}
-                        >
-                          <ScanBarcode size={14} color={colors.teal} />
-                        </RNTouchableOpacity>
+                        <>
+                          <RNTouchableOpacity
+                            className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
+                            onPress={() => router.push("/scan/photo")}
+                          >
+                            <Camera size={14} color={colors.teal} />
+                          </RNTouchableOpacity>
+                          <RNTouchableOpacity
+                            className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
+                            onPress={() => router.push("/scan")}
+                          >
+                            <ScanBarcode size={14} color={colors.teal} />
+                          </RNTouchableOpacity>
+                        </>
                       )}
                       <RNTouchableOpacity
                         className="w-8 h-8 rounded-full bg-secondary items-center justify-center"

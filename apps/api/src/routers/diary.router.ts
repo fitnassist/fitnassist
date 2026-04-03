@@ -1,5 +1,6 @@
 import { router, protectedProcedure } from "../lib/trpc";
 import { diaryService } from "../services/diary.service";
+import { foodRecognitionService } from "../services/food-recognition.service";
 import { prisma } from "../lib/prisma";
 import {
   logWeightSchema,
@@ -27,6 +28,7 @@ import {
   getRecentClientActivitySchema,
   logActivitySchema,
   getPersonalBestsSchema,
+  recognizeFoodSchema,
 } from "@fitnassist/schemas";
 
 export const diaryRouter = router({
@@ -77,6 +79,12 @@ export const diaryRouter = router({
     .input(lookupBarcodeSchema)
     .query(async ({ input }) => {
       return diaryService.lookupBarcode(input.barcode);
+    }),
+
+  recognizeFood: protectedProcedure
+    .input(recognizeFoodSchema)
+    .mutation(async ({ input }) => {
+      return foodRecognitionService.recognizeFromImage(input.imageBase64);
     }),
 
   logFood: protectedProcedure

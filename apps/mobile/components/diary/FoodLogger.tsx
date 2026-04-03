@@ -2,7 +2,7 @@ import { useState } from "react";
 import { View, ScrollView, TextInput as RNTextInput } from "react-native";
 import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { Search, ScanBarcode } from "lucide-react-native";
+import { Search, ScanBarcode, Camera } from "lucide-react-native";
 import { Text, Input, Button, Skeleton, useAlert } from "@/components/ui";
 import { LoggerModal } from "./LoggerModal";
 import { trpc } from "@/lib/trpc";
@@ -102,20 +102,33 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
         ))}
       </View>
 
-      {/* Scan Barcode */}
-      <TouchableOpacity
-        className="flex-row items-center justify-center gap-2 rounded-lg py-3 border border-border"
-        style={{ backgroundColor: colors.card }}
-        onPress={() => {
-          onClose();
-          router.push("/scan");
-        }}
-      >
-        <ScanBarcode size={18} color={colors.teal} />
-        <Text className="text-sm font-medium text-foreground">
-          Scan Barcode
-        </Text>
-      </TouchableOpacity>
+      {/* Scan / AI Photo */}
+      <View className="flex-row gap-2">
+        <TouchableOpacity
+          className="flex-1 flex-row items-center justify-center gap-2 rounded-lg py-3 border border-border"
+          style={{ backgroundColor: colors.card }}
+          onPress={() => {
+            onClose();
+            router.push("/scan");
+          }}
+        >
+          <ScanBarcode size={18} color={colors.teal} />
+          <Text className="text-sm font-medium text-foreground">
+            Scan Barcode
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          className="flex-1 flex-row items-center justify-center gap-2 rounded-lg py-3 border border-border"
+          style={{ backgroundColor: colors.card }}
+          onPress={() => {
+            onClose();
+            router.push("/scan/photo");
+          }}
+        >
+          <Camera size={18} color={colors.teal} />
+          <Text className="text-sm font-medium text-foreground">AI Photo</Text>
+        </TouchableOpacity>
+      </View>
 
       {mode === "search" ? (
         <>
