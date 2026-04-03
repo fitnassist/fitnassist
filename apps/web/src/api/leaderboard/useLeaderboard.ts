@@ -1,6 +1,14 @@
 import { trpc } from '@/lib/trpc';
 
-type LeaderboardType = 'STEPS' | 'WORKOUTS' | 'STREAKS' | 'GOALS' | 'ACTIVITY_DURATION';
+type LeaderboardType =
+  | 'STEPS'
+  | 'WORKOUTS'
+  | 'STREAKS'
+  | 'GOALS'
+  | 'ACTIVITY_DURATION'
+  | 'RUNNING_DISTANCE'
+  | 'CYCLING_DISTANCE'
+  | 'FASTEST_5K';
 type LeaderboardPeriod = 'WEEKLY' | 'MONTHLY' | 'ALL_TIME';
 type LeaderboardScope = 'GLOBAL' | 'FRIENDS';
 
