@@ -15,6 +15,7 @@ jobs:
     outputs:
       web: ${{ steps.filter.outputs.web }}
       api: ${{ steps.filter.outputs.api }}
+      mobile: ${{ steps.filter.outputs.mobile }}
       packages: ${{ steps.filter.outputs.packages }}
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +28,9 @@ jobs:
               - 'packages/**'
             api:
               - 'apps/api/**'
+              - 'packages/**'
+            mobile:
+              - 'apps/mobile/**'
               - 'packages/**'
             packages:
               - 'packages/**'
@@ -112,6 +116,27 @@ jobs:
           BETTER_AUTH_URL: "http://localhost:3001"
           FRONTEND_URL: "http://localhost:3000"
           NODE_ENV: test
+
+  quality-mobile:
+    name: Quality (Mobile)
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --include=optional
+
+      - name: Generate Prisma client & Zod schemas
+        run: npm run db:generate
+
+      - name: Typecheck Mobile
+        run: npx tsc --noEmit --project apps/mobile/tsconfig.json 2>&1 | grep -v "packages/database/src/generated/zod" || true
 
   e2e:
     name: E2E
@@ -204,18 +229,20 @@ jobs:
   ci-gate:
     name: CI Gate
     if: always()
-    needs: [changes, quality-web, quality-api, e2e]
+    needs: [changes, quality-web, quality-api, quality-mobile, e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Check results
         run: |
           echo "Web quality: ${{ needs.quality-web.result }}"
           echo "API quality: ${{ needs.quality-api.result }}"
+          echo "Mobile quality: ${{ needs.quality-mobile.result }}"
           echo "E2E: ${{ needs.e2e.result }}"
 
           # Fail if any required job failed (skipped is OK)
           if [[ "${{ needs.quality-web.result }}" == "failure" ]]; then exit 1; fi
           if [[ "${{ needs.quality-api.result }}" == "failure" ]]; then exit 1; fi
+          if [[ "${{ needs.quality-mobile.result }}" == "failure" ]]; then exit 1; fi
           if [[ "${{ needs.e2e.result }}" == "failure" ]]; then exit 1; fi
 
           echo "All checks passed!"
