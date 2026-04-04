@@ -1068,6 +1068,7 @@ enum IntegrationProvider {
   GOOGLE_FIT
   FITBIT
   GARMIN
+  APPLE_HEALTH
 }
 
 enum IntegrationStatus {
