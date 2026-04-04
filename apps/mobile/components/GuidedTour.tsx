@@ -111,16 +111,16 @@ export const GuidedTour = ({ role, onComplete, onSkip }: GuidedTourProps) => {
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 }}>
           <View
             style={{
-              width: 80,
-              height: 80,
-              borderRadius: 40,
+              width: 56,
+              height: 56,
+              borderRadius: 28,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: colors.teal + '20',
-              marginBottom: 32,
+              backgroundColor: 'rgba(94, 206, 187, 0.15)',
+              marginBottom: 24,
             }}
           >
-            <Icon size={40} color={colors.teal} />
+            <Icon size={28} color="#5ECEBB" />
           </View>
           <Text
             style={{
