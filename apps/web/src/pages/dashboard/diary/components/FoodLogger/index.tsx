@@ -1,7 +1,20 @@
 import { useState } from 'react';
 import { UtensilsCrossed, Plus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button } from '@/components/ui';
-import { useLogFood, useDeleteFoodEntry } from '@/api/diary';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  Input,
+  Label,
+} from '@/components/ui';
+import { useLogFood, useDeleteFoodEntry, useUpdateFoodEntry } from '@/api/diary';
 import { NutritionSummary } from './NutritionSummary';
 import { FoodSearchModal } from './FoodSearchModal';
 import { FoodEntryRow } from './FoodEntryRow';
@@ -15,29 +28,49 @@ const MEAL_LABELS: Record<string, string> = {
   SNACK: 'Snack',
 };
 
+interface FoodEntry {
+  id: string;
+  name: string;
+  calories: number;
+  proteinG: number | null;
+  carbsG: number | null;
+  fatG: number | null;
+  servingSize: number;
+  servingUnit: string;
+  thumbnailUrl: string | null;
+}
+
+interface EditValues {
+  servingSize: string;
+  calories: string;
+  proteinG: string;
+  carbsG: string;
+  fatG: string;
+}
+
 interface FoodLoggerProps {
   date: string;
   entry?: {
     id: string;
-    foodEntries?: Array<{
-      id: string;
-      name: string;
-      mealType: string;
-      calories: number;
-      proteinG: number | null;
-      carbsG: number | null;
-      fatG: number | null;
-      servingSize: number;
-      servingUnit: string;
-      thumbnailUrl: string | null;
-    }>;
+    foodEntries?: Array<FoodEntry & { mealType: string }>;
   } | null;
 }
 
 export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
   const [searchMealType, setSearchMealType] = useState<(typeof MEAL_TYPES)[number] | null>(null);
+  const [editingFood, setEditingFood] = useState<FoodEntry | null>(null);
+  const [editValues, setEditValues] = useState<EditValues>({
+    servingSize: '',
+    calories: '',
+    proteinG: '',
+    carbsG: '',
+    fatG: '',
+  });
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
   const logFood = useLogFood();
   const deleteFoodEntry = useDeleteFoodEntry();
+  const updateFoodEntry = useUpdateFoodEntry();
 
   const foodEntries = entry?.foodEntries ?? [];
 
@@ -47,6 +80,47 @@ export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
 
   const handleDeleteFood = (id: string) => {
     deleteFoodEntry.mutate({ id });
+  };
+
+  const handleEditFood = (foodEntry: FoodEntry) => {
+    setEditingFood(foodEntry);
+    setEditValues({
+      servingSize: String(foodEntry.servingSize),
+      calories: String(foodEntry.calories),
+      proteinG: foodEntry.proteinG != null ? String(foodEntry.proteinG) : '',
+      carbsG: foodEntry.carbsG != null ? String(foodEntry.carbsG) : '',
+      fatG: foodEntry.fatG != null ? String(foodEntry.fatG) : '',
+    });
+    setConfirmingDelete(false);
+  };
+
+  const handleCloseEdit = () => {
+    setEditingFood(null);
+    setConfirmingDelete(false);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingFood) return;
+    updateFoodEntry.mutate(
+      {
+        id: editingFood.id,
+        servingSize: parseFloat(editValues.servingSize) || 0,
+        calories: parseInt(editValues.calories, 10) || 0,
+        proteinG: editValues.proteinG ? parseFloat(editValues.proteinG) : null,
+        carbsG: editValues.carbsG ? parseFloat(editValues.carbsG) : null,
+        fatG: editValues.fatG ? parseFloat(editValues.fatG) : null,
+      },
+      { onSuccess: handleCloseEdit },
+    );
+  };
+
+  const handleDeleteFromEdit = () => {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    if (!editingFood) return;
+    deleteFoodEntry.mutate({ id: editingFood.id }, { onSuccess: handleCloseEdit });
   };
 
   return (
@@ -83,6 +157,7 @@ export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
                       <FoodEntryRow
                         key={foodEntry.id}
                         entry={foodEntry}
+                        onEdit={handleEditFood}
                         onDelete={handleDeleteFood}
                         isDeleting={deleteFoodEntry.isPending}
                       />
@@ -106,6 +181,77 @@ export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
             onAddFood={handleAddFood}
           />
         )}
+
+        <Dialog open={!!editingFood} onOpenChange={(open) => !open && handleCloseEdit()}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="capitalize">{editingFood?.name}</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-serving-size">Serving Size</Label>
+                <Input
+                  id="edit-serving-size"
+                  type="number"
+                  step="any"
+                  value={editValues.servingSize}
+                  onChange={(e) => setEditValues((v) => ({ ...v, servingSize: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-calories">Calories</Label>
+                <Input
+                  id="edit-calories"
+                  type="number"
+                  value={editValues.calories}
+                  onChange={(e) => setEditValues((v) => ({ ...v, calories: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-protein">Protein (g)</Label>
+                <Input
+                  id="edit-protein"
+                  type="number"
+                  step="any"
+                  value={editValues.proteinG}
+                  onChange={(e) => setEditValues((v) => ({ ...v, proteinG: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-carbs">Carbs (g)</Label>
+                <Input
+                  id="edit-carbs"
+                  type="number"
+                  step="any"
+                  value={editValues.carbsG}
+                  onChange={(e) => setEditValues((v) => ({ ...v, carbsG: e.target.value }))}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-fat">Fat (g)</Label>
+                <Input
+                  id="edit-fat"
+                  type="number"
+                  step="any"
+                  value={editValues.fatG}
+                  onChange={(e) => setEditValues((v) => ({ ...v, fatG: e.target.value }))}
+                />
+              </div>
+            </div>
+            <DialogFooter className="flex-row gap-2 sm:justify-between">
+              <Button
+                variant="destructive"
+                onClick={handleDeleteFromEdit}
+                disabled={deleteFoodEntry.isPending}
+              >
+                {confirmingDelete ? 'Confirm Delete?' : 'Delete'}
+              </Button>
+              <Button onClick={handleSaveEdit} disabled={updateFoodEntry.isPending}>
+                {updateFoodEntry.isPending ? 'Saving...' : 'Save'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui';
 
 interface FoodEntryRowProps {
@@ -13,11 +13,12 @@ interface FoodEntryRowProps {
     servingUnit: string;
     thumbnailUrl: string | null;
   };
+  onEdit: (entry: FoodEntryRowProps['entry']) => void;
   onDelete: (id: string) => void;
   isDeleting: boolean;
 }
 
-export const FoodEntryRow = ({ entry, onDelete, isDeleting }: FoodEntryRowProps) => {
+export const FoodEntryRow = ({ entry, onEdit, onDelete, isDeleting }: FoodEntryRowProps) => {
   return (
     <div className="flex items-center gap-3 py-1.5">
       {entry.thumbnailUrl && (
@@ -33,6 +34,14 @@ export const FoodEntryRow = ({ entry, onDelete, isDeleting }: FoodEntryRowProps)
         </p>
       </div>
       <span className="text-sm font-medium">{entry.calories}</span>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-7 w-7 text-muted-foreground hover:text-foreground"
+        onClick={() => onEdit(entry)}
+      >
+        <Pencil className="h-3.5 w-3.5" />
+      </Button>
       <Button
         variant="ghost"
         size="icon"

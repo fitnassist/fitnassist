@@ -112,7 +112,7 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
             router.push("/scan");
           }}
         >
-          <ScanBarcode size={18} color={colors.teal} />
+          <ScanBarcode size={18} color="#5ECEBB" />
           <Text className="text-sm font-medium text-foreground">
             Scan Barcode
           </Text>
@@ -125,7 +125,7 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
             router.push("/scan/photo");
           }}
         >
-          <Camera size={18} color={colors.teal} />
+          <Camera size={18} color="#5ECEBB" />
           <Text className="text-sm font-medium text-foreground">AI Photo</Text>
         </TouchableOpacity>
       </View>
@@ -134,7 +134,7 @@ export const FoodLogger = ({ visible, onClose, date }: FoodLoggerProps) => {
         <>
           {/* Search */}
           <View className="flex-row items-center h-12 bg-card border border-border rounded-lg px-3">
-            <Search size={18} color={colors.mutedForeground} />
+            <Search size={18} color="#7A7F91" />
             <RNTextInput
               value={query}
               onChangeText={setQuery}
