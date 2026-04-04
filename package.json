@@ -37,9 +37,7 @@
   "engines": {
     "node": "22.x"
   },
-  "overrides": {
-    "react-dom": "19.2.4"
-  },
+  "overrides": {},
   "optionalDependencies": {
     "@esbuild/linux-x64": "^0.25.0",
     "@rollup/rollup-linux-x64-gnu": "^4.60.1"
