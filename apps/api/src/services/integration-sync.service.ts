@@ -1,7 +1,11 @@
-import { diaryRepository } from '../repositories/diary.repository';
-import { integrationRepository } from '../repositories/integration.repository';
-import { diaryService } from './diary.service';
-import type { ActivityType, ActivitySource, IntegrationProvider } from '@fitnassist/database';
+import { diaryRepository } from "../repositories/diary.repository";
+import { integrationRepository } from "../repositories/integration.repository";
+import { diaryService } from "./diary.service";
+import type {
+  ActivityType,
+  ActivitySource,
+  IntegrationProvider,
+} from "@fitnassist/database";
 
 export interface ExternalActivity {
   externalId: string;
@@ -25,10 +29,11 @@ export interface ExternalActivity {
 const TIME_WINDOW_MS = 30 * 60 * 1000; // 30 minutes
 
 const providerToSource: Record<IntegrationProvider, ActivitySource> = {
-  STRAVA: 'STRAVA',
-  GOOGLE_FIT: 'GOOGLE_FIT',
-  FITBIT: 'FITBIT',
-  GARMIN: 'GARMIN',
+  STRAVA: "STRAVA",
+  GOOGLE_FIT: "GOOGLE_FIT",
+  FITBIT: "FITBIT",
+  GARMIN: "GARMIN",
+  APPLE_HEALTH: "APPLE_HEALTH",
 };
 
 export const integrationSyncService = {
@@ -37,11 +42,17 @@ export const integrationSyncService = {
    * Deduplicates by externalId, skips if manual entry exists in same time window.
    * Routes through diaryService.logActivity so all side effects trigger.
    */
-  async syncActivity(userId: string, provider: IntegrationProvider, activity: ExternalActivity) {
+  async syncActivity(
+    userId: string,
+    provider: IntegrationProvider,
+    activity: ExternalActivity,
+  ) {
     const source = providerToSource[provider];
 
     // Check for duplicate by externalId
-    const existing = await diaryRepository.findActivityByExternalId(activity.externalId);
+    const existing = await diaryRepository.findActivityByExternalId(
+      activity.externalId,
+    );
     if (existing) {
       console.log(`[Sync] Skipping duplicate activity ${activity.externalId}`);
       return null;
@@ -50,12 +61,18 @@ export const integrationSyncService = {
     // Check for manual entry in same time window (±30 min)
     const windowStart = new Date(activity.startTime.getTime() - TIME_WINDOW_MS);
     const windowEnd = new Date(activity.startTime.getTime() + TIME_WINDOW_MS);
-    const manualActivities = await diaryRepository.findActivitiesInTimeWindow(userId, windowStart, windowEnd);
+    const manualActivities = await diaryRepository.findActivitiesInTimeWindow(
+      userId,
+      windowStart,
+      windowEnd,
+    );
     const hasManual = manualActivities.some(
-      entry => entry.activityEntry?.source === 'MANUAL'
+      (entry) => entry.activityEntry?.source === "MANUAL",
     );
     if (hasManual) {
-      console.log(`[Sync] Skipping activity ${activity.externalId} — manual entry exists in time window`);
+      console.log(
+        `[Sync] Skipping activity ${activity.externalId} — manual entry exists in time window`,
+      );
       return null;
     }
 
@@ -83,11 +100,20 @@ export const integrationSyncService = {
   /**
    * Sync steps — only writes if no manual entry exists, or synced value is higher.
    */
-  async syncSteps(userId: string, provider: IntegrationProvider, date: string, steps: number) {
+  async syncSteps(
+    userId: string,
+    provider: IntegrationProvider,
+    date: string,
+    steps: number,
+  ) {
     const source = providerToSource[provider];
-    const dateObj = new Date(date + 'T00:00:00.000Z');
+    const dateObj = new Date(date + "T00:00:00.000Z");
 
-    const hasManual = await diaryRepository.hasManualEntryForDate(userId, dateObj, 'STEPS');
+    const hasManual = await diaryRepository.hasManualEntryForDate(
+      userId,
+      dateObj,
+      "STEPS",
+    );
     if (hasManual) {
       console.log(`[Sync] Skipping steps for ${date} — manual entry exists`);
       return null;
@@ -104,12 +130,16 @@ export const integrationSyncService = {
     provider: IntegrationProvider,
     date: string,
     hoursSlept: number,
-    quality: number = 3
+    quality: number = 3,
   ) {
     const source = providerToSource[provider];
-    const dateObj = new Date(date + 'T00:00:00.000Z');
+    const dateObj = new Date(date + "T00:00:00.000Z");
 
-    const hasManual = await diaryRepository.hasManualEntryForDate(userId, dateObj, 'SLEEP');
+    const hasManual = await diaryRepository.hasManualEntryForDate(
+      userId,
+      dateObj,
+      "SLEEP",
+    );
     if (hasManual) {
       console.log(`[Sync] Skipping sleep for ${date} — manual entry exists`);
       return null;
@@ -121,11 +151,20 @@ export const integrationSyncService = {
   /**
    * Sync weight — only writes if no manual entry exists.
    */
-  async syncWeight(userId: string, provider: IntegrationProvider, date: string, weightKg: number) {
+  async syncWeight(
+    userId: string,
+    provider: IntegrationProvider,
+    date: string,
+    weightKg: number,
+  ) {
     const source = providerToSource[provider];
-    const dateObj = new Date(date + 'T00:00:00.000Z');
+    const dateObj = new Date(date + "T00:00:00.000Z");
 
-    const hasManual = await diaryRepository.hasManualEntryForDate(userId, dateObj, 'WEIGHT');
+    const hasManual = await diaryRepository.hasManualEntryForDate(
+      userId,
+      dateObj,
+      "WEIGHT",
+    );
     if (hasManual) {
       console.log(`[Sync] Skipping weight for ${date} — manual entry exists`);
       return null;
@@ -137,11 +176,20 @@ export const integrationSyncService = {
   /**
    * Sync water — only writes if no manual entry exists.
    */
-  async syncWater(userId: string, provider: IntegrationProvider, date: string, totalMl: number) {
+  async syncWater(
+    userId: string,
+    provider: IntegrationProvider,
+    date: string,
+    totalMl: number,
+  ) {
     const source = providerToSource[provider];
-    const dateObj = new Date(date + 'T00:00:00.000Z');
+    const dateObj = new Date(date + "T00:00:00.000Z");
 
-    const hasManual = await diaryRepository.hasManualEntryForDate(userId, dateObj, 'WATER');
+    const hasManual = await diaryRepository.hasManualEntryForDate(
+      userId,
+      dateObj,
+      "WATER",
+    );
     if (hasManual) {
       console.log(`[Sync] Skipping water for ${date} — manual entry exists`);
       return null;
@@ -153,9 +201,13 @@ export const integrationSyncService = {
   /**
    * Update sync status after a sync operation completes.
    */
-  async markSyncComplete(userId: string, provider: IntegrationProvider, error?: string) {
+  async markSyncComplete(
+    userId: string,
+    provider: IntegrationProvider,
+    error?: string,
+  ) {
     await integrationRepository.updateSyncStatus(userId, provider, {
-      status: error ? 'ERROR' : 'CONNECTED',
+      status: error ? "ERROR" : "CONNECTED",
       lastSyncAt: new Date(),
       lastSyncError: error ?? null,
     });
