@@ -1,9 +1,10 @@
-import { TRPCError } from '@trpc/server';
-import { getStripe } from '../lib/stripe';
-import { prisma } from '../lib/prisma';
-import { sessionPaymentRepository } from '../repositories/session-payment.repository';
-import { sessionPriceRepository } from '../repositories/session-price.repository';
-import { cancellationPolicyRepository } from '../repositories/cancellation-policy.repository';
+import { TRPCError } from "@trpc/server";
+import { getStripe } from "../lib/stripe";
+import { prisma } from "../lib/prisma";
+import { env } from "../config/env";
+import { sessionPaymentRepository } from "../repositories/session-payment.repository";
+import { sessionPriceRepository } from "../repositories/session-price.repository";
+import { cancellationPolicyRepository } from "../repositories/cancellation-policy.repository";
 
 const PLATFORM_FEE_PENCE = 50; // £0.50
 
@@ -19,7 +20,10 @@ export const sessionPaymentService = {
       select: { isFreeSession: true },
     });
     if (booking?.isFreeSession) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'This is a free session — no payment required' });
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "This is a free session — no payment required",
+      });
     }
 
     const stripe = getStripe();
@@ -34,26 +38,46 @@ export const sessionPaymentService = {
       },
     });
 
-    if (!trainer?.paymentsEnabled || !trainer.stripeConnectedAccountId || !trainer.stripeOnboardingComplete) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Trainer has not enabled payments' });
+    if (
+      !trainer?.paymentsEnabled ||
+      !trainer.stripeConnectedAccountId ||
+      !trainer.stripeOnboardingComplete
+    ) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Trainer has not enabled payments",
+      });
     }
 
-    const sessionPrice = await sessionPriceRepository.findByTrainerId(trainerId);
+    const sessionPrice =
+      await sessionPriceRepository.findByTrainerId(trainerId);
     if (!sessionPrice) {
-      throw new TRPCError({ code: 'BAD_REQUEST', message: 'Trainer has not set a session price' });
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Trainer has not set a session price",
+      });
     }
 
     // Check for existing payment for this booking
     const existing = await sessionPaymentRepository.findByBookingId(bookingId);
     if (existing) {
       // If there's already a succeeded payment, don't create another
-      if (existing.status === 'SUCCEEDED') {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Booking already paid' });
+      if (existing.status === "SUCCEEDED") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Booking already paid",
+        });
       }
       // If pending, return the existing client secret
-      if (existing.status === 'PENDING') {
-        const pi = await stripe.paymentIntents.retrieve(existing.stripePaymentIntentId);
-        return { clientSecret: pi.client_secret!, paymentId: existing.id, amount: existing.amount };
+      if (existing.status === "PENDING") {
+        const pi = await stripe.paymentIntents.retrieve(
+          existing.stripePaymentIntentId,
+        );
+        return {
+          clientSecret: pi.client_secret!,
+          paymentId: existing.id,
+          amount: existing.amount,
+        };
       }
     }
 
@@ -69,7 +93,7 @@ export const sessionPaymentService = {
       metadata: {
         bookingId,
         trainerId,
-        platform: 'fitnassist',
+        platform: "fitnassist",
       },
     });
 
@@ -79,7 +103,7 @@ export const sessionPaymentService = {
       amount,
       platformFee: PLATFORM_FEE_PENCE,
       currency: sessionPrice.currency,
-      status: 'PENDING',
+      status: "PENDING",
     });
 
     return {
@@ -92,12 +116,15 @@ export const sessionPaymentService = {
   /**
    * Check if this is the trainee's first session with this trainer (for first-session-free).
    */
-  isFirstSession: async (trainerId: string, clientRosterId: string): Promise<boolean> => {
+  isFirstSession: async (
+    trainerId: string,
+    clientRosterId: string,
+  ): Promise<boolean> => {
     const count = await prisma.booking.count({
       where: {
         trainerId,
         clientRosterId,
-        status: { in: ['CONFIRMED', 'COMPLETED'] },
+        status: { in: ["CONFIRMED", "COMPLETED"] },
       },
     });
     return count === 0;
@@ -107,7 +134,11 @@ export const sessionPaymentService = {
    * Check if payment is required for a booking.
    * Returns pricing info or null if no payment needed.
    */
-  getPaymentRequirement: async (trainerId: string, clientRosterId: string, sessionType?: string) => {
+  getPaymentRequirement: async (
+    trainerId: string,
+    clientRosterId: string,
+    sessionType?: string,
+  ) => {
     const trainer = await prisma.trainerProfile.findUnique({
       where: { id: trainerId },
       select: {
@@ -119,37 +150,54 @@ export const sessionPaymentService = {
       },
     });
 
-    if (!trainer?.paymentsEnabled || !trainer.stripeConnectedAccountId || !trainer.stripeOnboardingComplete) {
+    if (
+      !trainer?.paymentsEnabled ||
+      !trainer.stripeConnectedAccountId ||
+      !trainer.stripeOnboardingComplete
+    ) {
       return null;
     }
 
     // Video calls are free if trainer has that setting enabled
-    if (sessionType === 'VIDEO_CALL' && trainer.videoCallsFree) {
-      return { paymentRequired: false as const, reason: 'video_calls_free' as const };
+    if (sessionType === "VIDEO_CALL" && trainer.videoCallsFree) {
+      return {
+        paymentRequired: false as const,
+        reason: "video_calls_free" as const,
+      };
     }
 
-    const sessionPrice = await sessionPriceRepository.findByTrainerId(trainerId);
+    const sessionPrice =
+      await sessionPriceRepository.findByTrainerId(trainerId);
     if (!sessionPrice) return null;
 
     // Check first-session-free
     if (trainer.firstSessionFree) {
-      const isFirst = await sessionPaymentService.isFirstSession(trainerId, clientRosterId);
+      const isFirst = await sessionPaymentService.isFirstSession(
+        trainerId,
+        clientRosterId,
+      );
       if (isFirst) {
-        return { paymentRequired: false as const, reason: 'first_session_free' as const };
+        return {
+          paymentRequired: false as const,
+          reason: "first_session_free" as const,
+        };
       }
     }
 
-    const cancellationPolicy = await cancellationPolicyRepository.findByTrainerId(trainerId);
+    const cancellationPolicy =
+      await cancellationPolicyRepository.findByTrainerId(trainerId);
 
     return {
       paymentRequired: true as const,
       amount: sessionPrice.amount,
       currency: sessionPrice.currency,
-      cancellationPolicy: cancellationPolicy ? {
-        fullRefundHours: cancellationPolicy.fullRefundHours,
-        partialRefundHours: cancellationPolicy.partialRefundHours,
-        partialRefundPercent: cancellationPolicy.partialRefundPercent,
-      } : null,
+      cancellationPolicy: cancellationPolicy
+        ? {
+            fullRefundHours: cancellationPolicy.fullRefundHours,
+            partialRefundHours: cancellationPolicy.partialRefundHours,
+            partialRefundPercent: cancellationPolicy.partialRefundPercent,
+          }
+        : null,
     };
   },
 
@@ -159,21 +207,32 @@ export const sessionPaymentService = {
   calculateRefund: (
     sessionDate: Date,
     sessionStartTime: string,
-    policy: { fullRefundHours: number; partialRefundHours: number; partialRefundPercent: number },
+    policy: {
+      fullRefundHours: number;
+      partialRefundHours: number;
+      partialRefundPercent: number;
+    },
     amountPaid: number,
   ): { refundAmount: number; refundPercent: number } => {
-    const dateStr = sessionDate instanceof Date
-      ? sessionDate.toISOString().split('T')[0]
-      : new Date(sessionDate).toISOString().split('T')[0];
+    const dateStr =
+      sessionDate instanceof Date
+        ? sessionDate.toISOString().split("T")[0]
+        : new Date(sessionDate).toISOString().split("T")[0];
     const sessionStart = new Date(`${dateStr}T${sessionStartTime}:00`);
-    const hoursUntilSession = (sessionStart.getTime() - Date.now()) / (1000 * 60 * 60);
+    const hoursUntilSession =
+      (sessionStart.getTime() - Date.now()) / (1000 * 60 * 60);
 
     if (hoursUntilSession >= policy.fullRefundHours) {
       return { refundAmount: amountPaid, refundPercent: 100 };
     }
     if (hoursUntilSession >= policy.partialRefundHours) {
-      const refund = Math.round(amountPaid * (policy.partialRefundPercent / 100));
-      return { refundAmount: refund, refundPercent: policy.partialRefundPercent };
+      const refund = Math.round(
+        amountPaid * (policy.partialRefundPercent / 100),
+      );
+      return {
+        refundAmount: refund,
+        refundPercent: policy.partialRefundPercent,
+      };
     }
     return { refundAmount: 0, refundPercent: 0 };
   },
@@ -183,18 +242,18 @@ export const sessionPaymentService = {
    */
   processDeclineRefund: async (bookingId: string) => {
     const payment = await sessionPaymentRepository.findByBookingId(bookingId);
-    if (!payment || payment.status !== 'SUCCEEDED') return null;
+    if (!payment || payment.status !== "SUCCEEDED") return null;
 
     const stripe = getStripe();
     await stripe.refunds.create({
       payment_intent: payment.stripePaymentIntentId,
-      reason: 'requested_by_customer',
+      reason: "requested_by_customer",
     });
 
     return sessionPaymentRepository.update(payment.id, {
-      status: 'REFUNDED',
+      status: "REFUNDED",
       refundAmount: payment.amount,
-      refundReason: 'Booking declined by trainer',
+      refundReason: "Booking declined by trainer",
       refundedAt: new Date(),
     });
   },
@@ -202,9 +261,12 @@ export const sessionPaymentService = {
   /**
    * Process a cancellation refund based on trainer's cancellation policy.
    */
-  processCancellationRefund: async (bookingId: string, cancelledBy: 'trainer' | 'client') => {
+  processCancellationRefund: async (
+    bookingId: string,
+    cancelledBy: "trainer" | "client",
+  ) => {
     const payment = await sessionPaymentRepository.findByBookingId(bookingId);
-    if (!payment || payment.status !== 'SUCCEEDED') return null;
+    if (!payment || payment.status !== "SUCCEEDED") return null;
 
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
@@ -213,45 +275,48 @@ export const sessionPaymentService = {
     if (!booking) return null;
 
     // Trainer cancellation always gets full refund
-    if (cancelledBy === 'trainer') {
+    if (cancelledBy === "trainer") {
       const stripe = getStripe();
       await stripe.refunds.create({
         payment_intent: payment.stripePaymentIntentId,
-        reason: 'requested_by_customer',
+        reason: "requested_by_customer",
       });
 
       return sessionPaymentRepository.update(payment.id, {
-        status: 'REFUNDED',
+        status: "REFUNDED",
         refundAmount: payment.amount,
-        refundReason: 'Cancelled by trainer — full refund',
+        refundReason: "Cancelled by trainer — full refund",
         refundedAt: new Date(),
       });
     }
 
     // Client cancellation — check policy
-    const policy = await cancellationPolicyRepository.findByTrainerId(booking.trainerId);
+    const policy = await cancellationPolicyRepository.findByTrainerId(
+      booking.trainerId,
+    );
     if (!policy) {
       // No policy = full refund
       const stripe = getStripe();
       await stripe.refunds.create({
         payment_intent: payment.stripePaymentIntentId,
-        reason: 'requested_by_customer',
+        reason: "requested_by_customer",
       });
 
       return sessionPaymentRepository.update(payment.id, {
-        status: 'REFUNDED',
+        status: "REFUNDED",
         refundAmount: payment.amount,
-        refundReason: 'No cancellation policy — full refund',
+        refundReason: "No cancellation policy — full refund",
         refundedAt: new Date(),
       });
     }
 
-    const { refundAmount, refundPercent } = sessionPaymentService.calculateRefund(
-      booking.date,
-      booking.startTime,
-      policy,
-      payment.amount,
-    );
+    const { refundAmount, refundPercent } =
+      sessionPaymentService.calculateRefund(
+        booking.date,
+        booking.startTime,
+        policy,
+        payment.amount,
+      );
 
     if (refundAmount === 0) {
       return sessionPaymentRepository.update(payment.id, {
@@ -264,16 +329,154 @@ export const sessionPaymentService = {
     await stripe.refunds.create({
       payment_intent: payment.stripePaymentIntentId,
       amount: refundAmount,
-      reason: 'requested_by_customer',
+      reason: "requested_by_customer",
     });
 
     const isFullRefund = refundPercent === 100;
     return sessionPaymentRepository.update(payment.id, {
-      status: isFullRefund ? 'REFUNDED' : 'PARTIALLY_REFUNDED',
+      status: isFullRefund ? "REFUNDED" : "PARTIALLY_REFUNDED",
       refundAmount,
       refundReason: `Cancelled ${refundPercent === 100 ? `>${policy.fullRefundHours}h` : `>${policy.partialRefundHours}h`} before session — ${refundPercent}% refund`,
       refundedAt: new Date(),
     });
+  },
+
+  /**
+   * Create a Stripe Checkout Session for a booking (for mobile clients that cannot use Stripe Elements).
+   * Returns the hosted checkout URL.
+   */
+  createCheckoutSession: async (
+    bookingId: string,
+    clientUserId: string,
+    successUrl?: string,
+    cancelUrl?: string,
+  ) => {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      select: {
+        id: true,
+        trainerId: true,
+        status: true,
+        isFreeSession: true,
+        clientRoster: {
+          select: { connection: { select: { senderId: true } } },
+        },
+      },
+    });
+    if (!booking)
+      throw new TRPCError({ code: "NOT_FOUND", message: "Booking not found" });
+
+    // Only the client (trainee) can pay
+    const isClient = booking.clientRoster.connection.senderId === clientUserId;
+    if (!isClient)
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Only the client can pay",
+      });
+
+    if (booking.isFreeSession) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "This is a free session — no payment required",
+      });
+    }
+
+    const stripe = getStripe();
+
+    const trainer = await prisma.trainerProfile.findUnique({
+      where: { id: booking.trainerId },
+      select: {
+        stripeConnectedAccountId: true,
+        stripeOnboardingComplete: true,
+        paymentsEnabled: true,
+      },
+    });
+
+    if (
+      !trainer?.paymentsEnabled ||
+      !trainer.stripeConnectedAccountId ||
+      !trainer.stripeOnboardingComplete
+    ) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Trainer has not enabled payments",
+      });
+    }
+
+    const sessionPrice = await sessionPriceRepository.findByTrainerId(
+      booking.trainerId,
+    );
+    if (!sessionPrice) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Trainer has not set a session price",
+      });
+    }
+
+    // Check for existing succeeded payment
+    const existing = await sessionPaymentRepository.findByBookingId(bookingId);
+    if (existing?.status === "SUCCEEDED") {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Booking already paid",
+      });
+    }
+
+    const amount = sessionPrice.amount;
+    const resolvedSuccessUrl =
+      successUrl ?? `${env.FRONTEND_URL}/bookings/${bookingId}?payment=success`;
+    const resolvedCancelUrl =
+      cancelUrl ??
+      `${env.FRONTEND_URL}/bookings/${bookingId}?payment=cancelled`;
+
+    const checkoutSession = await stripe.checkout.sessions.create({
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: sessionPrice.currency,
+            unit_amount: amount,
+            product_data: { name: "Training Session" },
+          },
+          quantity: 1,
+        },
+      ],
+      payment_intent_data: {
+        application_fee_amount: PLATFORM_FEE_PENCE,
+        transfer_data: {
+          destination: trainer.stripeConnectedAccountId,
+        },
+        metadata: {
+          bookingId,
+          trainerId: booking.trainerId,
+          clientUserId,
+          platform: "fitnassist",
+        },
+      },
+      success_url: resolvedSuccessUrl,
+      cancel_url: resolvedCancelUrl,
+      metadata: {
+        bookingId,
+        trainerId: booking.trainerId,
+        clientUserId,
+      },
+    });
+
+    // Save payment record if one doesn't already exist
+    if (!existing) {
+      await sessionPaymentRepository.create({
+        bookingId,
+        stripePaymentIntentId:
+          (checkoutSession.payment_intent as string) ??
+          `cs_${checkoutSession.id}`,
+        amount,
+        platformFee: PLATFORM_FEE_PENCE,
+        currency: sessionPrice.currency,
+        status: "PENDING",
+      });
+    }
+
+    return { url: checkoutSession.url! };
   },
 
   /**

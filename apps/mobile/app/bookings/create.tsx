@@ -1,20 +1,32 @@
-import { useState } from 'react';
-import { View, ScrollView, TouchableOpacity as RNTouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, ChevronDown, Check } from 'lucide-react-native';
-import { TouchableOpacity } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { Text, Button, Input, Card, CardContent, Skeleton, useAlert } from '@/components/ui';
-import { useClients } from '@/api/client';
-import { useAvailableSlots } from '@/api/availability';
-import { useMyTrainerProfile } from '@/api/trainer';
-import { trpc } from '@/lib/trpc';
-import { colors } from '@/constants/theme';
+import { useState } from "react";
+import {
+  View,
+  ScrollView,
+  TouchableOpacity as RNTouchableOpacity,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { ArrowLeft, ChevronDown, Check } from "lucide-react-native";
+import { TouchableOpacity } from "react-native";
+import { Calendar } from "react-native-calendars";
+import {
+  Text,
+  Button,
+  Input,
+  Card,
+  CardContent,
+  Skeleton,
+  useAlert,
+} from "@/components/ui";
+import { useClients } from "@/api/client";
+import { useAvailableSlots } from "@/api/availability";
+import { useMyTrainerProfile } from "@/api/trainer";
+import { trpc } from "@/lib/trpc";
+import { colors } from "@/constants/theme";
 
-type Step = 'client' | 'date' | 'time' | 'details' | 'confirm';
+type Step = "client" | "date" | "time" | "details" | "confirm";
 
-const today = new Date().toISOString().split('T')[0]!;
+const today = new Date().toISOString().split("T")[0]!;
 
 const CreateBookingScreen = () => {
   const { showAlert } = useAlert();
@@ -24,17 +36,23 @@ const CreateBookingScreen = () => {
   const createBooking = trpc.booking.createForClient.useMutation();
   const utils = trpc.useUtils();
 
-  const [step, setStep] = useState<Step>('client');
-  const [clientRosterId, setClientRosterId] = useState('');
-  const [clientName, setClientName] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedSlot, setSelectedSlot] = useState<{ startTime: string; endTime: string; durationMin: number } | null>(null);
-  const [sessionType, setSessionType] = useState<'IN_PERSON' | 'VIDEO_CALL'>('IN_PERSON');
-  const [notes, setNotes] = useState('');
+  const [step, setStep] = useState<Step>("client");
+  const [clientRosterId, setClientRosterId] = useState("");
+  const [clientName, setClientName] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState<{
+    startTime: string;
+    endTime: string;
+    durationMin: number;
+  } | null>(null);
+  const [sessionType, setSessionType] = useState<"IN_PERSON" | "VIDEO_CALL">(
+    "IN_PERSON",
+  );
+  const [notes, setNotes] = useState("");
   const [isFree, setIsFree] = useState(false);
 
   const { data: slots, isLoading: slotsLoading } = useAvailableSlots(
-    profile?.id ?? '',
+    profile?.id ?? "",
     selectedDate,
     60,
   );
@@ -45,7 +63,7 @@ const CreateBookingScreen = () => {
     try {
       await createBooking.mutateAsync({
         clientRosterId,
-        date: new Date(selectedDate + 'T00:00:00').toISOString(),
+        date: new Date(selectedDate + "T00:00:00").toISOString(),
         startTime: selectedSlot.startTime,
         durationMin: selectedSlot.durationMin,
         sessionType,
@@ -55,23 +73,26 @@ const CreateBookingScreen = () => {
       utils.booking.upcoming.invalidate();
       utils.booking.listByDateRange.invalidate();
       showAlert({
-        title: 'Success',
-        message: 'Booking created',
-        actions: [{ label: 'OK', onPress: () => router.back() }],
+        title: "Success",
+        message: "Booking created",
+        actions: [{ label: "OK", onPress: () => router.back() }],
       });
     } catch (err: any) {
-      showAlert({ title: 'Error', message: err.message ?? 'Failed to create booking' });
+      showAlert({
+        title: "Error",
+        message: err.message ?? "Failed to create booking",
+      });
     }
   };
 
   const goNext = () => {
-    const steps: Step[] = ['client', 'date', 'time', 'details', 'confirm'];
+    const steps: Step[] = ["client", "date", "time", "details", "confirm"];
     const idx = steps.indexOf(step);
     if (idx < steps.length - 1) setStep(steps[idx + 1]!);
   };
 
   const goBack = () => {
-    const steps: Step[] = ['client', 'date', 'time', 'details', 'confirm'];
+    const steps: Step[] = ["client", "date", "time", "details", "confirm"];
     const idx = steps.indexOf(step);
     if (idx > 0) setStep(steps[idx - 1]!);
     else router.back();
@@ -83,38 +104,54 @@ const CreateBookingScreen = () => {
         <TouchableOpacity onPress={goBack}>
           <ArrowLeft size={24} color={colors.foreground} />
         </TouchableOpacity>
-        <Text className="text-base font-semibold text-foreground">Book for Client</Text>
+        <Text className="text-base font-semibold text-foreground">
+          Book for Client
+        </Text>
       </View>
 
-      <ScrollView className="flex-1" contentContainerClassName="px-4 py-4 gap-4 pb-8">
-
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="px-4 py-4 gap-4 pb-8"
+      >
         {/* Step 1: Select Client */}
-        {step === 'client' && (
+        {step === "client" && (
           <>
-            <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+            <Text
+              className="text-sm font-medium text-teal uppercase"
+              style={{ letterSpacing: 1 }}
+            >
               Select Client
             </Text>
             {clientsLoading ? (
               <View className="gap-2">
-                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-14 rounded-lg" />)}
+                {[1, 2, 3].map((i) => (
+                  <Skeleton key={i} className="h-14 rounded-lg" />
+                ))}
               </View>
             ) : (
               <View className="gap-2">
                 {((clients as any)?.clients ?? []).map((client: any) => {
-                  const name = client.connection?.sender?.name ?? client.connection?.name ?? 'Unknown';
+                  const name =
+                    client.connection?.sender?.name ??
+                    client.connection?.name ??
+                    "Unknown";
                   const selected = client.id === clientRosterId;
                   return (
                     <RNTouchableOpacity
                       key={client.id}
                       className={`flex-row items-center justify-between p-4 rounded-lg border ${
-                        selected ? 'border-teal bg-teal/10' : 'border-border bg-card'
+                        selected
+                          ? "border-teal bg-teal/10"
+                          : "border-border bg-card"
                       }`}
                       onPress={() => {
                         setClientRosterId(client.id);
                         setClientName(name);
                       }}
                     >
-                      <Text className={`text-base ${selected ? 'text-teal font-semibold' : 'text-foreground'}`}>
+                      <Text
+                        className={`text-base ${selected ? "text-teal font-semibold" : "text-foreground"}`}
+                      >
                         {name}
                       </Text>
                       {selected && <Check size={18} color={colors.primary} />}
@@ -130,28 +167,40 @@ const CreateBookingScreen = () => {
         )}
 
         {/* Step 2: Select Date */}
-        {step === 'date' && (
+        {step === "date" && (
           <>
-            <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+            <Text
+              className="text-sm font-medium text-teal uppercase"
+              style={{ letterSpacing: 1 }}
+            >
               Select Date
             </Text>
             <Calendar
               minDate={today}
-              onDayPress={(day: { dateString: string }) => setSelectedDate(day.dateString)}
-              markedDates={selectedDate ? {
-                [selectedDate]: { selected: true, selectedColor: colors.primary },
-              } : {}}
+              onDayPress={(day: { dateString: string }) =>
+                setSelectedDate(day.dateString)
+              }
+              markedDates={
+                selectedDate
+                  ? {
+                      [selectedDate]: {
+                        selected: true,
+                        selectedColor: colors.primary,
+                      },
+                    }
+                  : {}
+              }
               theme={{
-                calendarBackground: 'transparent',
+                calendarBackground: "transparent",
                 textSectionTitleColor: colors.mutedForeground,
                 selectedDayBackgroundColor: colors.primary,
-                selectedDayTextColor: '#fff',
+                selectedDayTextColor: "#fff",
                 todayTextColor: colors.teal,
                 dayTextColor: colors.foreground,
                 textDisabledColor: colors.muted,
                 arrowColor: colors.teal,
                 monthTextColor: colors.foreground,
-                textMonthFontWeight: '300',
+                textMonthFontWeight: "300",
                 textDayFontSize: 14,
                 textMonthFontSize: 16,
                 textDayHeaderFontSize: 12,
@@ -164,19 +213,29 @@ const CreateBookingScreen = () => {
         )}
 
         {/* Step 3: Select Time */}
-        {step === 'time' && (
+        {step === "time" && (
           <>
-            <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+            <Text
+              className="text-sm font-medium text-teal uppercase"
+              style={{ letterSpacing: 1 }}
+            >
               Select Time
             </Text>
             <Text className="text-sm text-muted-foreground">
-              {new Date(selectedDate + 'T12:00:00').toLocaleDateString(undefined, {
-                weekday: 'long', month: 'long', day: 'numeric',
-              })}
+              {new Date(selectedDate + "T12:00:00").toLocaleDateString(
+                undefined,
+                {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                },
+              )}
             </Text>
             {slotsLoading ? (
               <View className="gap-2">
-                {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-12 rounded-lg" />)}
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-12 rounded-lg" />
+                ))}
               </View>
             ) : !slots || slots.length === 0 ? (
               <Text className="text-sm text-muted-foreground text-center py-6">
@@ -190,11 +249,15 @@ const CreateBookingScreen = () => {
                     <RNTouchableOpacity
                       key={slot.startTime}
                       className={`px-4 py-3 rounded-lg border ${
-                        selected ? 'border-teal bg-teal/10' : 'border-border bg-card'
+                        selected
+                          ? "border-teal bg-teal/10"
+                          : "border-border bg-card"
                       }`}
                       onPress={() => setSelectedSlot(slot)}
                     >
-                      <Text className={`text-sm ${selected ? 'text-teal font-semibold' : 'text-foreground'}`}>
+                      <Text
+                        className={`text-sm ${selected ? "text-teal font-semibold" : "text-foreground"}`}
+                      >
                         {slot.startTime} - {slot.endTime}
                       </Text>
                     </RNTouchableOpacity>
@@ -209,31 +272,44 @@ const CreateBookingScreen = () => {
         )}
 
         {/* Step 4: Session Details */}
-        {step === 'details' && (
+        {step === "details" && (
           <>
-            <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+            <Text
+              className="text-sm font-medium text-teal uppercase"
+              style={{ letterSpacing: 1 }}
+            >
               Session Details
             </Text>
 
-            <Text className="text-sm font-medium text-foreground">Session Type</Text>
+            <Text className="text-sm font-medium text-foreground">
+              Session Type
+            </Text>
             <View className="flex-row gap-2">
               <RNTouchableOpacity
                 className={`flex-1 items-center py-3 rounded-lg border-2 ${
-                  sessionType === 'IN_PERSON' ? 'border-teal bg-teal/10' : 'border-border'
+                  sessionType === "IN_PERSON"
+                    ? "border-teal bg-teal/10"
+                    : "border-border"
                 }`}
-                onPress={() => setSessionType('IN_PERSON')}
+                onPress={() => setSessionType("IN_PERSON")}
               >
-                <Text className={`text-sm font-medium ${sessionType === 'IN_PERSON' ? 'text-teal' : 'text-muted-foreground'}`}>
+                <Text
+                  className={`text-sm font-medium ${sessionType === "IN_PERSON" ? "text-teal" : "text-muted-foreground"}`}
+                >
                   In Person
                 </Text>
               </RNTouchableOpacity>
               <RNTouchableOpacity
                 className={`flex-1 items-center py-3 rounded-lg border-2 ${
-                  sessionType === 'VIDEO_CALL' ? 'border-teal bg-teal/10' : 'border-border'
+                  sessionType === "VIDEO_CALL"
+                    ? "border-teal bg-teal/10"
+                    : "border-border"
                 }`}
-                onPress={() => setSessionType('VIDEO_CALL')}
+                onPress={() => setSessionType("VIDEO_CALL")}
               >
-                <Text className={`text-sm font-medium ${sessionType === 'VIDEO_CALL' ? 'text-teal' : 'text-muted-foreground'}`}>
+                <Text
+                  className={`text-sm font-medium ${sessionType === "VIDEO_CALL" ? "text-teal" : "text-muted-foreground"}`}
+                >
                   Video Call
                 </Text>
               </RNTouchableOpacity>
@@ -243,12 +319,16 @@ const CreateBookingScreen = () => {
               className="flex-row items-center gap-3 py-3"
               onPress={() => setIsFree(!isFree)}
             >
-              <View className={`w-5 h-5 rounded border-2 items-center justify-center ${
-                isFree ? 'border-primary bg-primary' : 'border-border'
-              }`}>
+              <View
+                className={`w-5 h-5 rounded border-2 items-center justify-center ${
+                  isFree ? "border-primary bg-primary" : "border-border"
+                }`}
+              >
                 {isFree && <Check size={12} color="#fff" />}
               </View>
-              <Text className="text-sm text-foreground">Free session (no charge)</Text>
+              <Text className="text-sm text-foreground">
+                Free session (no charge)
+              </Text>
             </RNTouchableOpacity>
 
             <Input
@@ -260,16 +340,17 @@ const CreateBookingScreen = () => {
               numberOfLines={3}
             />
 
-            <Button onPress={goNext}>
-              Review Booking
-            </Button>
+            <Button onPress={goNext}>Review Booking</Button>
           </>
         )}
 
         {/* Step 5: Confirm */}
-        {step === 'confirm' && (
+        {step === "confirm" && (
           <>
-            <Text className="text-sm font-medium text-teal uppercase" style={{ letterSpacing: 1 }}>
+            <Text
+              className="text-sm font-medium text-teal uppercase"
+              style={{ letterSpacing: 1 }}
+            >
               Confirm Booking
             </Text>
 
@@ -277,15 +358,22 @@ const CreateBookingScreen = () => {
               <CardContent className="py-4 px-4 gap-2">
                 <View className="flex-row justify-between">
                   <Text className="text-sm text-muted-foreground">Client</Text>
-                  <Text className="text-sm font-medium text-foreground">{clientName}</Text>
+                  <Text className="text-sm font-medium text-foreground">
+                    {clientName}
+                  </Text>
                 </View>
                 <View className="border-b border-border" />
                 <View className="flex-row justify-between">
                   <Text className="text-sm text-muted-foreground">Date</Text>
                   <Text className="text-sm font-medium text-foreground">
-                    {new Date(selectedDate + 'T12:00:00').toLocaleDateString(undefined, {
-                      weekday: 'short', month: 'short', day: 'numeric',
-                    })}
+                    {new Date(selectedDate + "T12:00:00").toLocaleDateString(
+                      undefined,
+                      {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      },
+                    )}
                   </Text>
                 </View>
                 <View className="border-b border-border" />
@@ -299,15 +387,19 @@ const CreateBookingScreen = () => {
                 <View className="flex-row justify-between">
                   <Text className="text-sm text-muted-foreground">Type</Text>
                   <Text className="text-sm font-medium text-foreground">
-                    {sessionType === 'VIDEO_CALL' ? 'Video Call' : 'In Person'}
+                    {sessionType === "VIDEO_CALL" ? "Video Call" : "In Person"}
                   </Text>
                 </View>
                 {isFree && (
                   <>
                     <View className="border-b border-border" />
                     <View className="flex-row justify-between">
-                      <Text className="text-sm text-muted-foreground">Price</Text>
-                      <Text className="text-sm font-medium text-teal">Free</Text>
+                      <Text className="text-sm text-muted-foreground">
+                        Price
+                      </Text>
+                      <Text className="text-sm font-medium text-teal">
+                        Free
+                      </Text>
                     </View>
                   </>
                 )}
@@ -315,8 +407,12 @@ const CreateBookingScreen = () => {
                   <>
                     <View className="border-b border-border" />
                     <View>
-                      <Text className="text-sm text-muted-foreground">Notes</Text>
-                      <Text className="text-sm text-foreground mt-1">{notes}</Text>
+                      <Text className="text-sm text-muted-foreground">
+                        Notes
+                      </Text>
+                      <Text className="text-sm text-foreground mt-1">
+                        {notes}
+                      </Text>
                     </View>
                   </>
                 ) : null}
