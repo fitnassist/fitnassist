@@ -191,7 +191,7 @@ const PhotoScanScreen = () => {
             onPress={() => router.back()}
             className="w-10 h-10 rounded-full bg-card items-center justify-center"
           >
-            <X size={22} color={colors.foreground} />
+            <X size={22} color="#F2F2F2" />
           </TouchableOpacity>
           <Text className="text-base font-semibold text-foreground">
             AI Food Scanner
@@ -204,7 +204,7 @@ const PhotoScanScreen = () => {
             className="w-20 h-20 rounded-full items-center justify-center"
             style={{ backgroundColor: colors.teal + "20" }}
           >
-            <Sparkles size={40} color={colors.teal} />
+            <Sparkles size={40} color="#5ECEBB" />
           </View>
           <Text className="text-lg font-semibold text-foreground text-center">
             Snap your meal
@@ -224,7 +224,7 @@ const PhotoScanScreen = () => {
                 className="w-12 h-12 rounded-full items-center justify-center"
                 style={{ backgroundColor: colors.coral + "20" }}
               >
-                <Camera size={24} color={colors.coral} />
+                <Camera size={24} color="#D94F6B" />
               </View>
               <View className="flex-1">
                 <Text className="text-base font-medium text-foreground">
@@ -245,7 +245,7 @@ const PhotoScanScreen = () => {
                 className="w-12 h-12 rounded-full items-center justify-center"
                 style={{ backgroundColor: colors.teal + "20" }}
               >
-                <ImageIcon size={24} color={colors.teal} />
+                <ImageIcon size={24} color="#5ECEBB" />
               </View>
               <View className="flex-1">
                 <Text className="text-base font-medium text-foreground">
@@ -270,7 +270,7 @@ const PhotoScanScreen = () => {
           onPress={() => router.back()}
           className="w-10 h-10 rounded-full bg-card items-center justify-center"
         >
-          <X size={22} color={colors.foreground} />
+          <X size={22} color="#F2F2F2" />
         </TouchableOpacity>
         <Text className="text-base font-semibold text-foreground">
           AI Food Scanner
@@ -291,7 +291,7 @@ const PhotoScanScreen = () => {
           />
           {recognizeFood.isPending && (
             <View className="absolute inset-0 bg-black/60 items-center justify-center gap-3">
-              <ActivityIndicator color={colors.teal} size="large" />
+              <ActivityIndicator color="#5ECEBB" size="large" />
               <Text className="text-white text-sm font-medium">
                 Analysing your meal...
               </Text>
@@ -362,9 +362,7 @@ const PhotoScanScreen = () => {
                             borderColor: colors.border,
                           }}
                         >
-                          {isSelected && (
-                            <Check size={14} color={colors.tealForeground} />
-                          )}
+                          {isSelected && <Check size={14} color="#1A3D36" />}
                         </View>
 
                         <View className="flex-1">
@@ -508,7 +506,7 @@ const PhotoScanScreen = () => {
                 className="flex-1"
               >
                 <View className="flex-row items-center gap-2">
-                  <RotateCcw size={14} color={colors.foreground} />
+                  <RotateCcw size={14} color="#F2F2F2" />
                   <Text className="text-sm font-semibold text-foreground">
                     Retake
                   </Text>

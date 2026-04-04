@@ -24,6 +24,7 @@ import {
   MapPin,
   ScanBarcode,
   Camera,
+  Pencil,
 } from "lucide-react-native";
 import { Text, Card, CardContent, Skeleton, useAlert } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,6 +38,7 @@ import {
   WorkoutLogger,
   FoodLogger,
   ActivityLogger,
+  EditFoodModal,
 } from "@/components/diary";
 import { trpc } from "@/lib/trpc";
 import { colors } from "@/constants/theme";
@@ -70,6 +72,7 @@ const TraineeDiary = () => {
   const { showAlert } = useAlert();
   const [date, setDate] = useState(() => new Date());
   const [activeLogger, setActiveLogger] = useState<string | null>(null);
+  const [editingFood, setEditingFood] = useState<any>(null);
   const deleteEntry = trpc.diary.deleteEntry.useMutation();
   const diaryUtils = trpc.useUtils();
   const dateStr = formatDate(date);
@@ -120,7 +123,7 @@ const TraineeDiary = () => {
       {/* Date Navigator */}
       <View className="flex-row items-center justify-between px-4 py-3">
         <RNTouchableOpacity onPress={() => changeDate(-1)}>
-          <ChevronLeft size={24} color={colors.foreground} />
+          <ChevronLeft size={24} color="#F2F2F2" />
         </RNTouchableOpacity>
         <RNTouchableOpacity onPress={() => setDate(new Date())}>
           <Text className="text-base font-medium text-foreground">
@@ -134,10 +137,7 @@ const TraineeDiary = () => {
           </Text>
         </RNTouchableOpacity>
         <RNTouchableOpacity onPress={() => changeDate(1)} disabled={isToday}>
-          <ChevronRight
-            size={24}
-            color={isToday ? colors.muted : colors.foreground}
-          />
+          <ChevronRight size={24} color={isToday ? colors.muted : "#F2F2F2"} />
         </RNTouchableOpacity>
       </View>
 
@@ -224,13 +224,13 @@ const TraineeDiary = () => {
                             className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
                             onPress={() => router.push("/scan/photo")}
                           >
-                            <Camera size={14} color={colors.teal} />
+                            <Camera size={14} color="#5ECEBB" />
                           </RNTouchableOpacity>
                           <RNTouchableOpacity
                             className="w-8 h-8 rounded-full bg-secondary items-center justify-center"
                             onPress={() => router.push("/scan")}
                           >
-                            <ScanBarcode size={14} color={colors.teal} />
+                            <ScanBarcode size={14} color="#5ECEBB" />
                           </RNTouchableOpacity>
                         </>
                       )}
@@ -240,7 +240,7 @@ const TraineeDiary = () => {
                           setActiveLogger(LOGGER_MAP[type] ?? null)
                         }
                       >
-                        <Plus size={16} color={colors.mutedForeground} />
+                        <Plus size={16} color="#7A7F91" />
                       </RNTouchableOpacity>
                     </View>
                   </View>
@@ -268,6 +268,26 @@ const TraineeDiary = () => {
                         {type === "ACTIVITY" &&
                           `${entry.activityEntry?.activityType ?? "Activity"} - ${Math.round((entry.activityEntry?.durationSeconds ?? 0) / 60)} min`}
                       </Text>
+                      {type === "FOOD" && entry.foodEntries?.[0] && (
+                        <RNTouchableOpacity
+                          className="mr-2"
+                          onPress={() => {
+                            const fe = entry.foodEntries[0];
+                            setEditingFood({
+                              id: fe.id,
+                              name: fe.name,
+                              calories: fe.calories,
+                              proteinG: fe.proteinG,
+                              carbsG: fe.carbsG,
+                              fatG: fe.fatG,
+                              servingSize: fe.servingSize,
+                              servingUnit: fe.servingUnit,
+                            });
+                          }}
+                        >
+                          <Pencil size={14} color="#7A7F91" />
+                        </RNTouchableOpacity>
+                      )}
                       <RNTouchableOpacity
                         onPress={() => {
                           showAlert({
@@ -345,6 +365,12 @@ const TraineeDiary = () => {
         onClose={() => setActiveLogger(null)}
         date={dateStr}
       />
+      <EditFoodModal
+        visible={!!editingFood}
+        onClose={() => setEditingFood(null)}
+        entry={editingFood}
+        date={dateStr}
+      />
     </ScrollView>
   );
 };
@@ -395,7 +421,7 @@ const TrainerClientsTab = () => {
         </View>
       ) : entries.length === 0 ? (
         <View className="items-center justify-center py-12 gap-2">
-          <Users size={48} color={colors.mutedForeground} />
+          <Users size={48} color="#7A7F91" />
           <Text className="text-base text-muted-foreground">
             No recent client activity
           </Text>
