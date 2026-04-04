@@ -11,6 +11,9 @@ export const WorkoutExerciseSchema = z.object({
   sets: z.number().int().min(1).nullable(),
   reps: z.string().max(50).nullable(),
   restSeconds: z.number().int().min(0).nullable(),
+  targetWeight: z.number().min(0).nullable(),
+  weightUnit: z.string(),
+  targetDuration: z.string().max(50).nullable(),
   sortOrder: z.number().int(),
   notes: z.string().max(500).nullable(),
 })
@@ -23,6 +26,7 @@ export type WorkoutExercise = z.infer<typeof WorkoutExerciseSchema>
 
 export const WorkoutExerciseOptionalDefaultsSchema = WorkoutExerciseSchema.merge(z.object({
   id: z.string().cuid().optional(),
+  weightUnit: z.string().optional(),
   sortOrder: z.number().int().optional(),
 }))
 

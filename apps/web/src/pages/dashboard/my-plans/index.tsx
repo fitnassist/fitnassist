@@ -73,6 +73,9 @@ interface WorkoutExercise {
   sets?: number | null;
   reps?: string | null;
   restSeconds?: number | null;
+  targetWeight?: number | null;
+  weightUnit?: string | null;
+  targetDuration?: string | null;
   notes?: string | null;
   exercise: ExerciseDetail;
 }
@@ -103,12 +106,18 @@ const ExerciseContent = ({
   sets,
   reps,
   restSeconds,
+  targetWeight,
+  weightUnit,
+  targetDuration,
   notes,
 }: {
   exercise: ExerciseDetail;
   sets?: number | null;
   reps?: string | null;
   restSeconds?: number | null;
+  targetWeight?: number | null;
+  weightUnit?: string | null;
+  targetDuration?: string | null;
   notes?: string | null;
 }) => {
   const videoUrl = exercise.videoUrl || exercise.videoUploadUrl;
@@ -123,11 +132,18 @@ const ExerciseContent = ({
         />
       )}
 
-      {(sets || reps || restSeconds) && (
+      {(sets || reps || restSeconds || targetWeight || targetDuration) && (
         <div className="flex flex-wrap gap-3">
           {sets && <Badge variant="secondary">{sets} sets</Badge>}
           {reps && <Badge variant="secondary">{reps} reps</Badge>}
           {restSeconds && <Badge variant="secondary">{restSeconds}s rest</Badge>}
+          {targetWeight != null && (
+            <Badge variant="secondary">
+              {targetWeight}
+              {weightUnit ?? 'kg'}
+            </Badge>
+          )}
+          {targetDuration && <Badge variant="secondary">{targetDuration}</Badge>}
         </div>
       )}
 
@@ -383,6 +399,13 @@ export const MyPlansPage = () => {
                                 {we.sets && <span>{we.sets} sets</span>}
                                 {we.reps && <span>{we.reps} reps</span>}
                                 {we.restSeconds && <span>{we.restSeconds}s rest</span>}
+                                {we.targetWeight != null && (
+                                  <span>
+                                    {we.targetWeight}
+                                    {we.weightUnit ?? 'kg'}
+                                  </span>
+                                )}
+                                {we.targetDuration && <span>{we.targetDuration}</span>}
                               </div>
                             </div>
                             <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -482,6 +505,9 @@ export const MyPlansPage = () => {
             sets={selectedExercise.we.sets}
             reps={selectedExercise.we.reps}
             restSeconds={selectedExercise.we.restSeconds}
+            targetWeight={selectedExercise.we.targetWeight}
+            weightUnit={selectedExercise.we.weightUnit}
+            targetDuration={selectedExercise.we.targetDuration}
             notes={selectedExercise.we.notes}
           />
         )}

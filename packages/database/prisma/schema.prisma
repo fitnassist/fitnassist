@@ -634,6 +634,11 @@ model WorkoutExercise {
   reps           String?      // "8-12" or "to failure"
   /// @zod.number.int().min(0)
   restSeconds    Int?
+  /// @zod.number.min(0)
+  targetWeight   Float?
+  weightUnit     String?      @default("kg") // "kg" or "lbs"
+  /// @zod.string.max(50)
+  targetDuration String?      // "30s", "60s", "2 min" — for timed exercises
   sortOrder      Int          @default(0)
   /// @zod.string.max(500)
   notes          String?

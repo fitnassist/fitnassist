@@ -35,6 +35,24 @@ interface SetCompletion {
 
 const DEFAULT_REST_SECONDS = 60;
 
+const parseDurationToSeconds = (duration: string): number => {
+  // Handle "30s" format
+  const secMatch = duration.match(/^(\d+)\s*s$/i);
+  if (secMatch) return parseInt(secMatch[1]);
+
+  // Handle "2 min" or "2m" format
+  const minMatch = duration.match(/^(\d+)\s*m(?:in)?$/i);
+  if (minMatch) return parseInt(minMatch[1]) * 60;
+
+  // Handle "1:30" format
+  const colonMatch = duration.match(/^(\d+):(\d+)$/);
+  if (colonMatch) return parseInt(colonMatch[1]) * 60 + parseInt(colonMatch[2]);
+
+  // Fallback: try as seconds
+  const num = parseInt(duration);
+  return isNaN(num) ? 60 : num;
+};
+
 const formatTime = (seconds: number) => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -87,8 +105,14 @@ const WorkoutRunnerScreen = () => {
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [showFinishSummary, setShowFinishSummary] = useState(false);
   const [savingNotes, setSavingNotes] = useState("");
+  const [exerciseTimer, setExerciseTimer] = useState<{
+    setNumber: number;
+    remaining: number;
+    total: number;
+  } | null>(null);
 
   const restIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const exerciseTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const logWorkoutMutation = trpc.diary.logWorkout.useMutation();
 
@@ -144,6 +168,94 @@ const WorkoutRunnerScreen = () => {
       }
     };
   }, [isResting]);
+
+  // ---------------------------------------------------------------------------
+  // Exercise timer (timed exercises)
+  // ---------------------------------------------------------------------------
+
+  const startExerciseTimer = useCallback(
+    (setNumber: number, duration: string) => {
+      const seconds = parseDurationToSeconds(duration);
+      setExerciseTimer({ setNumber, remaining: seconds, total: seconds });
+    },
+    [],
+  );
+
+  const stopExerciseTimer = useCallback(() => {
+    if (exerciseTimerRef.current) {
+      clearInterval(exerciseTimerRef.current);
+      exerciseTimerRef.current = null;
+    }
+    setExerciseTimer(null);
+  }, []);
+
+  useEffect(() => {
+    if (!exerciseTimer || exerciseTimer.remaining <= 0) return;
+
+    exerciseTimerRef.current = setInterval(() => {
+      setExerciseTimer((prev) => {
+        if (!prev || prev.remaining <= 1) {
+          if (exerciseTimerRef.current) {
+            clearInterval(exerciseTimerRef.current);
+            exerciseTimerRef.current = null;
+          }
+          return prev ? { ...prev, remaining: 0 } : null;
+        }
+        return { ...prev, remaining: prev.remaining - 1 };
+      });
+    }, 1000);
+
+    return () => {
+      if (exerciseTimerRef.current) {
+        clearInterval(exerciseTimerRef.current);
+        exerciseTimerRef.current = null;
+      }
+    };
+  }, [
+    exerciseTimer?.setNumber,
+    exerciseTimer?.remaining !== undefined
+      ? exerciseTimer.remaining > 0
+      : false,
+  ]);
+
+  // Auto-complete set when exercise timer hits 0
+  useEffect(() => {
+    if (exerciseTimer && exerciseTimer.remaining === 0) {
+      const { setNumber } = exerciseTimer;
+      // Auto-mark the set as complete
+      setCompletedSets((prev) => {
+        const existing = prev.find(
+          (s) =>
+            s.exerciseIndex === currentExerciseIndex &&
+            s.setNumber === setNumber,
+        );
+        if (existing && existing.completed) return prev;
+        if (existing) {
+          return prev.map((s) =>
+            s.exerciseIndex === currentExerciseIndex &&
+            s.setNumber === setNumber
+              ? { ...s, completed: true }
+              : s,
+          );
+        }
+        return [
+          ...prev,
+          { exerciseIndex: currentExerciseIndex, setNumber, completed: true },
+        ];
+      });
+      // Start rest timer if there are more sets
+      if (totalSets && setNumber < totalSets) {
+        startRestTimer(restSeconds);
+      }
+      setExerciseTimer(null);
+    }
+  }, [
+    exerciseTimer,
+    currentExerciseIndex,
+    totalSets,
+    restSeconds,
+    startRestTimer,
+  ]);
 
   // ---------------------------------------------------------------------------
   // Set completion
@@ -222,19 +334,21 @@ const WorkoutRunnerScreen = () => {
 
   const goToNextExercise = useCallback(() => {
     skipRest();
+    stopExerciseTimer();
     if (currentExerciseIndex < exercises.length - 1) {
       setCurrentExerciseIndex((i) => i + 1);
     } else {
       setShowFinishSummary(true);
     }
-  }, [currentExerciseIndex, exercises.length, skipRest]);
+  }, [currentExerciseIndex, exercises.length, skipRest, stopExerciseTimer]);
 
   const goToPreviousExercise = useCallback(() => {
     skipRest();
+    stopExerciseTimer();
     if (currentExerciseIndex > 0) {
       setCurrentExerciseIndex((i) => i - 1);
     }
-  }, [currentExerciseIndex, skipRest]);
+  }, [currentExerciseIndex, skipRest, stopExerciseTimer]);
 
   const confirmQuit = useCallback(() => {
     Alert.alert("Quit Workout?", "Your progress will be lost.", [
@@ -450,6 +564,36 @@ const WorkoutRunnerScreen = () => {
               />
             ) : null}
 
+            {/* Weight and duration info in detail modal */}
+            {currentExercise?.targetWeight ||
+            currentExercise?.targetDuration ? (
+              <View className="flex-row flex-wrap gap-2">
+                {currentExercise?.targetWeight ? (
+                  <View className="flex-row items-center gap-1.5 bg-muted rounded-full px-3 py-1.5">
+                    <Dumbbell size={14} color={colors.foreground} />
+                    <Text className="text-sm font-semibold text-foreground">
+                      {currentExercise.targetWeight}
+                      {currentExercise.weightUnit ?? "kg"}
+                    </Text>
+                  </View>
+                ) : null}
+                {currentExercise?.targetDuration ? (
+                  <View
+                    className="flex-row items-center gap-1.5 rounded-full px-3 py-1.5"
+                    style={{ backgroundColor: "rgba(94, 209, 188, 0.15)" }}
+                  >
+                    <Timer size={14} color={colors.teal} />
+                    <Text
+                      className="text-sm font-semibold"
+                      style={{ color: colors.teal }}
+                    >
+                      {currentExercise.targetDuration}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+
             {exerciseDetail.videoUrl || exerciseDetail.videoUploadUrl ? (
               <TouchableOpacity
                 className="flex-row items-center gap-2 bg-muted rounded-lg px-4 py-3"
@@ -642,6 +786,36 @@ const WorkoutRunnerScreen = () => {
               </View>
             </View>
 
+            {/* Target weight and duration badges */}
+            {currentExercise?.targetWeight ||
+            currentExercise?.targetDuration ? (
+              <View className="flex-row flex-wrap gap-2">
+                {currentExercise?.targetWeight ? (
+                  <View className="flex-row items-center gap-1.5 bg-muted rounded-full px-3 py-1.5">
+                    <Dumbbell size={14} color={colors.foreground} />
+                    <Text className="text-sm font-semibold text-foreground">
+                      {currentExercise.targetWeight}
+                      {currentExercise.weightUnit ?? "kg"}
+                    </Text>
+                  </View>
+                ) : null}
+                {currentExercise?.targetDuration ? (
+                  <View
+                    className="flex-row items-center gap-1.5 rounded-full px-3 py-1.5"
+                    style={{ backgroundColor: "rgba(94, 209, 188, 0.15)" }}
+                  >
+                    <Timer size={14} color={colors.teal} />
+                    <Text
+                      className="text-sm font-semibold"
+                      style={{ color: colors.teal }}
+                    >
+                      {currentExercise.targetDuration}
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+
             {/* Trainer notes */}
             {currentExercise?.notes ? (
               <View className="bg-muted rounded-lg px-3 py-2">
@@ -684,21 +858,51 @@ const WorkoutRunnerScreen = () => {
                         s.completed,
                     );
                     return (
-                      <TouchableOpacity
-                        key={setNumber}
-                        onPress={() => toggleSet(setNumber)}
-                        className={`w-12 h-12 rounded-full items-center justify-center border-2 ${
-                          isCompleted ? "bg-teal border-teal" : "border-border"
-                        }`}
-                      >
-                        {isCompleted ? (
-                          <Check size={20} color={colors.tealForeground} />
-                        ) : (
-                          <Text className="text-sm font-semibold text-muted-foreground">
-                            {setNumber}
-                          </Text>
-                        )}
-                      </TouchableOpacity>
+                      <View key={setNumber} className="items-center gap-1">
+                        <TouchableOpacity
+                          onPress={() => toggleSet(setNumber)}
+                          className={`w-12 h-12 rounded-full items-center justify-center border-2 ${
+                            isCompleted
+                              ? "bg-teal border-teal"
+                              : "border-border"
+                          }`}
+                        >
+                          {isCompleted ? (
+                            <Check size={20} color={colors.tealForeground} />
+                          ) : (
+                            <Text className="text-sm font-semibold text-muted-foreground">
+                              {setNumber}
+                            </Text>
+                          )}
+                        </TouchableOpacity>
+                        {currentExercise?.targetDuration && !isCompleted ? (
+                          <TouchableOpacity
+                            onPress={() =>
+                              startExerciseTimer(
+                                setNumber,
+                                currentExercise.targetDuration!,
+                              )
+                            }
+                            disabled={exerciseTimer !== null}
+                            className="flex-row items-center gap-0.5 px-2 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor:
+                                exerciseTimer !== null
+                                  ? "transparent"
+                                  : "rgba(94, 209, 188, 0.15)",
+                              opacity: exerciseTimer !== null ? 0.4 : 1,
+                            }}
+                          >
+                            <Play size={10} color={colors.teal} />
+                            <Text
+                              className="text-[10px] font-medium"
+                              style={{ color: colors.teal }}
+                            >
+                              Timer
+                            </Text>
+                          </TouchableOpacity>
+                        ) : null}
+                      </View>
                     );
                   })}
                 </View>
@@ -775,6 +979,50 @@ const WorkoutRunnerScreen = () => {
           </View>
         </Button>
       </View>
+
+      {/* Exercise timer overlay (teal themed) */}
+      {exerciseTimer && exerciseTimer.remaining > 0 ? (
+        <Modal transparent animationType="fade" visible>
+          <View
+            className="flex-1 items-center justify-center px-6"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+          >
+            <Text
+              className="text-sm font-medium uppercase mb-2"
+              style={{ letterSpacing: 1, color: colors.teal }}
+            >
+              Exercise Timer - Set {exerciseTimer.setNumber}
+            </Text>
+            <Text className="text-6xl font-bold text-foreground mb-2">
+              {formatTime(exerciseTimer.remaining)}
+            </Text>
+
+            {/* Progress bar */}
+            <View className="w-40 h-3 bg-muted rounded-full overflow-hidden mb-6 mt-2">
+              <View
+                className="h-full rounded-full"
+                style={{
+                  backgroundColor: colors.teal,
+                  width: `${((exerciseTimer.total - exerciseTimer.remaining) / exerciseTimer.total) * 100}%`,
+                }}
+              />
+            </View>
+
+            <Text className="text-sm text-muted-foreground mb-6">
+              {exerciseDetail?.name ?? "Exercise"}
+            </Text>
+
+            <Button variant="outline" onPress={stopExerciseTimer}>
+              <View className="flex-row items-center gap-2">
+                <X size={16} color={colors.foreground} />
+                <Text className="text-sm font-semibold text-foreground">
+                  Stop
+                </Text>
+              </View>
+            </Button>
+          </View>
+        </Modal>
+      ) : null}
 
       {restTimerOverlay}
       {exerciseDetailModal}
