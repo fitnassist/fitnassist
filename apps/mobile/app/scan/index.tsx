@@ -112,10 +112,9 @@ const ScanScreen = () => {
         </View>
         <View className="flex-1 items-center justify-center px-8 gap-6">
           <View
-            className="w-20 h-20 rounded-full items-center justify-center"
-            style={{ backgroundColor: colors.teal + "20" }}
+            style={{ width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(94, 206, 187, 0.15)' }}
           >
-            <Camera size={40} color={colors.teal} />
+            <Camera size={40} color="#5ECEBB" />
           </View>
           <Text className="text-xl font-semibold text-foreground text-center">
             Camera Access Required
