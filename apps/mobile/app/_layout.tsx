@@ -14,6 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AlertProvider } from "@/components/ui";
 import { useSse } from "@/lib/sse";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useAppleHealthSync } from "@/hooks/useAppleHealthSync";
 import { CartProvider } from "@/hooks/useCart";
 
 // Tell TanStack Query to treat app foreground as "window focus"
@@ -34,6 +35,7 @@ const AuthenticatedProviders = ({
 }) => {
   useSse();
   useNotifications();
+  useAppleHealthSync();
   return <>{children}</>;
 };
 

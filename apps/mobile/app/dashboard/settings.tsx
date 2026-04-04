@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, ScrollView, TextInput, Switch } from "react-native";
+import { View, ScrollView, TextInput, Switch, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -9,6 +9,7 @@ import {
   MapPin,
   X,
   RotateCcw,
+  Heart,
 } from "lucide-react-native";
 import { TouchableOpacity } from "react-native";
 import * as WebBrowser from "expo-web-browser";
@@ -31,6 +32,7 @@ import { trpc } from "@/lib/trpc";
 import { authClient } from "@/lib/auth";
 import { hasFeatureAccess } from "@fitnassist/schemas/src/constants/subscription.constants";
 import { colors } from "@/constants/theme";
+import { appleHealth } from "@/lib/apple-health";
 
 const GOOGLE_API_KEY = Constants.expoConfig?.extra?.googleMapsApiKey ?? "";
 
@@ -1127,7 +1129,9 @@ const PROVIDER_META: Record<
     description: string;
     color: string;
     dataTypes: string[];
-    authPath: string;
+    authPath?: string;
+    isDevice?: boolean;
+    icon?: any;
   }
 > = {
   STRAVA: {
@@ -1158,6 +1162,14 @@ const PROVIDER_META: Record<
     dataTypes: ["Activities", "Steps", "Sleep", "Weight"],
     authPath: "/api/integrations/garmin/auth",
   },
+  APPLE_HEALTH: {
+    name: "Apple Health",
+    description: "Sync steps, workouts, sleep and weight from your iPhone",
+    color: "#FF2D55",
+    dataTypes: ["Steps", "Workouts", "Sleep", "Weight"],
+    isDevice: true,
+    icon: Heart,
+  },
 };
 
 const SYNC_PREF_LABELS: Record<string, string> = {
@@ -1174,10 +1186,16 @@ const IntegrationsTab = () => {
   const { data: providers } = trpc.integration.availableProviders.useQuery();
   const { data: connections, refetch } = trpc.integration.list.useQuery();
   const disconnectMut = trpc.integration.disconnect.useMutation();
+  const connectDeviceMut = trpc.integration.connectDevice.useMutation();
   const updatePrefsMut = trpc.integration.updatePreferences.useMutation();
   const { showAlert } = useAlert();
 
-  const availableProviders = (providers ?? []) as string[];
+  const availableProviders = ((providers ?? []) as string[]).filter((p) => {
+    const meta = PROVIDER_META[p];
+    // Hide device-only providers on non-matching platforms
+    if (meta?.isDevice && Platform.OS !== "ios") return false;
+    return true;
+  });
   const connectionMap = new Map(
     ((connections ?? []) as any[]).map((c: any) => [c.provider, c]),
   );
@@ -1230,9 +1248,13 @@ const IntegrationsTab = () => {
                   className="w-10 h-10 rounded-lg items-center justify-center"
                   style={{ backgroundColor: meta.color }}
                 >
-                  <Text className="text-white font-bold text-sm">
-                    {meta.name.charAt(0)}
-                  </Text>
+                  {meta.icon ? (
+                    <meta.icon size={20} color="#fff" />
+                  ) : (
+                    <Text className="text-white font-bold text-sm">
+                      {meta.name.charAt(0)}
+                    </Text>
+                  )}
                 </View>
                 <View className="flex-1 gap-0.5">
                   <View className="flex-row items-center gap-2">
@@ -1303,11 +1325,43 @@ const IntegrationsTab = () => {
                 ) : (
                   <Button
                     size="sm"
+                    disabled={meta.isDevice && Platform.OS !== "ios"}
                     onPress={async () => {
-                      await WebBrowser.openBrowserAsync(
-                        `${apiUrl}${meta.authPath}`,
-                      );
-                      refetch();
+                      if (meta.isDevice) {
+                        if (Platform.OS !== "ios") {
+                          showAlert({
+                            title: "Not Available",
+                            message:
+                              "Apple Health is only available on iOS devices.",
+                          });
+                          return;
+                        }
+                        const granted = await appleHealth.requestPermissions();
+                        if (!granted) {
+                          showAlert({
+                            title: "Permission Denied",
+                            message:
+                              "Please enable Health access in Settings to use this integration.",
+                          });
+                          return;
+                        }
+                        connectDeviceMut.mutate(
+                          { provider: providerKey } as any,
+                          {
+                            onSuccess: () => refetch(),
+                            onError: () =>
+                              showAlert({
+                                title: "Error",
+                                message: "Failed to connect Apple Health.",
+                              }),
+                          },
+                        );
+                      } else {
+                        await WebBrowser.openBrowserAsync(
+                          `${apiUrl}${meta.authPath}`,
+                        );
+                        refetch();
+                      }
                     }}
                   >
                     Connect
