@@ -40,7 +40,7 @@ export const StatsRow = () => {
   }
 
   return (
-    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+    <div data-tour="stats-row" className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       <StatCard
         label="Profile Views (30d)"
         value={data?.profileViews30d ?? 0}

@@ -66,6 +66,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     roles: ['TRAINER'] as const,
     badgeKey: 'requests' as const,
     group: 'Business',
+    dataTour: 'nav-requests',
   },
   {
     label: 'Clients',
@@ -74,6 +75,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     roles: ['TRAINER'] as const,
     requiredFeature: 'clientManagement',
     group: 'Business',
+    dataTour: 'nav-clients',
   },
   {
     label: 'Onboarding',
@@ -91,6 +93,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     roles: ['TRAINER'] as const,
     requiredFeature: 'resources',
     group: 'Business',
+    dataTour: 'nav-resources',
   },
   {
     label: 'Analytics',
@@ -143,6 +146,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     roles: ['TRAINEE'] as const,
     mobileBottom: true,
     group: 'Tracking',
+    dataTour: 'nav-diary',
   },
   {
     label: 'Goals',
@@ -150,6 +154,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     icon: <Target className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
     group: 'Tracking',
+    dataTour: 'nav-goals',
   },
   {
     label: 'My Plans',
@@ -157,6 +162,7 @@ const BASE_NAV_ITEMS: DashboardNavItem[] = [
     icon: <ClipboardList className="h-5 w-5" />,
     roles: ['TRAINEE'] as const,
     group: 'Tracking',
+    dataTour: 'nav-my-plans',
   },
   {
     label: 'My Contacts',

@@ -276,6 +276,12 @@ model User {
   pushNotifyDiary               Boolean @default(true)
   pushNotifyGoals               Boolean @default(true)
 
+  // Tour tracking
+  webTourCompleted              Boolean   @default(false)
+  webTourSkippedAt              DateTime?
+  mobileTourCompleted           Boolean   @default(false)
+  mobileTourSkippedAt           DateTime?
+
   // Relations
   trainerProfile   TrainerProfile?
   traineeProfile   TraineeProfile?

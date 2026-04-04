@@ -52,6 +52,7 @@ import { TrainerBookSessionPage } from '@/pages/dashboard/bookings/book-client';
 import { PrivacyPolicyPage } from '@/pages/privacy';
 import { TermsOfServicePage } from '@/pages/terms';
 import { SupportPage } from '@/pages/support';
+import { HelpCentrePage } from '@/pages/help';
 import { StatusPage } from '@/pages/status';
 import { PricingPage } from '@/pages/pricing';
 import { AnalyticsPage } from '@/pages/dashboard/analytics';
@@ -86,6 +87,7 @@ function App() {
                   <Route path={routes.privacy} element={<PrivacyPolicyPage />} />
                   <Route path={routes.terms} element={<TermsOfServicePage />} />
                   <Route path={routes.support} element={<SupportPage />} />
+                  <Route path={routes.help} element={<HelpCentrePage />} />
                   <Route path={routes.pricing} element={<PricingPage />} />
                   <Route path="/status" element={<StatusPage />} />
                 </Route>

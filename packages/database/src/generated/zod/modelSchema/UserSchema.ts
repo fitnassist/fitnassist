@@ -34,6 +34,10 @@ export const UserSchema = z.object({
   pushNotifyOnboarding: z.boolean(),
   pushNotifyDiary: z.boolean(),
   pushNotifyGoals: z.boolean(),
+  webTourCompleted: z.boolean(),
+  webTourSkippedAt: z.coerce.date().nullable(),
+  mobileTourCompleted: z.boolean(),
+  mobileTourSkippedAt: z.coerce.date().nullable(),
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -66,6 +70,8 @@ export const UserOptionalDefaultsSchema = UserSchema.merge(z.object({
   pushNotifyOnboarding: z.boolean().optional(),
   pushNotifyDiary: z.boolean().optional(),
   pushNotifyGoals: z.boolean().optional(),
+  webTourCompleted: z.boolean().optional(),
+  mobileTourCompleted: z.boolean().optional(),
 }))
 
 export type UserOptionalDefaults = z.infer<typeof UserOptionalDefaultsSchema>

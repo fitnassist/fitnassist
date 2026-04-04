@@ -45,8 +45,11 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
         (item.href !== '/dashboard' && currentPath.startsWith(item.href)));
     const hasBadge = !item.disabled && item.badge !== undefined && item.badge > 0;
 
+    const tourAttr = item.dataTour ? { 'data-tour': item.dataTour } : {};
+
     const content = item.disabled ? (
       <div
+        {...tourAttr}
         className={cn(
           'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium cursor-not-allowed opacity-50 overflow-hidden',
         )}
@@ -58,6 +61,7 @@ export function SidebarNav({ items, currentPath, isCollapsed }: SidebarNavProps)
     ) : (
       <Link
         to={item.href}
+        {...tourAttr}
         className={cn(
           'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors overflow-hidden',
           isActive ? 'text-coral' : 'text-muted-foreground hover:bg-muted hover:text-foreground',

@@ -64,6 +64,28 @@ export const auth = betterAuth({
         defaultValue: 'TRAINEE',
         input: true,
       },
+      webTourCompleted: {
+        type: 'boolean',
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+      webTourSkippedAt: {
+        type: 'date',
+        required: false,
+        input: false,
+      },
+      mobileTourCompleted: {
+        type: 'boolean',
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+      mobileTourSkippedAt: {
+        type: 'date',
+        required: false,
+        input: false,
+      },
     },
     changeEmail: {
       enabled: true,
