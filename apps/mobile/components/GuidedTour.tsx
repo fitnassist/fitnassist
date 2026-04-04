@@ -82,7 +82,6 @@ export const GuidedTour = ({ role, onComplete, onSkip }: GuidedTourProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const isLastStep = currentIndex === steps.length - 1;
   const step = steps[currentIndex];
-  const Icon = step.icon;
 
   const handleNext = () => {
     if (isLastStep) {
@@ -120,7 +119,10 @@ export const GuidedTour = ({ role, onComplete, onSkip }: GuidedTourProps) => {
               marginBottom: 24,
             }}
           >
-            <Icon size={28} color="#5ECEBB" />
+            {currentIndex === 0 && <Home size={28} color="#5ECEBB" />}
+            {currentIndex === 1 && (role === 'TRAINEE' ? <BookHeart size={28} color="#5ECEBB" /> : <MessageCircle size={28} color="#5ECEBB" />)}
+            {currentIndex === 2 && (role === 'TRAINEE' ? <Calendar size={28} color="#5ECEBB" /> : <Users size={28} color="#5ECEBB" />)}
+            {currentIndex === 3 && <Sparkles size={28} color="#5ECEBB" />}
           </View>
           <Text
             style={{
