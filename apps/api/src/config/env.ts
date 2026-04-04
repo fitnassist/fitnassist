@@ -82,6 +82,9 @@ const envSchema = z.object({
   GARMIN_CONSUMER_KEY: z.string().optional(),
   GARMIN_CONSUMER_SECRET: z.string().optional(),
 
+  // Anthropic (AI food recognition)
+  ANTHROPIC_API_KEY: z.string().optional(),
+
   // Website builder
   SITE_DOMAIN: z.string().default('sites.fitnassist.co'),
 });

@@ -1,6 +1,7 @@
-import { router, protectedProcedure } from '../lib/trpc';
-import { diaryService } from '../services/diary.service';
-import { prisma } from '../lib/prisma';
+import { router, protectedProcedure } from "../lib/trpc";
+import { diaryService } from "../services/diary.service";
+import { foodRecognitionService } from "../services/food-recognition.service";
+import { prisma } from "../lib/prisma";
 import {
   logWeightSchema,
   logWaterSchema,
@@ -11,6 +12,7 @@ import {
   updateFoodEntrySchema,
   deleteFoodEntrySchema,
   searchFoodSchema,
+  lookupBarcodeSchema,
   getDiaryEntriesSchema,
   getDiaryRangeSchema,
   getDailyNutritionSchema,
@@ -26,7 +28,8 @@ import {
   getRecentClientActivitySchema,
   logActivitySchema,
   getPersonalBestsSchema,
-} from '@fitnassist/schemas';
+  recognizeFoodSchema,
+} from "@fitnassist/schemas";
 
 export const diaryRouter = router({
   logWeight: protectedProcedure
@@ -70,6 +73,18 @@ export const diaryRouter = router({
     .input(searchFoodSchema)
     .query(async ({ input }) => {
       return diaryService.getFoodNutrients(input.query);
+    }),
+
+  lookupBarcode: protectedProcedure
+    .input(lookupBarcodeSchema)
+    .query(async ({ input }) => {
+      return diaryService.lookupBarcode(input.barcode);
+    }),
+
+  recognizeFood: protectedProcedure
+    .input(recognizeFoodSchema)
+    .mutation(async ({ input }) => {
+      return foodRecognitionService.recognizeFromImage(input.imageBase64);
     }),
 
   logFood: protectedProcedure
@@ -147,7 +162,11 @@ export const diaryRouter = router({
   addComment: protectedProcedure
     .input(addDiaryCommentSchema)
     .mutation(async ({ input, ctx }) => {
-      return diaryService.addComment(ctx.user.id, input.diaryEntryId, input.content);
+      return diaryService.addComment(
+        ctx.user.id,
+        input.diaryEntryId,
+        input.content,
+      );
     }),
 
   getComments: protectedProcedure
@@ -165,79 +184,80 @@ export const diaryRouter = router({
   /**
    * Get all workout plans assigned to the trainee
    */
-  getMyWorkoutPlans: protectedProcedure
-    .query(async ({ ctx }) => {
-      const rosters = await prisma.clientRoster.findMany({
-        where: {
-          connection: {
-            senderId: ctx.user.id,
-            type: 'CONNECTION_REQUEST',
-            status: 'ACCEPTED',
-          },
+  getMyWorkoutPlans: protectedProcedure.query(async ({ ctx }) => {
+    const rosters = await prisma.clientRoster.findMany({
+      where: {
+        connection: {
+          senderId: ctx.user.id,
+          type: "CONNECTION_REQUEST",
+          status: "ACCEPTED",
         },
-        include: {
-          workoutPlanAssignments: {
-            select: {
-              workoutPlan: {
-                select: {
-                  id: true,
-                  name: true,
-                  description: true,
-                },
+      },
+      include: {
+        workoutPlanAssignments: {
+          select: {
+            workoutPlan: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
               },
             },
           },
         },
-      });
+      },
+    });
 
-      const seen = new Set<string>();
-      const plans: Array<{ id: string; name: string; description: string | null }> = [];
+    const seen = new Set<string>();
+    const plans: Array<{
+      id: string;
+      name: string;
+      description: string | null;
+    }> = [];
 
-      for (const roster of rosters) {
-        for (const assignment of roster.workoutPlanAssignments) {
-          if (!seen.has(assignment.workoutPlan.id)) {
-            seen.add(assignment.workoutPlan.id);
-            plans.push(assignment.workoutPlan);
-          }
+    for (const roster of rosters) {
+      for (const assignment of roster.workoutPlanAssignments) {
+        if (!seen.has(assignment.workoutPlan.id)) {
+          seen.add(assignment.workoutPlan.id);
+          plans.push(assignment.workoutPlan);
         }
       }
+    }
 
-      return plans;
-    }),
+    return plans;
+  }),
 
   /**
    * Get all recipes from the trainee's assigned meal plans
    */
-  getMyRecipes: protectedProcedure
-    .query(async ({ ctx }) => {
-      const rosters = await prisma.clientRoster.findMany({
-        where: {
-          connection: {
-            senderId: ctx.user.id,
-            type: 'CONNECTION_REQUEST',
-            status: 'ACCEPTED',
-          },
+  getMyRecipes: protectedProcedure.query(async ({ ctx }) => {
+    const rosters = await prisma.clientRoster.findMany({
+      where: {
+        connection: {
+          senderId: ctx.user.id,
+          type: "CONNECTION_REQUEST",
+          status: "ACCEPTED",
         },
-        include: {
-          mealPlanAssignments: {
-            select: {
-              mealPlan: {
-                select: {
-                  name: true,
-                  recipes: {
-                    select: {
-                      mealType: true,
-                      recipe: {
-                        select: {
-                          id: true,
-                          name: true,
-                          calories: true,
-                          proteinG: true,
-                          carbsG: true,
-                          fatG: true,
-                          servings: true,
-                          imageUrl: true,
-                        },
+      },
+      include: {
+        mealPlanAssignments: {
+          select: {
+            mealPlan: {
+              select: {
+                name: true,
+                recipes: {
+                  select: {
+                    mealType: true,
+                    recipe: {
+                      select: {
+                        id: true,
+                        name: true,
+                        calories: true,
+                        proteinG: true,
+                        carbsG: true,
+                        fatG: true,
+                        servings: true,
+                        imageUrl: true,
                       },
                     },
                   },
@@ -246,40 +266,41 @@ export const diaryRouter = router({
             },
           },
         },
-      });
+      },
+    });
 
-      // Flatten and deduplicate recipes
-      const seen = new Set<string>();
-      const recipes: Array<{
-        id: string;
-        name: string;
-        mealPlanName: string;
-        mealType: string | null;
-        calories: number | null;
-        proteinG: number | null;
-        carbsG: number | null;
-        fatG: number | null;
-        servings: number | null;
-        imageUrl: string | null;
-      }> = [];
+    // Flatten and deduplicate recipes
+    const seen = new Set<string>();
+    const recipes: Array<{
+      id: string;
+      name: string;
+      mealPlanName: string;
+      mealType: string | null;
+      calories: number | null;
+      proteinG: number | null;
+      carbsG: number | null;
+      fatG: number | null;
+      servings: number | null;
+      imageUrl: string | null;
+    }> = [];
 
-      for (const roster of rosters) {
-        for (const assignment of roster.mealPlanAssignments) {
-          for (const mpr of assignment.mealPlan.recipes) {
-            if (!seen.has(mpr.recipe.id)) {
-              seen.add(mpr.recipe.id);
-              recipes.push({
-                ...mpr.recipe,
-                mealPlanName: assignment.mealPlan.name,
-                mealType: mpr.mealType,
-              });
-            }
+    for (const roster of rosters) {
+      for (const assignment of roster.mealPlanAssignments) {
+        for (const mpr of assignment.mealPlan.recipes) {
+          if (!seen.has(mpr.recipe.id)) {
+            seen.add(mpr.recipe.id);
+            recipes.push({
+              ...mpr.recipe,
+              mealPlanName: assignment.mealPlan.name,
+              mealType: mpr.mealType,
+            });
           }
         }
       }
+    }
 
-      return recipes;
-    }),
+    return recipes;
+  }),
 
   // ---- Activity Feed ----
   getRecentClientActivity: protectedProcedure
