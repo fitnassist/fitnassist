@@ -19,6 +19,7 @@ import {
   Footprints,
   Activity,
   Trash2,
+  Pencil,
   Users,
   Plus,
   MapPin,
@@ -37,6 +38,7 @@ import {
   WorkoutLogger,
   FoodLogger,
   ActivityLogger,
+  EditFoodModal,
 } from "@/components/diary";
 import { trpc } from "@/lib/trpc";
 import { colors } from "@/constants/theme";
@@ -70,6 +72,16 @@ const TraineeDiary = () => {
   const { showAlert } = useAlert();
   const [date, setDate] = useState(() => new Date());
   const [activeLogger, setActiveLogger] = useState<string | null>(null);
+  const [editingFood, setEditingFood] = useState<{
+    id: string;
+    name: string;
+    calories: number;
+    proteinG?: number | null;
+    carbsG?: number | null;
+    fatG?: number | null;
+    servingSize?: number;
+    servingUnit?: string;
+  } | null>(null);
   const deleteEntry = trpc.diary.deleteEntry.useMutation();
   const diaryUtils = trpc.useUtils();
   const dateStr = formatDate(date);
@@ -268,33 +280,56 @@ const TraineeDiary = () => {
                         {type === "ACTIVITY" &&
                           `${entry.activityEntry?.activityType ?? "Activity"} - ${Math.round((entry.activityEntry?.durationSeconds ?? 0) / 60)} min`}
                       </Text>
-                      <RNTouchableOpacity
-                        onPress={() => {
-                          showAlert({
-                            title: "Delete Entry",
-                            message: "Are you sure?",
-                            actions: [
-                              {
-                                label: "Delete",
-                                variant: "destructive",
-                                onPress: () =>
-                                  deleteEntry.mutate(
-                                    { id: entry.id },
-                                    {
-                                      onSuccess: () =>
-                                        diaryUtils.diary.getEntries.invalidate({
-                                          date: dateStr,
-                                        }),
-                                    },
-                                  ),
-                              },
-                              { label: "Cancel", variant: "outline" },
-                            ],
-                          });
-                        }}
-                      >
-                        <Trash2 size={14} color={colors.destructive} />
-                      </RNTouchableOpacity>
+                      <View className="flex-row items-center gap-2">
+                        {type === "FOOD" && entry.foodEntries?.[0] && (
+                          <RNTouchableOpacity
+                            onPress={() => {
+                              const food = entry.foodEntries[0];
+                              setEditingFood({
+                                id: food.id,
+                                name: food.name,
+                                calories: food.calories,
+                                proteinG: food.proteinG,
+                                carbsG: food.carbsG,
+                                fatG: food.fatG,
+                                servingSize: food.servingSize,
+                                servingUnit: food.servingUnit,
+                              });
+                            }}
+                          >
+                            <Pencil size={14} color="#5ECEBB" />
+                          </RNTouchableOpacity>
+                        )}
+                        <RNTouchableOpacity
+                          onPress={() => {
+                            showAlert({
+                              title: "Delete Entry",
+                              message: "Are you sure?",
+                              actions: [
+                                {
+                                  label: "Delete",
+                                  variant: "destructive",
+                                  onPress: () =>
+                                    deleteEntry.mutate(
+                                      { id: entry.id },
+                                      {
+                                        onSuccess: () =>
+                                          diaryUtils.diary.getEntries.invalidate(
+                                            {
+                                              date: dateStr,
+                                            },
+                                          ),
+                                      },
+                                    ),
+                                },
+                                { label: "Cancel", variant: "outline" },
+                              ],
+                            });
+                          }}
+                        >
+                          <Trash2 size={14} color={colors.destructive} />
+                        </RNTouchableOpacity>
+                      </View>
                     </View>
                   ))}
                 </CardContent>
@@ -343,6 +378,12 @@ const TraineeDiary = () => {
       <ActivityLogger
         visible={activeLogger === "activity"}
         onClose={() => setActiveLogger(null)}
+        date={dateStr}
+      />
+      <EditFoodModal
+        visible={!!editingFood}
+        onClose={() => setEditingFood(null)}
+        entry={editingFood}
         date={dateStr}
       />
     </ScrollView>

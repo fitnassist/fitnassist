@@ -76,7 +76,7 @@ const ScanScreen = () => {
             carbsG: Math.round((product.carbs_g ?? 0) * qty * 10) / 10,
             fatG: Math.round((product.fat_g ?? 0) * qty * 10) / 10,
             servingSize: qty,
-            servingUnit: product.serving_unit || 'serving',
+            servingUnit: product.serving_unit || "serving",
           },
         ],
       },
@@ -100,7 +100,7 @@ const ScanScreen = () => {
   if (!permission) {
     return (
       <SafeAreaView className="flex-1 bg-background items-center justify-center">
-        <ActivityIndicator color={colors.teal} size="large" />
+        <ActivityIndicator color="#5ECEBB" size="large" />
       </SafeAreaView>
     );
   }
@@ -114,12 +114,19 @@ const ScanScreen = () => {
             onPress={() => router.back()}
             className="w-10 h-10 rounded-full bg-background/80 items-center justify-center"
           >
-            <X size={22} color={colors.foreground} />
+            <X size={22} color="#F2F2F2" />
           </TouchableOpacity>
         </View>
         <View className="flex-1 items-center justify-center px-8 gap-6">
           <View
-            style={{ width: 80, height: 80, borderRadius: 40, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(94, 206, 187, 0.15)' }}
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 40,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(94, 206, 187, 0.15)",
+            }}
           >
             <Camera size={40} color="#5ECEBB" />
           </View>
@@ -207,7 +214,7 @@ const ScanScreen = () => {
               className="flex-row items-center gap-2 px-4 py-2 rounded-full"
               style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
             >
-              <ScanBarcode size={16} color={colors.teal} />
+              <ScanBarcode size={16} color="#5ECEBB" />
               <Text className="text-white text-sm">
                 Point at a product barcode
               </Text>
@@ -223,7 +230,7 @@ const ScanScreen = () => {
           <View className="px-4 pb-4">
             <Card>
               <CardContent className="py-6 items-center gap-3">
-                <ActivityIndicator color={colors.teal} size="large" />
+                <ActivityIndicator color="#5ECEBB" size="large" />
                 <Text className="text-sm text-muted-foreground">
                   Looking up product...
                 </Text>
@@ -241,7 +248,7 @@ const ScanScreen = () => {
                   className="w-14 h-14 rounded-full items-center justify-center"
                   style={{ backgroundColor: colors.mutedForeground + "20" }}
                 >
-                  <ScanBarcode size={28} color={colors.mutedForeground} />
+                  <ScanBarcode size={28} color="#7A7F91" />
                 </View>
                 <Text className="text-base font-semibold text-foreground">
                   Product Not Found
@@ -285,7 +292,7 @@ const ScanScreen = () => {
                       className="w-16 h-16 rounded-lg items-center justify-center"
                       style={{ backgroundColor: colors.muted }}
                     >
-                      <ScanBarcode size={24} color={colors.mutedForeground} />
+                      <ScanBarcode size={24} color="#7A7F91" />
                     </View>
                   )}
                   <View className="flex-1">
@@ -301,17 +308,22 @@ const ScanScreen = () => {
                       </Text>
                     )}
                     <Text className="text-xs text-muted-foreground mt-1">
-                      Per {product.serving_qty}{product.serving_unit}
+                      Per {product.serving_qty}
+                      {product.serving_unit}
                     </Text>
                   </View>
                 </View>
 
                 {/* Servings input */}
                 <View className="flex-row items-center gap-3">
-                  <Text className="text-sm text-muted-foreground">Servings:</Text>
+                  <Text className="text-sm text-muted-foreground">
+                    Servings:
+                  </Text>
                   <View className="flex-row items-center gap-2">
                     <TouchableOpacity
-                      onPress={() => setServings(String(Math.max(0.5, qty - 0.5)))}
+                      onPress={() =>
+                        setServings(String(Math.max(0.5, qty - 0.5)))
+                      }
                       className="w-8 h-8 rounded-full items-center justify-center border border-border"
                     >
                       <Text className="text-foreground text-lg">−</Text>
@@ -322,10 +334,10 @@ const ScanScreen = () => {
                       keyboardType="decimal-pad"
                       style={{
                         width: 50,
-                        textAlign: 'center',
+                        textAlign: "center",
                         color: colors.foreground,
                         fontSize: 16,
-                        fontWeight: 'bold',
+                        fontWeight: "bold",
                         borderBottomWidth: 1,
                         borderBottomColor: colors.border,
                         paddingVertical: 4,

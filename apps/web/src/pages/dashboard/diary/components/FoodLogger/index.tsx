@@ -1,7 +1,19 @@
 import { useState } from 'react';
 import { UtensilsCrossed, Plus } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, Button } from '@/components/ui';
-import { useLogFood, useDeleteFoodEntry } from '@/api/diary';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from '@/components/ui';
+import { useLogFood, useUpdateFoodEntry, useDeleteFoodEntry } from '@/api/diary';
 import { NutritionSummary } from './NutritionSummary';
 import { FoodSearchModal } from './FoodSearchModal';
 import { FoodEntryRow } from './FoodEntryRow';
@@ -34,9 +46,30 @@ interface FoodLoggerProps {
   } | null;
 }
 
+interface EditingFood {
+  id: string;
+  name: string;
+  calories: number;
+  proteinG: number | null;
+  carbsG: number | null;
+  fatG: number | null;
+  servingSize: number;
+  servingUnit: string;
+}
+
 export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
   const [searchMealType, setSearchMealType] = useState<(typeof MEAL_TYPES)[number] | null>(null);
+  const [editingFood, setEditingFood] = useState<EditingFood | null>(null);
+  const [editValues, setEditValues] = useState({
+    servingSize: '',
+    calories: '',
+    proteinG: '',
+    carbsG: '',
+    fatG: '',
+  });
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const logFood = useLogFood();
+  const updateFoodEntry = useUpdateFoodEntry();
   const deleteFoodEntry = useDeleteFoodEntry();
 
   const foodEntries = entry?.foodEntries ?? [];
@@ -47,6 +80,48 @@ export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
 
   const handleDeleteFood = (id: string) => {
     deleteFoodEntry.mutate({ id });
+  };
+
+  const handleEditFood = (food: EditingFood) => {
+    setEditingFood(food);
+    setEditValues({
+      servingSize: String(food.servingSize ?? 1),
+      calories: String(food.calories ?? 0),
+      proteinG: food.proteinG != null ? String(food.proteinG) : '',
+      carbsG: food.carbsG != null ? String(food.carbsG) : '',
+      fatG: food.fatG != null ? String(food.fatG) : '',
+    });
+    setConfirmDelete(false);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingFood) return;
+    updateFoodEntry.mutate(
+      {
+        id: editingFood.id,
+        servingSize: parseFloat(editValues.servingSize) || undefined,
+        calories: parseInt(editValues.calories) || undefined,
+        proteinG: editValues.proteinG ? parseFloat(editValues.proteinG) : null,
+        carbsG: editValues.carbsG ? parseFloat(editValues.carbsG) : null,
+        fatG: editValues.fatG ? parseFloat(editValues.fatG) : null,
+      },
+      {
+        onSuccess: () => setEditingFood(null),
+      },
+    );
+  };
+
+  const handleConfirmDelete = () => {
+    if (!editingFood) return;
+    deleteFoodEntry.mutate(
+      { id: editingFood.id },
+      {
+        onSuccess: () => {
+          setEditingFood(null);
+          setConfirmDelete(false);
+        },
+      },
+    );
   };
 
   return (
@@ -83,6 +158,7 @@ export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
                       <FoodEntryRow
                         key={foodEntry.id}
                         entry={foodEntry}
+                        onEdit={handleEditFood}
                         onDelete={handleDeleteFood}
                         isDeleting={deleteFoodEntry.isPending}
                       />
@@ -106,6 +182,97 @@ export const FoodLogger = ({ date, entry }: FoodLoggerProps) => {
             onAddFood={handleAddFood}
           />
         )}
+
+        <Dialog
+          open={!!editingFood}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditingFood(null);
+              setConfirmDelete(false);
+            }
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="capitalize">{editingFood?.name ?? 'Edit Food'}</DialogTitle>
+              <DialogDescription>Update the nutritional values for this entry.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 py-2">
+              <div>
+                <label className="text-sm font-medium">Serving Size</label>
+                <input
+                  type="number"
+                  className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  value={editValues.servingSize}
+                  onChange={(e) => setEditValues((v) => ({ ...v, servingSize: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Calories</label>
+                <input
+                  type="number"
+                  className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  value={editValues.calories}
+                  onChange={(e) => setEditValues((v) => ({ ...v, calories: e.target.value }))}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="text-sm font-medium">Protein (g)</label>
+                  <input
+                    type="number"
+                    className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    value={editValues.proteinG}
+                    onChange={(e) => setEditValues((v) => ({ ...v, proteinG: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Carbs (g)</label>
+                  <input
+                    type="number"
+                    className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    value={editValues.carbsG}
+                    onChange={(e) => setEditValues((v) => ({ ...v, carbsG: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Fat (g)</label>
+                  <input
+                    type="number"
+                    className="mt-1 flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    value={editValues.fatG}
+                    onChange={(e) => setEditValues((v) => ({ ...v, fatG: e.target.value }))}
+                  />
+                </div>
+              </div>
+            </div>
+            <DialogFooter className="flex-row gap-2 sm:justify-between">
+              {confirmDelete ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-destructive">Are you sure?</span>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleConfirmDelete}
+                    disabled={deleteFoodEntry.isPending}
+                  >
+                    {deleteFoodEntry.isPending ? 'Deleting...' : 'Confirm Delete'}
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => setConfirmDelete(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Button variant="destructive" onClick={() => setConfirmDelete(true)}>
+                  Delete
+                </Button>
+              )}
+              <Button onClick={handleSaveEdit} disabled={updateFoodEntry.isPending}>
+                {updateFoodEntry.isPending ? 'Saving...' : 'Save'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );
