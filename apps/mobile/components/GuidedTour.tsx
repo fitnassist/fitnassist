@@ -84,15 +84,16 @@ const traineeSteps: TourStep[] = [
   },
 ];
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const STEP_HEIGHT = SCREEN_HEIGHT - 250; // leave room for skip + dots + button
 
 const StepCard = ({ step }: { step: TourStep }) => {
   const Icon = step.icon;
 
   return (
     <View
-      style={{ width: SCREEN_WIDTH }}
-      className="flex-1 items-center justify-center px-8"
+      style={{ width: SCREEN_WIDTH, height: STEP_HEIGHT }}
+      className="items-center justify-center px-8"
     >
       <View
         className="w-20 h-20 rounded-full items-center justify-center mb-8"
@@ -173,7 +174,7 @@ export const GuidedTour = ({ role, onComplete, onSkip }: GuidedTourProps) => {
           renderItem={({ item }) => <StepCard step={item} />}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
-          className="flex-1"
+          style={{ flex: 1 }}
         />
 
         {/* Bottom controls */}
