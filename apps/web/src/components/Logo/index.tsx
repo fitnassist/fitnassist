@@ -6,12 +6,11 @@ interface LogoProps {
 }
 
 export const Logo = ({ size = 'default' }: LogoProps) => (
-  <Link
-    to={routes.home}
-    className={`font-extralight text-white uppercase tracking-[0.15em] ${
-      size === 'small' ? 'text-base' : 'text-xl'
-    }`}
-  >
-    Fitnassist
+  <Link to={routes.home} className="inline-block">
+    <img
+      src="/logo.svg"
+      alt="Fitnassist"
+      className={size === 'small' ? 'h-5 w-auto' : 'h-7 w-auto'}
+    />
   </Link>
 );
