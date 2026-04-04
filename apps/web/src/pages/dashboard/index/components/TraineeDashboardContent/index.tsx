@@ -72,7 +72,7 @@ export const TraineeDashboardContent = ({ badgeCounts }: TraineeDashboardContent
       <ProgressPhotoCompare />
 
       {/* Quick Actions */}
-      <Card>
+      <Card data-tour="quick-actions">
         <CardHeader>
           <CardTitle className="text-base">Quick Actions</CardTitle>
         </CardHeader>
@@ -83,6 +83,7 @@ export const TraineeDashboardContent = ({ badgeCounts }: TraineeDashboardContent
                 key={label}
                 to={href}
                 className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50"
+                {...(label === 'Find Trainers' ? { 'data-tour': 'nav-find-trainers' } : {})}
               >
                 <div className="rounded-full bg-muted p-2">
                   <Icon className={`h-4 w-4 ${color}`} />

@@ -9,6 +9,7 @@ export interface NavItem {
   disabledTooltip?: string;
   mobileBottom?: boolean;
   group?: string;
+  dataTour?: string;
 }
 
 export interface SidebarUser {

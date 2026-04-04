@@ -23,7 +23,7 @@ export const ProfileCard = ({ profile }: ProfileCardProps) => {
   const initials = getInitials(profile.displayName);
 
   return (
-    <Card>
+    <Card data-tour="profile-card">
       <CardHeader className="p-4 sm:p-6">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">

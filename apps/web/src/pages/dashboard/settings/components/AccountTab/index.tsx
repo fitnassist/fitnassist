@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Mail, Lock, User } from 'lucide-react';
+import { Loader2, Mail, Lock, User, RotateCcw } from 'lucide-react';
 import {
   Button,
   Card,
@@ -34,10 +34,18 @@ export const AccountTab = () => {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [tourResetSuccess, setTourResetSuccess] = useState(false);
 
   const updateName = trpc.user.updateName.useMutation({
     onSuccess: () => {
       setNameSuccess(true);
+      refetchSession();
+    },
+  });
+
+  const resetTours = trpc.user.resetTours.useMutation({
+    onSuccess: () => {
+      setTourResetSuccess(true);
       refetchSession();
     },
   });
@@ -294,6 +302,37 @@ export const AccountTab = () => {
               Update Password
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Restart Guided Tour */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RotateCcw className="h-5 w-5" />
+            Guided Tour
+          </CardTitle>
+          <CardDescription>
+            Restart the guided tour to revisit the key features of your dashboard.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {tourResetSuccess && (
+            <div className="mb-4 p-3 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg text-green-800 dark:text-green-200 text-sm">
+              Tour reset! Head to your dashboard to start the tour again.
+            </div>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => {
+              setTourResetSuccess(false);
+              resetTours.mutate();
+            }}
+            disabled={resetTours.isPending}
+          >
+            {resetTours.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Restart Guided Tour
+          </Button>
         </CardContent>
       </Card>
     </div>

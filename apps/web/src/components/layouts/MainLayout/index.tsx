@@ -250,6 +250,9 @@ export function MainLayout() {
                 >
                   Support
                 </Link>
+                <Link to={routes.help} className="block text-sm text-white/50 hover:text-white/80">
+                  Help Centre
+                </Link>
               </div>
             </nav>
           </div>

@@ -1,6 +1,6 @@
-import { View, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, ScrollView, TouchableOpacity, Image } from "react-native";
+import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Settings,
   Bell,
@@ -25,16 +25,20 @@ import {
   Rss,
   ChevronRight,
   LogOut,
-} from 'lucide-react-native';
-import { Text, Card, CardContent, useAlert } from '@/components/ui';
-import { Crown } from 'lucide-react-native';
-import { useAuth } from '@/hooks/useAuth';
-import { useMyTrainerProfile } from '@/api/trainer';
-import { useMyTraineeProfile } from '@/api/trainee';
-import { trpc } from '@/lib/trpc';
-import { hasFeatureAccess, type Feature } from '@fitnassist/schemas/src/constants/subscription.constants';
-import { Lock } from 'lucide-react-native';
-import { colors } from '@/constants/theme';
+  HelpCircle,
+} from "lucide-react-native";
+import { Text, Card, CardContent, useAlert } from "@/components/ui";
+import { Crown } from "lucide-react-native";
+import { useAuth } from "@/hooks/useAuth";
+import { useMyTrainerProfile } from "@/api/trainer";
+import { useMyTraineeProfile } from "@/api/trainee";
+import { trpc } from "@/lib/trpc";
+import {
+  hasFeatureAccess,
+  type Feature,
+} from "@fitnassist/schemas/src/constants/subscription.constants";
+import { Lock } from "lucide-react-native";
+import { colors } from "@/constants/theme";
 
 interface MenuItemProps {
   label: string;
@@ -45,23 +49,35 @@ interface MenuItemProps {
   lockedLabel?: string;
 }
 
-const MenuItem = ({ label, icon: Icon, onPress, destructive, locked, lockedLabel }: MenuItemProps) => {
+const MenuItem = ({
+  label,
+  icon: Icon,
+  onPress,
+  destructive,
+  locked,
+  lockedLabel,
+}: MenuItemProps) => {
   const { showAlert } = useAlert();
   const router = useRouter();
 
   return (
     <TouchableOpacity
-      className={`flex-row items-center py-3.5 px-1 gap-3 ${locked ? 'opacity-40' : ''}`}
+      className={`flex-row items-center py-3.5 px-1 gap-3 ${locked ? "opacity-40" : ""}`}
       activeOpacity={0.6}
       onPress={() => {
         if (locked) {
           showAlert({
-            title: 'Upgrade Required',
-            message: lockedLabel ?? 'Upgrade your subscription to unlock this feature.',
+            title: "Upgrade Required",
+            message:
+              lockedLabel ??
+              "Upgrade your subscription to unlock this feature.",
             icon: <Crown size={32} color={colors.primary} />,
             actions: [
-              { label: 'View Plans', onPress: () => router.push('/dashboard/subscription') },
-              { label: 'Maybe Later', variant: 'outline' },
+              {
+                label: "View Plans",
+                onPress: () => router.push("/dashboard/subscription"),
+              },
+              { label: "Maybe Later", variant: "outline" },
             ],
           });
         } else {
@@ -69,8 +85,13 @@ const MenuItem = ({ label, icon: Icon, onPress, destructive, locked, lockedLabel
         }
       }}
     >
-      <Icon size={20} color={destructive ? colors.destructive : colors.mutedForeground} />
-      <Text className={`flex-1 text-base ${destructive ? 'text-destructive' : 'text-foreground'}`}>
+      <Icon
+        size={20}
+        color={destructive ? colors.destructive : colors.mutedForeground}
+      />
+      <Text
+        className={`flex-1 text-base ${destructive ? "text-destructive" : "text-foreground"}`}
+      >
         {label}
       </Text>
       {locked ? (
@@ -87,47 +108,59 @@ const Divider = () => <View className="border-b border-border" />;
 const ProfileScreen = () => {
   const router = useRouter();
   const { user, role, signOut } = useAuth();
-  const isTrainer = role === 'TRAINER';
+  const isTrainer = role === "TRAINER";
   const { data: trainerProfile } = useMyTrainerProfile();
   const { data: traineeProfile } = useMyTraineeProfile();
-  const { data: subscription } = trpc.subscription.getCurrent.useQuery(undefined, {
-    enabled: isTrainer,
-  });
-  const currentTier = (subscription?.effectiveTier ?? 'FREE') as 'FREE' | 'PRO' | 'ELITE';
-  const canAccess = (feature: Feature) => hasFeatureAccess(currentTier, feature);
+  const { data: subscription } = trpc.subscription.getCurrent.useQuery(
+    undefined,
+    {
+      enabled: isTrainer,
+    },
+  );
+  const currentTier = (subscription?.effectiveTier ?? "FREE") as
+    | "FREE"
+    | "PRO"
+    | "ELITE";
+  const canAccess = (feature: Feature) =>
+    hasFeatureAccess(currentTier, feature);
 
-  const profileImage = isTrainer ? trainerProfile?.profileImageUrl : traineeProfile?.avatarUrl;
+  const profileImage = isTrainer
+    ? trainerProfile?.profileImageUrl
+    : traineeProfile?.avatarUrl;
   const displayName = isTrainer ? trainerProfile?.displayName : user?.name;
 
   const { showAlert } = useAlert();
 
   const handleSignOut = () => {
     showAlert({
-      title: 'Sign Out',
-      message: 'Are you sure you want to sign out?',
+      title: "Sign Out",
+      message: "Are you sure you want to sign out?",
       actions: [
         {
-          label: 'Sign Out',
-          variant: 'destructive',
+          label: "Sign Out",
+          variant: "destructive",
           onPress: async () => {
             try {
               await signOut();
             } catch {
-              showAlert({ title: 'Error', message: 'Failed to sign out' });
+              showAlert({ title: "Error", message: "Failed to sign out" });
             }
           },
         },
-        { label: 'Cancel', variant: 'outline' },
+        { label: "Cancel", variant: "outline" },
       ],
     });
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-background" edges={["top"]}>
       <ScrollView className="flex-1" contentContainerClassName="pb-8">
         {/* Header */}
         <View className="px-4 py-4">
-          <Text className="text-2xl font-extralight text-foreground uppercase" style={{ letterSpacing: 2 }}>
+          <Text
+            className="text-2xl font-extralight text-foreground uppercase"
+            style={{ letterSpacing: 2 }}
+          >
             Profile
           </Text>
         </View>
@@ -145,7 +178,9 @@ const ProfileScreen = () => {
                 ) : (
                   <View className="w-16 h-16 rounded-full bg-primary items-center justify-center">
                     <Text className="text-xl font-bold text-white">
-                      {(displayName ?? user?.name ?? '?').charAt(0).toUpperCase()}
+                      {(displayName ?? user?.name ?? "?")
+                        .charAt(0)
+                        .toUpperCase()}
                     </Text>
                   </View>
                 )}
@@ -153,8 +188,12 @@ const ProfileScreen = () => {
                   <Text className="text-lg font-semibold text-foreground">
                     {displayName ?? user?.name}
                   </Text>
-                  <Text className="text-sm text-muted-foreground">{user?.email}</Text>
-                  <Text className="text-xs text-primary capitalize">{role?.toLowerCase()}</Text>
+                  <Text className="text-sm text-muted-foreground">
+                    {user?.email}
+                  </Text>
+                  <Text className="text-xs text-primary capitalize">
+                    {role?.toLowerCase()}
+                  </Text>
                 </View>
               </View>
             </CardContent>
@@ -169,19 +208,31 @@ const ProfileScreen = () => {
               <MenuItem
                 label="Edit Profile"
                 icon={UserPen}
-                onPress={() => router.push(isTrainer ? '/dashboard/profile/edit' : '/dashboard/profile/edit')}
+                onPress={() =>
+                  router.push(
+                    isTrainer
+                      ? "/dashboard/profile/edit"
+                      : "/dashboard/profile/edit",
+                  )
+                }
               />
               <Divider />
               <MenuItem
                 label="Account Settings"
                 icon={Settings}
-                onPress={() => router.push('/dashboard/settings')}
+                onPress={() => router.push("/dashboard/settings")}
               />
               <Divider />
               <MenuItem
                 label="Notifications"
                 icon={Bell}
-                onPress={() => router.push('/dashboard/notifications')}
+                onPress={() => router.push("/dashboard/notifications")}
+              />
+              <Divider />
+              <MenuItem
+                label="Help Centre"
+                icon={HelpCircle}
+                onPress={() => router.push("/dashboard/help")}
               />
               {isTrainer && (
                 <>
@@ -189,7 +240,7 @@ const ProfileScreen = () => {
                   <MenuItem
                     label="Subscription"
                     icon={CreditCard}
-                    onPress={() => router.push('/dashboard/subscription')}
+                    onPress={() => router.push("/dashboard/subscription")}
                   />
                 </>
               )}
@@ -200,7 +251,10 @@ const ProfileScreen = () => {
           {isTrainer && (
             <>
               {/* Business */}
-              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+              <Text
+                className="text-xs font-medium text-teal uppercase px-1"
+                style={{ letterSpacing: 1 }}
+              >
                 Business
               </Text>
               <Card>
@@ -208,51 +262,54 @@ const ProfileScreen = () => {
                   <MenuItem
                     label="Requests"
                     icon={Phone}
-                    onPress={() => router.push('/dashboard/requests')}
+                    onPress={() => router.push("/dashboard/requests")}
                   />
                   <Divider />
                   <MenuItem
                     label="Clients"
                     icon={Users}
-                    onPress={() => router.push('/dashboard/clients')}
-                    locked={!canAccess('clientManagement')}
+                    onPress={() => router.push("/dashboard/clients")}
+                    locked={!canAccess("clientManagement")}
                     lockedLabel="Upgrade to Pro to manage clients"
                   />
                   <Divider />
                   <MenuItem
                     label="Onboarding"
                     icon={ClipboardCheck}
-                    onPress={() => router.push('/dashboard/onboarding')}
-                    locked={!canAccess('clientManagement')}
+                    onPress={() => router.push("/dashboard/onboarding")}
+                    locked={!canAccess("clientManagement")}
                     lockedLabel="Upgrade to Pro to use onboarding"
                   />
                   <Divider />
                   <MenuItem
                     label="Resources"
                     icon={BookOpen}
-                    onPress={() => router.push('/dashboard/resources')}
-                    locked={!canAccess('resources')}
+                    onPress={() => router.push("/dashboard/resources")}
+                    locked={!canAccess("resources")}
                     lockedLabel="Upgrade to Pro to access resources"
                   />
                   <Divider />
                   <MenuItem
                     label="Analytics"
                     icon={BarChart3}
-                    onPress={() => router.push('/dashboard/analytics')}
-                    locked={!canAccess('advancedAnalytics')}
+                    onPress={() => router.push("/dashboard/analytics")}
+                    locked={!canAccess("advancedAnalytics")}
                     lockedLabel="Upgrade to Elite for advanced analytics"
                   />
                   <Divider />
                   <MenuItem
                     label="Reviews"
                     icon={Star}
-                    onPress={() => router.push('/dashboard/reviews')}
+                    onPress={() => router.push("/dashboard/reviews")}
                   />
                 </CardContent>
               </Card>
 
               {/* Online Presence */}
-              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+              <Text
+                className="text-xs font-medium text-teal uppercase px-1"
+                style={{ letterSpacing: 1 }}
+              >
                 Online Presence
               </Text>
               <Card>
@@ -260,23 +317,26 @@ const ProfileScreen = () => {
                   <MenuItem
                     label="Website Builder"
                     icon={Globe}
-                    onPress={() => router.push('/dashboard/website')}
-                    locked={!canAccess('websiteBuilder')}
+                    onPress={() => router.push("/dashboard/website")}
+                    locked={!canAccess("websiteBuilder")}
                     lockedLabel="Upgrade to Elite for the website builder"
                   />
                   <Divider />
                   <MenuItem
                     label="Storefront"
                     icon={ShoppingBag}
-                    onPress={() => router.push('/dashboard/storefront')}
-                    locked={!canAccess('productStorefront')}
+                    onPress={() => router.push("/dashboard/storefront")}
+                    locked={!canAccess("productStorefront")}
                     lockedLabel="Upgrade to Elite for the product storefront"
                   />
                 </CardContent>
               </Card>
 
               {/* Growth */}
-              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+              <Text
+                className="text-xs font-medium text-teal uppercase px-1"
+                style={{ letterSpacing: 1 }}
+              >
                 Growth
               </Text>
               <Card>
@@ -284,7 +344,7 @@ const ProfileScreen = () => {
                   <MenuItem
                     label="Referrals"
                     icon={Gift}
-                    onPress={() => router.push('/dashboard/referrals')}
+                    onPress={() => router.push("/dashboard/referrals")}
                   />
                 </CardContent>
               </Card>
@@ -295,7 +355,10 @@ const ProfileScreen = () => {
           {!isTrainer && (
             <>
               {/* Tracking */}
-              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+              <Text
+                className="text-xs font-medium text-teal uppercase px-1"
+                style={{ letterSpacing: 1 }}
+              >
                 Tracking
               </Text>
               <Card>
@@ -303,25 +366,28 @@ const ProfileScreen = () => {
                   <MenuItem
                     label="Goals"
                     icon={Target}
-                    onPress={() => router.push('/dashboard/goals')}
+                    onPress={() => router.push("/dashboard/goals")}
                   />
                   <Divider />
                   <MenuItem
                     label="My Plans"
                     icon={ClipboardList}
-                    onPress={() => router.push('/dashboard/my-plans')}
+                    onPress={() => router.push("/dashboard/my-plans")}
                   />
                   <Divider />
                   <MenuItem
                     label="My Contacts"
                     icon={User}
-                    onPress={() => router.push('/dashboard/contacts')}
+                    onPress={() => router.push("/dashboard/contacts")}
                   />
                 </CardContent>
               </Card>
 
               {/* Social */}
-              <Text className="text-xs font-medium text-teal uppercase px-1" style={{ letterSpacing: 1 }}>
+              <Text
+                className="text-xs font-medium text-teal uppercase px-1"
+                style={{ letterSpacing: 1 }}
+              >
                 Social
               </Text>
               <Card>
@@ -329,25 +395,25 @@ const ProfileScreen = () => {
                   <MenuItem
                     label="Feed"
                     icon={Rss}
-                    onPress={() => router.push('/dashboard/feed')}
+                    onPress={() => router.push("/dashboard/feed")}
                   />
                   <Divider />
                   <MenuItem
                     label="Friends"
                     icon={Heart}
-                    onPress={() => router.push('/dashboard/friends')}
+                    onPress={() => router.push("/dashboard/friends")}
                   />
                   <Divider />
                   <MenuItem
                     label="Leaderboards"
                     icon={Trophy}
-                    onPress={() => router.push('/dashboard/leaderboards')}
+                    onPress={() => router.push("/dashboard/leaderboards")}
                   />
                   <Divider />
                   <MenuItem
                     label="Achievements"
                     icon={Award}
-                    onPress={() => router.push('/dashboard/achievements')}
+                    onPress={() => router.push("/dashboard/achievements")}
                   />
                 </CardContent>
               </Card>
@@ -358,7 +424,7 @@ const ProfileScreen = () => {
                   <MenuItem
                     label="Purchases"
                     icon={Package}
-                    onPress={() => router.push('/dashboard/purchases')}
+                    onPress={() => router.push("/dashboard/purchases")}
                   />
                 </CardContent>
               </Card>
