@@ -49,7 +49,7 @@ app.all(/^\/api\/auth(\/.*)?$/, toNodeHandler(auth));
 app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeWebhookRouter);
 
 // Body parsing
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // Health check endpoints (non-tRPC)
 app.get('/health', (_req, res) => {

@@ -45,8 +45,11 @@ const pickImage = async (useCamera: boolean) => {
     : ImagePicker.launchImageLibraryAsync;
   const result = await fn({
     mediaTypes: ["images"],
-    quality: 0.7,
+    quality: 0.3,
     base64: true,
+    allowsEditing: true,
+    aspect: [1, 1],
+    exif: false,
   });
   if (!result.canceled && result.assets[0]?.base64) {
     return {

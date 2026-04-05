@@ -8,6 +8,9 @@ import {
   Dimensions,
   Linking,
   TextInput,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { CameraView, useCameraPermissions } from "expo-camera";
@@ -276,169 +279,182 @@ const ScanScreen = () => {
 
         {/* Product found */}
         {product && !lookingUp && (
-          <View style={{ paddingHorizontal: 16, paddingBottom: 24 }}>
-            <Card>
-              <CardContent className="py-4 px-4 gap-4">
-                {/* Product info */}
-                <View className="flex-row gap-3">
-                  {product.thumbnail_url ? (
-                    <Image
-                      source={{ uri: product.thumbnail_url }}
-                      className="w-16 h-16 rounded-lg"
-                      resizeMode="cover"
-                    />
-                  ) : (
-                    <View
-                      className="w-16 h-16 rounded-lg items-center justify-center"
-                      style={{ backgroundColor: colors.muted }}
-                    >
-                      <ScanBarcode size={24} color="#7A7F91" />
-                    </View>
-                  )}
-                  <View className="flex-1">
-                    <Text
-                      className="text-base font-semibold text-foreground"
-                      numberOfLines={2}
-                    >
-                      {product.food_name}
-                    </Text>
-                    {product.brand_name && (
-                      <Text className="text-sm text-muted-foreground">
-                        {product.brand_name}
-                      </Text>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            style={{ paddingHorizontal: 16, paddingBottom: 24 }}
+          >
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <Card>
+                <CardContent className="py-4 px-4 gap-4">
+                  {/* Product info */}
+                  <View className="flex-row gap-3">
+                    {product.thumbnail_url ? (
+                      <Image
+                        source={{ uri: product.thumbnail_url }}
+                        className="w-16 h-16 rounded-lg"
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View
+                        className="w-16 h-16 rounded-lg items-center justify-center"
+                        style={{ backgroundColor: colors.muted }}
+                      >
+                        <ScanBarcode size={24} color="#7A7F91" />
+                      </View>
                     )}
-                    <Text className="text-xs text-muted-foreground mt-1">
-                      Per {product.serving_qty}
-                      {product.serving_unit}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Servings input */}
-                <View className="flex-row items-center gap-3">
-                  <Text className="text-sm text-muted-foreground">
-                    Servings:
-                  </Text>
-                  <View className="flex-row items-center gap-2">
-                    <TouchableOpacity
-                      onPress={() =>
-                        setServings(String(Math.max(0.5, qty - 0.5)))
-                      }
-                      className="w-8 h-8 rounded-full items-center justify-center border border-border"
-                    >
-                      <Text className="text-foreground text-lg">
-                        {"\u2212"}
-                      </Text>
-                    </TouchableOpacity>
-                    <TextInput
-                      value={servings}
-                      onChangeText={setServings}
-                      keyboardType="decimal-pad"
-                      style={{
-                        width: 50,
-                        textAlign: "center",
-                        color: "#F2F2F2",
-                        fontSize: 16,
-                        fontWeight: "bold",
-                        borderBottomWidth: 1,
-                        borderBottomColor: "#2E3348",
-                        paddingVertical: 4,
-                      }}
-                    />
-                    <TouchableOpacity
-                      onPress={() => setServings(String(qty + 0.5))}
-                      className="w-8 h-8 rounded-full items-center justify-center border border-border"
-                    >
-                      <Text className="text-foreground text-lg">+</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                {/* Macros */}
-                <View className="flex-row justify-between bg-background rounded-lg px-4 py-3">
-                  <View className="items-center">
-                    <Text className="text-lg font-bold text-foreground">
-                      {Math.round((product.calories ?? 0) * qty)}
-                    </Text>
-                    <Text className="text-xs text-muted-foreground">kcal</Text>
-                  </View>
-                  <View className="items-center">
-                    <Text className="text-lg font-bold text-foreground">
-                      {Math.round((product.protein_g ?? 0) * qty * 10) / 10}g
-                    </Text>
-                    <Text className="text-xs text-muted-foreground">
-                      Protein
-                    </Text>
-                  </View>
-                  <View className="items-center">
-                    <Text className="text-lg font-bold text-foreground">
-                      {Math.round((product.carbs_g ?? 0) * qty * 10) / 10}g
-                    </Text>
-                    <Text className="text-xs text-muted-foreground">Carbs</Text>
-                  </View>
-                  <View className="items-center">
-                    <Text className="text-lg font-bold text-foreground">
-                      {Math.round((product.fat_g ?? 0) * qty * 10) / 10}g
-                    </Text>
-                    <Text className="text-xs text-muted-foreground">Fat</Text>
-                  </View>
-                </View>
-
-                {/* Meal type selector */}
-                <View className="flex-row gap-1">
-                  {MEAL_TYPES.map((type) => (
-                    <TouchableOpacity
-                      key={type}
-                      className={`flex-1 items-center py-2 rounded-lg ${
-                        selectedMeal === type
-                          ? ""
-                          : "bg-card border border-border"
-                      }`}
-                      style={
-                        selectedMeal === type
-                          ? { backgroundColor: colors.teal }
-                          : undefined
-                      }
-                      onPress={() => setSelectedMeal(type)}
-                    >
+                    <View className="flex-1">
                       <Text
-                        className={`text-xs font-medium ${
+                        className="text-base font-semibold text-foreground"
+                        numberOfLines={2}
+                      >
+                        {product.food_name}
+                      </Text>
+                      {product.brand_name && (
+                        <Text className="text-sm text-muted-foreground">
+                          {product.brand_name}
+                        </Text>
+                      )}
+                      <Text className="text-xs text-muted-foreground mt-1">
+                        Per {product.serving_qty}
+                        {product.serving_unit}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* Servings input */}
+                  <View className="flex-row items-center gap-3">
+                    <Text className="text-sm text-muted-foreground">
+                      Servings:
+                    </Text>
+                    <View className="flex-row items-center gap-2">
+                      <TouchableOpacity
+                        onPress={() =>
+                          setServings(String(Math.max(0.5, qty - 0.5)))
+                        }
+                        className="w-8 h-8 rounded-full items-center justify-center border border-border"
+                      >
+                        <Text className="text-foreground text-lg">
+                          {"\u2212"}
+                        </Text>
+                      </TouchableOpacity>
+                      <TextInput
+                        value={servings}
+                        onChangeText={setServings}
+                        keyboardType="decimal-pad"
+                        returnKeyType="done"
+                        style={{
+                          width: 50,
+                          textAlign: "center",
+                          color: "#F2F2F2",
+                          fontSize: 16,
+                          fontWeight: "bold",
+                          borderBottomWidth: 1,
+                          borderBottomColor: "#2E3348",
+                          paddingVertical: 4,
+                        }}
+                      />
+                      <TouchableOpacity
+                        onPress={() => setServings(String(qty + 0.5))}
+                        className="w-8 h-8 rounded-full items-center justify-center border border-border"
+                      >
+                        <Text className="text-foreground text-lg">+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  {/* Macros */}
+                  <View className="flex-row justify-between bg-background rounded-lg px-4 py-3">
+                    <View className="items-center">
+                      <Text className="text-lg font-bold text-foreground">
+                        {Math.round((product.calories ?? 0) * qty)}
+                      </Text>
+                      <Text className="text-xs text-muted-foreground">
+                        kcal
+                      </Text>
+                    </View>
+                    <View className="items-center">
+                      <Text className="text-lg font-bold text-foreground">
+                        {Math.round((product.protein_g ?? 0) * qty * 10) / 10}g
+                      </Text>
+                      <Text className="text-xs text-muted-foreground">
+                        Protein
+                      </Text>
+                    </View>
+                    <View className="items-center">
+                      <Text className="text-lg font-bold text-foreground">
+                        {Math.round((product.carbs_g ?? 0) * qty * 10) / 10}g
+                      </Text>
+                      <Text className="text-xs text-muted-foreground">
+                        Carbs
+                      </Text>
+                    </View>
+                    <View className="items-center">
+                      <Text className="text-lg font-bold text-foreground">
+                        {Math.round((product.fat_g ?? 0) * qty * 10) / 10}g
+                      </Text>
+                      <Text className="text-xs text-muted-foreground">Fat</Text>
+                    </View>
+                  </View>
+
+                  {/* Meal type selector */}
+                  <View className="flex-row gap-1">
+                    {MEAL_TYPES.map((type) => (
+                      <TouchableOpacity
+                        key={type}
+                        className={`flex-1 items-center py-2 rounded-lg ${
                           selectedMeal === type
-                            ? "text-white"
-                            : "text-muted-foreground"
+                            ? ""
+                            : "bg-card border border-border"
                         }`}
                         style={
                           selectedMeal === type
-                            ? { color: colors.tealForeground }
+                            ? { backgroundColor: colors.teal }
                             : undefined
                         }
+                        onPress={() => setSelectedMeal(type)}
                       >
-                        {type.charAt(0) + type.slice(1).toLowerCase()}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                        <Text
+                          className={`text-xs font-medium ${
+                            selectedMeal === type
+                              ? "text-white"
+                              : "text-muted-foreground"
+                          }`}
+                          style={
+                            selectedMeal === type
+                              ? { color: colors.tealForeground }
+                              : undefined
+                          }
+                        >
+                          {type.charAt(0) + type.slice(1).toLowerCase()}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
 
-                {/* Actions */}
-                <View className="flex-row gap-3">
-                  <Button
-                    variant="outline"
-                    onPress={handleScanAnother}
-                    className="flex-1"
-                  >
-                    Scan Another
-                  </Button>
-                  <Button
-                    onPress={handleAddToDiary}
-                    loading={logFood.isPending}
-                    className="flex-1"
-                  >
-                    Add to Diary
-                  </Button>
-                </View>
-              </CardContent>
-            </Card>
-          </View>
+                  {/* Actions */}
+                  <View className="flex-row gap-3">
+                    <Button
+                      variant="outline"
+                      onPress={handleScanAnother}
+                      className="flex-1"
+                    >
+                      Scan Another
+                    </Button>
+                    <Button
+                      onPress={handleAddToDiary}
+                      loading={logFood.isPending}
+                      className="flex-1"
+                    >
+                      Add to Diary
+                    </Button>
+                  </View>
+                </CardContent>
+              </Card>
+            </ScrollView>
+          </KeyboardAvoidingView>
         )}
       </SafeAreaView>
     </View>
