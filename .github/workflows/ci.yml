@@ -138,6 +138,10 @@ jobs:
       - name: Typecheck Mobile
         run: npx tsc --noEmit --project apps/mobile/tsconfig.json 2>&1 | grep -v "packages/database/src/generated/zod" || true
 
+      - name: Verify Mobile bundle
+        run: npx expo export --platform ios --output-dir /tmp/expo-export 2>&1
+        working-directory: apps/mobile
+
   e2e:
     name: E2E
     needs: changes
