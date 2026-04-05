@@ -45,14 +45,25 @@ const pickImage = async (useCamera: boolean) => {
     : ImagePicker.launchImageLibraryAsync;
   const result = await fn({
     mediaTypes: ["images"],
-    quality: 0.7,
-    base64: true,
+    quality: 0.5,
+    base64: false,
   });
-  if (!result.canceled && result.assets[0]?.base64) {
-    return {
-      base64: result.assets[0].base64,
-      uri: result.assets[0].uri,
-    };
+  if (!result.canceled && result.assets[0]?.uri) {
+    // Resize and compress for API upload
+    const { ImageManipulator } = await import("expo-image-manipulator");
+    const ref = ImageManipulator.manipulate(result.assets[0].uri);
+    const resized = await ref.resize({ width: 800 }).renderAsync();
+    const base64Result = await resized.saveAsync({
+      format: "jpeg" as any,
+      compress: 0.5,
+      base64: true,
+    });
+    if (base64Result.base64) {
+      return {
+        base64: base64Result.base64,
+        uri: base64Result.uri,
+      };
+    }
   }
   return null;
 };
