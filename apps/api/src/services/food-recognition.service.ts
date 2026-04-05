@@ -23,10 +23,12 @@ export const foodRecognitionService = {
 
     const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1024,
-      messages: [
+    let response;
+    try {
+      response = await client.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        messages: [
         {
           role: "user",
           content: [
@@ -61,6 +63,13 @@ Use UK food names and realistic portion sizes. If you can't identify a food item
         },
       ],
     });
+    } catch (err: any) {
+      console.error('[FoodRecognition] Anthropic API error:', err?.message || err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `AI recognition failed: ${err?.message || 'Unknown error'}`,
+      });
+    }
 
     const text =
       response.content[0]?.type === "text" ? response.content[0].text : "";
