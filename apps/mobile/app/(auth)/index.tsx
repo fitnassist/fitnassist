@@ -25,10 +25,10 @@ const WelcomeScreen = () => {
     <GradientBackground>
       <SafeAreaView className="flex-1">
         <View className="flex-1 justify-center items-center px-8">
-          <View className="border border-white/60 px-8 py-4 mb-4">
+          <View className="mb-4">
             <Image
               source={require("@/assets/logo.png")}
-              style={{ width: 250, height: 40 }}
+              style={{ width: 280, height: 50 }}
               resizeMode="contain"
             />
           </View>
