@@ -30,6 +30,8 @@ export const Input = ({ label, error, variant = 'default', className, multiline,
           placeholderTextColor={isDark ? 'rgba(255,255,255,0.4)' : 'hsl(230, 10%, 55%)'}
           autoCapitalize="none"
           multiline={multiline}
+          returnKeyType={multiline ? 'default' : 'done'}
+          blurOnSubmit={!multiline}
           {...props}
         />
       </View>
