@@ -204,7 +204,7 @@ const PhotoScanScreen = () => {
             className="w-20 h-20 rounded-full items-center justify-center"
             style={{ backgroundColor: colors.teal + "20" }}
           >
-            <Sparkles size={40} color="#5ECEBB" />
+            <Sparkles size={40} color="#ffffff" />
           </View>
           <Text className="text-lg font-semibold text-foreground text-center">
             Snap your meal
@@ -224,7 +224,7 @@ const PhotoScanScreen = () => {
                 className="w-12 h-12 rounded-full items-center justify-center"
                 style={{ backgroundColor: colors.coral + "20" }}
               >
-                <Camera size={24} color="#D94F6B" />
+                <Camera size={24} color="#ffffff" />
               </View>
               <View className="flex-1">
                 <Text className="text-base font-medium text-foreground">
@@ -245,7 +245,7 @@ const PhotoScanScreen = () => {
                 className="w-12 h-12 rounded-full items-center justify-center"
                 style={{ backgroundColor: colors.teal + "20" }}
               >
-                <ImageIcon size={24} color="#5ECEBB" />
+                <ImageIcon size={24} color="#ffffff" />
               </View>
               <View className="flex-1">
                 <Text className="text-base font-medium text-foreground">
@@ -291,7 +291,7 @@ const PhotoScanScreen = () => {
           />
           {recognizeFood.isPending && (
             <View className="absolute inset-0 bg-black/60 items-center justify-center gap-3">
-              <ActivityIndicator color="#5ECEBB" size="large" />
+              <ActivityIndicator color="#ffffff" size="large" />
               <Text className="text-white text-sm font-medium">
                 Analysing your meal...
               </Text>
@@ -362,7 +362,7 @@ const PhotoScanScreen = () => {
                             borderColor: colors.border,
                           }}
                         >
-                          {isSelected && <Check size={14} color="#1A3D36" />}
+                          {isSelected && <Check size={14} color="#ffffff" />}
                         </View>
 
                         <View className="flex-1">

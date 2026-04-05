@@ -32,10 +32,20 @@ export interface FoodSearchResult {
 
 interface OFFNutriments {
   "energy-kcal_100g"?: number;
+  "energy-kcal"?: number;
+  "energy-kcal_serving"?: number;
   proteins_100g?: number;
+  proteins?: number;
+  proteins_serving?: number;
   carbohydrates_100g?: number;
+  carbohydrates?: number;
+  carbohydrates_serving?: number;
   fat_100g?: number;
+  fat?: number;
+  fat_serving?: number;
   fiber_100g?: number;
+  fiber?: number;
+  fiber_serving?: number;
 }
 
 interface OFFProduct {
@@ -67,15 +77,41 @@ const mapOFFProduct = (product: OFFProduct): FoodSearchItem | null => {
   const scale = servingQty / 100;
   const n = product.nutriments || {};
 
+  // Try per-100g first, then raw value, then per-serving (already scaled)
+  const kcal100 = n["energy-kcal_100g"] ?? n["energy-kcal"] ?? 0;
+  const pro100 = n.proteins_100g ?? n.proteins ?? 0;
+  const carb100 = n.carbohydrates_100g ?? n.carbohydrates ?? 0;
+  const fat100 = n.fat_100g ?? n.fat ?? 0;
+  const fib100 = n.fiber_100g ?? n.fiber ?? 0;
+
+  // If all per-100g values are 0 but per-serving exists, use those directly
+  const allZero =
+    kcal100 === 0 && pro100 === 0 && carb100 === 0 && fat100 === 0;
+  if (allZero && n["energy-kcal_serving"]) {
+    return {
+      food_name: product.product_name,
+      brand_name: product.brands || undefined,
+      external_id: product.code || "",
+      calories: Math.round(n["energy-kcal_serving"] || 0),
+      protein_g: round1(n.proteins_serving || 0),
+      carbs_g: round1(n.carbohydrates_serving || 0),
+      fat_g: round1(n.fat_serving || 0),
+      fibre_g: round1(n.fiber_serving || 0),
+      serving_qty: servingQty,
+      serving_unit: parseServingUnit(product.serving_size),
+      thumbnail_url: product.image_small_url || undefined,
+    };
+  }
+
   return {
     food_name: product.product_name,
     brand_name: product.brands || undefined,
     external_id: product.code || "",
-    calories: Math.round((n["energy-kcal_100g"] || 0) * scale),
-    protein_g: round1((n.proteins_100g || 0) * scale),
-    carbs_g: round1((n.carbohydrates_100g || 0) * scale),
-    fat_g: round1((n.fat_100g || 0) * scale),
-    fibre_g: round1((n.fiber_100g || 0) * scale),
+    calories: Math.round(kcal100 * scale),
+    protein_g: round1(pro100 * scale),
+    carbs_g: round1(carb100 * scale),
+    fat_g: round1(fat100 * scale),
+    fibre_g: round1(fib100 * scale),
     serving_qty: servingQty,
     serving_unit: parseServingUnit(product.serving_size),
     thumbnail_url: product.image_small_url || undefined,
