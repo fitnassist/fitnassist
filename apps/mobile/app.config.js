@@ -39,6 +39,10 @@ module.exports = {
           "Fitnassist reads your health data to track your fitness progress.",
         NSHealthUpdateUsageDescription:
           "Fitnassist can save workout data to Apple Health.",
+        NSCameraUsageDescription:
+          "Fitnassist needs camera access for video calls.",
+        NSMicrophoneUsageDescription:
+          "Fitnassist needs microphone access for video calls.",
       },
       entitlements: {
         "com.apple.developer.healthkit": true,

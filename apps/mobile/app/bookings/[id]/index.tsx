@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { View, ScrollView, Linking, Modal } from "react-native";
+import { View, ScrollView, Modal } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -333,9 +333,7 @@ const BookingDetailScreen = () => {
 
         {/* Video call join button */}
         {isVideo && isConfirmed && (booking as any).dailyRoomUrl && (
-          <Button
-            onPress={() => Linking.openURL((booking as any).dailyRoomUrl)}
-          >
+          <Button onPress={() => router.push(`/bookings/${id}/call`)}>
             Join Video Call
           </Button>
         )}
